@@ -1,0 +1,14 @@
+{
+  "name": "website-prototype",
+  "version": "1.0.0",
+  "description": "Prototype for ImbueNetwork website",
+  "main": "index.js",
+  "repository": "git@github.com:ImbueNetwork/website-prototype.git",
+  "author": "Tom Brennan <tjb1982@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.44.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  }
+}

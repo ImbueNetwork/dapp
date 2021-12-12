@@ -1,2 +1,3 @@
-docker/dynamodb/shared-local-instance.db
 node_modules/
+*.swp
+*.swo

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Aeonik';
+    src: url('fonts/Aeonik-Regular.eot');
+    src: url('fonts/Aeonik-Regular.eot?#iefix') format('embedded-opentype'),
+         url('fonts/Aeonik-Regular.woff2') format('woff2'),
+         url('fonts/Aeonik-Regular.woff') format('woff'),
+         url('fonts/Aeonik-Regular.ttf')  format('truetype'),
+         url('fonts/Aeonik-Regular.svg#Aeonik') format('svg');
+}

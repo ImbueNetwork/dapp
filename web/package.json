@@ -5,6 +5,9 @@
   "repository": "https://github.com/ImbueNetwork/prototype",
   "author": "Tom Brennan",
   "license": "MIT",
+  "scripts": {
+     "start": "serve ./webflow"
+  },
   "devDependencies": {
     "serve": "^13.0.2"
   }

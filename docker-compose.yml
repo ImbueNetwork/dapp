@@ -11,7 +11,7 @@ services:
     working_dir: /home/dynamodblocal
 
   api:
-    build: .
+    build: ./api
     container_name: api
     ports:
     - "3000:3000"
@@ -22,3 +22,11 @@ services:
       AWS_SECRET_ACCESS_KEY: foo
       DYNAMODB_ENDPOINT: "http://dynamodb-local:8000"
       REGION: us-east-1
+
+  web:
+    build: ./web
+    container_name: web
+    ports:
+    - "8080:80"
+    environment:
+    - API_LOCAL=http://api:3000

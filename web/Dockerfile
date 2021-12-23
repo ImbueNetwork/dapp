@@ -1,3 +1,3 @@
 from nginx:latest
 
-ADD . /usr/share/nginx/html/
+ADD ./webflow /usr/share/nginx/html/

@@ -1,3 +1,6 @@
+const basePathBase = process.env.POLKADOT_LAUNCH_BASE_PATH_BASE
+    || "/tmp/imbue-polkadot-launch";
+
 let relaychainBasePort = 30300;
 let relaychainBaseRPCPort = 9900;
 let relaychainBaseWSPort = 9914;
@@ -14,10 +17,12 @@ const commonFlags = [
     "--rpc-external",
     "--rpc-methods=Unsafe",
 ];
+
 const relaychainFlags = [
     ...commonFlags,
     "--wasm-execution=Compiled",
 ];
+
 const parachainNodeFlags = [
     ...commonFlags,
     "--prometheus-external",
@@ -46,6 +51,7 @@ const relaychain = {
             wsPort: relaychainBaseWSPort++,
             port: relaychainBasePort++,
             rpcPort: relaychainBaseRPCPort++,
+            basePath: `${basePathBase}/alice-relaychain`,
             flags: [
                 ...relaychainFlags,
                 "--prometheus-external",
@@ -62,6 +68,7 @@ const relaychain = {
             wsPort: relaychainBaseWSPort + idx,
             rpcPort: relaychainBaseRPCPort + idx,
             port: relaychainBasePort + idx,
+            basePath: `${basePathBase}/${name}-relaychain`,
             flags: [...relaychainFlags]
         }))
     ],
@@ -91,6 +98,7 @@ const parachains = [
                 wsPort: parachainBaseWSPort++,
                 port: parachainBasePort++,
                 rpcPort: parachainBaseRPCPort++,
+                basePath: `${basePathBase}/alice-imbue-collator`,
                 flags: [
                     `--prometheus-port=${parachainAlicePrometheusPort}`,
                     ...parachainNodeFlags,
@@ -109,6 +117,7 @@ const parachains = [
                 wsPort: parachainBaseWSPort + idx,
                 rpcPort: parachainBaseRPCPort + idx,
                 port: parachainBasePort + idx,
+                basePath: `${basePathBase}/${name}-imbue-collator`,
                 flags: parachainNodeFlags,
             }))
         ]

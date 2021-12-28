@@ -1,6 +1,6 @@
 let relaychainBasePort = 30300;
 let relaychainBaseRPCPort = 9900;
-let relaychainBaseWSPort = 9924;
+let relaychainBaseWSPort = 9914;
 
 let parachainBasePort = 30400;
 let parachainBaseRPCPort = 9930;

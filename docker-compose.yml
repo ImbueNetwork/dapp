@@ -30,3 +30,21 @@ services:
     - "8080:80"
     environment:
     - API_LOCAL=http://api:3000
+
+  imbue:
+    container_name: imbue
+    command: "polkadot-launch ./polkadot-launch/polkadotLaunchConfig.js"
+    image: imbue-collator:latest
+    ports:
+    # prometheus
+    - "9610:9610"
+    # WS and RPC
+    - "9900-9999:9900-9999"
+    # P2P
+    - "30000-31000:30000-31000"
+    environment:
+    - RELAYCHAIN_EXECUTABLE=/polkadot
+    - IMBUE_COLLATOR_EXECUTABLE=/imbue-collator
+    volumes:
+    - "./config:/polkadot-launch"
+

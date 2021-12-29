@@ -33,7 +33,11 @@ services:
 
   imbue:
     container_name: imbue
-    command: "polkadot-launch ./polkadot-launch/polkadotLaunchConfig.js"
+    command: >
+      /bin/bash -c "
+        cd /var/log/polkadot-launch-imbue;
+        polkadot-launch /polkadot-launch/polkadotLaunchConfig.js;
+      "
     image: imbue-collator:latest
     ports:
     # prometheus
@@ -45,6 +49,10 @@ services:
     environment:
     - RELAYCHAIN_EXECUTABLE=/polkadot
     - IMBUE_COLLATOR_EXECUTABLE=/imbue-collator
+    - POLKADOT_LAUNCH_BASE_PATH_BASE=/var/log/polkadot-launch-imbue
     volumes:
+    # Allows you to see/control the lifespan of the logs polkadot-launch
+    # creates.
+    - "/tmp/polkadot-launch-imbue:/var/log/polkadot-launch-imbue"
+    # Allows you to provide your own launchConfig via `command` above.
     - "./config:/polkadot-launch"
-

@@ -68,7 +68,7 @@ const relaychain = {
             wsPort: relaychainBaseWSPort + idx,
             rpcPort: relaychainBaseRPCPort + idx,
             port: relaychainBasePort + idx,
-            basePath: `${basePathBase}/${name}-relaychain`,
+            basePath: `${basePathBase}/${name}-${idx}-relaychain`,
             flags: [...relaychainFlags]
         }))
     ],
@@ -86,47 +86,45 @@ const relaychain = {
     }
 };
 
-const parachains = [
-    {
-        // bin: "../imbue/target/release/imbue-collator",
-        bin: executable("imbue_collator"),
-        id: "2010",
-        balance: "1000000000000000000000",
-        nodes: [
-            {
-                name: "alice",
-                wsPort: parachainBaseWSPort++,
-                port: parachainBasePort++,
-                rpcPort: parachainBaseRPCPort++,
-                basePath: `${basePathBase}/alice-imbue-collator`,
-                flags: [
-                    `--prometheus-port=${parachainAlicePrometheusPort}`,
-                    ...parachainNodeFlags,
-                ]
-            },
-            ...[
-                "bob",
-                "charlie",
-                "dave",
-                // "eve",
-                // "ferdie",
-                // // "alice",
-                // // "bob"
-            ].map((name, idx) => ({
-                name,
-                wsPort: parachainBaseWSPort + idx,
-                rpcPort: parachainBaseRPCPort + idx,
-                port: parachainBasePort + idx,
-                basePath: `${basePathBase}/${name}-imbue-collator`,
-                flags: parachainNodeFlags,
-            }))
-        ]
-    }
-];
+const imbue_collator = {
+    // bin: "../imbue/target/release/imbue-collator",
+    bin: executable("imbue_collator"),
+    id: "2102",
+    balance: "1000000000000000000000",
+    nodes: [
+        {
+            name: "alice",
+            wsPort: parachainBaseWSPort++,
+            port: parachainBasePort++,
+            rpcPort: parachainBaseRPCPort++,
+            basePath: `${basePathBase}/alice-imbue-collator`,
+            flags: [
+                `--prometheus-port=${parachainAlicePrometheusPort}`,
+                ...parachainNodeFlags,
+            ]
+        },
+        ...[
+                // "bob",
+            "charlie",
+            "dave",
+            // "eve",
+            // "ferdie",
+                "alice",
+                "bob"
+        ].map((name, idx) => ({
+            name,
+            wsPort: parachainBaseWSPort + idx,
+            rpcPort: parachainBaseRPCPort + idx,
+            port: parachainBasePort + idx,
+            basePath: `${basePathBase}/${name}-${idx}-imbue-collator`,
+            flags: parachainNodeFlags,
+        }))
+    ]
+};
 
 module.exports = {
     relaychain,
-    parachains,
+    parachains: [imbue_collator],
     simpleParachains: [],
     hrmpChannels: [],
     types: {

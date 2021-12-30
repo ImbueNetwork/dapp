@@ -1,0 +1,21 @@
+server {
+	listen 80;
+	listen [::]:80;
+
+	# Change 302 to 301 to make the redirect permanent.
+	return 302 https://${DOLLAR}host:${SSL_PORT}${DOLLAR}request_uri;
+}
+
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+	include conf.d/includes/self-signed.conf;
+	include conf.d/includes/ssl-params.conf;
+
+	root /usr/share/nginx/html;
+
+	location / {
+		proxy_pass ${WEBFLOW_URL};
+		proxy_ssl_server_name on;
+	}
+}

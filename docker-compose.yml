@@ -27,8 +27,11 @@ services:
     build: ./web
     container_name: web
     ports:
-    - "8080:80"
+    - "8081:80"
+    - "8443:443"
     environment:
+    - SSL_PORT=8443
+    - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
     - API_LOCAL=http://api:3000
 
   imbue:

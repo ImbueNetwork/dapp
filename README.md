@@ -12,7 +12,7 @@ docker-compose up -d
 
 to build the associated images and start all services.
 
-- The "web" service is an nginx container serving static content exported from webflow (without CMS data).
+- The "web" service is an nginx container that `proxy_pass`es most requests to the webflow server, except for `location /dest`
 - The "api" service is a nodejs/express app configured to use dynamodb local storage.
 - The "dynamodb-local" service is a temporary sqlite-based dynamodb interface to stand in for an eventual AWS hosted version of the same. (This will possibly be removed in the near future.)
 - The "imbue" service is a rococo-local test network

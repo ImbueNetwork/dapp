@@ -33,6 +33,8 @@ services:
     - SSL_PORT=8443
     - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
     - API_LOCAL=http://api:3000
+    volumes:
+    - "./web/dist:/usr/share/nginx/html/dist"
 
   imbue:
     container_name: imbue

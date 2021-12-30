@@ -3,6 +3,7 @@ from nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
 ADD ./nginx/conf /etc/nginx/conf.d/
 ADD ./nginx/ssl /etc/ssl/
+ADD ./dist /usr/share/nginx/html/dist
 
 ENV DOLLAR=\$
 ENV SSL_PORT=8443

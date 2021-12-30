@@ -39,7 +39,7 @@ services:
         polkadot-launch /polkadot-launch/polkadotLaunchConfig.js;
       "
     image: imbue-collator:latest
-    build: http://github.com/tjb1982/imbue.git#improvement/streamline-Dockerfile
+    build: http://github.com/ImbueNetwork/imbue.git#589ce100c1f8e76e3336920a7ce73653ae96d884
     ports:
     # prometheus
     - "9610:9610"

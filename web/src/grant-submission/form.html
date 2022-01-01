@@ -1,0 +1,107 @@
+
+<link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+<form id="grant-submission-form" name="grant-submission-form" data-name="Grant Submission Form" method="get" class="form" autocomplete="off">
+    <fieldset>
+        <legend class="label first-label">First, some basic info</legend>
+        
+        <mwc-textfield label="Name" helper="The name of the project." class="input-field" maxlength="256" name="imbue-project-name" required>
+        </mwc-textfield>
+
+        <mwc-textfield label="Contact" helper="e.g., email, website, LinkedIn, etc." class="input-field" name="imbue-project-contact" required>
+        </mwc-textfield>
+
+        <mwc-textfield label="Logo" type="text" class="input-field" name="imbue-project-logo"  helper="A URL to an image file." required>
+        </mwc-textfield>
+
+    </fieldset>
+
+    <fieldset>
+        <legend class="labe label">Describe what you’ll be creating</legend>
+
+        <mwc-select class="input-field" label="Category" name="imbue-project-category" required>
+            <mwc-list-item></mwc-list-item>
+            <mwc-list-item value="0">First choice</mwc-list-item>
+            <mwc-list-item value="1">Second choice</mwc-list-item>
+            <mwc-list-item value="2">Third choice</mwc-list-item>
+        </mwc-select>
+
+        <mwc-textarea
+        class="input-field"
+        label="Tell us about your project"
+        maxlength="5000"
+        charcounter
+        name="imbue-project-description"
+        rows="10"
+        required>
+        </mwc-textarea>
+    </fieldset>
+
+    <fieldset>
+        <legend class="label">How much funding will your project need?</legend>
+
+        <mwc-textfield
+        label="Funds required"
+        helper="Funds must be denominated in IMBU for now."
+        type="number"
+        class="input-field"
+        maxlength="256"
+        name="imbue-project-required-funds"
+        step="1"
+        min="1"
+        id="required-funds"
+        required>
+        </mwc-textfield>
+
+        <mwc-select id="web3-account-select" class="input-field" label="Web3 Account" name="imbue-project-account" required>
+            <mwc-list-item></mwc-list-item>
+            <!-- <mwc-list-item value="0">First choice</mwc-list-item>
+            <mwc-list-item value="1">Second choice</mwc-list-item>
+            <mwc-list-item value="2">Third choice</mwc-list-item> -->
+        </mwc-select>    
+        
+    </fieldset>
+    
+    <fieldset id="milestones-fieldset">
+        <legend class="label">Milestones</legend>
+
+        <ol id="milestones" role="list" class="list">
+            <!-- <li class="list-item milestone">
+                <input type="text" class="text-field modify w-input" maxlength="256" data-name="milestone-description" placeholder="What’s your first milestone?" required=""/>
+                <input type="number" class="text-field modify w-input" max="100" maxlength="256" data-name="milestone-percent-to-unlock" step="1" min="0" placeholder="Percent to unlock?" required=""/>
+            </li> -->
+        </ol>
+        <a id="add-milestone" class="button-2 w-button">Add another milestone</a>
+    </fieldset>
+    
+    <input type="submit" value="Submit" data-wait="Please wait..." id="submit-project" class="primary-btn fullwidth w-button"/>
+</form>
+
+<template id="milestone-item-template">
+    <li><hr size="1" noshade class="milestone-separator"></li>
+    <li class="list-item milestone">
+        <mwc-textfield
+        label="What is your next milestone?"
+        class="input-field"
+        maxlength="256"
+        helper="A short summary of a concrete deliverable."
+        required
+        iconTrailing="delete">
+        </mwc-textfield>
+
+        <mwc-textfield
+        label="Percent to unlock?"
+        type="number"
+        step="1"
+        min="1"
+        max="100"
+        class="input-field"
+        helper="Aggregate percentage of all milestones must add up to 100."
+        required>
+        </mwc-textfield>
+    </li>
+</template>
+
+<!--
+<div class="success-message w-form-done"><div>Thank you! Your submission has been received!</div></div>
+<div class="error-message w-form-fail"><div>Oops! Something went wrong while submitting the form.</div></div>
+-->

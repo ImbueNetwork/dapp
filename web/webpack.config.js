@@ -1,7 +1,9 @@
 const path = require("path");
 
 module.exports = {
-    entry: "./src/index.ts",
+    entry: {
+        "grant-submission": "./src/grant-submission.ts",
+    },
     devtool: "inline-source-map",
     module: {
         rules: [
@@ -16,8 +18,6 @@ module.exports = {
         extensions: [".ts", ".js"],
     },
     output: {
-        filename: "main.js",
         path: path.resolve(__dirname, "dist"),
     },
-
 };

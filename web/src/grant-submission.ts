@@ -1,8 +1,9 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { Keyring } from "@polkadot/keyring";
-import type { KeyringPair } from "@polkadot/keyring/types";
-import type { Hash } from "@polkadot/types/interfaces";
-import { web3Accounts, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
+// import { Keyring } from "@polkadot/keyring";
+// import type { KeyringPair } from "@polkadot/keyring/types";
+// import type { Hash } from "@polkadot/types/interfaces";
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import GrantSubmissionForm from "./grant-submission/form";
 
 import { appName, webSocketAddr } from "./config";
@@ -12,6 +13,20 @@ const provider: WsProvider = new WsProvider(webSocketAddr);
 let api: Promise<ApiPromise> = ApiPromise.create({provider});
 let attempts = 10;
 
+const renderForm = (
+    $parent: Element,
+    api: ApiPromise,
+    accounts: InjectedAccountWithMeta[]
+) => {
+    const $grantSubmissionForm = new GrantSubmissionForm(api, accounts);
+    const $child = $parent.firstElementChild;
+
+    if ($child) {
+        $parent?.replaceChild($grantSubmissionForm, $child);
+    } else {
+        $parent.appendChild($grantSubmissionForm)
+    }
+};
 
 (async function enableExtension() {
     const extensions = await web3Enable(appName);
@@ -24,17 +39,19 @@ let attempts = 10;
             throw new Error("Unable to enable any web3 extension.");
         }
     } else {
-        const $grantSubmissionForm =
-            document.getElementById("wf-form-Contact-Form") as Node;
-
         // For right now, we're just replacing the existing form, but in the near future
-        // we should just use a template that has a root element, and append to that.
-        $grantSubmissionForm.parentElement?.replaceChild(
-            new GrantSubmissionForm(await api, await web3Accounts()),
-            $grantSubmissionForm
+        // we should just use an empty webflow page that has a root element with an `id`,
+        // and append to that instead.
+        const $oldForm =
+            document.getElementById("wf-form-Contact-Form") as Node;
+        const $parent = $oldForm.parentElement as Element;
+
+        $parent.addEventListener(
+            "imbu:grant-submission-form:done",
+            async _ => renderForm($parent, await api, await web3Accounts())
         );
 
-        console.log($grantSubmissionForm);
+        renderForm($parent, await api, await web3Accounts());
     }
 })();
 

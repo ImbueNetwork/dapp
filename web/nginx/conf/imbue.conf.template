@@ -15,7 +15,8 @@ server {
 	root /usr/share/nginx/html;
 
 	location /dist {
-		
+		gzip on;
+		gzip_types text/html text/plain application/json application/javascript;
 	}
 
 	location / {

@@ -1,0 +1,60 @@
+:root {
+    --mdc-shape-small: 8px;
+    --mdc-theme-primary: #B2FF0B;
+    --mdc-theme-secondary: #411DC9;
+    --mdc-theme-secondary-hover: #512dd9;
+    --mdc-theme-error: #ff7755;
+    --mdc-theme-background: #1A1A19;
+    --mdc-theme-surface: #1A1A19;
+
+    --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
+    --mdc-text-field-label-ink-color: #aaa;
+    --mdc-text-field-ink-color: #fafafa;
+
+    --mdc-select-fill-color: rgba(235, 234, 226, 0.11); /* #1a1a19;*/
+    --mdc-select-label-ink-color: #aaa;
+    --mdc-select-ink-color: #fafafa;
+    --mdc-theme-text-primary-on-background: #fafafa;
+    --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
+}
+fieldset, legend {
+    margin: 0;
+    padding: 0;
+}
+fieldset:first-of-type {
+    margin-top: 0;
+}
+fieldset {
+    margin-top: 26px;
+}
+.label {
+    margin-top: 0;
+}
+.milestone-separator {
+    width: 95%;
+    border: 1px 0 0 0;
+    border-color: #555;
+}
+#milestones-fieldset {
+    padding-bottom: 20px;
+}
+.input-field {
+    margin: 0 0 5px 0;
+    display: flex;
+}
+
+#add-milestone:hover {
+    background-color: #656565;
+    /* color: var(--mdc-theme-secondary); */
+    color: white;
+    transition: all 150ms ease-in-out;
+}
+
+#add-milestone {
+    transition: all 150ms ease-in-out;
+    background-color: #555;
+}
+
+#submit-project:hover {
+    background-color: var(--mdc-theme-secondary-hover);
+}

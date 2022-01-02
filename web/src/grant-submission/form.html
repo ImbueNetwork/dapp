@@ -4,13 +4,13 @@
     <fieldset>
         <legend class="label first-label">First, some basic info</legend>
         
-        <mwc-textfield label="Name" helper="The name of the project." class="input-field" maxlength="256" name="imbue-project-name" required>
+        <mwc-textfield id="imbu-name" label="Name" helper="The name of the project." class="input-field" maxlength="256" name="imbu-name" required>
         </mwc-textfield>
 
-        <mwc-textfield label="Contact" helper="e.g., email, website, LinkedIn, etc." class="input-field" name="imbue-project-contact" required>
+        <mwc-textfield id="imbu-contact" label="Contact" helper="e.g., email, website, LinkedIn, etc." class="input-field" name="imbu-contact" required>
         </mwc-textfield>
 
-        <mwc-textfield label="Logo" type="text" class="input-field" name="imbue-project-logo"  helper="A URL to an image file." required>
+        <mwc-textfield label="Logo" type="text" class="input-field" name="imbu-logo"  helper="A URL to an image file." required>
         </mwc-textfield>
 
     </fieldset>
@@ -18,7 +18,7 @@
     <fieldset>
         <legend class="labe label">Describe what you’ll be creating</legend>
 
-        <mwc-select class="input-field" label="Category" name="imbue-project-category" required>
+        <mwc-select class="input-field" label="Category" name="imbu-category" helper="">
             <mwc-list-item></mwc-list-item>
             <mwc-list-item value="0">First choice</mwc-list-item>
             <mwc-list-item value="1">Second choice</mwc-list-item>
@@ -30,7 +30,7 @@
         label="Tell us about your project"
         maxlength="5000"
         charcounter
-        name="imbue-project-description"
+        name="imbu-description"
         rows="10"
         required>
         </mwc-textarea>
@@ -45,19 +45,16 @@
         type="number"
         class="input-field"
         maxlength="256"
-        name="imbue-project-required-funds"
+        name="imbu-required-funds"
         step="1"
         min="1"
         id="required-funds"
         required>
         </mwc-textfield>
 
-        <mwc-select id="web3-account-select" class="input-field" label="Web3 Account" name="imbue-project-account" required>
+        <mwc-select id="web3-account-select" class="input-field" label="Web3 Account" name="imbu-account" required>
             <mwc-list-item></mwc-list-item>
-            <!-- <mwc-list-item value="0">First choice</mwc-list-item>
-            <mwc-list-item value="1">Second choice</mwc-list-item>
-            <mwc-list-item value="2">Third choice</mwc-list-item> -->
-        </mwc-select>    
+        </mwc-select>
         
     </fieldset>
     
@@ -65,10 +62,12 @@
         <legend class="label">Milestones</legend>
 
         <ol id="milestones" role="list" class="list">
-            <!-- <li class="list-item milestone">
+            <!--
+            <li class="list-item milestone">
                 <input type="text" class="text-field modify w-input" maxlength="256" data-name="milestone-description" placeholder="What’s your first milestone?" required=""/>
                 <input type="number" class="text-field modify w-input" max="100" maxlength="256" data-name="milestone-percent-to-unlock" step="1" min="0" placeholder="Percent to unlock?" required=""/>
-            </li> -->
+            </li>
+            -->
         </ol>
         <a id="add-milestone" class="button-2 w-button">Add another milestone</a>
     </fieldset>
@@ -84,8 +83,7 @@
         class="input-field"
         maxlength="256"
         helper="A short summary of a concrete deliverable."
-        required
-        iconTrailing="delete">
+        required>
         </mwc-textfield>
 
         <mwc-textfield
@@ -94,7 +92,7 @@
         step="1"
         min="1"
         max="100"
-        class="input-field"
+        class="input-field milestone-percent-to-unlock"
         helper="Aggregate percentage of all milestones must add up to 100."
         required>
         </mwc-textfield>

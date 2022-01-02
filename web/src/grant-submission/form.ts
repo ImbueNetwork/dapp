@@ -5,80 +5,41 @@ import Hoquet from "@pojagi/hoquet/mixin";
 import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import template from "./form.html";
+import styles from "./form.css";
+import { TextField } from "@material/mwc-textfield";
 
-import "@material/mwc-textfield";
-import '@material/mwc-select';
-import '@material/mwc-list/mwc-list-item';
-import '@material/mwc-textarea';
-import '@material/mwc-icon';
-
-
-const styles = stylesheet`
-:root {
-    --mdc-shape-small: 8px;
-    --mdc-theme-primary: #B2FF0B;
-    --mdc-theme-secondary: #411DC9;
-    --mdc-theme-error: inherit;
-    --mdc-theme-background: #1A1A19;
-    --mdc-theme-surface: #1A1A19;
-
-    --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
-    --mdc-text-field-label-ink-color: #aaa;
-    --mdc-text-field-ink-color: #fafafa;
-
-    --mdc-select-fill-color: rgba(235, 234, 226, 0.11); /* #1a1a19;*/
-    --mdc-select-label-ink-color: #aaa;
-    --mdc-select-ink-color: #fafafa;
-    --mdc-theme-text-primary-on-background: #fafafa;
-    --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
-}
-fieldset, legend {
-    margin: 0;
-    padding: 0;
-}
-fieldset:first-of-type {
-    margin-top: 0;
-}
-fieldset {
-    margin-top: 26px;
-}
-.label {
-    margin-top: 0;
-}
-.milestone-separator {
-    width: 95%;
-    border: 1px 0 0 0;
-    border-color: #555;
-}
-#milestones-fieldset {
-    padding-bottom: 20px;
-}
-.input-field {
-    margin: 0 0 5px 0;
-    display: flex;
-}
-`;
 
 type Milestone = {
-    "name": string,
-    "percentageToUnlock": number,
-}
+    name: string,
+    percentageToUnlock: number,
+};
+
+type GrantProposal = {
+    name: string,
+    logo: string,
+    description: string,
+    contact: string,
+    milestones: Milestone[],
+    "required-funds": number,
+};
+
 
 export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     template: html`${template}`,
-    stylesheets: [styles],
+    stylesheets: [stylesheet`${styles}`],
     shadowy: false
 }) {
     accounts: InjectedAccountWithMeta[];
-    milstoneIdx = 1;
     api: ApiPromise;
 
     constructor(api: ApiPromise, accounts: InjectedAccountWithMeta[]) {
         super();
         this.accounts = accounts;
         this.api = api;
+    }
 
-        console.log(accounts);
+    get $inputs(): HTMLInputElement[] {
+        return Array.from(this.querySelectorAll(".input-field"));
     }
 
     connectedCallback() {
@@ -88,24 +49,16 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         this.render();
         this.addMilestoneItem();
 
+        this.$inputs.forEach($input => this.bindInputValidation($input));
+
         this.$["add-milestone"].addEventListener(
-            "click", e => this.addMilestoneItem()
-        );
+            "click", _ => this.addMilestoneItem());
 
         this.$["grant-submission-form"].addEventListener("submit", e => {
             e.preventDefault();
             e.stopPropagation();
-            this.submitGrantProposal(e.target as HTMLFormElement);
-        });
 
-        this.$["grant-submission-form"].addEventListener("reset", e => {
-            (
-                this.$["grant-submission-form"].querySelectorAll(".input-field") as
-                    NodeListOf<HTMLInputElement>
-            ).forEach(($field: HTMLInputElement) => {
-                $field.value = "";
-                $field.setCustomValidity("");
-            });
+            this.handleFormSubmission(e.target as HTMLFormElement);
         });
 
         this.accounts.forEach((account, idx) => {
@@ -119,6 +72,82 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
     }
 
+    bindInputValidation($input: HTMLInputElement) {
+        $input.addEventListener("focus", _ => $input.setCustomValidity(""));
+        $input.addEventListener("change", _ => this.reportValidity($input));
+    }
+
+    proposalFromFormData(formData: FormData): GrantProposal {
+        return Object.fromEntries(
+            Array.from(formData).map(
+                ([k, v]) => [
+                    k.replace(/^imbu-/, ""),
+                    v
+                ]
+            )
+        ) as unknown as GrantProposal;
+    }
+
+    reportValidity($input: HTMLInputElement) {
+        if ($input.validity.valueMissing) {
+            $input.setAttribute("validationmessage", "Required.");
+        } else if ($input.classList.contains("milestone-percent-to-unlock")) {
+            this.reportMilestoneImbalances();
+        }
+        $input.reportValidity();
+    }
+
+    handleFormSubmission($form: HTMLFormElement): void {
+        if (!this.accounts.length)
+            throw new Error("No web3 accounts.");
+
+        this.$inputs.forEach($input => this.reportValidity($input));
+
+        const valid = this.$inputs.every(
+            $input => $input.checkValidity()
+        );
+
+        // FIXME: We need UX here.
+        if (!valid) {
+            throw new Error("Invalid form data.");
+        }
+
+        // Form is valid.
+        const formData = new FormData($form);
+        const proposal = this.proposalFromFormData(formData);
+
+        proposal.milestones = this.milestones;
+
+        // XXX: shouldn't happen because we get the list of accounts to
+        // populate the dropdown in the first place.
+        const account = this.accounts.filter(
+            account => account.address === formData.get("imbu-account")
+        )[0];
+
+        if (!account) {
+            // FIXME: Need UX here.
+            throw new Error("Selected account no longer found.");
+        }
+
+        this.submitGrantProposal(account, proposal);
+    }
+
+    reportMilestoneImbalances() {
+        const $all = Array.from(
+            this.querySelectorAll(".milestone-percent-to-unlock")
+        ) as HTMLInputElement[];
+        const aggregate = $all.reduce((p, $x) => p + parseInt($x.value), 0);
+
+        if (aggregate > 100) {
+            $all.forEach($input => {
+                $input.setCustomValidity($input.getAttribute("helper") ?? "");
+            });
+        } else {
+            $all.forEach($x => $x.setCustomValidity(""));
+        }
+        $all.forEach($input => $input.reportValidity());
+    }
+
     addMilestoneItem() {
         const frag = (this.$["milestone-item-template"] as HTMLTemplateElement)
             .content
@@ -126,6 +155,14 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
 
         if (!this.$["milestones"].children.length) {
             frag.removeChild(frag.firstElementChild as Node);
+        }
+
+        frag.querySelector(".milestone-percent-to-unlock")?.addEventListener(
+            "blur", e => this.reportMilestoneImbalances()
+        );
+
+        for (const $field of frag.querySelectorAll(".input-field")) {
+            this.bindInputValidation($field as HTMLInputElement);
         }
 
         this.$["milestones"].appendChild(frag);
@@ -141,65 +178,34 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
     }
 
-    async submitGrantProposal($grantSubmissionForm: HTMLFormElement) {
-        if (!this.accounts.length)
-            throw new Error("No web3 accounts.");
-        
-        const formData = new FormData($grantSubmissionForm);
-
-        // let $firstMilestonePercent = Array.from($grantSubmissionForm.elements)
-        //     .filter(x => x.id.startsWith("milestone-percent"))[0] as HTMLInputElement;
-
-        // TODO: `checkValidity` on keyup or something like that
-        // let total = 0;
-        // for (let milestone of milestones) {
-        //     total += milestone.percentageToUnlock;
-        // }
-
-        // if (total > 100) {
-        //     $firstMilestonePercent.setCustomValidity(
-        //         "Aggregate \"percent to unlock\" cannot exceed 100 percent.");
-        //     return;
-        // }
-
-        // if (total !== 100) {
-        //     $firstMilestonePercent.setCustomValidity(
-        //         "Aggregate \"percent to unlock\" must equal exactly 100 percent.");
-        //     return;
-        // }
-
-        // For now just using the first account we find.
-        //const account = this.accounts[parseInt(formData.get("imbue-project-account")?.toString() || "0")];
-        const account = this.accounts.filter(account => account.address === formData.get("imbue-project-account"))[0];
-        
-        if (!account) {
-            throw new Error(`Selected account not found: ${formData.get("imbue-project-account")}`);
-        }
-        
+    async submitGrantProposal(account: InjectedAccountWithMeta, proposal: GrantProposal) {
         const injector = await web3FromSource(account.meta.source);
 
-        const extrinsic = this.api.tx.imbueProposals.createProject(
-            formData.get("imbue-project-name"),
-            formData.get("imbue-project-logo"),
-            formData.get("imbue-project-description"),
-            formData.get("imbue-project-contact"),
-            this.milestones,
-            formData.get("imbue-project-required-funds"),
-        );
-
         try {
+            const extrinsic = this.api.tx.imbueProposals.createProject(
+                proposal.name,
+                proposal.logo,
+                proposal.description,
+                proposal.contact,
+                proposal.milestones,
+                proposal["required-funds"],
+            );
+
             const txHash = await extrinsic.signAndSend(
                 account.address,
                 {signer: injector.signer},
                 ({ status }) => {
                     if (status.isInBlock) {
                         console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-                        $grantSubmissionForm.reset();
+                        this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
+                            bubbles: true, composed: true
+                        }));
                     } else {
                         console.log(`Current status: ${status.type}`);
                     }
                 }
             );
+
             console.log(`Transaction hash: ${txHash}`);
         } catch (e: any) {
             console.error("Transaction failed...", e);

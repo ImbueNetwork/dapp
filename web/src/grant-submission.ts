@@ -9,6 +9,8 @@ import GrantSubmissionForm from "./grant-submission/form";
 import { appName, webSocketAddr } from "./config";
 
 
+const $oldForm = document.getElementById("wf-form-Contact-Form") as Node;
+const $parent = $oldForm.parentElement as Element;
 const provider: WsProvider = new WsProvider(webSocketAddr);
 let api: Promise<ApiPromise> = ApiPromise.create({provider});
 let attempts = 10;
@@ -28,6 +30,8 @@ const renderForm = (
     }
 };
 
+$parent.removeChild($oldForm);
+
 (async function enableExtension() {
     const extensions = await web3Enable(appName);
     if (!extensions.length) {
@@ -42,10 +46,6 @@ const renderForm = (
         // For right now, we're just replacing the existing form, but in the near future
         // we should just use an empty webflow page that has a root element with an `id`,
         // and append to that instead.
-        const $oldForm =
-            document.getElementById("wf-form-Contact-Form") as Node;
-        const $parent = $oldForm.parentElement as Element;
-
         $parent.addEventListener(
             "imbu:grant-submission-form:done",
             async _ => renderForm($parent, await api, await web3Accounts())

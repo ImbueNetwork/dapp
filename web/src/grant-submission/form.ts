@@ -6,7 +6,7 @@ import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import template from "./form.html";
 import styles from "./form.css";
-import { TextField } from "@material/mwc-textfield";
+
 
 
 type Milestone = {
@@ -38,8 +38,12 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         this.api = api;
     }
 
-    get $inputs(): HTMLInputElement[] {
+    get $fields(): HTMLInputElement[] {
         return Array.from(this.querySelectorAll(".input-field"));
+    }
+
+    get $inputs(): HTMLInputElement[] {
+        return Array.from(this.querySelectorAll("input"));
     }
 
     connectedCallback() {
@@ -49,7 +53,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         this.render();
         this.addMilestoneItem();
 
-        this.$inputs.forEach($input => this.bindInputValidation($input));
+        this.$fields.forEach($input => this.bindInputValidation($input));
 
         this.$["add-milestone"].addEventListener(
             "click", _ => this.addMilestoneItem());
@@ -65,7 +69,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             const $opt = this.fragment(`
                 <mwc-list-item twoline value="${account.address}">
                     <span>${account.meta.name ?? account.address}</span>
-                    <span slot="secondary">${account.meta.source}</span>
+                    <span class="web3-source" slot="secondary">${account.meta.source}</span>
                 </mwc-list-item>
             `).firstElementChild as Node;
             this.$["web3-account-select"].appendChild($opt);
@@ -88,22 +92,28 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         ) as unknown as GrantProposal;
     }
 
-    reportValidity($input: HTMLInputElement) {
+    reportValidity($input: HTMLInputElement, submitting: boolean = false) {
         if ($input.validity.valueMissing) {
-            $input.setAttribute("validationmessage", "Required.");
+            $input.setAttribute("validationmessage", "This field is required.");
         } else if ($input.classList.contains("milestone-percent-to-unlock")) {
-            this.reportMilestoneImbalances();
+            this.reportMilestoneImbalances(submitting);
         }
         $input.reportValidity();
+    }
+
+    toggleInputsAttribute(qualifiedName: string, force?: boolean): boolean[] {
+        return [...this.$fields, this.$["submit-project"], this.$["add-milestone"]].map(
+            $field => $field.toggleAttribute(qualifiedName, force)
+        );
     }
 
     handleFormSubmission($form: HTMLFormElement): void {
         if (!this.accounts.length)
             throw new Error("No web3 accounts.");
 
-        this.$inputs.forEach($input => this.reportValidity($input));
+        this.$fields.forEach($input => this.reportValidity($input, true));
 
-        const valid = this.$inputs.every(
+        const valid = this.$fields.every(
             $input => $input.checkValidity()
         );
 
@@ -132,15 +142,19 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         this.submitGrantProposal(account, proposal);
     }
 
-    reportMilestoneImbalances() {
+    reportMilestoneImbalances(submitting: boolean = false) {
         const $all = Array.from(
             this.querySelectorAll(".milestone-percent-to-unlock")
         ) as HTMLInputElement[];
         const aggregate = $all.reduce((p, $x) => p + parseInt($x.value), 0);
 
-        if (aggregate > 100) {
+        const valid = submitting
+            ? aggregate === 100
+            : aggregate <= 100;
+
+        if (!valid) {
             $all.forEach($input => {
-                $input.setCustomValidity($input.getAttribute("helper") ?? "");
+                $input.setCustomValidity($input.getAttribute("helper") as string);
             });
         } else {
             $all.forEach($x => $x.setCustomValidity(""));
@@ -179,9 +193,13 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     }
 
     async submitGrantProposal(account: InjectedAccountWithMeta, proposal: GrantProposal) {
-        const injector = await web3FromSource(account.meta.source);
-
         try {
+            const injector = await web3FromSource(account.meta.source);
+
+            this.$["imbu-status"].innerText = "Signing and sending.";
+            this.$["imbu-dialog"].toggleAttribute("open", true);
+
+            this.toggleInputsAttribute("disabled", true);
             const extrinsic = this.api.tx.imbueProposals.createProject(
                 proposal.name,
                 proposal.logo,
@@ -190,25 +208,34 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                 proposal.milestones,
                 proposal["required-funds"],
             );
-
             const txHash = await extrinsic.signAndSend(
                 account.address,
                 {signer: injector.signer},
                 ({ status }) => {
+                    console.log(status);
                     if (status.isInBlock) {
                         console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-                        this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
-                            bubbles: true, composed: true
-                        }));
+                        this.$["imbu-status"].innerText = `Completed at block hash #${status.asInBlock.toString()}`;
+
+                        // FIXME: rather than timeout, provide a link to see the project detail page,
+                        // and a button for the user to dismiss
+                        setTimeout(() => {
+                            this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
+                                bubbles: true, composed: true
+                            }));                                
+                        }, 5000);
                     } else {
+                        this.$["imbu-status"].innerText = status.type;
                         console.log(`Current status: ${status.type}`);
                     }
                 }
             );
-
             console.log(`Transaction hash: ${txHash}`);
         } catch (e: any) {
             console.error("Transaction failed...", e);
+            // probably canceled, so just re-enable the form fields.
+            this.toggleInputsAttribute("disabled", false);
+            this.$["imbu-dialog"].toggleAttribute("open", false);
         }
     }
 }

@@ -73,6 +73,24 @@
   dependencies:
     tslib "^2.1.0"
 
+"@material/button@14.0.0-canary.261f2db59.0":
+  version "14.0.0-canary.261f2db59.0"
+  resolved "https://registry.yarnpkg.com/@material/button/-/button-14.0.0-canary.261f2db59.0.tgz#d4453aa0c03dae2b4a009d15fe4a2cd529a59af5"
+  integrity sha512-DB0MAvdIGWKuFwlQ57hjv7ZuHIioT2mnG7RWtL7ZoCWoY45nCrsbJirmX5zZFipm9gIOJ3YnIkIrUyMVSrDX+g==
+  dependencies:
+    "@material/density" "14.0.0-canary.261f2db59.0"
+    "@material/dom" "14.0.0-canary.261f2db59.0"
+    "@material/elevation" "14.0.0-canary.261f2db59.0"
+    "@material/feature-targeting" "14.0.0-canary.261f2db59.0"
+    "@material/ripple" "14.0.0-canary.261f2db59.0"
+    "@material/rtl" "14.0.0-canary.261f2db59.0"
+    "@material/shape" "14.0.0-canary.261f2db59.0"
+    "@material/theme" "14.0.0-canary.261f2db59.0"
+    "@material/tokens" "14.0.0-canary.261f2db59.0"
+    "@material/touch-target" "14.0.0-canary.261f2db59.0"
+    "@material/typography" "14.0.0-canary.261f2db59.0"
+    tslib "^2.1.0"
+
 "@material/density@14.0.0-canary.261f2db59.0":
   version "14.0.0-canary.261f2db59.0"
   resolved "https://registry.yarnpkg.com/@material/density/-/density-14.0.0-canary.261f2db59.0.tgz#e34683ef5d68c661b0e2adaed1cd68668f35c18d"
@@ -85,6 +103,27 @@
   resolved "https://registry.yarnpkg.com/@material/density/-/density-13.0.0.tgz#5ae2fdec0418775014fed24e7ccdd5ba5d005d54"
   integrity sha512-ppJTzOsuhjQam5GvHaq/XZocZNUr+41XQ2sd5nONAmQ0wwzXgqG0FaxtF1EXqK3uZFadz+vAu6enagre9DXhTA==
   dependencies:
+    tslib "^2.1.0"
+
+"@material/dialog@=14.0.0-canary.261f2db59.0":
+  version "14.0.0-canary.261f2db59.0"
+  resolved "https://registry.yarnpkg.com/@material/dialog/-/dialog-14.0.0-canary.261f2db59.0.tgz#61ba003954640590f2842247d09fabda0c326060"
+  integrity sha512-NfQR0fmNS/y2iRAx5YeODLLywBAnSyZI/CL9GUq4NiNj+FeSxe+5bhG1p9NxHeGMjEVrl6fG5L9ql7lqtfQaYQ==
+  dependencies:
+    "@material/animation" "14.0.0-canary.261f2db59.0"
+    "@material/base" "14.0.0-canary.261f2db59.0"
+    "@material/button" "14.0.0-canary.261f2db59.0"
+    "@material/dom" "14.0.0-canary.261f2db59.0"
+    "@material/elevation" "14.0.0-canary.261f2db59.0"
+    "@material/feature-targeting" "14.0.0-canary.261f2db59.0"
+    "@material/icon-button" "14.0.0-canary.261f2db59.0"
+    "@material/ripple" "14.0.0-canary.261f2db59.0"
+    "@material/rtl" "14.0.0-canary.261f2db59.0"
+    "@material/shape" "14.0.0-canary.261f2db59.0"
+    "@material/theme" "14.0.0-canary.261f2db59.0"
+    "@material/tokens" "14.0.0-canary.261f2db59.0"
+    "@material/touch-target" "14.0.0-canary.261f2db59.0"
+    "@material/typography" "14.0.0-canary.261f2db59.0"
     tslib "^2.1.0"
 
 "@material/dom@14.0.0-canary.261f2db59.0", "@material/dom@=14.0.0-canary.261f2db59.0":
@@ -155,6 +194,21 @@
     "@material/rtl" "^13.0.0"
     "@material/theme" "^13.0.0"
     "@material/typography" "^13.0.0"
+    tslib "^2.1.0"
+
+"@material/icon-button@14.0.0-canary.261f2db59.0":
+  version "14.0.0-canary.261f2db59.0"
+  resolved "https://registry.yarnpkg.com/@material/icon-button/-/icon-button-14.0.0-canary.261f2db59.0.tgz#36398248c769a8580878a0ef14a68eccfd66b667"
+  integrity sha512-9P6cjRqKtjE6ML+r5yz0ExU/f2KLdNabHQxmO6RpKd/FnjTyP1NcWqqj8dsvo/DZ7mOtT1MIThgkQDdiMqcYLg==
+  dependencies:
+    "@material/base" "14.0.0-canary.261f2db59.0"
+    "@material/density" "14.0.0-canary.261f2db59.0"
+    "@material/elevation" "14.0.0-canary.261f2db59.0"
+    "@material/feature-targeting" "14.0.0-canary.261f2db59.0"
+    "@material/ripple" "14.0.0-canary.261f2db59.0"
+    "@material/rtl" "14.0.0-canary.261f2db59.0"
+    "@material/theme" "14.0.0-canary.261f2db59.0"
+    "@material/touch-target" "14.0.0-canary.261f2db59.0"
     tslib "^2.1.0"
 
 "@material/line-ripple@14.0.0-canary.261f2db59.0", "@material/line-ripple@=14.0.0-canary.261f2db59.0":
@@ -236,6 +290,16 @@
     lit "^2.0.0"
     tslib "^2.0.1"
 
+"@material/mwc-button@^0.25.3":
+  version "0.25.3"
+  resolved "https://registry.yarnpkg.com/@material/mwc-button/-/mwc-button-0.25.3.tgz#ddbe6d3bc1e92b73baddaf6b586da9eab5cd03c6"
+  integrity sha512-usHEKchj9hqetY7n0yebTz1Pk9Z+9W/sNZheFoSaiWQCv9XhtCdKkHH0MXTv8SpwxWuEKUf/XjtyvikGIcIn7w==
+  dependencies:
+    "@material/mwc-icon" "^0.25.3"
+    "@material/mwc-ripple" "^0.25.3"
+    lit "^2.0.0"
+    tslib "^2.0.1"
+
 "@material/mwc-checkbox@^0.25.3":
   version "0.25.3"
   resolved "https://registry.yarnpkg.com/@material/mwc-checkbox/-/mwc-checkbox-0.25.3.tgz#93fd75b301186b4775456b8fe5155c9417e8fcfd"
@@ -245,6 +309,20 @@
     "@material/mwc-ripple" "^0.25.3"
     lit "^2.0.0"
     tslib "^2.0.1"
+
+"@material/mwc-dialog@^0.25.3":
+  version "0.25.3"
+  resolved "https://registry.yarnpkg.com/@material/mwc-dialog/-/mwc-dialog-0.25.3.tgz#11aca257c199d22bfb5f502cc86a56853c6ae1f6"
+  integrity sha512-UpxAYAzKXO1MW4ezpiYfEQgov08p0J8KDVKqKrMwg7lsZRkAtUMk4YJkM6qmWGqGPqd/cN++42PMPHAISJH3yA==
+  dependencies:
+    "@material/dialog" "=14.0.0-canary.261f2db59.0"
+    "@material/dom" "=14.0.0-canary.261f2db59.0"
+    "@material/mwc-base" "^0.25.3"
+    "@material/mwc-button" "^0.25.3"
+    blocking-elements "^0.1.0"
+    lit "^2.0.0"
+    tslib "^2.0.1"
+    wicg-inert "^3.0.0"
 
 "@material/mwc-floating-label@^0.25.3":
   version "0.25.3"
@@ -559,6 +637,13 @@
   dependencies:
     "@material/feature-targeting" "^13.0.0"
     tslib "^2.1.0"
+
+"@material/tokens@14.0.0-canary.261f2db59.0":
+  version "14.0.0-canary.261f2db59.0"
+  resolved "https://registry.yarnpkg.com/@material/tokens/-/tokens-14.0.0-canary.261f2db59.0.tgz#117a1e47d9d229576b9500d5bb35c9e1606ef9b9"
+  integrity sha512-mgar9gsLv00HTvXIDvNR1vEEXpfKgeWhVTO8a7aWofSNyENNOVc5ImJwBgCAMb5SgLHBi6w8/c1tPzjOewBfCA==
+  dependencies:
+    "@material/elevation" "14.0.0-canary.261f2db59.0"
 
 "@material/touch-target@14.0.0-canary.261f2db59.0":
   version "14.0.0-canary.261f2db59.0"
@@ -1223,6 +1308,11 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+blocking-elements@^0.1.0:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/blocking-elements/-/blocking-elements-0.1.1.tgz#6acddbe2714a029a1774e9219bcf38736e07ded3"
+  integrity sha512-/SLWbEzMoVIMZACCyhD/4Ya2M1PWP1qMKuiymowPcI+PdWDARqeARBjhj73kbUBCxEmTZCUu5TAqxtwUO9C1Ig==
 
 bn.js@^4.12.0:
   version "4.12.0"
@@ -2948,6 +3038,11 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+wicg-inert@^3.0.0:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/wicg-inert/-/wicg-inert-3.1.1.tgz#b033fd4fbfb9e3fd709e5d84becbdf2e06e5c229"
+  integrity sha512-PhBaNh8ur9Xm4Ggy4umelwNIP6pPP1bv3EaWaKqfb/QNme2rdLjm7wIInvV4WhxVHhzA4Spgw9qNSqWtB/ca2A==
 
 widest-line@^3.1.0:
   version "3.1.0"

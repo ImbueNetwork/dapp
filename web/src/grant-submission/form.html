@@ -4,7 +4,7 @@
     <fieldset>
         <legend class="label first-label">First, some basic info</legend>
         
-        <mwc-textfield id="imbu-name" label="Name" helper="The name of the project." class="input-field" maxlength="256" name="imbu-name" required>
+        <mwc-textfield id="imbu-name" label="Project name" helper="The name of the project." class="input-field" maxlength="256" name="imbu-name" required>
         </mwc-textfield>
 
         <mwc-textfield id="imbu-contact" label="Contact" helper="e.g., email, website, LinkedIn, etc." class="input-field" name="imbu-contact" required>
@@ -69,11 +69,15 @@
             </li>
             -->
         </ol>
-        <a id="add-milestone" class="button-2 w-button">Add another milestone</a>
+        <input id="add-milestone" type="button" value="Add another milestone" class="primary-btn fullwidth w-button">
     </fieldset>
     
-    <input type="submit" value="Submit" data-wait="Please wait..." id="submit-project" class="primary-btn fullwidth w-button"/>
+    <input type="submit" value="Create Project Proposal" id="submit-project" class="primary-btn fullwidth w-button"/>
 </form>
+
+<mwc-dialog id="imbu-dialog" heading="Status">
+    <div id="imbu-status"></div>
+</mwc-dialog>
 
 <template id="milestone-item-template">
     <li><hr size="1" noshade class="milestone-separator"></li>
@@ -93,7 +97,7 @@
         min="1"
         max="100"
         class="input-field milestone-percent-to-unlock"
-        helper="Aggregate percentage of all milestones must add up to 100."
+        helper="Sum of all milestones must be 100%."
         required>
         </mwc-textfield>
     </li>

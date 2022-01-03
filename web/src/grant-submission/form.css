@@ -8,15 +8,25 @@
     --mdc-theme-surface: #1A1A19;
 
     --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
+    --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23);
     --mdc-text-field-label-ink-color: #aaa;
+    --mdc-text-field-disabled-ink-color: rgba(255, 255, 255, 0.25);
     --mdc-text-field-ink-color: #fafafa;
 
-    --mdc-select-fill-color: rgba(235, 234, 226, 0.11); /* #1a1a19;*/
-    --mdc-select-label-ink-color: #aaa;
-    --mdc-select-ink-color: #fafafa;
-    --mdc-theme-text-primary-on-background: #fafafa;
+    --mdc-select-fill-color: var(--mdc-text-field-fill-color);
+    --mdc-select-disabled-fill-color: var(--mdc-text-field-disabled-fill-color);
+    --mdc-select-label-ink-color: var(--mdc-text-field-label-ink-color);
+    --mdc-select-ink-color: var(--mdc-text-field-ink-color);
+    --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
     --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
+
+    --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
+    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5);
 }
+.web3-source {
+    color: #999;
+}
+
 fieldset, legend {
     margin: 0;
     padding: 0;

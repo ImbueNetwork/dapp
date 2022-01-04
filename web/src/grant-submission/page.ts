@@ -11,7 +11,7 @@ import styles from "./page.css";
 
 
 const web3Error = (reason: string) => {
-    return `
+    return html`
     <div>
         <p>
             Something went wrong interfacing with web3 extensions:
@@ -23,6 +23,18 @@ const web3Error = (reason: string) => {
                 Polkadot{.js} extension</a>
             installed, and that you have created an account with an
             IMBU balance sufficient to make transactions.
+        </p>
+    </div>
+    `;
+}
+
+const webSocketError = (addr: string) => {
+    return html`
+    <div>
+        <p>The websocket is not connected to ${addr}.
+        <p>This might only be a temporary network error. However, if the
+        problem persist, feel free to
+            <a href="mailto:help@example.com">contact us</a>.
         </p>
     </div>
     `;
@@ -49,11 +61,11 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
                 this.status("Initializing", html`Interfacing with web3 extensions.`);
                 this.extensions = await this.enableAppForExtension(appName);
             } catch (e) {
-                this.status("Error", html`${web3Error((e as Error).toString())}`)
+                this.status("Error", web3Error((e as Error).toString()));
                 console.error(e);
                 return;
             } finally {
-                this.dismissAlert();
+                this.dismissStatus();
             }
         }
 
@@ -72,12 +84,12 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
         this.appendChild(this.$form);
 
         if (!accounts.length) {
-            this.status("Error", html`${web3Error("No accounts found.")}`);
+            this.status("Error", web3Error("No accounts found."));
             this.$form.toggleDisabled(true);
             return;
         }
 
-        this.dismissAlert();
+        this.dismissStatus();
         setTimeout(() => this.$form?.$fields[0].focus(), 0);
     }
 
@@ -95,13 +107,13 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
                         ));
                     }, 2000);
                 } else {
-                    this.dismissAlert();
+                    this.dismissStatus();
                     reject(new Error(
                         "Unable to enable any web3 extension."
                     ));
                 }
             } else {
-                this.dismissAlert();
+                this.dismissStatus();
                 resolve(extensions);
             }
         });
@@ -112,6 +124,11 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
             return;
 
         this.render();
+
+        this.status(
+            "Connecting to the Imbue Network",
+            html`<p>Connecting to websocket at ${this.getAttribute("websocket-addr")}</p>`
+        );
 
         this.addEventListener("imbu:status", e => {
             const detail = (e as CustomEvent).detail;
@@ -136,7 +153,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
         this.$["imbu-dialog"].toggleAttribute("open", true);
     }
 
-    dismissAlert() {
+    dismissStatus() {
         this.$["imbu-dialog"].toggleAttribute("open", false);
     }
 
@@ -145,11 +162,26 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
             return;
 
         if (k === "websocket-addr") {
-            const provider = new WsProvider(webSocketAddr);
-            ApiPromise.create({provider}).then(api => {
-                this.api = api;
-                this.init();
-            });
+            const err = webSocketError(curr);
+            try {
+                const provider = new WsProvider(webSocketAddr);
+                provider.on("error", e => {
+                    this.status("Connection Error", err)
+                });
+                provider.on("disconnected", e => {
+                    this.status("Disconnected", err);
+                });
+                provider.on("connected", e => this.dismissStatus());
+                ApiPromise.create({provider}).then(api => {
+                    this.dismissStatus();
+                    this.api = api;
+                    this.init();
+                }).catch(e => {
+                    this.status("Error", err);
+                });    
+            } catch (e) {
+                this.status("Error", html`${e}`);
+            }
         } else if (k === "app-name") {
             this.init();
         }

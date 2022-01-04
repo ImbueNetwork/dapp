@@ -37,30 +37,32 @@ services:
     volumes:
     - "./web/dist:/usr/share/nginx/html/dist"
 
-  imbue:
-    container_name: imbue
-    command: >
-      /bin/bash -c "
-        cd /var/log/polkadot-launch-imbue;
-        polkadot-launch /polkadot-launch/polkadotLaunchConfig.js;
-      "
-    image: imbue-collator:latest
-    build: http://github.com/ImbueNetwork/imbue.git#589ce100c1f8e76e3336920a7ce73653ae96d884
-    ports:
-    # prometheus
-    - "9610:9610"
-    # WS and RPC
-    - "9900-9999:9900-9999"
-    # P2P
-    - "30000-31000:30000-31000"
-    environment:
-    - RELAYCHAIN_EXECUTABLE=/polkadot
-    - COLLATOR_EXECUTABLE=/imbue-collator
-    - COLLATOR_PARACHAIN_ID=2102
-      #- POLKADOT_LAUNCH_BASE_PATH_BASE=/var/log/polkadot-launch-imbue
-    volumes:
-    # Allows you to see/control the lifespan of the logs polkadot-launch
-    # creates.
-    - "/tmp/polkadot-launch-imbue:/var/log/polkadot-launch-imbue"
-    # Allows you to provide your own launchConfig via `command` above.
-    - "./config:/polkadot-launch"
+  ## XXX: commenting this out for now, because we have a testnet to work with instead.
+  # but if you wanted to work with a local network, this is one possibility.
+  # imbue:
+  #   container_name: imbue
+  #   command: >
+  #     /bin/bash -c "
+  #       cd /var/log/polkadot-launch-imbue;
+  #       polkadot-launch /polkadot-launch/polkadotLaunchConfig.js;
+  #     "
+  #   image: imbue-collator:latest
+  #   build: http://github.com/ImbueNetwork/imbue.git#589ce100c1f8e76e3336920a7ce73653ae96d884
+  #   ports:
+  #   # prometheus
+  #   - "9610:9610"
+  #   # WS and RPC
+  #   - "9900-9999:9900-9999"
+  #   # P2P
+  #   - "30000-31000:30000-31000"
+  #   environment:
+  #   - RELAYCHAIN_EXECUTABLE=/polkadot
+  #   - COLLATOR_EXECUTABLE=/imbue-collator
+  #   - COLLATOR_PARACHAIN_ID=2102
+  #     #- POLKADOT_LAUNCH_BASE_PATH_BASE=/var/log/polkadot-launch-imbue
+  #   volumes:
+  #   # Allows you to see/control the lifespan of the logs polkadot-launch
+  #   # creates.
+  #   - "/tmp/polkadot-launch-imbue:/var/log/polkadot-launch-imbue"
+  #   # Allows you to provide your own launchConfig via `command` above.
+  #   - "./config:/polkadot-launch"

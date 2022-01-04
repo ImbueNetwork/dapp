@@ -9,7 +9,7 @@
     --mdc-dialog-heading-ink-color: #fff;
     --mdc-dialog-content-ink-color: #a9a9a9;
 
-    --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
+    /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color); */
     --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5);
 
     --mdc-dialog-box-shadow:

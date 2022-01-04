@@ -35,7 +35,7 @@ const web3Error = (reason: string) => {
 const webSocketError = (addr: string) => {
     return html`
     <div>
-        <p>The websocket is not connected to ${addr}.
+        <p>The websocket is not connected to ${addr}.</p>
         <p>This might only be a temporary network error. However, if the
         problem persist, feel free to
             <a href="mailto:help@example.com">contact us</a>.
@@ -141,6 +141,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
     }
 
     status(heading: string, msg: HTMLTemplateElement, dismissable = false) {
+        const dialogActions = ["escapeKey", "scrimClick"];
         const $dialog = this.$["imbu-dialog"];
 
         $dialog.setAttribute("heading", heading);
@@ -150,9 +151,15 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
 
         $dialog.appendChild(msg.content.cloneNode(true));
 
-        
-        this.$["imbu-dialog"].toggleAttribute("scrimClickAction", !dismissable);
-        this.$["imbu-dialog"].toggleAttribute("escapeKeyAction", !dismissable);
+        if (dismissable) {
+            dialogActions.forEach(type => {
+                $dialog.removeAttribute(`${type}Action`);    
+            });
+        } else {
+            dialogActions.forEach(type => {
+                $dialog.toggleAttribute(`${type}Action`, true);
+            });
+        }
         
         this.$["imbu-dialog"].toggleAttribute("open", true);
     }

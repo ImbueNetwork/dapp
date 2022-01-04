@@ -225,7 +225,8 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                         this.dispatchEvent(new CustomEvent("imbu:status", {
                             bubbles: true, detail: {
                                 heading: "Status",
-                                msg: `Completed at block hash #${status.asInBlock.toString()}`
+                                msg: `Completed at block hash #${status.asInBlock.toString()}`,
+                                dismissable: true,
                             }
                         }));
 
@@ -240,7 +241,8 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                         this.dispatchEvent(new CustomEvent("imbu:status", {
                             bubbles: true, detail: {
                                 heading: "Status",
-                                msg: status.type
+                                msg: status.type,
+                                dismissable: true,
                             }
                         }))
                         console.log(`Current status: ${status.type}`);

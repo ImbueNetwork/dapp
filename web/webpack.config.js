@@ -9,7 +9,7 @@ module.exports = {
         "grant-submission": "./src/grant-submission.ts",
         "material-components": "./src/material-components.ts",
     },
-    devtool: "inline-source-map",
+//    devtool: "inline-source-map",
     module: {
         rules: [
             {

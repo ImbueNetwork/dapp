@@ -14,7 +14,7 @@ to build the associated images and start all services.
 
 ## Steps to create a new Imbue Network Project
 
-1. Navigate to https://localhost:8443/
+1. Navigate to https://localhost:8443/ (currently, because we're using self-signed certs, the only browsers that can be used for testing are Chromium (i.e., not Google Chrome) and Firefox.
 2. In the navigation, click "Start a project"
     - Note that the website's navigation currently only shows up when the screen size is at a small breakpoint. You can alternatively navigate directly to "Start a project" by going to https://localhost:8443/grant-submission
 3. The site will start to try connect to the configured websocket, as well as search for a web3 extension, etc. This will require you to grant permission to the site on your extension. If there is no extension found, the site should notify you and link to the download page.

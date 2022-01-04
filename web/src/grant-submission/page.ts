@@ -16,7 +16,7 @@ const web3Error = (reason: string) => {
         <p>
             Something went wrong interfacing with web3 extensions:
         </p>
-        <p>${reason}</p>
+        <p>Reason: <span class="reason-message">${reason}</span></p>
         <p>
             Make sure that you have the
             <a href="https://polkadot.js.org/extension/">
@@ -58,7 +58,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
 
         if (!this.extensions) {
             try {
-                this.status("Initializing", html`Interfacing with web3 extensions.`);
+                this.status("Initializing", web3Error("No extensions found."));
                 this.extensions = await this.enableAppForExtension(appName);
             } catch (e) {
                 this.status("Error", web3Error((e as Error).toString()));
@@ -146,10 +146,10 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
 
         $dialog.appendChild(msg.content.cloneNode(true));
 
-        if (dismissable) {
-            this.$["imbu-dialog"].toggleAttribute("scrimClickAction", !dismissable);
-            this.$["imbu-dialog"].toggleAttribute("escapeKeyAction", !dismissable);
-        }
+        
+        this.$["imbu-dialog"].toggleAttribute("scrimClickAction", !dismissable);
+        this.$["imbu-dialog"].toggleAttribute("escapeKeyAction", !dismissable);
+        
         this.$["imbu-dialog"].toggleAttribute("open", true);
     }
 

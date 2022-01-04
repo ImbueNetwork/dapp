@@ -34,7 +34,7 @@ server {
     # 	proxy_set_header Host ${DOLLAR}host;
 	# }
 
-	location /dist {
+	location /imbue {
 		gzip on;
 		gzip_types text/plain application/json application/javascript;
 	}

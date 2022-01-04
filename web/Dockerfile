@@ -1,16 +1,17 @@
-from node:16-slim AS builder
+FROM node:16-slim AS builder
 
 WORKDIR /builds/imbue
 ADD . .
 RUN yarn install
 RUN yarn run webpack build
 
-from nginx:latest
+
+FROM nginx:latest
+COPY --from=builder /builds/imbue/dist /usr/share/nginx/html/imbue
 
 RUN rm /etc/nginx/conf.d/default.conf
 ADD ./nginx/conf /etc/nginx/conf.d/
 ADD ./nginx/ssl /etc/ssl/
-COPY --from=builder /builds/imbue/dist /usr/share/nginx/html/dist
 
 ENV DOLLAR=\$
 ENV SSL_PORT=8443

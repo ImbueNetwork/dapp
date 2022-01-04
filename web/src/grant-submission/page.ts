@@ -16,7 +16,7 @@ const web3Error = (reason: string) => {
         <p>
             Something went wrong interfacing with web3 extensions:
         </p>
-        <p>Reason: <span class="reason-message">${reason}</span></p>
+        <p><span class="reason-message">${reason}</span></p>
         <p>
             Make sure that you have the
             <a href="https://polkadot.js.org/extension/">

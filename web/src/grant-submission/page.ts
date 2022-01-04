@@ -58,7 +58,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
 
         if (!this.extensions) {
             try {
-                this.status("Initializing", web3Error("No extensions found."));
+                this.status("Error", web3Error("No extensions found."));
                 this.extensions = await this.enableAppForExtension(appName);
             } catch (e) {
                 this.status("Error", web3Error((e as Error).toString()));

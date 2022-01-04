@@ -19,10 +19,14 @@ const web3Error = (reason: string) => {
         <p><span class="reason-message">${reason}</span></p>
         <p>
             Make sure that you have the
-            <a href="https://polkadot.js.org/extension/">
+            <a href="https://polkadot.js.org/extension/" target="_blank">
                 Polkadot{.js} extension</a>
             installed, and that you have created an account with an
             IMBU balance sufficient to make transactions.
+
+            <p>
+                Refresh the page once you believe the issues have been resolved.
+            </p>
         </p>
     </div>
     `;
@@ -58,7 +62,6 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
 
         if (!this.extensions) {
             try {
-                this.status("Error", web3Error("No extensions found."));
                 this.extensions = await this.enableAppForExtension(appName);
             } catch (e) {
                 this.status("Error", web3Error((e as Error).toString()));
@@ -100,6 +103,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
         return new Promise(async (resolve, reject) => {
             const extensions = await web3Enable(appName);
             if (!extensions.length) {
+                this.status("Error", web3Error("No extensions found."));
                 if (attempts > 0) {
                     setTimeout(() => {
                         resolve(this.enableAppForExtension(

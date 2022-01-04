@@ -1,62 +1,25 @@
-import { ApiPromise, WsProvider } from "@polkadot/api";
-// import { Keyring } from "@polkadot/keyring";
-// import type { KeyringPair } from "@polkadot/keyring/types";
-// import type { Hash } from "@polkadot/types/interfaces";
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import GrantSubmissionForm from "./grant-submission/form";
-
+import "./grant-submission/page";
 import { appName, webSocketAddr } from "./config";
 
 
 const $oldForm = document.getElementById("wf-form-Contact-Form") as Node;
 const $parent = $oldForm.parentElement as Element;
-const provider: WsProvider = new WsProvider(webSocketAddr);
-let api: Promise<ApiPromise> = ApiPromise.create({provider});
-let attempts = 10;
-
-const renderForm = (
-    $parent: Element,
-    api: ApiPromise,
-    accounts: InjectedAccountWithMeta[]
-) => {
-    const $grantSubmissionForm = new GrantSubmissionForm(api, accounts);
-    const $child = $parent.firstElementChild;
-
-    if ($child) {
-        $parent?.replaceChild($grantSubmissionForm, $child);
-    } else {
-        $parent.appendChild($grantSubmissionForm)
-    }
-};
 
 $parent.removeChild($oldForm);
+$parent.appendChild(document.createRange().createContextualFragment(`
+<imbu-grant-submission-page app-name="${appName}" websocket-addr="${webSocketAddr}">
+</imbu-grant-submission-page>
+`));
 
-(async function enableExtension() {
-    const extensions = await web3Enable(appName);
-    if (!extensions.length) {
-        if (attempts--) {
-            setTimeout(() => {
-                enableExtension();
-            }, 2000);
-        } else {
-            throw new Error("Unable to enable any web3 extension.");
-        }
-    } else {
-        // For right now, we're just replacing the existing form, but in the near future
-        // we should just use an empty webflow page that has a root element with an `id`,
-        // and append to that instead.
-        $parent.addEventListener(
-            "imbu:grant-submission-form:done",
-            async _ => renderForm($parent, await api, await web3Accounts())
-        );
 
-        renderForm($parent, await api, await web3Accounts());
-    }
-})();
-
+// import { ApiPromise, WsProvider } from "@polkadot/api";
+// import { Keyring } from "@polkadot/keyring";
+// import type { KeyringPair } from "@polkadot/keyring/types";
+// import type { Hash } from "@polkadot/types/interfaces";
+// import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+// import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+// import GrantSubmissionForm from "./grant-submission/form";
 // (async (): Promise<void> => {
-
 //     // const keyring: Keyring = new Keyring({type: "sr25519"});
 //     // const alice: KeyringPair = keyring.addFromUri("//Alice", {name: "Alice default"});
 //     // const txHash: Hash = await api.tx.imbueProposals.createProject(
@@ -106,16 +69,10 @@ $parent.removeChild($oldForm);
 // })();
 
 
-declare global {
-    interface Window {
-        api: ApiPromise;
-        $form: HTMLFormElement;
-        extensions: any[];
-    }
-}
-
-(async () => {
-    window.api = await api;
-})();
-
-// window.$form = $grantSubmissionForm;
+// declare global {
+//     interface Window {
+//         api: ApiPromise;
+//         $form: HTMLFormElement;
+//         extensions: any[];
+//     }
+// }

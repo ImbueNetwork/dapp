@@ -8,7 +8,6 @@ import template from "./form.html";
 import styles from "./form.css";
 
 
-
 type Milestone = {
     name: string,
     percentageToUnlock: number,
@@ -192,14 +191,22 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
     }
 
+    toggleDisabled(force?: boolean) {
+        this.toggleInputsAttribute("disabled", force);
+    }
+
     async submitGrantProposal(account: InjectedAccountWithMeta, proposal: GrantProposal) {
         try {
             const injector = await web3FromSource(account.meta.source);
 
-            this.$["imbu-status"].innerText = "Signing and sending.";
-            this.$["imbu-dialog"].toggleAttribute("open", true);
+            this.dispatchEvent(new CustomEvent("imbu:status", {
+                bubbles: true, detail: {
+                    heading: "Submitting",
+                    msg: "Signing and sending...",
+                }
+            }));
 
-            this.toggleInputsAttribute("disabled", true);
+            this.toggleDisabled(true);
             const extrinsic = this.api.tx.imbueProposals.createProject(
                 proposal.name,
                 proposal.logo,
@@ -215,17 +222,27 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                     console.log(status);
                     if (status.isInBlock) {
                         console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-                        this.$["imbu-status"].innerText = `Completed at block hash #${status.asInBlock.toString()}`;
+                        this.dispatchEvent(new CustomEvent("imbu:status", {
+                            bubbles: true, detail: {
+                                heading: "Status",
+                                msg: `Completed at block hash #${status.asInBlock.toString()}`
+                            }
+                        }));
 
                         // FIXME: rather than timeout, provide a link to see the project detail page,
                         // and a button for the user to dismiss
                         setTimeout(() => {
                             this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
                                 bubbles: true, composed: true
-                            }));                                
+                            }));
                         }, 5000);
                     } else {
-                        this.$["imbu-status"].innerText = status.type;
+                        this.dispatchEvent(new CustomEvent("imbu:status", {
+                            bubbles: true, detail: {
+                                heading: "Status",
+                                msg: status.type
+                            }
+                        }))
                         console.log(`Current status: ${status.type}`);
                     }
                 }
@@ -234,10 +251,16 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         } catch (e: any) {
             console.error("Transaction failed...", e);
             // probably canceled, so just re-enable the form fields.
-            this.toggleInputsAttribute("disabled", false);
-            this.$["imbu-dialog"].toggleAttribute("open", false);
+            this.dispatchEvent(new CustomEvent("imbu:status", {
+                bubbles: true, detail: {
+                    heading: "Transaction failed",
+                    msg: e.toString(),
+                    dismissable: true
+                }
+            }));
+            this.toggleDisabled(false);
         }
     }
 }
 
-window.customElements.define("imbue-grant-submission-form", GrantSubmissionForm);
+window.customElements.define("imbu-grant-submission-form", GrantSubmissionForm);

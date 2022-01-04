@@ -1,12 +1,4 @@
 :root {
-    --mdc-shape-small: 8px;
-    --mdc-theme-primary: #B2FF0B;
-    --mdc-theme-secondary: #411DC9;
-    --mdc-theme-secondary-hover: #512dd9;
-    --mdc-theme-error: #ff7755;
-    --mdc-theme-background: #1A1A19;
-    --mdc-theme-surface: #1A1A19;
-
     --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
     --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23);
     --mdc-text-field-label-ink-color: #aaa;
@@ -20,8 +12,8 @@
     --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
     --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
 
-    --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
-    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5);
+    /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
+    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
 }
 .web3-source {
     color: #999;
@@ -68,3 +60,14 @@ fieldset {
 #submit-project:hover {
     background-color: var(--mdc-theme-secondary-hover);
 }
+
+/* .input-field mwc-list-item {
+    color: inherit;
+}
+.input-field mwc-list-item:focus,
+.input-field mwc-list-item:hover {
+    background-color: rgb(178, 255, 11, 0.2);
+    outline-width: 10px;
+    outline-color: rgb(178, 255, 11);
+    outline: 1px  solid var(--mdc-theme-primary);
+} */

@@ -23,7 +23,7 @@ server {
     # 	proxy_set_header Host $host;
 	# }
 
-	location /imbue {
+	location /dist {
 		gzip on;
 		gzip_types text/plain application/json application/javascript;
 	}

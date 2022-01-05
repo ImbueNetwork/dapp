@@ -1,0 +1,35 @@
+server {
+	listen ${HTTP_PORT};
+	listen [::]:${HTTP_PORT};
+
+	# Change 302 to 301 to make the redirect permanent.
+	return 302 https://$host:${HTTPS_PORT}$request_uri;
+}
+
+server {
+	listen ${HTTPS_PORT} ssl;
+	listen [::]:${HTTPS_PORT} ssl;
+	include ${SSL_CERTS_CONF};
+	include conf.d/ssl-params.conf;
+
+	root /usr/share/nginx/html;
+
+	# FIXME: connect to imbue with TLS
+	# location /wsapp/ {
+    # 	proxy_pass ${IMBUE_WS_ADDR};
+    # 	proxy_http_version 1.1;
+    # 	proxy_set_header Upgrade $http_upgrade;
+    # 	proxy_set_header Connection "Upgrade";
+    # 	proxy_set_header Host $host;
+	# }
+
+	location /imbue {
+		gzip on;
+		gzip_types text/plain application/json application/javascript;
+	}
+
+	location / {
+		proxy_pass ${WEBFLOW_URL};
+		proxy_ssl_server_name on;
+	}
+}

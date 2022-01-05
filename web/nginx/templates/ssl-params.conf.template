@@ -1,6 +1,6 @@
 ssl_protocols TLSv1.3;
 ssl_prefer_server_ciphers on;
-ssl_dhparam /etc/nginx/conf.d/includes/dhparam.pem;
+ssl_dhparam ${SSL_DHPARAM}; #/etc/nginx/conf.d/includes/dhparam.pem;
 ssl_ciphers EECDH+AESGCM:EDH+AESGCM;
 ssl_ecdh_curve secp384r1;
 ssl_session_timeout  10m;

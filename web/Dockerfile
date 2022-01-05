@@ -7,19 +7,15 @@ RUN yarn run webpack build
 
 
 FROM nginx:latest
-COPY --from=builder /builds/imbue/dist /usr/share/nginx/html/imbue
+COPY --from=builder /builds/imbue/dist /usr/share/nginx/html/dist
 
 RUN rm /etc/nginx/conf.d/default.conf
 ADD ./nginx/conf /etc/nginx/conf.d/
+ADD ./nginx/templates /etc/nginx/templates/
 ADD ./nginx/ssl /etc/ssl/
 
-ENV DOLLAR=\$
-ENV SSL_PORT=8443
-
-CMD [ "/bin/bash"\
-    , "-c"\
-    , "envsubst\
-        < /etc/nginx/conf.d/imbue.conf.template\
-        > /etc/nginx/conf.d/imbue.conf;\
-        /docker-entrypoint.sh nginx -g 'daemon off;'"\
-    ]
+ENV HTTP_PORT=8081
+ENV HTTPS_PORT=8443
+ENV SSL_DHPARAM=/etc/nginx/conf.d/includes/dhparam.pem
+ENV SSL_CERTS_CONF=conf.d/includes/self-signed.conf
+ENV WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io

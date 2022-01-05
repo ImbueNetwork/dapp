@@ -31,8 +31,10 @@ services:
     - "8443:443"
     environment:
     - SSL_PORT=8443
+    - SSL_DHPARAM=/etc/nginx/conf.d/includes/dhparam.pem
+    - SSL_CERTS_CONF=conf.d/includes/self-signed.conf
     - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
-    - IMBUE_WS_ADDR=http://3.9.171.186:9944
+    # - IMBUE_WS_ADDR=http://3.9.171.186:9944
     - API_LOCAL=http://api:3000
       #volumes:
       #- "./web/dist:/usr/share/nginx/html/imbue"

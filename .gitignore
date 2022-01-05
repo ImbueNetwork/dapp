@@ -6,4 +6,4 @@ node_modules/
 *.swp
 *.swo
 
-docker-compose.*.yaml
+docker-compose.*.yml

@@ -14,4 +14,5 @@ ADD ./nginx/conf /etc/nginx/conf.d/
 ADD ./nginx/templates /etc/nginx/templates/
 ADD ./nginx/ssl /etc/ssl/
 
-ENV SSL_PORT=8443
+ENV HTTP_PORT=8081
+ENV HTTPS_PORT=8443

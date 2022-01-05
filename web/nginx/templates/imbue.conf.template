@@ -1,14 +1,14 @@
 server {
-	listen 80;
-	listen [::]:80;
+	listen ${HTTP_PORT};
+	listen [::]:${HTTP_PORT};
 
 	# Change 302 to 301 to make the redirect permanent.
-	return 302 https://$host:${SSL_PORT}$request_uri;
+	return 302 https://$host:${HTTPS_PORT}$request_uri;
 }
 
 server {
-	listen 443 ssl;
-	listen [::]:443 ssl;
+	listen ${HTTPS_PORT} ssl;
+	listen [::]:${HTTPS_PORT} ssl;
 	include ${SSL_CERTS_CONF};
 	include conf.d/ssl-params.conf;
 

@@ -36,8 +36,8 @@ services:
     - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
     # - IMBUE_WS_ADDR=http://3.9.171.186:9944
     - API_LOCAL=http://api:3000
-      #volumes:
-      #- "./web/dist:/usr/share/nginx/html/imbue"
+    #volumes:
+    #- "./web/dist:/usr/share/nginx/html/dist"
 
   ## XXX: commenting this out for now, because we have a testnet to work with instead.
   # but if you wanted to work with a local network, this is one possibility.

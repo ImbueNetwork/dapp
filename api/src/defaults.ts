@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     region: "local", // AWS region
     dynamodb:{
         endpoint: "http://localhost:8000"

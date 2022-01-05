@@ -1,14 +1,25 @@
 version: '3.8'
 services:
-  dynamodb-local:
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
+  # dynamodb-local:
+  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+  #   image: "amazon/dynamodb-local:latest"
+  #   container_name: dynamodb-local
+  #   ports:
+  #   - "8000:8000"
+  #   volumes:
+  #   - "./docker/dynamodb:/home/dynamodblocal/data"
+  #   working_dir: /home/dynamodblocal
+
+  ebok-postgres:
+    container_name: ebok-postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: imbue
+      POSTGRES_PASSWORD: imbue
     ports:
-    - "8000:8000"
-    volumes:
-    - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
+    - 55432:5432
+    #volumes:
+    #- /tmp/imbue/postgres:/var/lib/postgresql/data
 
   api:
     build: ./api

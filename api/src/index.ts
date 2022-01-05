@@ -1,11 +1,15 @@
-const http = require("http");
-const createError = require("http-errors");
-const express = require("express");
-const { DynamoDBClient, ListTablesCommand } =
-    require("@aws-sdk/client-dynamodb");
-const logger = require("morgan");
+import http from "http";
+import createError from "http-errors";
+import express from "express";
+import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
+import logger from "morgan";
 
-const defaults = require("./defaults");
+// const defaults = require("./defaults");
+import defaults from "./defaults";
+
+type Cause = Error & {
+    constructor(msg: string, options: Record<string, any>): Cause;
+}
 
 const port = process.env.PORT || defaults.port;
 const app = express();
@@ -30,7 +34,7 @@ app.get("/healthcheck", async (_req, res, next) => {
         next(
             new Error(
                 "Unable to get DynamoDB table listing.",
-                {cause}
+                {cause: (cause as Error)}
             )
         );
     }
@@ -42,7 +46,12 @@ app.use((_req, _res, next) => {
 });
 
 // error handler
-app.use((err, _req, res, _next) => {
+app.use((
+    err: Error<express.Request>,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction
+) => {
     const causes = [];
     let cause = err;
 

@@ -5,3 +5,5 @@ node_modules/
 # vim
 *.swp
 *.swo
+
+docker-compose.*.yaml

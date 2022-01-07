@@ -19,7 +19,7 @@ type GrantProposal = {
     description: string,
     contact: string,
     milestones: Milestone[],
-    "required-funds": number,
+    requiredFunds: number,
 };
 
 
@@ -80,15 +80,26 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         $input.addEventListener("change", _ => this.reportValidity($input));
     }
 
+    /**
+     * At this point, the form should have been validated, so we simply cast
+     * the form inputs into their respective types and rely on the fact that
+     * there won't be any undefined values.
+     * 
+     * Note that `requiredFunds` is multiplied by 1e12, so that whatever the
+     * user submits here, we are ultimately submitting
+     * $number * 1_000_000_000_000 to the blockchain.
+     */
     proposalFromFormData(formData: FormData): GrantProposal {
-        return Object.fromEntries(
-            Array.from(formData).map(
-                ([k, v]) => [
-                    k.replace(/^imbu-/, ""),
-                    v
-                ]
-            )
-        ) as unknown as GrantProposal;
+        return {
+            name: formData.get("imbu-name") as string,
+            logo: formData.get("imbu-logo") as string,
+            description: formData.get("imbu-description") as string,
+            contact: formData.get("imbu-contact") as string,
+            milestones: this.milestones,
+            requiredFunds: parseInt(
+                formData.get("imbu-required-funds") as string
+            ) * 1e12,
+        }
     }
 
     reportValidity($input: HTMLInputElement, submitting: boolean = false) {
@@ -124,8 +135,6 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         // Form is valid.
         const formData = new FormData($form);
         const proposal = this.proposalFromFormData(formData);
-
-        proposal.milestones = this.milestones;
 
         // XXX: shouldn't happen because we get the list of accounts to
         // populate the dropdown in the first place.
@@ -213,7 +222,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                 proposal.description,
                 proposal.contact,
                 proposal.milestones,
-                proposal["required-funds"],
+                proposal.requiredFunds,
             );
             const txHash = await extrinsic.signAndSend(
                 account.address,

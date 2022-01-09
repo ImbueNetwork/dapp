@@ -3,9 +3,9 @@ import { html, stylesheet } from "@pojagi/hoquet/utils";
 
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { InjectedExtension } from '@polkadot/extension-inject/types';
-import GrantSubmissionForm from "./form";
-import { appName, webSocketAddr } from "../config";
+import type { InjectedExtension } from '@polkadot/extension-inject/types';
+import GrantSubmissionForm from "../form/form";
+import { appName, webSocketAddr } from "../../config";
 import template from "./page.html";
 import styles from "./page.css";
 
@@ -75,9 +75,7 @@ class GrantSubmissionPage extends Hoquet(HTMLElement, {
         this.status("Initializing", html`Finding web3 accounts.`);
         const accounts = await web3Accounts();
 
-        const $form = new GrantSubmissionForm(
-            this.api, await web3Accounts()
-        );
+        const $form = new GrantSubmissionForm(this.api, accounts);
 
         if (this.$form) {
             this.removeChild(this.$form);

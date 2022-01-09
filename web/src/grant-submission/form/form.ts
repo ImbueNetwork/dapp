@@ -1,11 +1,14 @@
-import { ApiPromise } from "@polkadot/api";
-import { web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
+import type { ApiPromise } from "@polkadot/api";
+import { web3FromSource } from '@polkadot/extension-dapp';
 
 import Hoquet from "@pojagi/hoquet/mixin";
 import { html, stylesheet } from "@pojagi/hoquet/utils";
-import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import template from "./form.html";
 import styles from "./form.css";
+import { categories } from "../../config";
+
+import "lib/imbue/forms/textfield/textfield";
 
 
 type Milestone = {
@@ -22,6 +25,12 @@ type GrantProposal = {
     requiredFunds: number,
 };
 
+const ordinals = [
+    "first",
+    "second",
+    "third",
+];
+
 
 export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     template: html`${template}`,
@@ -30,6 +39,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
 }) {
     accounts: InjectedAccountWithMeta[];
     api: ApiPromise;
+    milestoneIdx: number = 0;
 
     constructor(api: ApiPromise, accounts: InjectedAccountWithMeta[]) {
         super();
@@ -43,6 +53,10 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
 
     get $inputs(): HTMLInputElement[] {
         return Array.from(this.querySelectorAll("input"));
+    }
+
+    get nextMilestoneOrdinal(): string {
+        return ordinals[this.milestoneIdx++] ?? "next";
     }
 
     connectedCallback() {
@@ -65,19 +79,29 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
 
         this.accounts.forEach((account, idx) => {
-            const $opt = this.fragment(`
+            this.$["web3-account-select"].appendChild(this.fragment(`
                 <mwc-list-item twoline value="${account.address}">
                     <span>${account.meta.name ?? account.address}</span>
-                    <span class="web3-source" slot="secondary">${account.meta.source}</span>
+                    <span class="select-source" slot="secondary">${account.meta.source}</span>
                 </mwc-list-item>
-            `).firstElementChild as Node;
-            this.$["web3-account-select"].appendChild($opt);
+            `));
+        });
+
+        Object.entries(categories).forEach(([category, subcategies], idx) => {
+            this.$["category-select"].appendChild(this.fragment(`
+                <mwc-list-item twoline value="${idx}">
+                    <span>${category}</span>
+                    <span class="select-source" slot="secondary">${
+                        subcategies.join("; ")
+                    }</span>
+                </mwc-list-item>
+            `));
         });
     }
 
     bindInputValidation($input: HTMLInputElement) {
         $input.addEventListener("focus", _ => $input.setCustomValidity(""));
-        $input.addEventListener("change", _ => this.reportValidity($input));
+        $input.addEventListener("input", _ => this.reportValidity($input));
     }
 
     /**
@@ -97,7 +121,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             contact: formData.get("imbu-contact") as string,
             milestones: this.milestones,
             requiredFunds: parseInt(
-                formData.get("imbu-required-funds") as string
+                formData.get("imbu-funds-required") as string
             ) * 1e12,
         }
     }
@@ -107,6 +131,8 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             $input.setAttribute("validationmessage", "This field is required.");
         } else if ($input.classList.contains("milestone-percent-to-unlock")) {
             this.reportMilestoneImbalances(submitting);
+        } else {
+            $input.setAttribute("validationmessage", "");
         }
         $input.reportValidity();
     }
@@ -136,12 +162,12 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         const formData = new FormData($form);
         const proposal = this.proposalFromFormData(formData);
 
-        // XXX: shouldn't happen because we get the list of accounts to
-        // populate the dropdown in the first place.
         const account = this.accounts.filter(
             account => account.address === formData.get("imbu-account")
         )[0];
 
+        // XXX: shouldn't happen because we get the list of accounts to
+        // populate the dropdown in the first place.
         if (!account) {
             // FIXME: Need UX here.
             throw new Error("Selected account no longer found.");
@@ -171,6 +197,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     }
 
     addMilestoneItem() {
+        const ordinal = this.nextMilestoneOrdinal;
         const frag = (this.$["milestone-item-template"] as HTMLTemplateElement)
             .content
             .cloneNode(true) as DocumentFragment
@@ -182,6 +209,9 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         frag.querySelector(".milestone-percent-to-unlock")?.addEventListener(
             "blur", e => this.reportMilestoneImbalances()
         );
+
+        (frag.querySelector(".milestone-next-label") as HTMLElement).innerText =
+            `What is you ${ordinal} milestone?`;
 
         for (const $field of frag.querySelectorAll(".input-field")) {
             this.bindInputValidation($field as HTMLInputElement);

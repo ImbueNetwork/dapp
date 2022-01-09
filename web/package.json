@@ -6,7 +6,7 @@
   "author": "Tom Brennan",
   "license": "MIT",
   "scripts": {
-    "start": "webpack watch --mode development"
+    "start": "NODE_ENV=development webpack watch --mode development"
   },
   "devDependencies": {
     "css-loader": "^6.5.1",
@@ -27,8 +27,9 @@
     "@material/mwc-textarea": "^0.25.3",
     "@material/mwc-textfield": "^0.25.3",
     "@material/textfield": "^13.0.0",
-    "@pojagi/hoquet": "^9.0.0-SNAPSHOT.13",
+    "@pojagi/hoquet": "^9.0.0-SNAPSHOT.17",
     "@polkadot/api": "^7.1.1",
-    "@polkadot/extension-dapp": "^0.42.4"
+    "@polkadot/extension-dapp": "^0.42.4",
+    "element-internals-polyfill": "^0.1.51"
   }
 }

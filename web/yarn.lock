@@ -683,10 +683,10 @@
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.3.4.tgz#158ded712d09237c0d3428be60dc01ce8ebab9fb"
   integrity sha512-ZVRouDO5mbdCiDg4zCd3ZZABduRtpy4tCnB33Gh9upHe9tRzpiqbRSN1VTjrj/2g8u2c6MBi0YLNnNQpBYOiWg==
 
-"@pojagi/hoquet@^9.0.0-SNAPSHOT.13":
-  version "9.0.0-SNAPSHOT.13"
-  resolved "https://registry.yarnpkg.com/@pojagi/hoquet/-/hoquet-9.0.0-SNAPSHOT.13.tgz#04fc3b4cd34442a0e1183e1d11d2faa738acc8df"
-  integrity sha512-AwnPTGy6ujFXnEF9zInx5U2u/THrt68PREvypatvNi3XfoBp+zpr9cPRVt9pbe1i0dwGp1DHuWNQEmvGjVhovg==
+"@pojagi/hoquet@^9.0.0-SNAPSHOT.17":
+  version "9.0.0-SNAPSHOT.17"
+  resolved "https://registry.yarnpkg.com/@pojagi/hoquet/-/hoquet-9.0.0-SNAPSHOT.17.tgz#035a827118b7d5939d446f9be40287964c2e5638"
+  integrity sha512-BldkmUR9HzyjN20NCsQLpaq+nBUTq/4QJ/H1+Fu/NlXyyOZkB+ZzPkWcVV1KF7dxMN+OHb0P23mREAdmV3jtQw==
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -1641,6 +1641,11 @@ electron-to-chromium@^1.4.17:
   version "1.4.30"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.30.tgz#0f75a1dce26dffbd5a0f7212e5b87fe0b61cbc76"
   integrity sha512-609z9sIMxDHg+TcR/VB3MXwH+uwtrYyeAwWc/orhnr90ixs6WVGSrt85CDLGUdNnLqCA7liv426V20EecjvflQ==
+
+element-internals-polyfill@^0.1.51:
+  version "0.1.51"
+  resolved "https://registry.yarnpkg.com/element-internals-polyfill/-/element-internals-polyfill-0.1.51.tgz#b0d133c678f695f5a3fe6b110c524a34800dbf45"
+  integrity sha512-clT7Hjh7TF105BWpWrShX1jtbWKVgw3DrYCC0ZgtllSj1eZEUm9UP8JqkzvXFUWWesvSIdsKsfmt07n9O+zEPw==
 
 emoji-regex@^8.0.0:
   version "8.0.0"

@@ -7,6 +7,7 @@
 
     --mdc-select-fill-color: var(--mdc-text-field-fill-color);
     --mdc-select-disabled-fill-color: var(--mdc-text-field-disabled-fill-color);
+    --mdc-select-disabled-ink-color: var(--mdc-text-field-disabled-ink-color);
     --mdc-select-label-ink-color: var(--mdc-text-field-label-ink-color);
     --mdc-select-ink-color: var(--mdc-text-field-ink-color);
     --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
@@ -15,7 +16,7 @@
     /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
     --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
 }
-.web3-source {
+.select-source {
     color: #999;
 }
 
@@ -28,10 +29,26 @@ fieldset:first-of-type {
 }
 fieldset {
     margin-top: 26px;
+    display: flex;
+    flex-direction: column;
 }
-.label {
+legend {
     margin-top: 0;
+    width: 100%;
 }
+
+fieldset.funding {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.input-field[name=imbu-account] {
+    width: 40%
+}
+.input-field[name=imbu-funds-required] {
+    width: 59%;
+}
+
 .milestone-separator {
     width: 95%;
     border: 1px 0 0 0;
@@ -42,32 +59,43 @@ fieldset {
 }
 .input-field {
     margin: 0 0 5px 0;
-    display: flex;
+    display: block;
 }
 
-#add-milestone:hover {
+#add-milestone:not(:disabled):hover {
     background-color: #656565;
     /* color: var(--mdc-theme-secondary); */
     color: white;
     transition: all 150ms ease-in-out;
 }
 
-#add-milestone {
+#add-milestone:not(:disabled) {
     transition: all 150ms ease-in-out;
     background-color: #555;
+    margin: 0;
 }
 
-#submit-project:hover {
+.primary-btn:disabled {
+    background-color: #676767;
+    color: #b5b5b5;
+    cursor: unset;
+}
+
+#submit-project:not(:disabled):hover {
     background-color: var(--mdc-theme-secondary-hover);
 }
 
-/* .input-field mwc-list-item {
+.imbu-symbol-prefix {
+    padding-right: 5px;
+}
+
+.input-field mwc-list-item {
     color: inherit;
 }
 .input-field mwc-list-item:focus,
 .input-field mwc-list-item:hover {
     background-color: rgb(178, 255, 11, 0.2);
-    outline-width: 10px;
-    outline-color: rgb(178, 255, 11);
-    outline: 1px  solid var(--mdc-theme-primary);
-} */
+    background-color: rgba(255,255,255, 0.1);
+    /* outline-color: rgb(178, 255, 11);
+    outline: 1px  solid var(--mdc-theme-primary); */
+}

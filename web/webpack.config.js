@@ -9,7 +9,9 @@ module.exports = {
         "grant-submission": "./src/grant-submission.ts",
         "material-components": "./src/material-components.ts",
     },
-//    devtool: "inline-source-map",
+    devtool: process.env.NODE_ENV === "development"
+        ? "inline-source-map"
+        : void 0,
     module: {
         rules: [
             {
@@ -30,12 +32,14 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: "css-loader",
-                exclude: /node_modules/,
             },
         ]
     },
     resolve: {
-        extensions: [".ts", ".js", ".html"],
+        extensions: [".ts", ".js"],
+        alias: {
+            lib: path.resolve(__dirname, "lib"),
+        },
     },
     output: {
         path: path.resolve(__dirname, "dist"),

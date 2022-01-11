@@ -20,7 +20,7 @@ type GrantProposal = {
     name: string,
     logo: string,
     description: string,
-    contact: string,
+    website: string,
     milestones: Milestone[],
     requiredFunds: number,
 };
@@ -118,7 +118,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             name: formData.get("imbu-name") as string,
             logo: formData.get("imbu-logo") as string,
             description: formData.get("imbu-description") as string,
-            contact: formData.get("imbu-contact") as string,
+            website: formData.get("imbu-website") as string,
             milestones: this.milestones,
             requiredFunds: parseInt(
                 formData.get("imbu-funds-required") as string
@@ -250,7 +250,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                 proposal.name,
                 proposal.logo,
                 proposal.description,
-                proposal.contact,
+                proposal.website,
                 proposal.milestones,
                 proposal.requiredFunds,
             );

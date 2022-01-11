@@ -21,7 +21,12 @@
         /* 0px 11px 15px -7px var(--mdc-theme-primary),
         0px 24px 38px 3px var(--mdc-theme-secondary),
         0px 9px 46px 8px var(--mdc-theme-secondary-hover); */
-    --mdc-typography-font-family: "Aeoniktrial", sans-serif;
+    /* --mdc-typography-font-family: "Aeoniktrial", sans-serif; */
+    /* --mdc-typography-subtitle1-font-size: 15px; */
+    /* Aeoniktrial seems good, but gets cut off at the bottom without
+       resizing, and then once resized it doesn't look as good as plain sans
+       FIXME: try different fonts. */
+    --mdc-typography-font-family: sans-serif;
 }
 
 #imbu-dialog * {

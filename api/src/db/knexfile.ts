@@ -1,19 +1,14 @@
 // Update with your config settings.
 
-module.exports = {
-
-  // development: {
-  //   client: 'sqlite3',
-  //   connection: {
-  //     filename: './dev.sqlite3'
-  //   }
-  // },
+export default {
 
   development: {
-    client: 'postgresql',
+    client: "postgresql",
     connection: {
+      host: "127.0.0.1",
+      port: 55432,
       database: "imbue",
-      user:     "imbue",
+      user: "imbue",
       password: "imbue"
     },
     pool: {
@@ -21,15 +16,15 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations'
+      tableName: "knex_migrations"
     }
   },
 
   staging: {
-    client: 'postgresql',
+    client: "postgresql",
     connection: {
       database: "imbue",
-      user:     "imbue",
+      user: "imbue",
       password: "imbue"
     },
     pool: {
@@ -37,15 +32,15 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations'
+      tableName: "knex_migrations"
     }
   },
 
   production: {
-    client: 'postgresql',
+    client: "postgresql",
     connection: {
       database: "imbue",
-      user:     "imbue",
+      user: "imbue",
       password: "imbue"
     },
     pool: {
@@ -53,7 +48,7 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations'
+      tableName: "knex_migrations"
     }
   }
 

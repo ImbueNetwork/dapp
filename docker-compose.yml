@@ -1,17 +1,17 @@
 version: '3.8'
 services:
-  # dynamodb-local:
-  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-  #   image: "amazon/dynamodb-local:latest"
-  #   container_name: dynamodb-local
-  #   ports:
-  #   - "8000:8000"
-  #   volumes:
-  #   - "./docker/dynamodb:/home/dynamodblocal/data"
-  #   working_dir: /home/dynamodblocal
+  #dynamodb-local:
+  #  command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+  #  image: "amazon/dynamodb-local:latest"
+  #  container_name: dynamodb-local
+  #  ports:
+  #  - "8000:8000"
+  #  volumes:
+  #  - "./docker/dynamodb:/home/dynamodblocal/data"
+  #  working_dir: /home/dynamodblocal
 
-  ebok-postgres:
-    container_name: ebok-postgres
+  postgres:
+    container_name: postgres
     image: postgres:14-alpine
     environment:
       POSTGRES_USER: imbue
@@ -21,18 +21,20 @@ services:
     #volumes:
     #- /tmp/imbue/postgres:/var/lib/postgresql/data
 
-  api:
-    build: ./api
-    container_name: api
-    ports:
-    - "3000:3000"
-    environment:
-      # Even though these aren't legitimate credentials, they need to exist
-      # in order for the dynamodb client to do requests.
-      AWS_ACCESS_KEY_ID: foo
-      AWS_SECRET_ACCESS_KEY: foo
-      DYNAMODB_ENDPOINT: "http://dynamodb-local:8000"
-      REGION: us-east-1
+  #api:
+  # build: ./api
+  # container_name: api
+  # ports:
+  # - "3000:3000"
+  # environment:
+  #   # Even though these aren't legitimate credentials, they need to exist
+  #   # in order for the dynamodb client to do requests.
+  #   AWS_ACCESS_KEY_ID: foo
+  #   AWS_SECRET_ACCESS_KEY: foo
+  #   GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
+  #   GOOGLE_OAUTH@_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
+  #   DYNAMODB_ENDPOINT: "http://dynamodb-local:8000"
+  #   REGION: us-east-1
 
   web:
     build: ./web

@@ -1,12 +1,11 @@
 // Update with your config settings.
-
 export default {
 
   development: {
     client: "postgresql",
     connection: {
-      host: "127.0.0.1",
-      port: 55432,
+      host: process.env.DB_HOST || "127.0.0.1",
+      port: Number(process.env.DB_PORT) || 5433,
       database: "imbue",
       user: "imbue",
       password: "imbue"
@@ -20,6 +19,7 @@ export default {
     }
   },
 
+  // host:port default to localhost:5432 for prod and staging
   staging: {
     client: "postgresql",
     connection: {

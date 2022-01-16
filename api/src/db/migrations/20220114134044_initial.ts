@@ -81,13 +81,21 @@ export async function up(knex: Knex): Promise<void> {
         // `AccountId` is a 32 byte array
         builder.binary("owner").notNullable();
 
-        // Must be nullable; that's sort of the whole point, actually, and
-        // like `withdrawn_funds` we'll need to update this from the chain.
-        // N.B., `BlockNumber` from Substrate can be either a u32 or a byte
-        // array (usually represented as Hex). But it's clearly a sequential
-        // integer in terms of its use, so whatever we get we're going
-        // to want to store it as an int, so we're going with bigint here
-        // because postgres only has signed ints (`unsigned` is ignored).
+        /**
+         * Must be nullable; that's sort of the whole point, actually, and
+         * like `withdrawn_funds` we'll need to update this from the chain.
+         * N.B., `BlockNumber` from Substrate can be either a u32 or a byte
+         * array (usually represented as Hex). But it's clearly a sequential
+         * integer in terms of its use, so whatever we get we're going
+         * to want to store it as an int, so we're going with bigint here
+         * because postgres only has signed ints (`unsigned` is ignored).
+         * 
+         * Once this is set, the project is regarded as "committed", but the
+         * real source of truth for this value is the chain itself.
+         * 
+         * If you can't find this on the chain and this value is null, then
+         * the project should be considered in a "draft" state.
+         */
         builder.bigInteger("create_block_number")//.unsigned();
 
         builder.integer("usr_id").notNullable();

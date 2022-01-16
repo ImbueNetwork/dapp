@@ -51,6 +51,7 @@ export const verifyOIDC = async (
          * If not, create the `usr`, then the `federated_credential`
          */
         if (!federated) {
+            // FIXME: do these in a tx
             user = await insertUserByDisplayName(displayName);
             await insertFederatedCredential(user.id, issuer, subject);
         } else {

@@ -17,24 +17,23 @@ services:
       POSTGRES_USER: imbue
       POSTGRES_PASSWORD: imbue
     ports:
-    - 55432:5432
+    - 5433:5432
     #volumes:
     #- /tmp/imbue/postgres:/var/lib/postgresql/data
 
-  #api:
-  # build: ./api
-  # container_name: api
-  # ports:
-  # - "3000:3000"
-  # environment:
-  #   # Even though these aren't legitimate credentials, they need to exist
-  #   # in order for the dynamodb client to do requests.
-  #   AWS_ACCESS_KEY_ID: foo
-  #   AWS_SECRET_ACCESS_KEY: foo
-  #   GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
-  #   GOOGLE_OAUTH@_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
-  #   DYNAMODB_ENDPOINT: "http://dynamodb-local:8000"
-  #   REGION: us-east-1
+  api:
+    build: ./api
+    container_name: api
+    ports:
+    - "3000:3000"
+    environment:
+      GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
+      GOOGLE_OAUTH2_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
+      WEB_HOST: "https://localhost:8443"
+      DB_PORT: 5432
+      DB_HOST: postgres
+    volumes:
+    - "./api/build:/api/build"
 
   web:
     build: ./web
@@ -49,7 +48,7 @@ services:
     - SSL_CERTS_CONF=conf.d/includes/self-signed.conf
     - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
     # - IMBUE_WS_ADDR=http://3.9.171.186:9944
-    - API_LOCAL=http://api:3000
+    - API_URL_BASE=http://api:3000
     volumes:
     - "./web/dist:/usr/share/nginx/html/dist"
 

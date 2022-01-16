@@ -10,7 +10,7 @@ server {
 	listen ${HTTPS_PORT} ssl;
 	listen [::]:${HTTPS_PORT} ssl;
 	include ${SSL_CERTS_CONF};
-	include conf.d/ssl-params.conf;
+	include conf.d/ssl-params.snippet;
 
 	root /usr/share/nginx/html;
 
@@ -22,6 +22,18 @@ server {
     # 	proxy_set_header Connection "Upgrade";
     # 	proxy_set_header Host $host;
 	# }
+
+	location = /logout {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location /api/v1 {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location ~ /oauth2/.* {
+		include conf.d/api-proxy-directives.snippet;
+	}
 
 	location /dist {
 		gzip on;

@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { verifyOIDC } from "../common";
+import config from "../../../config";
 
 // No @types yet :(
 const OIDCStrategy = require("passport-openidconnect");
@@ -11,9 +12,7 @@ export class GoogleOIDCStrategy extends OIDCStrategy {
 
     constructor(options: Record<string,any>, verify: CallableFunction) {
         super({
-            issuer: "https://accounts.google.com",
-            authorizationURL: "https://accounts.google.com/o/oauth2/v2/auth",
-            tokenURL: "https://www.googleapis.com/oauth2/v4/token",
+            ...config.oidc.google,
             ...options
         }, verify);
         this.name = "google";
@@ -27,13 +26,10 @@ export class GoogleOIDCStrategy extends OIDCStrategy {
 
 export const googleOIDCStrategy = new GoogleOIDCStrategy(
     {
-        clientID: process.env.GOOGLE_OAUTH2_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET,
-        callbackURL: "/oauth2/redirect/accounts.google.com",
+        // callbackURL: "/oauth2/redirect/accounts.google.com",
         scope: ["profile"],
         // state: true,
     },
-    // verify
     (issuer: string, profile: Record<string,any>, done: CallableFunction) => {
         return verifyOIDC(issuer, profile.id, profile.displayName, done);
     }
@@ -41,8 +37,8 @@ export const googleOIDCStrategy = new GoogleOIDCStrategy(
 
 export const googleOIDCRouter = express.Router();
 
-googleOIDCRouter.get("/login/google", passport.authenticate("google"));
-googleOIDCRouter.get("/oauth2/redirect/accounts.google.com", passport.authenticate(
+googleOIDCRouter.get("/login", passport.authenticate("google"));
+googleOIDCRouter.get("/redirect", passport.authenticate(
     "google",
     {
         successReturnToOrRedirect: "/",

@@ -21,7 +21,7 @@ passport.deserializeUser(async (id: string, done) => {
 
 const router = express.Router();
 
-router.use(googleOIDCRouter);
+router.use("/oauth2/accounts.google.com", googleOIDCRouter);
 
 router.get("/logout", (req, res, next) => {
     req.logout();

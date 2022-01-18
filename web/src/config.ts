@@ -1,12 +1,17 @@
-const appName = "Imbue Network";
+export const appName = "Imbue Network";
 // const webSocketAddr = "ws://127.0.0.1:8081/wsapp/";
-const webSocketAddr = "wss://dev.imbue.network";
+export const webSocketAddr = "wss://dev.imbue.network";
 // http://3.9.171.186:3000/?rpc=ws%3A%2F%2F3.9.171.186%3A9942#/chainstate
 // const webSocketAddr = "ws://3.9.171.186:9944"
 
 // https://www.hachettebookgroup.com/travel/trip-ideas/types-of-volunteer-opportunities/
 // https://sbg.sg/business_category_list.pdf
-const categories = {
+
+export const apiBase = "https://localhost:8443/api/v1";
+
+export const googleAuthEndpoint = "/oauth2/accounts.google.com/login";
+
+export const categories = {
     "Automative": [
         "Auto Accessories",
         "Auto Dealers - New",
@@ -167,9 +172,3 @@ const categories = {
         "Utility Companies",
     ],
 };
-
-export {
-    appName,
-    webSocketAddr,
-    categories,
-}

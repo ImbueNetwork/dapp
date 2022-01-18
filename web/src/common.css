@@ -1,0 +1,48 @@
+:root {
+    --mdc-shape-small: 8px;
+    --mdc-theme-primary: #B2FF0B;
+    --mdc-theme-secondary: #411DC9;
+    --mdc-theme-secondary-hover: #512dd9;
+    --mdc-theme-error: #ff7755;
+    --mdc-theme-background: #1A1A19;
+    --mdc-theme-surface: #0f0f0f;
+    --mdc-dialog-heading-ink-color: #fff;
+    --mdc-dialog-content-ink-color: #a9a9a9;
+    --mdc-dialog-z-index: 1001;
+
+    /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color); */
+    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5);
+
+    --mdc-dialog-box-shadow:
+        0px 0px 1px #fff,
+        0px 11px 15px -7px rgba(50, 50, 50, 0.2),
+        0px 24px 38px 3px rgba(50, 50, 50, 0.14),
+        0px 9px 46px 8px rgba(50, 50, 50, 0.12);
+
+        /* 0px 11px 15px -7px var(--mdc-theme-primary),
+        0px 24px 38px 3px var(--mdc-theme-secondary),
+        0px 9px 46px 8px var(--mdc-theme-secondary-hover); */
+    /* --mdc-typography-font-family: "Aeoniktrial", sans-serif; */
+    /* --mdc-typography-subtitle1-font-size: 15px; */
+    /* Aeoniktrial seems good, but gets cut off at the bottom without
+       resizing, and then once resized it doesn't look as good as plain sans
+       FIXME: try different fonts. */
+    --mdc-typography-font-family: sans-serif;
+    
+    --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
+    --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23);
+    --mdc-text-field-label-ink-color: #aaa;
+    --mdc-text-field-disabled-ink-color: rgba(255, 255, 255, 0.25);
+    --mdc-text-field-ink-color: #fafafa;
+
+    --mdc-select-fill-color: var(--mdc-text-field-fill-color);
+    --mdc-select-disabled-fill-color: var(--mdc-text-field-disabled-fill-color);
+    --mdc-select-disabled-ink-color: var(--mdc-text-field-disabled-ink-color);
+    --mdc-select-label-ink-color: var(--mdc-text-field-label-ink-color);
+    --mdc-select-ink-color: var(--mdc-text-field-ink-color);
+    --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
+    --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
+
+    /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
+    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
+}

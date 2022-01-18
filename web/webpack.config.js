@@ -20,7 +20,7 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.html$/,
+                test: /\.(html|svg)$/,
                 use: {
                     loader: "html-loader",
                     options: {

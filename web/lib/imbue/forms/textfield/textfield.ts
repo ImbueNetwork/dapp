@@ -2,6 +2,7 @@ import Hoquet from "@pojagi/hoquet/mixin";
 import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { MDCTextField } from "@material/textfield";
 import 'element-internals-polyfill';
+import rootStyles from "/src/common.css";
 
 import template from "./textfield.html";
 import styles from "./textfield.css";
@@ -14,7 +15,7 @@ const inputAttrs = new Set([
 
 export default class TextField extends Hoquet(HTMLElement, {
     template: html`${template}`,
-    stylesheets: [stylesheet`${styles}`,],
+    stylesheets: [stylesheet`${rootStyles}${styles}`],
     shadowy: true,
     attributes: [...inputAttrs, "validationmessage", "helper", "persistent-helper"]
 }) {
@@ -29,12 +30,6 @@ export default class TextField extends Hoquet(HTMLElement, {
         this.internals = this.attachInternals();
 
         this.render();
-
-        if (!("adoptedStyleSheets" in document)) {
-            this.shadowRoot?.prepend(...Array.from(
-                this.shadowRoot.querySelectorAll("link[rel='stylesheet']"))
-            );
-        }
 
         const $label = this.$["container"] as Element;
         const $input = this.$input = this.$["input"] as HTMLInputElement;
@@ -98,6 +93,11 @@ export default class TextField extends Hoquet(HTMLElement, {
 
     get value() {
         return this.$input.value;
+    }
+
+    set value(x: string) {
+        this.internals.setFormValue(x);
+        this.textField.value = x;
     }
 
     validityToValidationMessage(validity: ValidityState): string {

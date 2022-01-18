@@ -27,12 +27,29 @@ server {
 		include conf.d/api-proxy-directives.snippet;
 	}
 
+	location = /redirect {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
 	location /api/v1 {
 		include conf.d/api-proxy-directives.snippet;
 	}
 
-	location ~ /oauth2/.* {
+	location /oauth2 {
 		include conf.d/api-proxy-directives.snippet;
+	}
+
+	# pages -- eventually this will change to just `/` and we won't proxy
+	# webflow anymore.
+	location = /grant-proposals {
+		return 302 /grant-proposals/;
+	}
+	location = /grant-proposals/ {
+		proxy_pass ${WEBFLOW_URL}/project-voting;
+	}
+	location /grant-proposals/ {
+		rewrite .* /project-voting/illum-rerum-necessitatibus break;
+		proxy_pass ${WEBFLOW_URL};
 	}
 
 	location /dist {

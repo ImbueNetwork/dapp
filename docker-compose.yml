@@ -34,6 +34,8 @@ services:
       DB_HOST: postgres
     volumes:
     - "./api/build:/api/build"
+    - "./api/node_modules:/api/node_modules"
+    - "./api/views:/api/views"
 
   web:
     build: ./web

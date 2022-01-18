@@ -1,0 +1,20 @@
+/* --mdc-dialog-heading-ink-color: #fff;
+--mdc-dialog-content-ink-color: #a9a9a9; */
+
+
+.mdc-dialog .mdc-dialog__title {
+    color: var(--mdc-dialog-heading-ink-color);
+}
+
+.mdc-dialog .mdc-dialog__content {
+    color: var(--mdc-dialog-content-ink-color);
+}
+
+.mdc-dialog .mdc-dialog__content a {
+    color: var(--mdc-theme-primary);
+}
+
+.mdc-dialog .mdc-dialog__content .achtung {
+    font-weight: bold;
+    color: var(--mdc-dialog-heading-ink-color);
+}

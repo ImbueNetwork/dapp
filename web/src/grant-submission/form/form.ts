@@ -1,28 +1,37 @@
-import type { ApiPromise } from "@polkadot/api";
-import { web3FromSource } from '@polkadot/extension-dapp';
-
 import Hoquet from "@pojagi/hoquet/mixin";
 import { html, stylesheet } from "@pojagi/hoquet/utils";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+
 import template from "./form.html";
 import styles from "./form.css";
 import { categories } from "../../config";
 
-import "lib/imbue/forms/textfield/textfield";
+import "../../../lib/imbue/forms/textfield/textfield";
 
 
 type Milestone = {
-    name: string,
-    percentageToUnlock: number,
+    name: string;
+    percentageToUnlock: number;
 };
 
 type GrantProposal = {
-    name: string,
-    logo: string,
-    description: string,
-    website: string,
-    milestones: Milestone[],
-    requiredFunds: number,
+    name: string;
+    logo: string;
+    description: string;
+    website: string;
+    milestones: Milestone[];
+    requiredFunds: number;
+    usrId?: number;
+    category?: string;
+};
+
+type Draft = {
+    proposal: GrantProposal;
+    accountAddress?: string;
+};
+
+export type User = {
+    id: number;
 };
 
 const ordinals = [
@@ -35,24 +44,14 @@ const ordinals = [
 export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     template: html`${template}`,
     stylesheets: [stylesheet`${styles}`],
-    shadowy: false
+    shadowy: false,
 }) {
-    accounts: InjectedAccountWithMeta[];
-    api: ApiPromise;
     milestoneIdx: number = 0;
-
-    constructor(api: ApiPromise, accounts: InjectedAccountWithMeta[]) {
-        super();
-        this.accounts = accounts;
-        this.api = api;
-    }
+    usr?: User;
+    accounts?: InjectedAccountWithMeta[];
 
     get $fields(): HTMLInputElement[] {
         return Array.from(this.querySelectorAll(".input-field"));
-    }
-
-    get $inputs(): HTMLInputElement[] {
-        return Array.from(this.querySelectorAll("input"));
     }
 
     get nextMilestoneOrdinal(): string {
@@ -64,9 +63,16 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             return;
 
         this.render();
-        this.addMilestoneItem();
 
-        this.$fields.forEach($input => this.bindInputValidation($input));
+        const draftSrc = localStorage["imbu-draft-proposal"];
+        if (draftSrc) {
+            const draft = JSON.parse(draftSrc);
+            this.proposalIntoFormFields(draft);
+        } else {
+            this.addMilestoneItem();
+        }
+
+        this.$fields.forEach($input => this.bindFocusBlurValidation($input));
 
         this.$["add-milestone"].addEventListener(
             "click", _ => this.addMilestoneItem());
@@ -78,14 +84,20 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             this.handleFormSubmission(e.target as HTMLFormElement);
         });
 
-        this.accounts.forEach((account, idx) => {
-            this.$["web3-account-select"].appendChild(this.fragment(`
-                <mwc-list-item twoline value="${account.address}">
-                    <span>${account.meta.name ?? account.address}</span>
-                    <span class="select-source" slot="secondary">${account.meta.source}</span>
-                </mwc-list-item>
-            `));
-        });
+        /**
+         * TODO: maybe we should at least allow the accounts to be collected here if they're
+         * already connected. But we still don't want to submit it to the chain until we get
+         * to the detail page, where there will be a "commit" and "edit" button and plenty
+         * of opportunity to communicate that submission is *final*, etc.
+         */
+        // this.accounts.forEach((account, idx) => {
+        //     this.$["web3-account-select"].appendChild(this.fragment(`
+        //         <mwc-list-item twoline value="${account.address}">
+        //             <span>${account.meta.name ?? account.address}</span>
+        //             <span class="select-source" slot="secondary">${account.meta.source}</span>
+        //         </mwc-list-item>
+        //     `));
+        // });
 
         Object.entries(categories).forEach(([category, subcategies], idx) => {
             this.$["category-select"].appendChild(this.fragment(`
@@ -99,7 +111,7 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
     }
 
-    bindInputValidation($input: HTMLInputElement) {
+    bindFocusBlurValidation($input: HTMLInputElement) {
         $input.addEventListener("focus", _ => $input.setCustomValidity(""));
         $input.addEventListener("input", _ => this.reportValidity($input));
     }
@@ -123,6 +135,31 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             requiredFunds: parseInt(
                 formData.get("imbu-funds-required") as string
             ) * 1e12,
+            category: formData.get("imbu-category") as string,
+        }
+    }
+
+    proposalIntoFormFields(draft: Draft): void {
+        const proposal = draft.proposal;
+        const $form = this.$["grant-submission-form"] as HTMLFormElement;
+        const $inputFields: Record<string,HTMLInputElement> = Array.from(
+            $form.querySelectorAll(".input-field")
+        ).reduce((p, c: Element) => {
+            return {...p, [c.getAttribute("name") as string]: c as HTMLInputElement};
+        }, {});
+
+        $inputFields["imbu-account"].value = draft.accountAddress ?? "";
+        $inputFields["imbu-name"].value = proposal.name ?? "";
+        $inputFields["imbu-logo"].value = proposal.logo ?? "";
+        $inputFields["imbu-description"].value = proposal.description ?? "";
+        $inputFields["imbu-website"].value = proposal.website ?? "";
+        $inputFields["imbu-funds-required"].value = String(proposal.requiredFunds / 1e12) ?? "";
+        $inputFields["imbu-category"].value = proposal.category ?? "";
+
+        for (let milestone of proposal.milestones) {
+            const $inputs = this.addMilestoneItem();
+            $inputs["milestone-next"].value = milestone.name;
+            $inputs["milestone-percent-to-unlock"].value = String(milestone.percentageToUnlock);
         }
     }
 
@@ -144,8 +181,8 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     }
 
     handleFormSubmission($form: HTMLFormElement): void {
-        if (!this.accounts.length)
-            throw new Error("No web3 accounts.");
+        // if (!this.accounts.length)
+        //     throw new Error("No web3 accounts.");
 
         this.$fields.forEach($input => this.reportValidity($input, true));
 
@@ -162,18 +199,20 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         const formData = new FormData($form);
         const proposal = this.proposalFromFormData(formData);
 
-        const account = this.accounts.filter(
+        const account = this.accounts?.filter(
             account => account.address === formData.get("imbu-account")
         )[0];
 
         // XXX: shouldn't happen because we get the list of accounts to
         // populate the dropdown in the first place.
-        if (!account) {
-            // FIXME: Need UX here.
-            throw new Error("Selected account no longer found.");
-        }
+        // if (!account) {
+        //     // FIXME: Need UX here.
+        //     throw new Error("Selected account no longer found.");
+        // }
 
-        this.submitGrantProposal(account, proposal);
+        this.disabled = true;
+
+        this.submitGrantProposal(proposal, account);
     }
 
     reportMilestoneImbalances(submitting: boolean = false) {
@@ -214,10 +253,16 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
             `What is you ${ordinal} milestone?`;
 
         for (const $field of frag.querySelectorAll(".input-field")) {
-            this.bindInputValidation($field as HTMLInputElement);
+            this.bindFocusBlurValidation($field as HTMLInputElement);
         }
 
+        const $inputs = frag.querySelectorAll(".input-field");
         this.$["milestones"].appendChild(frag);
+
+        return {
+            "milestone-next": $inputs[0] as HTMLInputElement,
+            "milestone-percent-to-unlock": $inputs[1] as HTMLInputElement,
+        };
     }
 
     get milestones(): Milestone[] {
@@ -230,76 +275,41 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
         });
     }
 
-    toggleDisabled(force?: boolean) {
+    set disabled(force: boolean) {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    async submitGrantProposal(account: InjectedAccountWithMeta, proposal: GrantProposal) {
-        try {
-            const injector = await web3FromSource(account.meta.source);
+    async submitGrantProposal(proposal: GrantProposal, account?: InjectedAccountWithMeta) {
+        // check the api to see if the user is logged in
+        if (this.usr) {
+            const apiBase = this.getAttribute("api-base");
+            if (apiBase) {
+                // if yes, go ahead and post the draft with the `usr_id`
+                proposal.usrId = this.usr.id;
 
-            this.dispatchEvent(new CustomEvent("imbu:status", {
-                bubbles: true, detail: {
-                    heading: "Submitting",
-                    msg: "Signing and sending...",
-                }
-            }));
+                const resp = await fetch(`${apiBase}/projects/`, {
+                    method: "post",
+                    headers: {
+                        "content-type": "application/json",
+                        "accept": "application/json"
+                    },
+                    body: JSON.stringify(proposal)
+                });
 
-            this.toggleDisabled(true);
-            const extrinsic = this.api.tx.imbueProposals.createProject(
-                proposal.name,
-                proposal.logo,
-                proposal.description,
-                proposal.website,
-                proposal.milestones,
-                proposal.requiredFunds,
-            );
-            const txHash = await extrinsic.signAndSend(
-                account.address,
-                {signer: injector.signer},
-                ({ status }) => {
-                    console.log(status);
-                    if (status.isInBlock) {
-                        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-                        this.dispatchEvent(new CustomEvent("imbu:status", {
-                            bubbles: true, detail: {
-                                heading: "Status",
-                                msg: `Completed at block hash #${status.asInBlock.toString()}`,
-                                dismissable: true,
-                            }
-                        }));
-
-                        // FIXME: rather than timeout, provide a link to see the project detail page,
-                        // and a button for the user to dismiss
-                        setTimeout(() => {
-                            this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
-                                bubbles: true, composed: true
-                            }));
-                        }, 5000);
-                    } else {
-                        this.dispatchEvent(new CustomEvent("imbu:status", {
-                            bubbles: true, detail: {
-                                heading: "Status",
-                                msg: status.type,
-                                dismissable: true,
-                            }
-                        }))
-                        console.log(`Current status: ${status.type}`);
-                    }
+                if (resp.ok) {
+                    // redirect to detail page
+                } else {
+                    // UX for submission failed
                 }
-            );
-            console.log(`Transaction hash: ${txHash}`);
-        } catch (e: any) {
-            console.error("Transaction failed...", e);
-            // probably canceled, so just re-enable the form fields.
-            this.dispatchEvent(new CustomEvent("imbu:status", {
-                bubbles: true, detail: {
-                    heading: "Transaction failed",
-                    msg: e.toString(),
-                    dismissable: true
-                }
-            }));
-            this.toggleDisabled(false);
+            }
+        } else {
+            // if no, save the proposal to localStorage
+            window.localStorage["imbu-draft-proposal"] = JSON.stringify({
+                proposal,
+                web3Account: account?.address,
+            });
+            // Now that we have the proposal ready in `localStorage`, redirect to the detail page
+            // this.dispatchEvent(new CustomEvent("imbu:auth-login-required", {bubbles: true}));
         }
     }
 }

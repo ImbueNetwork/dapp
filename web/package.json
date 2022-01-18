@@ -21,13 +21,15 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
+    "@material/dialog": "^13.0.0",
+    "@material/list": "^13.0.0",
     "@material/mwc-dialog": "^0.25.3",
     "@material/mwc-icon": "^0.25.3",
     "@material/mwc-select": "^0.25.3",
     "@material/mwc-textarea": "^0.25.3",
     "@material/mwc-textfield": "^0.25.3",
     "@material/textfield": "^13.0.0",
-    "@pojagi/hoquet": "^9.0.0-SNAPSHOT.17",
+    "@pojagi/hoquet": "^9.0.0-SNAPSHOT.20",
     "@polkadot/api": "^7.1.1",
     "@polkadot/extension-dapp": "^0.42.4",
     "element-internals-polyfill": "^0.1.51"

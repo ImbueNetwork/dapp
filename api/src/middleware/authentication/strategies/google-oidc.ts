@@ -1,4 +1,5 @@
 import express from "express";
+import type { Session } from "express-session";
 import passport from "passport";
 import { verifyOIDC } from "../common";
 import config from "../../../config";
@@ -37,11 +38,19 @@ export const googleOIDCStrategy = new GoogleOIDCStrategy(
 
 export const googleOIDCRouter = express.Router();
 
-googleOIDCRouter.get("/login", passport.authenticate("google"));
+googleOIDCRouter.get("/login", (req, _res, next) => {
+    console.log("QUERY", req.query);
+    if (req.query.n) {
+        (req.session as any).next = req.query.n;
+    }
+    next();
+}, passport.authenticate("google"));
+
 googleOIDCRouter.get("/redirect", passport.authenticate(
     "google",
     {
-        successReturnToOrRedirect: "/",
-        failureRedirect: "/error"
+        successReturnToOrRedirect: "/redirect",
+        // We don't have any error page yet
+        failureRedirect: "/"
     }
 ));

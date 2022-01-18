@@ -13,22 +13,22 @@ export async function up(knex: Knex): Promise<void> {
         builder.increments("id", { primaryKey: true });
         builder.text("display_name").notNullable();
 
-        /**
-         * A User will ultimately need the `web3_account_id` to do anything on
-         * the chain.
-         */
-        builder.binary("web3_account_id").nullable().unique();
-
         auditFields(knex, builder);
     });
 
-    // await knex.schema.createTable("web3_account", (builder) => {
-    //     builder.binary("id");
-    //     builder.primary(["id"]);
-    //     builder.foreign("id").references("usr.web3_account_id");
+    /**
+     * Without at least one of these, a usr can't really do much beyond saving
+     * a draft proposal.
+     */
+    await knex.schema.createTable("web3_account", (builder) => {
+        builder.binary("id");
+        builder.integer("usr_id").notNullable();
 
-    //     auditFields(knex, builder);
-    // });
+        builder.primary(["id"]);
+        builder.foreign("usr_id").references("usr.id");
+
+        auditFields(knex, builder);
+    });
 
     await knex.schema.createTable("federated_credential", (builder) => {
         builder.integer("id");
@@ -77,9 +77,13 @@ export async function up(knex: Knex): Promise<void> {
         // need to update it from the blockchain.
         // builder.decimal("withdrawn_funds").defaultTo(0);
 
-        // owner -- `AccountId`
-        // `AccountId` is a 32 byte array
-        builder.binary("owner").notNullable();
+        /**
+         * owner -- `AccountId` is a 32 byte array
+         * This has to be nullable, because we need to be able to save the record
+         * without having submitted it to the chain. Note that we also have a `usr_id`
+         * below, which will be necessary to submit the form.
+         */
+        builder.binary("owner").nullable();
 
         /**
          * Must be nullable; that's sort of the whole point, actually, and
@@ -96,7 +100,7 @@ export async function up(knex: Knex): Promise<void> {
          * If you can't find this on the chain and this value is null, then
          * the project should be considered in a "draft" state.
          */
-        builder.bigInteger("create_block_number")//.unsigned();
+        builder.bigInteger("create_block_number").nullable(); //.unsigned();
 
         builder.integer("usr_id").notNullable();
         builder.foreign("usr_id")
@@ -187,6 +191,6 @@ export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("milestone");
     await knex.schema.dropTableIfExists("project");
     await knex.schema.dropTableIfExists("federated_credential");
-    // await knex.schema.dropTableIfExists("web3_account");
+    await knex.schema.dropTableIfExists("web3_account");
     await knex.schema.dropTableIfExists("usr");
 }

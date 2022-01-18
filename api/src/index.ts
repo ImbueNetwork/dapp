@@ -10,11 +10,13 @@ import passport from "passport";
 import config from "./config";
 import { errorHandler } from "./middleware/errors";
 import authenticationMiddleware from "./middleware/authentication";
-import routes from "./routes";
+import v1routes from "./routes/api/v1";
 
 const port = process.env.PORT || config.port;
 const app = express();
 const environment = config.environment;
+
+// app.set("view engine", "ejs");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -23,7 +25,17 @@ app.use(session(config.session));
 
 app.use(passport.authenticate("session"));
 app.use(authenticationMiddleware);
-app.use("/api/v1", routes);
+app.use("/api/v1", v1routes);
+
+app.get("/redirect", (req, res) => {
+    const next = (req.session as any).next;
+    if (next) {
+        delete (req.session as any).next;
+        res.redirect(next);
+    }
+    res.redirect("/");
+});
+
 
 // not found
 app.use((_req, _res, next) => {

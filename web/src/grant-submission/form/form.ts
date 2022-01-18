@@ -308,6 +308,13 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
                 proposal,
                 web3Account: account?.address,
             });
+            this.dispatchEvent(new CustomEvent("imbu:status", {
+                detail: {heading: "Status", msg: "Submitting"},
+                bubbles: true
+            }));
+            setTimeout(_ => {
+                window.location.href = "/grant-proposals/local";
+            }, 1000);
             // Now that we have the proposal ready in `localStorage`, redirect to the detail page
             // this.dispatchEvent(new CustomEvent("imbu:auth-login-required", {bubbles: true}));
         }

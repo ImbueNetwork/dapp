@@ -1,13 +1,13 @@
 import Hoquet from "@pojagi/hoquet/mixin";
 import { html, stylesheet } from "@pojagi/hoquet/utils";
-import { MDCList } from '@material/list';
+// import { MDCList } from '@material/list';
 
 import GrantSubmissionForm from "../form/form";
 
 import template from "./page.html";
 import styles from "./page.css";
-import AuthDialog from "../auth-dialog/auth-dialog";
-import "../auth-dialog/auth-dialog";
+import AuthDialog from "../../auth-dialog/auth-dialog";
+import "../../auth-dialog/auth-dialog";
 
 
 class GrantSubmissionPage extends Hoquet(HTMLElement, {

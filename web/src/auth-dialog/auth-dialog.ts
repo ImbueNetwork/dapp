@@ -3,10 +3,10 @@ import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { MDCDialog } from '@material/dialog';
 // import { MDCList } from '@material/list';
 
-import { googleAuthEndpoint } from "../../config";
+import { googleAuthEndpoint } from "../config";
 import template from "./auth-dialog.html";
 import styles from "./auth-dialog.css";
-import googleButtonSVG from "../../../assets/google_signin_buttons/web/vector/btn_google_light_pressed_ios.svg";
+import googleButtonSVG from "../../assets/google_signin_buttons/web/vector/btn_google_light_pressed_ios.svg";
 
 
 export default class AuthDialog extends Hoquet(HTMLElement, {

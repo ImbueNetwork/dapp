@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { googleOIDCStrategy, googleOIDCRouter } from "./strategies/google-oidc";
-import { polkadotJsAuthRouter, polkadotjsStrategy } from "./strategies/web3/polkadotjs";
+import { polkadotJsAuthRouter, polkadotjsStrategy } from "./strategies/web3/polkadot-js";
 import type { User } from "./common";
 import db from "../../db";
 

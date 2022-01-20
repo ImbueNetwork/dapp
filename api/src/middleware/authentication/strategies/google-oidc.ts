@@ -1,7 +1,7 @@
 import express from "express";
 import type { Session } from "express-session";
 import passport from "passport";
-import { verifyOIDC } from "../common";
+import { upsertFederated } from "../common";
 import config from "../../../config";
 
 // No @types yet :(
@@ -32,7 +32,7 @@ export const googleOIDCStrategy = new GoogleOIDCStrategy(
         // state: true,
     },
     (issuer: string, profile: Record<string,any>, done: CallableFunction) => {
-        return verifyOIDC(issuer, profile.id, profile.displayName, done);
+        return upsertFederated(issuer, profile.id, profile.displayName, done);
     }
 );
 

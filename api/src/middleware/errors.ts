@@ -27,7 +27,9 @@ export const errorHandler = (environment: string): ErrorRequestHandler => (
         message: err.message,
         ...(
             environment.startsWith("dev")
-                ? {causes: causes}
+                ? {causes: causes.map(
+                    cause => cause.message
+                )}
                 : {}
         )
     });

@@ -21,10 +21,13 @@ export async function up(knex: Knex): Promise<void> {
      * a draft proposal.
      */
     await knex.schema.createTable("web3_account", (builder) => {
-        builder.binary("id");
+        builder.text("address");
         builder.integer("usr_id").notNullable();
 
-        builder.primary(["id"]);
+        builder.text("type");
+        builder.text("challenge");
+
+        builder.primary(["address"]);
         builder.foreign("usr_id").references("usr.id");
 
         auditFields(knex, builder);
@@ -40,6 +43,8 @@ export async function up(knex: Knex): Promise<void> {
             .references("usr.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
+
+        auditFields(knex, builder);
     });
 
     /**

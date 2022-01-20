@@ -1,4 +1,5 @@
-import db from "../../db";
+import type { Knex } from "knex";
+import db from "../../db/index";
 
 
 export type FederatedCredential = {
@@ -10,71 +11,158 @@ export type FederatedCredential = {
 export type User = {
     id: number;
     display_name: string;
-    web3_account_id: string;
     email: string;
 };
 
-export const insertUserByDisplayName = async (displayName: string) => {
-    return (
-        await db.insert({
-            display_name: displayName
-        }).into<User>("usr").returning("*")
-    )[0];
+export type Web3Account = {
+    address: string,
+    usr_id: number;
+    type: string;
+    challenge: string;
 };
 
-export const insertFederatedCredential = async (id: number, issuer: string, subject: string) => {
-    return (
-        await db.insert({id, issuer, subject}).into<FederatedCredential>(
-            "federated_credential"
-        ).returning("*")
-    )[0];
+export const fetchWeb3Account = (address: string, tx?: Knex.Transaction) => {
+    const run = async (tx: Knex.Transaction) => {
+        return await tx<Web3Account>("web3_account").select().where({
+            address,
+        }).first();
+    };
+    if (!tx) {
+        return db.transaction(run);
+    }
+    return run(tx);
+};
+
+export const fetchUser = (id: number, tx?: Knex.Transaction) => {
+    const run = async (tx: Knex.Transaction) => {
+        return await tx<User>("usr").where({id}).first();
+    };
+    if (!tx) {
+        return db.transaction(run);
+    }
+    return run(tx);
+};
+
+export const upsertWeb3Challenge = async (
+    user: User,
+    address: string,
+    type: string,
+    challenge: string,
+    tx?: Knex.Transaction,
+) => {
+    const run = async (tx: Knex.Transaction):
+        Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+        let web3Account = await tx<Web3Account>("web3_account")
+            .select()
+            .where({
+                usr_id: user.id
+            })
+            .first();
+
+        if (!web3Account) {
+            return [
+                (
+                    await tx<Web3Account>("web3_account").insert({
+                        address,
+                        usr_id: user.id,
+                        type,
+                        challenge,
+                    }).returning("*")
+                )[0],
+                true
+            ];
+        }
+        
+        return [
+            (
+                await tx<Web3Account>("web3_account").update({challenge}).where(
+                    {usr_id: user.id}
+                ).returning("*")
+            )[0],
+            false
+        ];
+    };
+
+    if (!tx) {
+        return db.transaction(run);
+    }
+    return run(tx);
 }
 
-export const verifyOIDC = async (
+export const insertUserByDisplayName = async (displayName: string, tx?: Knex.Transaction) => {
+    const run = async (tx: Knex.Transaction) => (
+        await tx<User>("usr").insert({
+            display_name: displayName
+        }).returning("*")
+    )[0];
+
+    if (!tx) {
+        return await db.transaction(run);
+    }
+    return run(tx);
+};
+
+export const insertFederatedCredential = async (id: number, issuer: string, subject: string, tx?: Knex.Transaction) => {
+    const run = async (tx: Knex.Transaction) => (
+        await tx<FederatedCredential>("federated_credential").insert({
+            id, issuer, subject
+        }).returning("*")
+    )[0];
+
+    if (!tx) {
+        return await db.transaction(run);
+    }
+    return run(tx);
+}
+
+export const upsertFederated = (
     issuer: string,
     subject: string,
     displayName: string,
     done: CallableFunction
 ) => {
-    let user: User;
+    db.transaction(async tx => {
+        let user: User;
 
-    try {
-        /**
-         * Do we already have a federated_credential ?
-         */
-        const federated = await db.select().from<FederatedCredential>("federated_credential").where({
-            issuer,
-            subject,
-        }).first();
-
-        /**
-         * If not, create the `usr`, then the `federated_credential`
-         */
-        if (!federated) {
-            // FIXME: do these in a tx
-            user = await insertUserByDisplayName(displayName);
-            await insertFederatedCredential(user.id, issuer, subject);
-        } else {
-            const user_ = await db.select().from<User>("usr").where({
-                id: federated.id
+        try {
+            /**
+             * Do we already have a federated_credential ?
+             */
+            const federated = await tx<FederatedCredential>("federated_credential").select().where({
+                issuer,
+                subject,
             }).first();
-
-            if (!user_) {
-                throw new Error(
-                    `Unable to find matching user by \`federated_credential.id\`: ${
-                        federated.id
-                    }`
-                );
+    
+            /**
+             * If not, create the `usr`, then the `federated_credential`
+             */
+            if (!federated) {
+                // FIXME: do these in a tx
+                user = await insertUserByDisplayName(displayName, tx);
+                await insertFederatedCredential(user.id, issuer, subject, tx);
+            } else {
+                const user_ = await db.select().from<User>("usr").where({
+                    id: federated.id
+                }).first();
+    
+                if (!user_) {
+                    throw new Error(
+                        `Unable to find matching user by \`federated_credential.id\`: ${
+                            federated.id
+                        }`
+                    );
+                }
+                user = user_;
             }
-            user = user_;
+    
+            done(null, user);
+        } catch (err) {
+            await tx.rollback();
+            done(new Error(
+                "Failed to upsert federated authentication.",
+                {cause: err as Error}
+            ));
         }
-
-        done(null, user);
-    } catch (err) {
-        done(new Error(
-            "Failed to `verify` via Google OIDC authentication.",
-            {cause: err as Error})
-        );
-    }
+    });
 };
 

@@ -22,7 +22,8 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-google-oidc": "^0.1.0",
     "passport-openidconnect": "^0.1.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "uuidv4": "^6.2.12"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",

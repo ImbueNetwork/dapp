@@ -1,11 +1,13 @@
 import express from "express";
 import passport from "passport";
 import { googleOIDCStrategy, googleOIDCRouter } from "./strategies/google-oidc";
+import { polkadotJsAuthRouter, polkadotjsStrategy } from "./strategies/web3/polkadotjs";
 import type { User } from "./common";
-import db from "../../db"
+import db from "../../db";
 
 
 passport.use(googleOIDCStrategy);
+passport.use(polkadotjsStrategy);
 
 passport.serializeUser((user, done) => {
     return done(null, (user as User).id);
@@ -21,7 +23,8 @@ passport.deserializeUser(async (id: string, done) => {
 
 const router = express.Router();
 
-router.use("/oauth2/accounts.google.com", googleOIDCRouter);
+router.use("/auth/web3/polkadot-js", polkadotJsAuthRouter);
+router.use("/auth/oauth2/accounts.google.com", googleOIDCRouter);
 
 router.get("/logout", (req, res, next) => {
     req.logout();

@@ -15,7 +15,6 @@ import {
     upsertFederated
 } from "../../common";
 import db from "../../../../db";
-import { Strategy } from "passport-google-oauth20";
 
 
 type Solution = {

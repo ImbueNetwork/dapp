@@ -1,7 +1,0 @@
-#imbu-dialog * {
-    color: var(--mdc-dialog-content-ink-color);
-}
-
-.reason-message {
-    font-weight: bold;
-}

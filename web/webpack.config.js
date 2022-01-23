@@ -6,7 +6,8 @@ const WebpackBundleAnalyzer = require('webpack-bundle-analyzer');
 
 module.exports = {
     entry: {
-        "grant-submission": "./src/grant-submission.ts",
+        "grant-submission/index": "./src/grant-submission/index.ts",
+        "grant-proposals/detail": "./src/grant-proposals/detail.ts",
         "material-components": "./src/material-components.ts",
     },
     devtool: process.env.NODE_ENV === "development"

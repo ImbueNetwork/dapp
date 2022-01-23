@@ -25,3 +25,15 @@
 .mdc-dialog {
     z-index: var(--dialog-z-index, 1001);
 }
+
+ul#action-list {
+    list-style: none outside none;
+    margin: 0;
+    padding: 20px 0 0 0;
+    display: flex;
+}
+
+ul li {
+    width: 100%;
+    color: var(--dialog-content-color);
+}

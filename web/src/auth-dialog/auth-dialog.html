@@ -1,19 +1,16 @@
-<link id="material-components-styles" rel="stylesheet" href="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.css">
-
 <div class="mdc-dialog" id="dialog">
     <div class="mdc-dialog__container">
         <div class="mdc-dialog__surface"
             role="alertdialog"
             aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
+            aria-labelledby="auth-dialog-title"
+            aria-describedby="auth-dialog-content">
 
-            <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-            <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+            <h2 class="mdc-dialog__title" id="auth-dialog-title"><!--
                 --><span>Almost there ...</span><!--
             --></h2>
 
-            <div class="mdc-dialog__content" id="my-dialog-content">
+            <div class="mdc-dialog__content" id="auth-dialog-content">
                 <div>
                     <p>
                         You are not currently logged in and we were unable to find a web3 extension.
@@ -31,8 +28,8 @@
                         enough $IMBU to make the transaction.
                     </p>
                     <p>
-                        <span class="achtung">For now, the contents of the grant submission form have
-                        been saved to your browser's local storage.</span> After you've
+                        <strong>For now, the contents of the grant submission form have
+                        been saved to your browser's local storage.</strong> After you've
                         installed the web3 extension, or signed up and logged in using one of
                         the web 2.0 services below, you will either be redirected back to this
                         form, you can refresh the page, and/or navigate here yourself later.
@@ -40,23 +37,17 @@
                         the browser you used to create this draft, you will be able to save your
                         draft on our remote server, and move on to the next step.
                     </p>
-                    <ul id="web2-list" class="mdc-deprecated-list mdc-deprecated-list--avatar-list">
+                    <ul class="mdc-deprecated-list mdc-deprecated-list--avatar-list">
                         <li class="mdc-deprecated-list-item" tabindex="0" data-mdc-dialog-action="google">
-                            <span class="mdc-deprecated-list-item__graphic" id="google-btn">
-                                <!-- <image src="https://uploads-ssl.webflow.com/61c41775bc27a424e28e6ed0/61c41775bc27a4fbc08e6f4a_greenwhite.svg"></image> -->
+                            <span id="google-btn" class="mdc-deprecated-list-item__graphic">
+                                <!-- <image ...> -->
                             </span>
                             <span class="mdc-deprecated-list-item__text">Sign in with Google</span>
                         </li>
-                        <!-- <li class="mdc-deprecated-list-item" data-mdc-dialog-action="callisto">
-                            <span class="mdc-deprecated-list-item__text">Create an account with email</span>
-                        </li> -->
                     </ul>
-                </div>            
+                </div>
             </div>
         </div>
     </div>
     <div class="mdc-dialog__scrim"></div>
   </div>
-
-<imbu-dialog id="dialog">
-</imbu-dialog>

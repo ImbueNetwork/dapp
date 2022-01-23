@@ -1,4 +1,7 @@
 import express from "express";
+import db from "../../../db";
+import * as models from "../../../models";
+import projectsRouter from "./projects";
 
 const router = express.Router();
 
@@ -10,5 +13,6 @@ router.get("/user", (req, res) => {
     }
 });
 
+router.use("/projects", projectsRouter);
 
 export default router;

@@ -1,26 +1,30 @@
 import type { Knex } from "knex";
-import { auditFields } from "../utils";
+import { auditFields, DROP_ON_UPDATE_TIMESTAMP_FUNCTION, onUpdateTrigger, ON_UPDATE_TIMESTAMP_FUNCTION } from "../utils";
 
 
 export async function up(knex: Knex): Promise<void> {
 
-    await knex.schema.createTable("usr", (builder) => {
+    await knex.raw(ON_UPDATE_TIMESTAMP_FUNCTION);
+
+    const usrTableName = "usr";
+    await knex.schema.createTable(usrTableName, (builder) => {
         /**
          * We need to be able to capture users who are just casually creating
          * a Project without any web3 functionality yet. So we lazily require
          * the web3 stuff only when it's necessary.
          */
         builder.increments("id", { primaryKey: true });
-        builder.text("display_name").notNullable();
+        builder.text("display_name");
 
         auditFields(knex, builder);
-    });
+    }).then(onUpdateTrigger(knex, usrTableName));
 
     /**
      * Without at least one of these, a usr can't really do much beyond saving
      * a draft proposal.
      */
-    await knex.schema.createTable("web3_account", (builder) => {
+    const web3AccountTableName = "web3_account";
+    await knex.schema.createTable(web3AccountTableName, (builder) => {
         builder.text("address");
         builder.integer("usr_id").notNullable();
 
@@ -31,9 +35,10 @@ export async function up(knex: Knex): Promise<void> {
         builder.foreign("usr_id").references("usr.id");
 
         auditFields(knex, builder);
-    });
+    }).then(onUpdateTrigger(knex, web3AccountTableName));
 
-    await knex.schema.createTable("federated_credential", (builder) => {
+    const federatedCredTableName = "federated_credential";
+    await knex.schema.createTable(federatedCredTableName, (builder) => {
         builder.integer("id");
         builder.text("issuer");
         builder.text("subject");
@@ -45,7 +50,15 @@ export async function up(knex: Knex): Promise<void> {
             .onUpdate("CASCADE");
 
         auditFields(knex, builder);
-    });
+    }).then(onUpdateTrigger(knex, federatedCredTableName));
+
+    const projectStatusTableName = "project_status";
+    await knex.schema.createTable(projectStatusTableName, builder => {
+        builder.text("status");
+        builder.primary(["status"]);
+
+        auditFields(knex, builder);
+    }).then(onUpdateTrigger(knex, projectStatusTableName));
 
     /**
      *  pub struct Project<AccountId, Balance, BlockNumber> {
@@ -62,12 +75,21 @@ export async function up(knex: Knex): Promise<void> {
      *      create_block_number: BlockNumber,
      *  }
      */
-    await knex.schema.createTable("project", (builder: Knex.CreateTableBuilder) => {
-        builder.increments("id");
+    const projectTableName = "project";
+    await knex.schema.createTable(projectTableName, (builder: Knex.CreateTableBuilder) => {
+        builder.increments("id", { primaryKey: true });
         builder.text("name"); // project name
         builder.text("logo"); // URL or dataURL (i.e., base64 encoded)
         builder.text("description");
         builder.text("website");
+        builder.integer("category");
+
+        builder.text("status").notNullable().defaultTo("draft");
+        builder.foreign("status")
+            .references("project_status.status")
+            .onDelete("SET NULL")
+            .onUpdate("CASCADE");
+
         // milestones[]: `milstone` has a foreign key back to project.
         
         // TODO: contributions[] will probably have a foreign key back to
@@ -83,12 +105,31 @@ export async function up(knex: Knex): Promise<void> {
         // builder.decimal("withdrawn_funds").defaultTo(0);
 
         /**
-         * owner -- `AccountId` is a 32 byte array
-         * This has to be nullable, because we need to be able to save the record
-         * without having submitted it to the chain. Note that we also have a `usr_id`
-         * below, which will be necessary to submit the form.
+         * owner -- `AccountId` is a 32 byte array, stored as base64 encoded
+         * 
+         * This shouldn't be null because we have to offer users the ability to
+         * submit the form without having an account, to protect their privacy.
          */
-        builder.binary("owner").nullable();
+        builder.text("owner");
+
+        /**
+         * This is nullable because we offer web3 account holders the ability to
+         * do all of their dealings wihout an account. This means that if they
+         * opt-out, they can't edit, etc., before finalization.
+         * 
+         * This is nullable because editing is "opt-in" and we don't need an
+         * account, per se, to store projects. But if/when a user wants to 
+         * create an account and associate it with a web3 address, we can update
+         * all of the projects whose "owner" is a `web3_account` associated with
+         * the `usr` account. Likewise, when a user decides to delete their
+         * account, we don't CASCADE in that case -- only nullify the `usr_id`
+         * here, as it wouldn't point to anything useful.
+         */
+        builder.integer("usr_id");
+        builder.foreign("usr_id")
+            .references("usr.id")
+            .onUpdate("CASCADE")
+            .onDelete("SET NULL");
 
         /**
          * Must be nullable; that's sort of the whole point, actually, and
@@ -107,14 +148,8 @@ export async function up(knex: Knex): Promise<void> {
          */
         builder.bigInteger("create_block_number").nullable(); //.unsigned();
 
-        builder.integer("usr_id").notNullable();
-        builder.foreign("usr_id")
-            .references("usr.id")
-            .onUpdate("CASCADE")
-            .onDelete("CASCADE");
-
         auditFields(knex, builder);
-    });
+    }).then(onUpdateTrigger(knex, projectTableName));
 
     /**
      *  pub struct Milestone {
@@ -125,21 +160,22 @@ export async function up(knex: Knex): Promise<void> {
      *      is_approved: bool
      *  }
      */
-    await knex.schema.createTable("milestone", (builder) => {
+    const milestoneTableName = "milestone";
+    await knex.schema.createTable(milestoneTableName, (builder) => {
         builder.integer("milestone_index");
-        builder.integer("project_key").notNullable();
-        builder.primary(["project_key","milestone_index"]);
-        builder.foreign("project_key")
+        builder.integer("project_id").notNullable();
+        builder.primary(["project_id","milestone_index"]);
+        builder.foreign("project_id")
             .references("project.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
 
         builder.text("name");
         builder.integer("percentage_to_unlock");
-        builder.boolean("is_approved");
+        builder.boolean("is_approved").defaultTo(false);
 
         auditFields(knex, builder);
-    });
+    }).then(onUpdateTrigger(knex, milestoneTableName));
 
     /**
      * TODO: ? votes and contributions
@@ -195,7 +231,9 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("milestone");
     await knex.schema.dropTableIfExists("project");
+    await knex.schema.dropTableIfExists("project_status");
     await knex.schema.dropTableIfExists("federated_credential");
     await knex.schema.dropTableIfExists("web3_account");
     await knex.schema.dropTableIfExists("usr");
+    await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }

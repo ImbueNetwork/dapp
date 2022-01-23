@@ -12,6 +12,13 @@ import { errorHandler } from "./middleware/errors";
 import authenticationMiddleware from "./middleware/authentication";
 import v1routes from "./routes/api/v1";
 
+
+declare global {
+    interface ErrorConstructor {
+        new(message?: string, opts?: {cause: Error}): Error;
+    }
+}
+
 const port = process.env.PORT || config.port;
 const app = express();
 const environment = config.environment;

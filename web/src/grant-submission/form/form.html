@@ -40,7 +40,7 @@
     </fieldset>
 
     <fieldset>
-        <legend class="label">Describe what you’ll be creating</legend>
+        <legend class="label">Describe what you'll be creating</legend>
 
         <mwc-select id="category-select" class="input-field" label="Category" name="imbu-category" helper="">
             <mwc-list-item></mwc-list-item>
@@ -63,28 +63,41 @@
     <fieldset class="funding">
         <legend class="label">How much funding will your project need?</legend>
 
+        <div class="funding">
+            <imbu-forms-textfield
+             class="input-field"
+             name="imbu-funds-required"
+             type="number"
+             helper="The total amount of funding required for the project."
+             step="1"
+             min="1"
+             max="1e127"
+             required>
+               <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
+               <span slot="suffix">.00</span>
+               <span slot="floating-label">Funds required</span>
+           </imbu-forms-textfield>
+   
+           <mwc-select
+            id="web3-account-select"
+            class="input-field"
+            label="Web3 Account"
+            name="imbu-account"
+            required>
+               <mwc-list-item></mwc-list-item>
+           </mwc-select>   
+        </div>
+
         <imbu-forms-textfield
          class="input-field"
-         name="imbu-funds-required"
-         type="number"
-         helper="The total amount of funding required for the project."
-         step="1"
-         min="1"
-         max="1e127"
+         id="web3-address"
+         name="imbu-address"
+         type="text"
+         helper="A valid Polkadot wallet address."
          required>
-            <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
-            <span slot="suffix">.00</span>
-            <span slot="floating-label">Funds required</span>
-        </imbu-forms-textfield>
-
-        <mwc-select
-         id="web3-account-select"
-         class="input-field"
-         label="Web3 Account"
-         name="imbu-account">
-         <!-- required> -->
-            <mwc-list-item></mwc-list-item>
-        </mwc-select>        
+            <!-- TODO: add address validation-->
+           <span slot="floating-label">Address</span>
+       </imbu-forms-textfield>
     </fieldset>
     
     <fieldset id="milestones-fieldset">
@@ -110,11 +123,11 @@
      id="submit-project"
      type="submit"
      class="primary-btn fullwidth w-button"
-     value="Save Draft Proposal">
+     value="Preview Draft Proposal">
 </form>
 
 <template id="milestone-item-template">
-    <li><hr size="1" noshade class="milestone-separator"></li>
+    <!-- <li><hr size="1" noshade class="milestone-separator"></li> -->
     <li class="list-item milestone">
         <imbu-forms-textfield
          class="input-field milestone-next"

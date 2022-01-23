@@ -1,39 +1,60 @@
-import Hoquet from "@pojagi/hoquet/mixin";
-import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { MDCDialog } from '@material/dialog';
-// import { MDCList } from '@material/list';
-
 import { googleAuthEndpoint } from "../config";
-import template from "./auth-dialog.html";
+import templateSrc from "./auth-dialog.html";
 import styles from "./auth-dialog.css";
-import googleButtonSVG from "../../assets/google_signin_buttons/web/vector/btn_google_light_pressed_ios.svg";
+import materialComponentsLink from "../../material-components-link.html";
+import googleButtonSVGSrc from "../../assets/google_signin_buttons/web/vector/btn_google_dark_normal_ios.svg";
+
+const template = document.createElement("template");
+template.innerHTML = `
+    ${materialComponentsLink}
+    <style>${styles}</style>
+    ${templateSrc}
+`;
+
+const googleButtonSVG = document.createElement("template");
+googleButtonSVG.innerHTML = googleButtonSVGSrc;
+
+const CONTENT = Symbol();
 
 
-export default class AuthDialog extends Hoquet(HTMLElement, {
-    shadowy: true,
-    stylesheets: [stylesheet`${styles}`],
-    template: html`${template}`
-}) {
-
+export default class AuthDialog extends HTMLElement {
     dialog: MDCDialog;
+    next = window.location.href;
+    private [CONTENT]: DocumentFragment;
 
     constructor() {
         super();
+        this.attachShadow({mode:"open"});
+        this[CONTENT] = template.content.cloneNode(true) as
+            DocumentFragment;
 
-        this.render();
-        this.$["google-btn"].appendChild(this.fragment(`${googleButtonSVG}`));
+        const $dialog =
+            this[CONTENT].getElementById("dialog") as HTMLElement;
+        const $googleBtn = this[CONTENT].getElementById("google-btn");
 
-        this.dialog = new MDCDialog(this.$["dialog"]);
-
-        this.$["dialog"].addEventListener("MDCDialog:closing", e => {
+        $googleBtn?.appendChild(googleButtonSVG.content.cloneNode(true));
+        this.dialog = new MDCDialog($dialog);
+        
+        $dialog.addEventListener("MDCDialog:closing", e => {
             const detail = (e as CustomEvent).detail;
+        
             if (detail.action === "google") {
-                window.location.href = `${googleAuthEndpoint}?n=/grant-submission`;
+                window.location.href = `${
+                    googleAuthEndpoint
+                }?n=${
+                    this.next ?? window.location.href
+                }`;
             }
         });
     }
 
-    open() {
+    connectedCallback() {
+        this.shadowRoot?.appendChild(this[CONTENT]);
+    }
+
+    open(next?: string) {
+        this.next = next ? next : this.next;
         this.dialog?.open();
     }
 }

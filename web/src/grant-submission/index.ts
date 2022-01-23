@@ -1,5 +1,4 @@
-import "./grant-submission/page/page";
-import { appName, apiBase } from "./config";
+import "./form/form";
 import rootStyles from "/src/common.css";
 
 document.head.appendChild(document.createRange().createContextualFragment(`
@@ -13,8 +12,7 @@ const $parent = $oldForm.parentElement as Element;
 
 $parent.removeChild($oldForm);
 $parent.appendChild(document.createRange().createContextualFragment(`
-<imbu-grant-submission-page app-name="${appName}" api-base="${apiBase}">
-</imbu-grant-submission-page>
+<imbu-grant-submission-form></imbu-grant-submission-form>
 `));
 
 

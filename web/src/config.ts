@@ -8,8 +8,18 @@ export const webSocketAddr = "wss://dev.imbue.network";
 // https://sbg.sg/business_category_list.pdf
 
 export const apiBase = "https://localhost:8443/api/v1";
+export const getAPIHeaders = {
+    "accept": "application/json",
+};
+export const postAPIHeaders = {
+    ...getAPIHeaders,
+    "content-type": "application/json",
+};
 
-export const googleAuthEndpoint = "/oauth2/accounts.google.com/login";
+export const grantProposalsURL = "/grant-proposals";
+export const grantSubmissionURL = "/grant-submission";
+
+export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
 
 export const categories = {
     "Automative": [

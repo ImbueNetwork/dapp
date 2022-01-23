@@ -35,9 +35,17 @@ migrate_reset: node_modules
 	    done;\
 	'
 
+seed:
+	yarn run knex --cwd ${DBDIR} seed:run
+
+db_up: migrate seed
+
+db_down: migrate_reset
+
 start: node_modules migrate_latest
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \
 	migrate migrate_latest migrate_up migrate_down migrate_reset \
+	seed db_up db_down \
 	start

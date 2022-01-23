@@ -12,8 +12,8 @@ import {
     fetchWeb3Account,
     upsertWeb3Challenge,
     User,
-    upsertFederated
-} from "../../common";
+    getOrCreateFederatedUser
+} from "../../../../models";
 import db from "../../../../db";
 
 
@@ -38,13 +38,13 @@ export class Web3Strategy extends passport.Strategy {
             try {
                 const solution: Solution = req.body;
                 const web3Account = await fetchWeb3Account(
-                    solution.address, tx
-                );
+                    solution.address
+                )(tx);
 
                 if (!web3Account) {
                     this.fail();
                 } else {
-                    const user = await fetchUser(web3Account.usr_id, tx);
+                    const user = await fetchUser(web3Account.usr_id)(tx);
                     if (user) {
                         if (
                             signatureVerify(
@@ -61,7 +61,7 @@ export class Web3Strategy extends passport.Strategy {
                                 req.body.address,
                                 req.body.type,
                                 challenge
-                            );
+                            )(tx);
 
                             /**
                              * FIXME: this sets the "WWW-Authenticate" header.
@@ -130,7 +130,7 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
  
     // If no address can be found, create a `usr` and then a
     // `federated_credential`
-    upsertFederated(
+    getOrCreateFederatedUser(
         req.body.meta.source,
         address,
         req.body.meta.name,
@@ -142,15 +142,17 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
             try {
                 // create a `challenge` uuid and insert it into the usr
                 // table respond with the challenge
-                const challenge = uuid();
-                const [web3Account, isInsert] = await upsertWeb3Challenge(
-                    user, address, req.body.type, challenge
-                );
-                
-                if (isInsert) {
-                    res.status(201);
-                }
-                res.send({user, web3Account});
+                db.transaction(async tx => {
+                    const challenge = uuid();
+                    const [web3Account, isInsert] = await upsertWeb3Challenge(
+                        user, address, req.body.type, challenge
+                    )(tx);
+                    
+                    if (isInsert) {
+                        res.status(201);
+                    }
+                    res.send({user, web3Account});    
+                });
             } catch (e) {
                 next(e);
             }

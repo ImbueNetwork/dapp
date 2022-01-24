@@ -317,7 +317,10 @@ class GrantProposalsDetailPage extends HTMLElement {
     }
 
     async apiSetup() {
-        const provider = new WsProvider(config.webSocketAddr);
+        const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
+            resp => resp.json()
+        )).imbueNetworkWebsockAddr;
+        const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
             // this.dialog("PolkadotJS API Connection Error", "", {
             //     "dismiss": {label: "Okay"}

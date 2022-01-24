@@ -15,5 +15,6 @@ export default {
             tokenURL: "https://www.googleapis.com/oauth2/v4/token",
             callbackURL: `${process.env.WEB_HOST}/auth/oauth2/accounts.google.com/redirect`,
         }
-    }
+    },
+    imbueNetworkWebsockAddr: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
 };

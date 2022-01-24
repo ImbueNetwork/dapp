@@ -2,6 +2,7 @@ import express from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import projectsRouter from "./projects";
+import config from "../../../config";
 
 const router = express.Router();
 
@@ -11,6 +12,12 @@ router.get("/user", (req, res) => {
     } else {
         res.status(401).end();
     }
+});
+
+router.get("/info", (req, res) => {
+    res.send({
+        imbueNetworkWebsocketAddr: config.imbueNetworkWebsockAddr
+    });
 });
 
 router.use("/projects", projectsRouter);

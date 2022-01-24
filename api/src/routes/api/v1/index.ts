@@ -16,7 +16,7 @@ router.get("/user", (req, res) => {
 
 router.get("/info", (req, res) => {
     res.send({
-        imbueNetworkWebsocketAddr: config.imbueNetworkWebsockAddr
+        imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr
     });
 });
 

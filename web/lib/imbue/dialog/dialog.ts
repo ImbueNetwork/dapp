@@ -28,7 +28,7 @@ dialogTemplate.innerHTML = `
 export type ActionConfig = {
     label?: string;
     isPrimary?: boolean;
-    handler: CallableFunction;
+    handler?: CallableFunction;
 };
 
 const CONTENT = Symbol();
@@ -54,7 +54,7 @@ export default class Dialog extends HTMLElement {
     }
 
     button(action: string, config: ActionConfig) {
-        return `<button class="w-button fullwidth primary-btn ${
+        return `<button class="${
             config.isPrimary ? "primary" : ""
         }" data-mdc-dialog-action="${action}">${config.label}</button>`;
     }
@@ -67,7 +67,8 @@ export default class Dialog extends HTMLElement {
     ) {
         const tmp = dialogTemplate.content.cloneNode(true) as
             DocumentFragment;
-        this.$dialog = tmp.getElementById("dialog") as HTMLElement;
+        const $dialog =
+            this.$dialog = tmp.getElementById("dialog") as HTMLElement;
         const $content = tmp.getElementById("dialog-content") as
             HTMLElement
         const $title = tmp.getElementById("dialog-title") as
@@ -87,6 +88,7 @@ export default class Dialog extends HTMLElement {
                 .filter(([_, conf]) => conf.label)
                 .forEach(([action, conf]) => {
                     const $li = document.createElement("li");
+                    $li.classList.add("button-container");
                     $li.appendChild(
                         document.createRange().createContextualFragment(
                             this.button(action, conf)
@@ -98,25 +100,26 @@ export default class Dialog extends HTMLElement {
             $content.appendChild($actionList);
         }
 
-        this.dialog = new MDCDialog(this.$dialog);
+        this.dialog = new MDCDialog($dialog);
 
         if (!isDismissable) {
             this.dialog.escapeKeyAction = "";
             this.dialog.scrimClickAction = "";
         }
 
-        this.$dialog.addEventListener("MDCDialog:closing", e => {
+        $dialog.addEventListener("MDCDialog:closing", e => {
             const detail = (e as CustomEvent).detail;
             const action = this.actions?.[detail.action];
-            if (action) {
+            if (action?.handler) {
                 action.handler();
             };
-            this.$dialog?.parentNode?.removeChild(this.$dialog);
+            $dialog?.parentNode?.removeChild($dialog);
         });
 
-        this.shadowRoot?.appendChild(tmp);
-
-        this.dialog.open();
+        if (this.shadowRoot) {
+            this.shadowRoot.appendChild(tmp);
+            this.dialog?.open();
+        }
     }
 }
 

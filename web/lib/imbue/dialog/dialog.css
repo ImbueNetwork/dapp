@@ -31,9 +31,38 @@ ul#action-list {
     margin: 0;
     padding: 20px 0 0 0;
     display: flex;
+    flex-direction: column;
 }
 
 ul li {
+    margin: 5px 0 0 0;
     width: 100%;
     color: var(--dialog-content-color);
+}
+
+.button-container {
+    display: flex;
+}
+
+button {
+    border-radius: var(--button-border-radius);
+    background-color: var(--secondary-button-background-color);
+    /* --secondary-button-background-hover-color: #656565; */
+    color: var(--secondary-button-color);
+    border: var(--secondary-button-border);
+    transition: var(--base-transition);
+    width: 100%;
+    padding: var(--button-padding);
+}
+
+button:hover {
+    background-color: var(--secondary-button-background-hover-color);
+}
+
+button.primary {
+    background-color: var(--primary-button-background-color);
+    font-weight: bold;
+}
+button.primary:hover {
+    background-color: var(--primary-button-background-hover-color);
 }

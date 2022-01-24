@@ -1,3 +1,5 @@
+import * as config from "./config";
+
 export type Project = {
     id: number;
     name: string;
@@ -47,3 +49,20 @@ export type User = {
     id: number;
     web3Accounts: Web3Account[];
 };
+
+export const postGrantProposal = (
+    proposal: GrantProposal
+) => fetch(`${config.apiBase}/projects/`, {
+    method: "post",
+    headers: config.postAPIHeaders,
+    body: JSON.stringify({proposal})
+});
+
+export const updateGrantProposal = (
+    proposal: GrantProposal,
+    id: string | number
+) => fetch(`${config.apiBase}/projects/${id}`, {
+    method: "put",
+    headers: config.postAPIHeaders,
+    body: JSON.stringify({proposal})
+});

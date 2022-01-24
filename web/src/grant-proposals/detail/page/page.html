@@ -43,6 +43,9 @@
         <div id="project-description"></div>
         <ul class="project-details">
             <li class="project-detail">
+                <span class="detail-value hidden" id="in-block"></span>
+            </li>
+            <li class="project-detail">
                 <span class="detail-label"></span>
                 <span class="imbu-currency-label">$IMBU</span>
                 <span id="funds-required"></span><!--
@@ -58,20 +61,20 @@
     <ol id="milestones" class="tab-content mdc-deprecated-list mdc-deprecated-list--two-line">
     </ol>
 
-    <div class="action-buttons">
+    <div class="action-buttons" id="action-buttons">
         <div class="action-button-container">
             <button href="javascript:void(0)" id="edit" class="edit button">
                 Edit
             </button>
         </div>
-        <div class="action-button-container">
+        <div class="action-button-container" id="save-container">
             <button href="javascript:void(0)" id="save" class="edit button">
                 Save
             </button>
         </div>
         <div class="action-button-container">
             <button href="javascript:void(0)" id="finalize" class="button primary">
-                Finalize!
+                Finalise!
             </button>
         </div>
     </div>

@@ -118,6 +118,14 @@ export const insertProject = (project: Project) =>
         await tx<Project>("project").insert(project).returning("*")
     )[0];
 
+export const updateProject = (id: string | number, project: Project) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Project>("project")
+            .update(project)
+            .where({id})
+            .returning("*")
+    )[0];
+
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) => 
         tx<Project>("project").select().where({id}).first();
@@ -125,7 +133,6 @@ export const fetchProject = (id: string | number) =>
 export const insertMilestones = (
     milestones: ProposedMilestone[],
     project_id: string | number,
-    tx?: Knex.Transaction
 ) => {
     const values = milestones.map((m, idx) => ({
         ...m,
@@ -136,6 +143,10 @@ export const insertMilestones = (
     return (tx: Knex.Transaction) =>
         tx<Milestone>("milestone").insert(values).returning("*");
 };
+
+export const deleteMilestones = (project_id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx<Milestone>("milestone").delete().where({project_id});
 
 export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) => 
@@ -173,7 +184,6 @@ export const getOrCreateFederatedUser = (
              * If not, create the `usr`, then the `federated_credential`
              */
             if (!federated) {
-                // FIXME: do these in a tx
                 user = await insertUserByDisplayName(displayName)(tx);
                 await insertFederatedCredential(user.id, issuer, subject)(tx);
             } else {
@@ -193,7 +203,6 @@ export const getOrCreateFederatedUser = (
     
             done(null, user);
         } catch (err) {
-            await tx.rollback();
             done(new Error(
                 "Failed to upsert federated authentication.",
                 {cause: err as Error}

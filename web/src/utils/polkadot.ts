@@ -1,11 +1,11 @@
-import { web3Accounts, web3Enable, web3FromAddress, web3FromSource } from "@polkadot/extension-dapp";
+import { web3Accounts, web3Enable, web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta, InjectedExtension } from "@polkadot/extension-inject/types";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 import { Keyring } from "@polkadot/keyring";
 import { stringToHex } from "@polkadot/util";
-import { signatureVerify } from "@polkadot/util-crypto";
 
-import { appName } from '../config';
+import * as config from '../config';
 
 
 const sr25519Keyring = new Keyring({type: "sr25519", ss58Format: 2});
@@ -40,7 +40,7 @@ export const enableAppForExtension = (
 
 export const getWeb3Accounts = async () => {
     try {
-        const extensions = await enableAppForExtension(appName);
+        const extensions = await enableAppForExtension(config.appName);
         if (!extensions.length) {
             console.log("No extensions found.");
             return [];
@@ -53,16 +53,21 @@ export const getWeb3Accounts = async () => {
     return [];
 };
 
-export const createWeb3User = async (account: InjectedAccountWithMeta) => {
+export const signWeb3Challenge = async (
+    account: InjectedAccountWithMeta,
+    challenge: string
+) => {
     const injector = await web3FromSource(account.meta.source);
     const signRaw = injector.signer.signRaw;
 
     if (signRaw) {
         const signature = await signRaw({
             address: account.address,
-            data: stringToHex("test"),
+            data: stringToHex(challenge),
             type: "bytes"
         });
-        console.log(signature);
+        return signature;
     }
 }
+
+export const getPolkadotJSAPI = (provider: WsProvider) => ApiPromise.create({provider});

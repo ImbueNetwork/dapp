@@ -42,7 +42,7 @@ db_up: migrate seed
 
 db_down: migrate_reset
 
-start: node_modules migrate_latest
+start: db_up
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \

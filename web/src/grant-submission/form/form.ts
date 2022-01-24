@@ -8,7 +8,8 @@ import { categories } from "../../config";
 import "../../../lib/imbue/forms/textfield/textfield";
 
 import type { ProposedMilestone, GrantProposal, User, Project } from "../../model";
-import { createWeb3User, getWeb3Accounts } from "../../utils/polkadot";
+import { getWeb3Accounts } from "../../utils/polkadot";
+import * as model from "../../model";
 import * as config from "../../config";
 
 declare global {
@@ -35,6 +36,7 @@ const CONTENT = Symbol();
 
 export default class GrantSubmissionForm extends HTMLElement {
     private [CONTENT]: DocumentFragment;
+    private _projectId?: string;
     milestoneIdx: number = 0;
     user?: User;
     accounts?: Promise<InjectedAccountWithMeta[]>;
@@ -223,7 +225,15 @@ export default class GrantSubmissionForm extends HTMLElement {
     }
 
     get projectId() {
-        return window.location.pathname.split("/")[2];
+        if (this._projectId) {
+            return this._projectId;
+        }
+        const parts = window.location.pathname.split("/");
+        if (parts.length === 3) {
+            this._projectId = parts[2];
+            return this._projectId;
+        }
+        return;
     }
 
     bind() {
@@ -442,11 +452,7 @@ export default class GrantSubmissionForm extends HTMLElement {
     }
 
     async postGrantProposal(proposal: GrantProposal) {
-        const resp = await fetch(`${config.apiBase}/projects/`, {
-            method: "post",
-            headers: config.postAPIHeaders,
-            body: JSON.stringify({proposal})
-        });
+        const resp = await model.postGrantProposal(proposal);
 
         if (resp.ok) {
             const project: Project = await resp.json();
@@ -460,6 +466,18 @@ export default class GrantSubmissionForm extends HTMLElement {
         }
     }
 
+    async updateGrantProposal(proposal: GrantProposal, id: string | number) {
+        const resp = await model.updateGrantProposal(proposal, id);
+
+        if (resp.ok) {
+            const project: Project = await resp.json();
+            window.location.href = `/grant-proposals/preview?id=${project.id}`;
+        } else {
+            // TODO: UX needed (similar to "post" version)
+            this.disabled = false;
+        }
+    }
+
     async submitGrantProposal(
         proposal: GrantProposal,
         account?: InjectedAccountWithMeta,
@@ -468,6 +486,9 @@ export default class GrantSubmissionForm extends HTMLElement {
         if (this.user) {
             // if yes, go ahead and post the draft with the `usr_id`
             proposal.usr_id = this.user.id;
+            if (this.projectId && this.projectId !== "local-draft") {
+                return this.updateGrantProposal(proposal, this.projectId);
+            }
             return this.postGrantProposal(proposal);
         } else {
             // Not logged in, save it to localStorage and redirect to

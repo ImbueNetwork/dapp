@@ -32,7 +32,7 @@ export class Web3Strategy extends passport.Strategy {
 
     authenticate(
         req: express.Request<Record<string,any>>,
-        opts?: Record<string,any>
+        _opts?: Record<string,any>
     ) {
         db.transaction(async tx => {
             try {
@@ -151,10 +151,13 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
                     if (isInsert) {
                         res.status(201);
                     }
-                    res.send({user, web3Account});    
+                    res.send({user, web3Account});
                 });
             } catch (e) {
-                next(e);
+                next(new Error(
+                    `Unable to upsert web3 challenge for address: ${address}`,
+                    {cause: e as Error}
+                ));
             }
         }
     );
@@ -164,7 +167,7 @@ polkadotJsAuthRouter.post(
     "/callback",
     passport.authenticate("polkadot-js"),
     (
-        req: express.Request,
+        _req: express.Request,
         res: express.Response,
     ) => {
             res.send({success: true});

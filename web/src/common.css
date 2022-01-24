@@ -48,8 +48,12 @@
     /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
     --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
 
+    --button-border-radius: 3px;
+    --button-padding: 20px;
+    --primary-button-background-color: var(--theme-secondary);
+    --primary-button-background-hover-color: var(--theme-primary);
     --secondary-button-background-color: #555;
-    --secondary-button-background-color: transparent;
+    --secondary-button-background-color: black; /* rgb(5, 12, 38); */
     --secondary-button-background-hover-color: #656565;
     --secondary-button-color: white;
     --secondary-button-border: 1px solid var(--dialog-content-color);

@@ -1,47 +1,66 @@
-import Hoquet from "@pojagi/hoquet/mixin";
-import { html, stylesheet } from "@pojagi/hoquet/utils";
 import { MDCTextField } from "@material/textfield";
 import 'element-internals-polyfill';
+import materialComponentsLink from "../../../../material-components-link.html";
+import rootStyles from "/src/common.css";
 
-import template from "./textfield.html";
+import templateSrc from "./textfield.html";
 import styles from "./textfield.css";
 
+
+const template = document.createElement("template");
+template.innerHTML = `
+    ${materialComponentsLink}
+    <style>${rootStyles}${styles}</style>
+    ${templateSrc}
+`;
 
 const inputAttrs = new Set([
     "type", "pattern", "min", "max", "step", "minlength",
     "maxlength", "disabled", "required",
 ]);
 
-export default class TextField extends Hoquet(HTMLElement, {
-    template: html`${template}`,
-    stylesheets: [stylesheet`${styles}`,],
-    shadowy: true,
-    attributes: [...inputAttrs, "validationmessage", "helper", "persistent-helper"]
-}) {
+const attributes = [
+    ...inputAttrs, "validationmessage", "helper", "persistent-helper"
+];
 
+const CONTENT = Symbol();
+
+
+export default class TextField extends HTMLElement {
+    private [CONTENT]: DocumentFragment;
     textField: MDCTextField;
     internals: ElementInternals | any;
     $input: HTMLInputElement;
+    $helperText: HTMLElement;
+
+
     static formAssociated = true;
+
+    static get observedAttributes() { return attributes; }
 
     constructor() {
         super();
+        this.attachShadow({mode:"open"});
         this.internals = this.attachInternals();
+        this[CONTENT] = template.content.cloneNode(true) as
+            DocumentFragment;
 
-        this.render();
-
-        if (!("adoptedStyleSheets" in document)) {
-            this.shadowRoot?.prepend(...Array.from(
-                this.shadowRoot.querySelectorAll("link[rel='stylesheet']"))
-            );
-        }
-
-        const $label = this.$["container"] as Element;
-        const $input = this.$input = this.$["input"] as HTMLInputElement;
+        const $label =
+            this[CONTENT].getElementById("container") as
+                Element;
+        this.$input =
+            this[CONTENT].getElementById("input") as
+                HTMLInputElement;
+        this.$helperText =
+            this[CONTENT].getElementById("helper-text") as
+                HTMLElement;
         this.textField = new MDCTextField($label);
+    }
 
-        $input.addEventListener("input", e => {
-            this.internals.setFormValue($input.value);
+    connectedCallback() {
+        this.shadowRoot?.appendChild(this[CONTENT]);
+        this.$input.addEventListener("input", e => {
+            this.internals.setFormValue(this.$input.value);
             this.checkValidity();
         });
     }
@@ -73,12 +92,12 @@ export default class TextField extends Hoquet(HTMLElement, {
         this.textField.helperTextContent = text;
     }
     set isPersistentHelper(is: boolean) {
-        this.$["helper-text"].classList[is ? "add" : "remove"](
+        this.$helperText.classList[is ? "add" : "remove"](
             "mdc-text-field-helper-text--persistent"
         );
     }
     set isValidationHelper(is: boolean) {
-        this.$["helper-text"].classList[is ? "add" : "remove"](
+        this.$helperText.classList[is ? "add" : "remove"](
             "mdc-text-field-helper-text--validation-msg"
         );
     }
@@ -98,6 +117,11 @@ export default class TextField extends Hoquet(HTMLElement, {
 
     get value() {
         return this.$input.value;
+    }
+
+    set value(x: string) {
+        this.internals.setFormValue(x);
+        this.textField.value = x;
     }
 
     validityToValidationMessage(validity: ValidityState): string {
@@ -133,6 +157,9 @@ export default class TextField extends Hoquet(HTMLElement, {
 
     checkValidity(): boolean {
         const valid = this.$input.checkValidity();
+        if (!this.shadowRoot?.contains(this.$input))
+            return false;
+
         if (!valid) {
             this.internals.setValidity(
                 this.$input.validity,
@@ -161,6 +188,10 @@ export default class TextField extends Hoquet(HTMLElement, {
         return (
             this.textField.valid = this.internals.reportValidity()
         );
+    }
+
+    focus() {
+        this.textField.focus();
     }
 }
 

@@ -1,21 +1,3 @@
-:root {
-    --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
-    --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23);
-    --mdc-text-field-label-ink-color: #aaa;
-    --mdc-text-field-disabled-ink-color: rgba(255, 255, 255, 0.25);
-    --mdc-text-field-ink-color: #fafafa;
-
-    --mdc-select-fill-color: var(--mdc-text-field-fill-color);
-    --mdc-select-disabled-fill-color: var(--mdc-text-field-disabled-fill-color);
-    --mdc-select-disabled-ink-color: var(--mdc-text-field-disabled-ink-color);
-    --mdc-select-label-ink-color: var(--mdc-text-field-label-ink-color);
-    --mdc-select-ink-color: var(--mdc-text-field-ink-color);
-    --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
-    --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
-
-    /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
-    --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
-}
 .select-source {
     color: #999;
 }
@@ -31,22 +13,24 @@ fieldset {
     margin-top: 26px;
     display: flex;
     flex-direction: column;
+    border: none;
 }
 legend {
-    margin-top: 0;
+    margin: 0 0 inherit 0;
     width: 100%;
 }
 
-fieldset.funding {
+div.funding {
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
 .input-field[name=imbu-account] {
-    width: 40%
+    width: 59%
 }
 .input-field[name=imbu-funds-required] {
-    width: 59%;
+    width: 40%;
 }
 
 .milestone-separator {
@@ -57,32 +41,36 @@ fieldset.funding {
 #milestones-fieldset {
     padding-bottom: 20px;
 }
+
 .input-field {
     margin: 0 0 5px 0;
     display: block;
 }
 
+#add-milestone {
+    margin: 0;
+    transition: var(--base-transition);
+}
+
 #add-milestone:not(:disabled):hover {
-    background-color: #656565;
+    background-color: var(--secondary-button-background-hover-color);
     /* color: var(--mdc-theme-secondary); */
     color: white;
-    transition: all 150ms ease-in-out;
 }
 
 #add-milestone:not(:disabled) {
-    transition: all 150ms ease-in-out;
-    background-color: #555;
-    margin: 0;
-}
-
-.primary-btn:disabled {
-    background-color: #676767;
-    color: #b5b5b5;
-    cursor: unset;
+    background-color: var(--secondary-button-background-color);
+    border: var(--secondary-button-border);
 }
 
 #submit-project:not(:disabled):hover {
-    background-color: var(--mdc-theme-secondary-hover);
+    background-color: var(--mdc-theme-primary);
+    color: black;
+}
+
+.primary-btn.fullwidth:disabled {
+    background-color: var(--disabled-button-background-color);
+    color: var(--disabled-button-color);
 }
 
 .imbu-symbol-prefix {

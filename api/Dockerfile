@@ -1,9 +1,12 @@
 FROM node:16-slim
 
-WORKDIR /app
+WORKDIR /api
+
+RUN apt-get update
+RUN apt-get install -y make
 
 COPY . .
 
-RUN yarn install
+RUN make
 
-CMD ["node", "index.js"]
+CMD ["node", "build/index.js"]

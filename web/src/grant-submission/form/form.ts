@@ -1,29 +1,29 @@
-import type { ApiPromise } from "@polkadot/api";
-import { web3FromSource } from '@polkadot/extension-dapp';
-
-import Hoquet from "@pojagi/hoquet/mixin";
-import { html, stylesheet } from "@pojagi/hoquet/utils";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import template from "./form.html";
+
+import templateSrc from "./form.html";
 import styles from "./form.css";
+import webflowCSSLink from "../../../webflow-css-link.html";
 import { categories } from "../../config";
 
-import "lib/imbue/forms/textfield/textfield";
+import "../../../lib/imbue/forms/textfield/textfield";
 
+import type { ProposedMilestone, GrantProposal, User, Project } from "../../model";
+import { getWeb3Accounts } from "../../utils/polkadot";
+import * as model from "../../model";
+import * as config from "../../config";
 
-type Milestone = {
-    name: string,
-    percentageToUnlock: number,
-};
+declare global {
+    interface ErrorConstructor {
+        new(message?: string, opts?: {cause: Error}): Error;
+    }
+}
 
-type GrantProposal = {
-    name: string,
-    logo: string,
-    description: string,
-    contact: string,
-    milestones: Milestone[],
-    requiredFunds: number,
-};
+const template = document.createElement("template");
+template.innerHTML = `
+    ${webflowCSSLink}
+    <style>${styles}</style>
+    ${templateSrc}
+`;
 
 const ordinals = [
     "first",
@@ -31,81 +31,240 @@ const ordinals = [
     "third",
 ];
 
+const CONTENT = Symbol();
 
-export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
-    template: html`${template}`,
-    stylesheets: [stylesheet`${styles}`],
-    shadowy: false
-}) {
-    accounts: InjectedAccountWithMeta[];
-    api: ApiPromise;
+
+export default class GrantSubmissionForm extends HTMLElement {
+    private [CONTENT]: DocumentFragment;
+    private _projectId?: string;
     milestoneIdx: number = 0;
-
-    constructor(api: ApiPromise, accounts: InjectedAccountWithMeta[]) {
-        super();
-        this.accounts = accounts;
-        this.api = api;
-    }
+    user?: User;
+    accounts?: Promise<InjectedAccountWithMeta[]>;
+    $submitProject: HTMLInputElement;
+    $categorySelect: HTMLSelectElement;
+    $web3AccountSelect: HTMLSelectElement;
+    $web3Address: HTMLInputElement;
+    $addMilestone: HTMLInputElement;
+    $grantSubmissionForm: HTMLFormElement;
+    $milestoneItemTemplate: HTMLTemplateElement;
+    $milestones: HTMLOListElement;
 
     get $fields(): HTMLInputElement[] {
-        return Array.from(this.querySelectorAll(".input-field"));
-    }
-
-    get $inputs(): HTMLInputElement[] {
-        return Array.from(this.querySelectorAll("input"));
+        return Array.from(
+            this.$grantSubmissionForm.querySelectorAll(".input-field")
+        );
     }
 
     get nextMilestoneOrdinal(): string {
         return ordinals[this.milestoneIdx++] ?? "next";
     }
 
+    constructor() {
+        super();
+        this.attachShadow({mode:"open"});
+        this[CONTENT] = template.content.cloneNode(true) as
+            DocumentFragment;
+
+        this.$submitProject =
+            this[CONTENT].getElementById("submit-project") as
+                HTMLInputElement;
+        this.$categorySelect =
+            this[CONTENT].getElementById("category-select") as
+                HTMLSelectElement;
+        this.$web3AccountSelect =
+            this[CONTENT].getElementById("web3-account-select") as
+                HTMLSelectElement;
+        this.$addMilestone =
+            this[CONTENT].getElementById("add-milestone") as
+                HTMLInputElement;
+        this.$grantSubmissionForm =
+            this[CONTENT].getElementById("grant-submission-form") as
+                HTMLFormElement;
+        this.$milestoneItemTemplate =
+            this[CONTENT].getElementById("milestone-item-template") as
+                HTMLTemplateElement;
+        this.$milestones =
+            this[CONTENT].getElementById("milestones") as
+                HTMLOListElement;
+        this.$web3Address =
+            this[CONTENT].getElementById("web3-address") as
+                HTMLInputElement;
+    }
+
     connectedCallback() {
-        if (this.rendered)
-            return;
+        this.shadowRoot?.appendChild(this[CONTENT]);
+        this.init();
+    }
 
-        this.render();
-        this.addMilestoneItem();
+    accountFragment(account: InjectedAccountWithMeta) {
+        return document.createRange().createContextualFragment(`
+            <mwc-list-item
+             twoline
+             value="${account.address}"
+             data-source="${account.meta.source}">
+                <span>${account.meta.name ?? account.address}</span>
+                <span class="select-source" slot="secondary">${
+                    account.meta.source
+                }</span>
+            </mwc-list-item>
+        `);
+    }
 
-        this.$fields.forEach($input => this.bindInputValidation($input));
+    async init() {
+        // fetch authenticated user
+        const resp = await fetch(`${config.apiBase}/user`);
+        if (resp.ok) {
+            this.user = await resp.json();
+        }
 
-        this.$["add-milestone"].addEventListener(
-            "click", _ => this.addMilestoneItem());
+        /**
+         * If not logged in, we can't submit the proposal to the API for
+         * saving, so we don't want to tell them we're "creating" or "saving"
+         * it. We say instead "preview" because they will be redirected to the
+         * detail page, where they have other options.
+         */
+        this.$submitProject.value = this.user
+            ? "Save Draft Proposal"
+            : "Preview Draft Proposal";
 
-        this.$["grant-submission-form"].addEventListener("submit", e => {
-            e.preventDefault();
-            e.stopPropagation();
+        this.accounts = getWeb3Accounts().then(accounts =>{
+            const $select = this.$web3AccountSelect;
 
-            this.handleFormSubmission(e.target as HTMLFormElement);
+            accounts.forEach(account => {
+                $select.appendChild(this.accountFragment(account));
+            });
+            $select.appendChild(this.accountFragment({
+                address: "other",
+                meta: {
+                    name: "Other",
+                    source: `(entered manually)`
+                }
+            }));
+            return accounts;
         });
 
-        this.accounts.forEach((account, idx) => {
-            this.$["web3-account-select"].appendChild(this.fragment(`
-                <mwc-list-item twoline value="${account.address}">
-                    <span>${account.meta.name ?? account.address}</span>
-                    <span class="select-source" slot="secondary">${account.meta.source}</span>
-                </mwc-list-item>
-            `));
+        this.$web3AccountSelect.addEventListener("change", e => {
+            const address = this.$web3AccountSelect.value;
+            if (address === "other") {
+                this.$web3Address.value = "";
+                this.$web3Address.toggleAttribute("disabled", false);
+            } else {
+                this.$web3Address.toggleAttribute("disabled", true);
+                this.$web3Address.value = address;
+            }
+        });
+
+        this.$web3AccountSelect.addEventListener("closed", e => {
+            if (this.$web3AccountSelect.value === "other")
+                this.$web3Address.focus();
         });
 
         Object.entries(categories).forEach(([category, subcategies], idx) => {
-            this.$["category-select"].appendChild(this.fragment(`
-                <mwc-list-item twoline value="${idx}">
-                    <span>${category}</span>
-                    <span class="select-source" slot="secondary">${
-                        subcategies.join("; ")
-                    }</span>
-                </mwc-list-item>
-            `));
+            this.$categorySelect.appendChild(
+                document.createRange().createContextualFragment(`
+                    <mwc-list-item twoline value="${idx}">
+                        <span>${category}</span>
+                        <span class="select-source" slot="secondary">${
+                            subcategies.join("; ")
+                        }</span>
+                    </mwc-list-item>
+                `)
+            );
+        });
+
+        const projectId = this.projectId;
+        if (projectId) {
+            this.setupExistingDraft(projectId);
+        } else {
+            this.addMilestoneItem();
+            setTimeout(() => this.$fields[0].focus(), 0);
+        }
+
+        this.bind();
+    }
+
+    async setupExistingDraft(projectId: string) {
+        let draft: GrantProposal;
+        
+        if (projectId === "local-draft") {
+            const local = localStorage.getItem(
+                "imbu-draft-proposal:local-draft"
+            );
+
+            if (!local) {
+                window.location.href = "/grant-submission";
+            }
+
+            draft = JSON.parse(String(local));
+        } else {
+            try {
+                draft = await fetch(
+                    `${config.apiBase}/projects/${projectId}`,
+                    {headers: config.getAPIHeaders}
+                ).then(resp => {
+                    if (resp.ok) {
+                        return resp.json();
+                    } else if (resp.status === 404) {
+                        // FIXME: 404 page or some other UX
+                        // throw new Error("Not found");
+                        window.location.href = config.grantSubmissionURL;
+                    }
+                });
+            } catch (cause) {
+                // FIXME: if you get here, it should be because of a
+                // 500 level error, because we should be handling 
+                // 400 level stuff above.
+                throw new Error(
+                    `Server error fetching project with id ${projectId}`,
+                    {cause: cause as Error}
+                );
+            }
+        }
+        
+        this.proposalIntoForm(draft);
+    }
+
+    get projectId() {
+        if (this._projectId) {
+            return this._projectId;
+        }
+        const parts = window.location.pathname.split("/");
+        if (parts.length === 3) {
+            this._projectId = parts[2];
+            return this._projectId;
+        }
+        return;
+    }
+
+    bind() {
+        this.shadowRoot?.addEventListener("input", e => {
+            this.reportValidity(e.target as any);
+        });
+
+        this.shadowRoot?.addEventListener("focus", e => {
+            const target = e.target as any;
+            if (target && target.setCustomValidity) {
+                target.setCustomValidity("");
+            }
+        });
+
+        this.$addMilestone.addEventListener(
+            "click", _ => {
+                const inputs = this.addMilestoneItem();
+                inputs["milestone-next"].focus();
+            }
+        );
+
+        this.$grantSubmissionForm.addEventListener("submit", e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            this.handleFormSubmission();
         });
     }
 
-    bindInputValidation($input: HTMLInputElement) {
-        $input.addEventListener("focus", _ => $input.setCustomValidity(""));
-        $input.addEventListener("input", _ => this.reportValidity($input));
-    }
-
     /**
-     * At this point, the form should have been validated, so we simply cast
+     * At this point, the form must have been validated, so we simply cast
      * the form inputs into their respective types and rely on the fact that
      * there won't be any undefined values.
      * 
@@ -113,22 +272,60 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
      * user submits here, we are ultimately submitting
      * $number * 1_000_000_000_000 to the blockchain.
      */
-    proposalFromFormData(formData: FormData): GrantProposal {
+    proposalFromForm(formData: FormData): GrantProposal {
+        console.log(Object.fromEntries(formData));
         return {
             name: formData.get("imbu-name") as string,
             logo: formData.get("imbu-logo") as string,
             description: formData.get("imbu-description") as string,
-            contact: formData.get("imbu-contact") as string,
+            website: formData.get("imbu-website") as string,
             milestones: this.milestones,
-            requiredFunds: parseInt(
+            required_funds: parseInt(
                 formData.get("imbu-funds-required") as string
             ) * 1e12,
+            category: formData.get("imbu-category") as string,
+            owner: formData.get("imbu-address") as string,
+        }
+    }
+
+    proposalIntoForm(proposal: GrantProposal): void {
+        const $inputFields: Record<string, HTMLInputElement> =
+            this.$fields.reduce((p, c: Element) => ({
+                ...p, [c.getAttribute("name") as string]: c
+            }), {});
+
+        this.accounts?.then(accounts => {
+            if (proposal.owner && accounts.some(
+                account => account.address === proposal.owner
+            )) {
+                $inputFields["imbu-account"].value = proposal.owner ?? "";
+            } else {
+                // `owner` exists and is a String
+                $inputFields["imbu-account"].value = "other";
+                $inputFields["imbu-address"].value = proposal.owner ?? "";
+            }
+        });
+        $inputFields["imbu-name"].value = proposal.name ?? "";
+        $inputFields["imbu-logo"].value = proposal.logo ?? "";
+        $inputFields["imbu-description"].value = proposal.description ?? "";
+        $inputFields["imbu-website"].value = proposal.website ?? "";
+        $inputFields["imbu-funds-required"].value =
+            String(proposal.required_funds / 1e12) ?? "";
+        $inputFields["imbu-category"].value = String(proposal.category ?? "");
+
+        for (let milestone of proposal.milestones) {
+            const $inputs = this.addMilestoneItem();
+            $inputs["milestone-next"].value = milestone.name;
+            $inputs["milestone-percent-to-unlock"].value =
+                String(milestone.percentage_to_unlock);
         }
     }
 
     reportValidity($input: HTMLInputElement, submitting: boolean = false) {
         if ($input.validity.valueMissing) {
-            $input.setAttribute("validationmessage", "This field is required.");
+            $input.setAttribute(
+                "validationmessage", "This field is required."
+            );
         } else if ($input.classList.contains("milestone-percent-to-unlock")) {
             this.reportMilestoneImbalances(submitting);
         } else {
@@ -138,50 +335,61 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
     }
 
     toggleInputsAttribute(qualifiedName: string, force?: boolean): boolean[] {
-        return [...this.$fields, this.$["submit-project"], this.$["add-milestone"]].map(
+        return [...this.$fields, this.$submitProject, this.$addMilestone].map(
             $field => $field.toggleAttribute(qualifiedName, force)
         );
     }
 
-    handleFormSubmission($form: HTMLFormElement): void {
-        if (!this.accounts.length)
-            throw new Error("No web3 accounts.");
-
+    async handleFormSubmission(): Promise<void> {
+        const $form = this.$grantSubmissionForm;
+        /**
+         * Often this field is disabled because it's set using a "select".
+         * However, the value we want is ultimately taken from this field
+         * instead, and it won't be culled from the form if it's disabled.
+         */
+        this.$web3Address.toggleAttribute("disabled", false);
         this.$fields.forEach($input => this.reportValidity($input, true));
 
         const valid = this.$fields.every(
             $input => $input.checkValidity()
         );
 
-        // FIXME: We need UX here.
         if (!valid) {
             throw new Error("Invalid form data.");
         }
 
         // Form is valid.
         const formData = new FormData($form);
-        const proposal = this.proposalFromFormData(formData);
+        this.disabled = true;
+        const proposal = this.proposalFromForm(formData);
 
-        const account = this.accounts.filter(
-            account => account.address === formData.get("imbu-account")
+        const account = (await this.accounts)?.filter(
+            account => account.address === proposal.owner
         )[0];
 
         // XXX: shouldn't happen because we get the list of accounts to
         // populate the dropdown in the first place.
-        if (!account) {
-            // FIXME: Need UX here.
-            throw new Error("Selected account no longer found.");
-        }
+        // if (!account) {
+        //     // FIXME: Need UX here.
+        //     throw new Error("Selected account no longer found.");
+        // }
 
-        this.submitGrantProposal(account, proposal);
+        return this.submitGrantProposal(proposal, account);
+    }
+
+    get milestonePercentFields() {
+        if (!this.shadowRoot)
+            return [];
+        return Array.from(
+            this.shadowRoot?.querySelectorAll(".milestone-percent-to-unlock")
+        ) as HTMLInputElement[];
     }
 
     reportMilestoneImbalances(submitting: boolean = false) {
         const $all = Array.from(
-            this.querySelectorAll(".milestone-percent-to-unlock")
+            this.shadowRoot?.querySelectorAll(".milestone-percent-to-unlock") ?? []
         ) as HTMLInputElement[];
         const aggregate = $all.reduce((p, $x) => p + parseInt($x.value), 0);
-
         const valid = submitting
             ? aggregate === 100
             : aggregate <= 100;
@@ -198,109 +406,103 @@ export default class GrantSubmissionForm extends Hoquet(HTMLElement, {
 
     addMilestoneItem() {
         const ordinal = this.nextMilestoneOrdinal;
-        const frag = (this.$["milestone-item-template"] as HTMLTemplateElement)
+        const frag = this.$milestoneItemTemplate
             .content
-            .cloneNode(true) as DocumentFragment
-
-        if (!this.$["milestones"].children.length) {
-            frag.removeChild(frag.firstElementChild as Node);
-        }
-
-        frag.querySelector(".milestone-percent-to-unlock")?.addEventListener(
-            "blur", e => this.reportMilestoneImbalances()
-        );
+            .cloneNode(true) as DocumentFragment;
 
         (frag.querySelector(".milestone-next-label") as HTMLElement).innerText =
-            `What is you ${ordinal} milestone?`;
+            `What is your ${ordinal} milestone?`;
 
-        for (const $field of frag.querySelectorAll(".input-field")) {
-            this.bindInputValidation($field as HTMLInputElement);
-        }
+        const $inputs = frag.querySelectorAll(".input-field");
+        this.$milestones.appendChild(frag);
 
-        this.$["milestones"].appendChild(frag);
+        return {
+            "milestone-next": $inputs[0] as HTMLInputElement,
+            "milestone-percent-to-unlock": $inputs[1] as HTMLInputElement,
+        };
     }
 
-    get milestones(): Milestone[] {
-        return Array.from(this.$["milestones"].querySelectorAll(".milestone")).map(($li: Element) => {
-            const [$name, $percentageToUnlock] = Array.from($li.children) as HTMLInputElement[];
+    get milestones(): ProposedMilestone[] {
+        return Array.from(
+            this.$milestones.querySelectorAll(".milestone")
+        ).map(($li: Element) => {
+            const [$name, $percentageToUnlock] =
+                Array.from($li.children) as HTMLInputElement[];
             return {
                 name: $name.value.trim(),
-                percentageToUnlock: parseInt($percentageToUnlock.value)
-            } as Milestone;
+                percentage_to_unlock: parseInt($percentageToUnlock.value),
+            } as ProposedMilestone;
         });
     }
 
-    toggleDisabled(force?: boolean) {
+    set disabled(force: boolean) {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    async submitGrantProposal(account: InjectedAccountWithMeta, proposal: GrantProposal) {
-        try {
-            const injector = await web3FromSource(account.meta.source);
+    dialog(
+        title: string,
+        content: string,
+        actions: Record<string, CallableFunction>,
+        isDismissable = false
+    ) {
+        this.dispatchEvent(new CustomEvent("imbu:dialog", {
+            bubbles: true,
+            detail: {title, content, actions, isDismissable}
+        }));
+    }
 
-            this.dispatchEvent(new CustomEvent("imbu:status", {
-                bubbles: true, detail: {
-                    heading: "Submitting",
-                    msg: "Signing and sending...",
-                }
-            }));
+    async postGrantProposal(proposal: GrantProposal) {
+        const resp = await model.postGrantProposal(proposal);
 
-            this.toggleDisabled(true);
-            const extrinsic = this.api.tx.imbueProposals.createProject(
-                proposal.name,
-                proposal.logo,
-                proposal.description,
-                proposal.contact,
-                proposal.milestones,
-                proposal.requiredFunds,
-            );
-            const txHash = await extrinsic.signAndSend(
-                account.address,
-                {signer: injector.signer},
-                ({ status }) => {
-                    console.log(status);
-                    if (status.isInBlock) {
-                        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-                        this.dispatchEvent(new CustomEvent("imbu:status", {
-                            bubbles: true, detail: {
-                                heading: "Status",
-                                msg: `Completed at block hash #${status.asInBlock.toString()}`,
-                                dismissable: true,
-                            }
-                        }));
-
-                        // FIXME: rather than timeout, provide a link to see the project detail page,
-                        // and a button for the user to dismiss
-                        setTimeout(() => {
-                            this.dispatchEvent(new CustomEvent("imbu:grant-submission-form:done", {
-                                bubbles: true, composed: true
-                            }));
-                        }, 5000);
-                    } else {
-                        this.dispatchEvent(new CustomEvent("imbu:status", {
-                            bubbles: true, detail: {
-                                heading: "Status",
-                                msg: status.type,
-                                dismissable: true,
-                            }
-                        }))
-                        console.log(`Current status: ${status.type}`);
-                    }
-                }
-            );
-            console.log(`Transaction hash: ${txHash}`);
-        } catch (e: any) {
-            console.error("Transaction failed...", e);
-            // probably canceled, so just re-enable the form fields.
-            this.dispatchEvent(new CustomEvent("imbu:status", {
-                bubbles: true, detail: {
-                    heading: "Transaction failed",
-                    msg: e.toString(),
-                    dismissable: true
-                }
-            }));
-            this.toggleDisabled(false);
+        if (resp.ok) {
+            const project: Project = await resp.json();
+            
+            // FIXME: delete from localStorage?
+            window.location.href = `/grant-proposals/preview?id=${project.id}`
+        } else {
+            // TODO: UX for submission failed
+            // maybe `this.dialog(...)`
+            this.disabled = false;
         }
+    }
+
+    async updateGrantProposal(proposal: GrantProposal, id: string | number) {
+        const resp = await model.updateGrantProposal(proposal, id);
+
+        if (resp.ok) {
+            const project: Project = await resp.json();
+            window.location.href = `/grant-proposals/preview?id=${project.id}`;
+        } else {
+            // TODO: UX needed (similar to "post" version)
+            this.disabled = false;
+        }
+    }
+
+    async submitGrantProposal(
+        proposal: GrantProposal,
+        account?: InjectedAccountWithMeta,
+    ): Promise<void> {
+        // Are we logged in?
+        if (this.user) {
+            // if yes, go ahead and post the draft with the `usr_id`
+            proposal.usr_id = this.user.id;
+            if (this.projectId && this.projectId !== "local-draft") {
+                return this.updateGrantProposal(proposal, this.projectId);
+            }
+            return this.postGrantProposal(proposal);
+        } else {
+            // Not logged in, save it to localStorage and redirect to
+            // preview page as "local-draft"
+            this.savetoLocalStorage(proposal, account);
+            window.location.href = "/grant-proposals/preview?id=local-draft";
+        }
+    }
+
+    savetoLocalStorage(proposal: GrantProposal, account?: InjectedAccountWithMeta) {
+        window.localStorage.setItem(
+            "imbu-draft-proposal:local-draft",
+            JSON.stringify(proposal)
+        );
     }
 }
 

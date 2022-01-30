@@ -1,12 +1,34 @@
-const appName = "Imbue Network";
-// const webSocketAddr = "ws://127.0.0.1:8081/wsapp/";
-const webSocketAddr = "wss://dev.imbue.network";
-// http://3.9.171.186:3000/?rpc=ws%3A%2F%2F3.9.171.186%3A9942#/chainstate
-// const webSocketAddr = "ws://3.9.171.186:9944"
+export const appName = "Imbue Network";
 
-// https://www.hachettebookgroup.com/travel/trip-ideas/types-of-volunteer-opportunities/
-// https://sbg.sg/business_category_list.pdf
-const categories = {
+/**
+ * XXX: we get webSocketAddr from /api/v1/info now.
+ */
+// const webSocketAddr = "ws://127.0.0.1:8081/wsapp/";
+// export const webSocketAddr = "wss://dev.imbue.network";
+// http://3.9.171.186:3000/?rpc=ws%3A%2F%2F3.9.171.186%3A9942#/chainstate
+// export const webSocketAddr = "ws://3.9.171.186:9944";
+// export const webSocketAddr = "ws://127.0.0.1:9944";
+
+
+export const apiBase = "/api/v1";
+export const getAPIHeaders = {
+    "accept": "application/json",
+};
+export const postAPIHeaders = {
+    ...getAPIHeaders,
+    "content-type": "application/json",
+};
+
+export const grantProposalsURL = "/grant-proposals";
+export const grantSubmissionURL = "/grant-submission";
+
+export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
+
+/**
+ * https://www.hachettebookgroup.com/travel/trip-ideas/types-of-volunteer-opportunities/
+ * https://sbg.sg/business_category_list.pdf
+ */
+export const categories = {
     "Automative": [
         "Auto Accessories",
         "Auto Dealers - New",
@@ -167,9 +189,3 @@ const categories = {
         "Utility Companies",
     ],
 };
-
-export {
-    appName,
-    webSocketAddr,
-    categories,
-}

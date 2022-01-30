@@ -10,7 +10,7 @@ server {
 	listen ${HTTPS_PORT} ssl;
 	listen [::]:${HTTPS_PORT} ssl;
 	include ${SSL_CERTS_CONF};
-	include conf.d/ssl-params.conf;
+	include conf.d/ssl-params.snippet;
 
 	root /usr/share/nginx/html;
 
@@ -22,6 +22,47 @@ server {
     # 	proxy_set_header Connection "Upgrade";
     # 	proxy_set_header Host $host;
 	# }
+
+	location = /logout {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location = /redirect {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location /api/v1 {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location /auth {
+		include conf.d/api-proxy-directives.snippet;
+	}
+
+	# Redirect to "/"
+	location = /grant-proposals {
+		return 302 /grant-proposals/;
+	}
+
+	# Projects list:
+	location = /grant-proposals/ {
+		proxy_pass ${WEBFLOW_URL}/project-voting;
+	}
+
+	# Project detail:
+	location /grant-proposals {
+		rewrite ^ /project-voting/illum-rerum-necessitatibus break;
+		proxy_pass ${WEBFLOW_URL};
+	}
+
+	# New/edit project:
+	#     /grant-submission = new
+	#     /grant-submission/local = edit
+	#     /grant-submission/123 = edit
+	location /grant-submission {
+		rewrite ^ /grant-submission break;
+		proxy_pass ${WEBFLOW_URL};
+	}
 
 	location /dist {
 		gzip on;

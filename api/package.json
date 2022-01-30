@@ -1,14 +1,41 @@
 {
   "name": "website-prototype",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Prototype for ImbueNetwork website",
-  "main": "index.js",
+  "main": "build/index.js",
   "repository": "git@github.com:ImbueNetwork/website-prototype.git",
   "author": "Tom Brennan <tjb1982@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon src/index.ts"
+  },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.44.0",
-    "express": "^4.17.1",
-    "morgan": "^1.10.0"
+    "@polkadot/api": "^7.3.1",
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.6",
+    "express": "^5.0.0-alpha.8",
+    "express-session": "^1.17.2",
+    "knex": "^0.95.15",
+    "morgan": "^1.10.0",
+    "passport": "^0.5.2",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-google-oidc": "^0.1.0",
+    "passport-openidconnect": "^0.1.1",
+    "pg": "^8.7.1",
+    "uuidv4": "^6.2.12"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
+    "@types/http-errors": "^1.8.1",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^17.0.8",
+    "@types/passport": "^1.0.7",
+    "@types/passport-google-oauth20": "^2.0.11",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
   }
 }

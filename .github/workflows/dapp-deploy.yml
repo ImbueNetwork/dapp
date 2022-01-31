@@ -16,7 +16,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -24,7 +23,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           name: id_rsa
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
+          
       - name: aws cli creds
         uses: aws-actions/configure-aws-credentials@v1
         if: github.event.inputs.environment == 'DEV' || github.event.inputs.environment == 'STAGING'
@@ -32,7 +31,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-   
+
       - name: Set permissions on AWS Deploy script
         uses: actions/checkout@v2
       - if: ${{github.event.inputs.environment == 'STAGING'}}

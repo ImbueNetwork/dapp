@@ -4,7 +4,7 @@ export const appName = "Imbue Network";
  * XXX: we get webSocketAddr from /api/v1/info now.
  */
 // const webSocketAddr = "ws://127.0.0.1:8081/wsapp/";
-// export const webSocketAddr = "wss://dev.imbue.network";
+// export const webSocketAddr = "wss://testnet.imbue.network";
 // http://3.9.171.186:3000/?rpc=ws%3A%2F%2F3.9.171.186%3A9942#/chainstate
 // export const webSocketAddr = "ws://3.9.171.186:9944";
 // export const webSocketAddr = "ws://127.0.0.1:9944";

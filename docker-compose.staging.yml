@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: imbue
+      POSTGRES_PASSWORD: imbue
+    ports:
+    - 5433:5432
+
+  api:
+    build: ./api
+    container_name: api
+    ports:
+    - "3000:3000"
+    environment:
+      GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
+      GOOGLE_OAUTH2_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
+      WEB_HOST: "https://localhost:8443"
+      DB_PORT: 5432
+      DB_HOST: postgres
+      IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
+  
+  web:
+    build: ./web
+    container_name: web
+    ports:
+    - "8081:80"
+    - "8443:8443"
+    environment:
+    - HTTP_PORT=80
+    - HTTPS_PORT=8443
+    - SSL_DHPARAM=/etc/nginx/conf.d/includes/dhparam.pem
+    - SSL_CERTS_CONF=conf.d/includes/self-signed.conf
+    - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
+    - API_LOCAL=http://api:3000

@@ -1,6 +1,6 @@
-# prototype
+# DAPP
 
-Imbue Network Dapp prototype/MVP
+Imbue Network Dapp
 
 ## Local deployment quickstart with docker-compose
 

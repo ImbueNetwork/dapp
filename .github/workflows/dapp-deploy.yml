@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: DAPP
+name: DAPP-DEPLOY
 on:
   workflow_dispatch:
     inputs:
@@ -16,33 +16,32 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: aws cli DEV
-        uses: aws-actions/configure-aws-credentials@v1
-        if: github.event.inputs.environment == 'DEV' || github.event.inputs.environment == 'STAGING'
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY }}
           name: id_rsa
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+          
+      - name: aws cli creds
+        uses: aws-actions/configure-aws-credentials@v1
+        if: github.event.inputs.environment == 'DEV' || github.event.inputs.environment == 'STAGING'
         with:
-          java-version: 1.8
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Set permissions on AWS Deploy script
+        uses: actions/checkout@v2
       - if: ${{github.event.inputs.environment == 'STAGING'}}
-        name: DEV Build and upload to S3
+        name: Deploy DAPP To AWS
         run: |
           branch_name=${GITHUB_REF#refs/heads/}
           if [ "${{ github.event.inputs.deployType}}" = "BUILD" ] || [ "${{ github.event.inputs.deployType}}" = "BUILD+DEPLOY" ]; then
             ls -ltr
+            echo BRANCH IS $branch_name
+            chmod +x scripts/deploy_to_aws.sh
           fi
-      - name: rsync over ssh
-        run: ./scripts/deploy_to_aws.sh
+      - name: rsync deploy script over ssh
+        run: export branch_name=${GITHUB_REF#refs/heads/}; ./scripts/deploy_to_aws.sh ${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }} ${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }} $branch_name

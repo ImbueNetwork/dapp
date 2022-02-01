@@ -23,7 +23,7 @@ services:
       WEB_HOST: "https://pojagi.org"
       DB_PORT: 5432
       DB_HOST: postgres
-      IMBUE_NETWORK_WEBSOCK_ADDR: wss://dev.imbue.network
+      IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
     #volumes:
     #- "./api/build:/api/build"
     #- "./api/node_modules:/api/node_modules"

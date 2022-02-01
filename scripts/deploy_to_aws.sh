@@ -17,7 +17,7 @@ ssh ec2-user@3.12.198.64 -o StrictHostKeyChecking=no "
         docker system prune --volumes;
         docker-compose -f docker-compose.staging.yml build --no-cache; 
         docker-compose -f docker-compose.staging.yml up -d;
-        cd api && make db_up;
+        docker exec -it api make db_up;
 "
 
 echo 'Deployment completed successfully'

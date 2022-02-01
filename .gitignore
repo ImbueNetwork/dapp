@@ -5,3 +5,7 @@ node_modules/
 # vim
 *.swp
 *.swo
+
+.DS_Store
+
+.vscode/

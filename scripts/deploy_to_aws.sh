@@ -14,8 +14,10 @@ ssh ec2-user@3.12.198.64 -o StrictHostKeyChecking=no "
         export BRANCH_NAME=$BRANCH_NAME;
         rm -rf dapp && git clone https://github.com/ImbueNetwork/dapp/ && cd dapp; git checkout $BRANCH_NAME;
         docker-compose -f docker-compose.staging.yml down;
+        docker system prune --volumes;
         docker-compose -f docker-compose.staging.yml build --no-cache; 
-        docker-compose -f docker-compose.staging.yml up -d
+        docker-compose -f docker-compose.staging.yml up -d;
+        cd api && make db_up;
 "
 
 echo 'Deployment completed successfully'

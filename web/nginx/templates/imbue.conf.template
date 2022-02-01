@@ -41,7 +41,7 @@ server {
 
 	# Redirect to "/"
 	location = /grant-proposals {
-		return 302 /grant-proposals/;
+		return 302 $scheme://$http_host/grant-proposals/;
 	}
 
 	# Projects list:

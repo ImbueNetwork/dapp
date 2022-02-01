@@ -32,7 +32,9 @@ div.funding {
 .input-field[name=imbu-funds-required] {
     width: 40%;
 }
-
+.milestone {
+    margin: 0 0 5px 0;
+}
 .milestone-separator {
     width: 95%;
     border: 1px 0 0 0;
@@ -40,6 +42,11 @@ div.funding {
 }
 #milestones-fieldset {
     padding-bottom: 20px;
+}
+
+#milestones {
+    list-style: none outside none;
+    padding: 0;
 }
 
 .input-field {

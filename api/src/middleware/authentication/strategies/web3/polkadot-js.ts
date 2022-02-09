@@ -104,7 +104,7 @@ const ensureParams = (
 }
 
 
-export const polkadotjsStrategy = new Web3Strategy("polkadot-js");
+export const polkadotJsStrategy = new Web3Strategy("polkadot-js");
 export const polkadotJsAuthRouter = express.Router();
 
 polkadotJsAuthRouter.post("/", (req, res, next) => {

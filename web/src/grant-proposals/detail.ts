@@ -1,5 +1,5 @@
 import "./detail/page/page";
-import rootStyles from "../common.css";
+import rootStyles from "../styles/common.css";
 
 
 const $section = document.querySelector(".voting-section .container");

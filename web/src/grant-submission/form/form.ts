@@ -1,16 +1,18 @@
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import "@pojagi/hoquet/lib/forms/textfield/textfield";
+
+import "../../material-components";
+import formStyles from "../../styles/forms.css";
 
 import templateSrc from "./form.html";
 import styles from "./form.css";
-import webflowCSSLink from "../../../webflow-css-link.html";
 import { categories } from "../../config";
-
-import "../../../lib/imbue/forms/textfield/textfield";
 
 import type { ProposedMilestone, GrantProposal, User, Project } from "../../model";
 import { getWeb3Accounts } from "../../utils/polkadot";
 import * as model from "../../model";
 import * as config from "../../config";
+
 
 declare global {
     interface ErrorConstructor {
@@ -20,8 +22,10 @@ declare global {
 
 const template = document.createElement("template");
 template.innerHTML = `
-    ${webflowCSSLink}
-    <style>${styles}</style>
+    <style>
+    ${formStyles}
+    ${styles}
+    </style>
     ${templateSrc}
 `;
 
@@ -173,9 +177,18 @@ export default class GrantSubmissionForm extends HTMLElement {
         });
 
         const projectId = this.projectId;
-        if (projectId) {
-            this.setupExistingDraft(projectId);
-        } else {
+        try {
+            if (projectId) {
+                await this.setupExistingDraft(projectId);
+            } else {
+                this.addMilestoneItem();
+                setTimeout(() => this.$fields[0].focus(), 0);
+            }
+        } catch (e) {
+            console.error(e);
+            // FIXME: UX -- dialog explaining that we tried to
+            // fetch, but failed for some reason.
+            // maybe 500 page.
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
         }
@@ -208,6 +221,8 @@ export default class GrantSubmissionForm extends HTMLElement {
                         // FIXME: 404 page or some other UX
                         // throw new Error("Not found");
                         window.location.href = config.grantSubmissionURL;
+                    } else {
+                        throw resp;
                     }
                 });
             } catch (cause) {
@@ -439,26 +454,13 @@ export default class GrantSubmissionForm extends HTMLElement {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    dialog(
-        title: string,
-        content: string,
-        actions: Record<string, CallableFunction>,
-        isDismissable = false
-    ) {
-        this.dispatchEvent(new CustomEvent("imbu:dialog", {
-            bubbles: true,
-            detail: {title, content, actions, isDismissable}
-        }));
-    }
-
     async postGrantProposal(proposal: GrantProposal) {
         const resp = await model.postGrantProposal(proposal);
 
         if (resp.ok) {
             const project: Project = await resp.json();
-            
             // FIXME: delete from localStorage?
-            window.location.href = `/grant-proposals/preview?id=${project.id}`
+            return project;
         } else {
             // TODO: UX for submission failed
             // maybe `this.dialog(...)`
@@ -471,10 +473,7 @@ export default class GrantSubmissionForm extends HTMLElement {
 
         if (resp.ok) {
             const project: Project = await resp.json();
-            window.location.href = `/grant-proposals/preview?id=${project.id}`;
-        } else {
-            // TODO: UX needed (similar to "post" version)
-            this.disabled = false;
+            return project;
         }
     }
 
@@ -486,15 +485,25 @@ export default class GrantSubmissionForm extends HTMLElement {
         if (this.user) {
             // if yes, go ahead and post the draft with the `usr_id`
             proposal.usr_id = this.user.id;
+            let project;
+
             if (this.projectId && this.projectId !== "local-draft") {
-                return this.updateGrantProposal(proposal, this.projectId);
+                project = await this.updateGrantProposal(proposal, this.projectId);
+            } else {
+                project = await this.postGrantProposal(proposal);
             }
-            return this.postGrantProposal(proposal);
+
+            if (project) {
+                window.location.href = `/dapp/proposals/preview?id=${project.id}`;
+            } else {
+                // FIXME: UX needed
+                this.disabled = false;
+            }
         } else {
             // Not logged in, save it to localStorage and redirect to
             // preview page as "local-draft"
             this.savetoLocalStorage(proposal, account);
-            window.location.href = "/grant-proposals/preview?id=local-draft";
+            window.location.href = "/dapp/proposals/preview?id=local-draft";
         }
     }
 

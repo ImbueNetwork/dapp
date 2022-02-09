@@ -1,5 +1,10 @@
 import "./form/form";
-import rootStyles from "/src/common.css";
+import rootStyles from "../styles/common.css";
+
+
+document.addEventListener("click", e => {
+    (e.target as {href?: string}).href && e.preventDefault();
+});
 
 document.head.appendChild(document.createRange().createContextualFragment(`
 <link rel="stylesheet" href="https://unpkg.com/material-components-web@13.0.0/dist/material-components-web.min.css">

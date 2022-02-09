@@ -15,7 +15,6 @@ export type Web3Account = {
     challenge: string;
 };
 
-
 export type User = {
     id: number;
     display_name: string;

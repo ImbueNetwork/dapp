@@ -14,14 +14,12 @@ server {
 
 	root /usr/share/nginx/html;
 
-	# FIXME: connect to imbue with TLS
-	# location /wsapp/ {
-    # 	proxy_pass ${IMBUE_WS_ADDR};
-    # 	proxy_http_version 1.1;
-    # 	proxy_set_header Upgrade $http_upgrade;
-    # 	proxy_set_header Connection "Upgrade";
-    # 	proxy_set_header Host $host;
-	# }
+	# FIXME: requires authentication?
+	location /dapp {
+		# auth_request /auth;
+		root /etc/nginx/conf.d/html;
+		rewrite ^ /index.html break;
+	}
 
 	location = /logout {
 		include conf.d/api-proxy-directives.snippet;
@@ -37,6 +35,11 @@ server {
 
 	location /auth {
 		include conf.d/api-proxy-directives.snippet;
+	}
+
+	location /assets {
+		gzip on;
+		# FIXME: do we need to specify `gzip_types` here?
 	}
 
 	# Redirect to "/"

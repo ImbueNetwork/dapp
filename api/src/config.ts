@@ -13,6 +13,7 @@ export default {
             issuer: "https://accounts.google.com",
             authorizationURL: "https://accounts.google.com/o/oauth2/v2/auth",
             tokenURL: "https://www.googleapis.com/oauth2/v4/token",
+            // FIXME: does this really need the host? Can it not just be off of "/" ?
             callbackURL: `${process.env.WEB_HOST}/auth/oauth2/accounts.google.com/redirect`,
         }
     },

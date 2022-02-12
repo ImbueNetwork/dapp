@@ -31,26 +31,32 @@ const navigationItems: MenuItem[] = [
     {
         name: "new-proposal",
         label: "New",
-        href: "/dapp/proposals/edit",
+        href: "/dapp/proposals/draft",
         icon: "library_add",
+        spa: true,
     },
+    // FIXME: only if logged in:
     {
         name: "my-proposals",
         label: "List",
         href: "/dapp/proposals",
         icon: "library_books",
+        spa: true,
     },
     {
         name: "search-proposals",
         label: "Search",
         href: "/dapp/proposals/search",
         icon: "search",
+        spa: true,
     },
+    // FIXME: only when logged in:
     {
         name: "account-settings",
         label: "Me",
         href: "/dapp/settings",
-        icon: "face"
+        icon: "face",
+        spa: true,
     },
     {
         name: "contact",
@@ -58,7 +64,7 @@ const navigationItems: MenuItem[] = [
         href: "/#join",
         icon: "alternate_email"
     }
-];
+].filter(x => x);
 
 
 window.customElements.define("imbu-dapp", class extends HTMLElement {
@@ -98,6 +104,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             this.$layout.openDrawer("right");
         });
         this.initNavigation(navigationItems);
+        window.addEventListener("popstate", e => {
+            this.route();
+        });
         this.route();
     }
 
@@ -134,18 +143,18 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     routeProposalAction(path: string) {
         const route = new Route("/:action", path)
 
-        // Available actions: "draft", "preview"
+        // Available actions: "draft", "preview", "search"
         switch (route.data?.action) {
             case "draft":
-                /**
-                 * display the form page.
-                 */
                  this.$pages.select("draft");
                 (this.$pages.selected as GrantSubmissionPage).init();
                 break;
             case "preview":
                 this.$pages.select("preview");
                 (this.$pages.selected as GrantProposalsDetailPage).init();
+                break;
+            case "search":
+                this.$pages.select("not-implemented");
                 break;
             default:
                 this.$pages.select("not-found");
@@ -169,12 +178,16 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
         switch (route.data?.app) {
             case "proposals":
-            default:
                 if (!route.tail) {
                     // i.e., /dapp/proposals
                     return await this.routeProposalsListing();
                 }
                 return await this.routeProposalAction(route.tail);
+            case "settings":
+                this.$pages.select("not-implemented");
+                break;
+            default:
+                this.$pages.select("not-found");
         }
     }
 });

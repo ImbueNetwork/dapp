@@ -42,30 +42,30 @@ server {
 		# FIXME: do we need to specify `gzip_types` here?
 	}
 
-	# Redirect to "/"
-	location = /grant-proposals {
-		return 302 $scheme://$http_host/grant-proposals/;
-	}
+	# # Redirect to "/"
+	# location = /grant-proposals {
+	# 	return 302 $scheme://$http_host/grant-proposals/;
+	# }
 
-	# Projects list:
-	location = /grant-proposals/ {
-		proxy_pass ${WEBFLOW_URL}/project-voting;
-	}
+	# # Projects list:
+	# location = /grant-proposals/ {
+	# 	proxy_pass ${WEBFLOW_URL}/project-voting;
+	# }
 
-	# Project detail:
-	location /grant-proposals {
-		rewrite ^ /project-voting/illum-rerum-necessitatibus break;
-		proxy_pass ${WEBFLOW_URL};
-	}
+	# # Project detail:
+	# location /grant-proposals {
+	# 	rewrite ^ /project-voting/illum-rerum-necessitatibus break;
+	# 	proxy_pass ${WEBFLOW_URL};
+	# }
 
-	# New/edit project:
-	#     /grant-submission = new
-	#     /grant-submission/local = edit
-	#     /grant-submission/123 = edit
-	location /grant-submission {
-		rewrite ^ /grant-submission break;
-		proxy_pass ${WEBFLOW_URL};
-	}
+	# # New/edit project:
+	# #     /grant-submission = new
+	# #     /grant-submission/local = edit
+	# #     /grant-submission/123 = edit
+	# location /grant-submission {
+	# 	rewrite ^ /grant-submission break;
+	# 	proxy_pass ${WEBFLOW_URL};
+	# }
 
 	location /dist {
 		gzip on;

@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import "@pojagi/hoquet/lib/dialog/dialog";
 import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { MDCTabBar } from "@material/tab-bar";
@@ -36,7 +37,7 @@ template.innerHTML = `
 `;
 
 
-class GrantProposalsDetailPage extends HTMLElement {
+export default class GrantProposalsDetailPage extends HTMLElement {
     private _projectId?: string;
     draft?: GrantProposal | Project;
     // project?: {};
@@ -162,7 +163,7 @@ class GrantProposalsDetailPage extends HTMLElement {
         this.toggleSave = false;
 
         this.bind();
-        this.init();
+        // this.init();
     }
 
     async init() {
@@ -364,7 +365,7 @@ class GrantProposalsDetailPage extends HTMLElement {
             }
             // redirect to "new" grant submission, because there isn't a reason
             // to be here without something to view.
-            window.location.href = config.grantSubmissionURL;
+            window.location.href = `${config.grantProposalsURL}/draft`;
             return;
         }
 
@@ -410,7 +411,7 @@ class GrantProposalsDetailPage extends HTMLElement {
 
         this.$edit.addEventListener("click", e => {
             const edit = () => {
-                window.location.href = `/grant-submission/${this.projectId}`;
+                window.location.href = `${config.grantProposalsURL}/draft?id=${this.projectId}`;
             };
 
             if (this.projectId === "local-draft" || this.user) {

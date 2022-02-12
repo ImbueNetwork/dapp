@@ -74,10 +74,11 @@ export const upsertWeb3Challenge = (
     challenge: string,
 ) => async (tx: Knex.Transaction):
     Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+
     let web3Account = await tx<Web3Account>("web3_account")
         .select()
         .where({
-            usr_id: user.id
+            usr_id: user?.id
         })
         .first();
 

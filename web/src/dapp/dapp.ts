@@ -7,7 +7,9 @@ import Route from "@pojagi/hoquet/lib/route/route";
 import Layout from "@pojagi/hoquet/lib/layout/layout";
 
 import "../grant-submission/page/page";
+import GrantSubmissionPage from "../grant-submission/page/page";
 import "../grant-proposals/detail/page/page";
+import GrantProposalsDetailPage from "../grant-proposals/detail/page/page";
 
 import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
@@ -29,7 +31,7 @@ const navigationItems: MenuItem[] = [
     {
         name: "new-proposal",
         label: "New",
-        href: "/dapp/proposals/new",
+        href: "/dapp/proposals/edit",
         icon: "library_add",
     },
     {
@@ -96,8 +98,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             this.$layout.openDrawer("right");
         });
         this.initNavigation(navigationItems);
-        const route = new Route("/dapp/:app");
-        this.route(route);
+        this.route();
     }
 
     navRelocate(
@@ -130,11 +131,51 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$layout.breakpointer.addHandler(this.navRelocate.bind(this));
     }
 
-    route(route: Route) {
-        // this.$pages.select("new-proposal");
-        // this.$pages.select("draft-preview");
+    routeProposalAction(path: string) {
+        const route = new Route("/:action", path)
 
-        console.log(route);
+        // Available actions: "draft", "preview"
+        switch (route.data?.action) {
+            case "draft":
+                /**
+                 * display the form page.
+                 */
+                 this.$pages.select("draft");
+                (this.$pages.selected as GrantSubmissionPage).init();
+                break;
+            case "preview":
+                this.$pages.select("preview");
+                (this.$pages.selected as GrantProposalsDetailPage).init();
+                break;
+            default:
+                this.$pages.select("not-found");
+        }
+    }
+
+    async routeProposalsListing() {
+        // TODO:
+        this.$pages.select("not-implemented");
+    }
+
+    async route() {
+        const route = new Route("/dapp/:app");
+
+        if (!route.active) {
+            // FIXME: no app/page to route to
+            // is this 404, etc?
+            this.$pages.select("not-found");
+            return;
+        }
+
+        switch (route.data?.app) {
+            case "proposals":
+            default:
+                if (!route.tail) {
+                    // i.e., /dapp/proposals
+                    return await this.routeProposalsListing();
+                }
+                return await this.routeProposalAction(route.tail);
+        }
     }
 });
 

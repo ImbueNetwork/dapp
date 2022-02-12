@@ -97,7 +97,7 @@ export default class GrantSubmissionForm extends HTMLElement {
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
-        this.init();
+        // this.init();
     }
 
     accountFragment(account: InjectedAccountWithMeta) {
@@ -220,7 +220,7 @@ export default class GrantSubmissionForm extends HTMLElement {
                     } else if (resp.status === 404) {
                         // FIXME: 404 page or some other UX
                         // throw new Error("Not found");
-                        window.location.href = config.grantSubmissionURL;
+                        window.location.href = `${config.grantProposalsURL}/draft`;
                     } else {
                         throw resp;
                     }
@@ -243,11 +243,23 @@ export default class GrantSubmissionForm extends HTMLElement {
         if (this._projectId) {
             return this._projectId;
         }
-        const parts = window.location.pathname.split("/");
-        if (parts.length === 3) {
-            this._projectId = parts[2];
+
+        const entries = window.location.search
+            .split("?")[1]
+            ?.split("&")
+            .map(x => x.split("="));
+
+        if (!entries) {
+            return;
+        }
+
+        const id = Object.fromEntries(entries).id;
+
+        if (id) {
+            this._projectId = id;
             return this._projectId;
         }
+        
         return;
     }
 

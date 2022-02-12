@@ -1,10 +1,6 @@
 <hq-layout id="layout">
-    <!--<ebok-nav slot="left-drawer" id="nav-hamburger"></ebok-nav>-->
-    <!-- <ebok-selected-cards-viewer
-            id="selected-cards-viewer"
-            slot="right-drawer"></ebok-selected-cards-viewer> -->
 
-    <div id="logo" slot="main-title"></div>
+    <a slot="main-title" href="/"><div id="logo"></div></a>
 
     <div class="context-menu" slot="context-menu">
         <div class="context-menu-item">
@@ -13,22 +9,14 @@
     </div>
 
     <div id="main" slot="main">
-        <hq-pages id="pages" attr-for-selected="name" default-selection="new-proposal">
-            <imbu-grant-submission-page name="new-proposal"></imbu-grant-submission-page>
-            <!-- <imbu-grant-proposals-detail-page name="draft-preview"></imbu-grant-proposals-detail-page> -->
-            <div name="foo">Foo</div>
+        <hq-pages id="pages" attr-for-selected="name" default-selection="not-found">
+            <imbu-grant-submission-page id="grant-submission-page" name="draft"></imbu-grant-submission-page>
+            <imbu-grant-proposals-detail-page name="preview"></imbu-grant-proposals-detail-page>
             <h1 name="not-found" id="not-found">Not found</h1>
+            <h1 name="not-implemented">Not implemented yet</h1>
             <h1 name="server-error">Service down</h1>
         </hq-pages>
     </div>
 
-    <!-- <span id="logo" slot="left-menu"> -->
-        <!-- <paper-button id="hamburger"> -->
-        <!-- <span class="material-icons">menu</span>
-        <span id="main-title">Imbue Dapp</span> -->
-        <!-- </paper-button> -->
-    <!-- </span> -->
-
     <hq-nav id="nav" slot="right-drawer" display-mode="stack"></hq-nav>
 </hq-layout>
-

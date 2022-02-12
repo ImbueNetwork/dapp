@@ -45,7 +45,7 @@ export class Web3Strategy extends passport.Strategy {
                     this.fail();
                 } else {
                     const user = await fetchUser(web3Account.usr_id)(tx);
-                    if (user) {
+                    if (user?.id) {
                         if (
                             signatureVerify(
                                 web3Account.challenge,
@@ -137,6 +137,10 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
         async (err: Error, user: User) => {
             if (err) {
                 next(err);
+            }
+
+            if (!user) {
+                next(new Error("No user provided."));
             }
 
             try {

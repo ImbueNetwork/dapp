@@ -10,7 +10,7 @@
     <fieldset>
         <legend class="label first-label">First, some basic info</legend>
         
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field"
          name="imbu-name"
          type="text"
@@ -18,25 +18,25 @@
          maxlength="256"
          required>
             <span slot="floating-label">Project name</span>
-        </imbu-forms-textfield>
+        </hq-forms-textfield>
    
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field"
          name="imbu-website"
          type="text"
-         helper="A website where potential funders can go to find more information."
+         helper="A website where contributors can find out more."
          required>
             <span slot="floating-label">Website</span>
-        </imbu-forms-textfield>
+        </hq-forms-textfield>
 
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field"
          name="imbu-logo"
          type="text"
          helper="A URL to an image file."
          required>
             <span slot="floating-label">Logo</span>
-        </imbu-forms-textfield>
+        </hq-forms-textfield>
     </fieldset>
 
     <fieldset>
@@ -64,11 +64,11 @@
         <legend class="label">How much funding will your project need?</legend>
 
         <div class="funding">
-            <imbu-forms-textfield
+            <hq-forms-textfield
              class="input-field"
              name="imbu-funds-required"
              type="number"
-             helper="The total amount of funding required for the project."
+             helper="The total amount required for the project."
              step="1"
              min="1"
              max="1e127"
@@ -76,7 +76,7 @@
                <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
                <span slot="suffix">.00</span>
                <span slot="floating-label">Funds required</span>
-           </imbu-forms-textfield>
+           </hq-forms-textfield>
    
            <mwc-select
             id="web3-account-select"
@@ -88,7 +88,7 @@
            </mwc-select>   
         </div>
 
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field"
          id="web3-address"
          name="imbu-address"
@@ -97,7 +97,7 @@
          required>
             <!-- TODO: add address validation-->
            <span slot="floating-label">Address</span>
-       </imbu-forms-textfield>
+       </hq-forms-textfield>
     </fieldset>
     
     <fieldset id="milestones-fieldset">
@@ -129,7 +129,7 @@
 <template id="milestone-item-template">
     <!-- <li><hr size="1" noshade class="milestone-separator"></li> -->
     <li class="list-item milestone">
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field milestone-next"
          type="text"
          maxlength="256"
@@ -138,9 +138,9 @@
             <span
              slot="floating-label"
              class="milestone-next-label">What is your next milestone?</span>
-        </imbu-forms-textfield>
+        </hq-forms-textfield>
 
-        <imbu-forms-textfield
+        <hq-forms-textfield
          class="input-field milestone-percent-to-unlock"
          type="number"
          step="1"
@@ -149,7 +149,7 @@
          helper="The sum of all milestones must be 100%."
          required>
          <span slot="floating-label">Percent to unlock?</span>
-        </imbu-forms-textfield>
+        </hq-forms-textfield>
     </li>
 </template>
 

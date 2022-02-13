@@ -1,13 +1,13 @@
 import express from "express";
 import passport from "passport";
 import { googleOIDCStrategy, googleOIDCRouter } from "./strategies/google-oidc";
-import { polkadotJsAuthRouter, polkadotjsStrategy } from "./strategies/web3/polkadot-js";
+import { polkadotJsAuthRouter, polkadotJsStrategy } from "./strategies/web3/polkadot-js";
 import type { User, Web3Account } from "../../models";
 import db from "../../db";
 
 
 passport.use(googleOIDCStrategy);
-passport.use(polkadotjsStrategy);
+passport.use(polkadotJsStrategy);
 
 passport.serializeUser((user, done) => {
     if (!(user as any).id) {
@@ -43,6 +43,14 @@ const router = express.Router();
 
 router.use("/auth/web3/polkadot-js", polkadotJsAuthRouter);
 router.use("/auth/oauth2/accounts.google.com", googleOIDCRouter);
+
+router.get("/auth", (req, res, _next) => {
+    return res.status(
+        req.isAuthenticated()
+            ? 200
+            : 401
+    ).end();
+});
 
 router.get("/logout", (req, res, next) => {
     const redirect: string = req.query.n as string;

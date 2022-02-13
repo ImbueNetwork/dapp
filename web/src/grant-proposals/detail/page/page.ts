@@ -1,8 +1,12 @@
 import { marked } from "marked";
-
+import "@pojagi/hoquet/lib/dialog/dialog";
+import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-
 import { MDCTabBar } from "@material/tab-bar";
+import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { web3FromSource } from "@polkadot/extension-dapp";
+import type { ISubmittableResult } from "@polkadot/types/types";
 
 import webflowCSSLink from "../../../../webflow-css-link.html";
 import materialComponentsLink from "../../../../material-components-link.html";
@@ -15,17 +19,10 @@ import type { GrantProposal, Project, User } from "../../../model";
 
 import "../../../auth-dialog/auth-dialog";
 import type AuthDialog from "../../../auth-dialog/auth-dialog";
-import "../../../../lib/imbue/dialog/dialog";
-import type Dialog from "../../../../lib/imbue/dialog/dialog";
 
 import { getWeb3Accounts, signWeb3Challenge } from "../../../utils/polkadot";
 import * as config from "../../../config";
 import * as model from "../../../model";
-import { ActionConfig } from "../../../../lib/imbue/dialog/dialog";
-import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { web3FromSource } from "@polkadot/extension-dapp";
-import type { ISubmittableResult } from "@polkadot/types/types";
 
 
 const CONTENT = Symbol();
@@ -40,7 +37,7 @@ template.innerHTML = `
 `;
 
 
-class GrantProposalsDetailPage extends HTMLElement {
+export default class GrantProposalsDetailPage extends HTMLElement {
     private _projectId?: string;
     draft?: GrantProposal | Project;
     // project?: {};
@@ -117,7 +114,8 @@ class GrantProposalsDetailPage extends HTMLElement {
                 HTMLOListElement;
         this.$actionButtonContainers =
             Array.from(
-                this.$save.parentElement?.parentElement?.children as HTMLCollection
+                this.$save.parentElement?.parentElement?.children as
+                    HTMLCollection
             ) as HTMLElement[];
     }
 
@@ -166,7 +164,7 @@ class GrantProposalsDetailPage extends HTMLElement {
         this.toggleSave = false;
 
         this.bind();
-        this.init();
+        // this.init();
     }
 
     async init() {
@@ -368,7 +366,7 @@ class GrantProposalsDetailPage extends HTMLElement {
             }
             // redirect to "new" grant submission, because there isn't a reason
             // to be here without something to view.
-            window.location.href = config.grantSubmissionURL;
+            window.location.href = `${config.grantProposalsURL}/draft`;
             return;
         }
 
@@ -391,7 +389,7 @@ class GrantProposalsDetailPage extends HTMLElement {
 
         const entry = window.location.search
             .split("?")[1]
-            .split("&")
+            ?.split("&")
             .map(str => str.split("="))
             .find(([k,_]) => k === "id");
             
@@ -414,7 +412,7 @@ class GrantProposalsDetailPage extends HTMLElement {
 
         this.$edit.addEventListener("click", e => {
             const edit = () => {
-                window.location.href = `/grant-submission/${this.projectId}`;
+                window.location.href = `${config.grantProposalsURL}/draft?id=${this.projectId}`;
             };
 
             if (this.projectId === "local-draft" || this.user) {

@@ -27,10 +27,10 @@ div.funding {
 }
 
 .input-field[name=imbu-account] {
-    width: 59%
+    width: 49%
 }
 .input-field[name=imbu-funds-required] {
-    width: 40%;
+    width: 50%;
 }
 .milestone {
     margin: 0 0 5px 0;
@@ -93,4 +93,19 @@ div.funding {
     background-color: rgba(255,255,255, 0.1);
     /* outline-color: rgb(178, 255, 11);
     outline: 1px  solid var(--mdc-theme-primary); */
+}
+
+@media screen and (max-width: 500px) {
+    div.funding {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .input-field[name=imbu-account] {
+        width: 100%;
+    }
+    .input-field[name=imbu-funds-required] {
+        width: 100%;
+    }        
 }

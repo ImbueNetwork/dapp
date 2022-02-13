@@ -54,6 +54,7 @@ services:
     - API_LOCAL=http://api:3000
     volumes:
     - "./web/dist:/usr/share/nginx/html/dist"
+    - "./web/nginx/templates:/etc/nginx/templates"
 
   # # XXX: commenting this out for now, because we have a testnet to work with instead.
   # # but if you wanted to work with a local network, this is one possibility.

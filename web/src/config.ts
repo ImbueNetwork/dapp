@@ -19,8 +19,7 @@ export const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-export const grantProposalsURL = "/grant-proposals";
-export const grantSubmissionURL = "/grant-submission";
+export const grantProposalsURL = "/dapp/proposals";
 
 export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
 

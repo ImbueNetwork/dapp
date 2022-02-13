@@ -38,7 +38,7 @@ app.get("/redirect", (req, res) => {
     const next = (req.session as any).next;
     if (next) {
         delete (req.session as any).next;
-        res.redirect(next);
+        return res.redirect(next);
     }
     res.redirect("/");
 });

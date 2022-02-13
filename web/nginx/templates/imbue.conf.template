@@ -14,14 +14,12 @@ server {
 
 	root /usr/share/nginx/html;
 
-	# FIXME: connect to imbue with TLS
-	# location /wsapp/ {
-    # 	proxy_pass ${IMBUE_WS_ADDR};
-    # 	proxy_http_version 1.1;
-    # 	proxy_set_header Upgrade $http_upgrade;
-    # 	proxy_set_header Connection "Upgrade";
-    # 	proxy_set_header Host $host;
-	# }
+	# FIXME: requires authentication?
+	location /dapp {
+		# auth_request /auth;
+		root /etc/nginx/conf.d/html;
+		rewrite ^ /index.html break;
+	}
 
 	location = /logout {
 		include conf.d/api-proxy-directives.snippet;
@@ -39,30 +37,35 @@ server {
 		include conf.d/api-proxy-directives.snippet;
 	}
 
-	# Redirect to "/"
-	location = /grant-proposals {
-		return 302 $scheme://$http_host/grant-proposals/;
+	location /assets {
+		gzip on;
+		# FIXME: do we need to specify `gzip_types` here?
 	}
 
-	# Projects list:
-	location = /grant-proposals/ {
-		proxy_pass ${WEBFLOW_URL}/project-voting;
-	}
+	# # Redirect to "/"
+	# location = /grant-proposals {
+	# 	return 302 $scheme://$http_host/grant-proposals/;
+	# }
 
-	# Project detail:
-	location /grant-proposals {
-		rewrite ^ /project-voting/illum-rerum-necessitatibus break;
-		proxy_pass ${WEBFLOW_URL};
-	}
+	# # Projects list:
+	# location = /grant-proposals/ {
+	# 	proxy_pass ${WEBFLOW_URL}/project-voting;
+	# }
 
-	# New/edit project:
-	#     /grant-submission = new
-	#     /grant-submission/local = edit
-	#     /grant-submission/123 = edit
-	location /grant-submission {
-		rewrite ^ /grant-submission break;
-		proxy_pass ${WEBFLOW_URL};
-	}
+	# # Project detail:
+	# location /grant-proposals {
+	# 	rewrite ^ /project-voting/illum-rerum-necessitatibus break;
+	# 	proxy_pass ${WEBFLOW_URL};
+	# }
+
+	# # New/edit project:
+	# #     /grant-submission = new
+	# #     /grant-submission/local = edit
+	# #     /grant-submission/123 = edit
+	# location /grant-submission {
+	# 	rewrite ^ /grant-submission break;
+	# 	proxy_pass ${WEBFLOW_URL};
+	# }
 
 	location /dist {
 		gzip on;

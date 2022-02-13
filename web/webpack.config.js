@@ -9,6 +9,7 @@ module.exports = {
         "grant-submission/index": "./src/grant-submission/index.ts",
         "grant-proposals/detail": "./src/grant-proposals/detail.ts",
         "material-components": "./src/material-components.ts",
+        "dapp": "./src/dapp/dapp.ts",
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"
@@ -28,7 +29,7 @@ module.exports = {
                         esModule: true
                     }
                 },
-                exclude: /node_modules/,
+                // exclude: /node_modules/,
             },
             {
                 test: /\.css$/,
@@ -37,7 +38,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [".ts", ".js"],
+        extensions: [".js", ".ts"],
         alias: {
             lib: path.resolve(__dirname, "lib"),
         },

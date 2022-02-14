@@ -35,14 +35,12 @@ legend {
     align-self: center;
     border: 2px solid transparent;
     transition: color 300ms, background-color 300ms;
-    font-size: 16px;
+    font-size: var(--button-font-size);
     text-align: center;
     letter-spacing: .6px;
     text-decoration: none;
     text-transform: capitalize;
     cursor: pointer;
-
     border-radius: 3px;
     font-weight: normal;
-
 }

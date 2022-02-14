@@ -8,7 +8,6 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { ISubmittableResult } from "@polkadot/types/types";
 
-import webflowCSSLink from "../../../../webflow-css-link.html";
 import materialComponentsLink from "../../../../material-components-link.html";
 import materialIconsLink from "../../../../material-icons-link.html";
 import templateSrc from "./page.html";
@@ -29,7 +28,6 @@ const CONTENT = Symbol();
 
 const template = document.createElement("template");
 template.innerHTML = `
-    ${webflowCSSLink}
     ${materialComponentsLink}
     ${materialIconsLink}
     <style>${styles}</style>
@@ -412,7 +410,9 @@ export default class GrantProposalsDetailPage extends HTMLElement {
 
         this.$edit.addEventListener("click", e => {
             const edit = () => {
-                window.location.href = `${config.grantProposalsURL}/draft?id=${this.projectId}`;
+                window.location.href = `${
+                    config.grantProposalsURL
+                }/draft?id=${this.projectId}`;
             };
 
             if (this.projectId === "local-draft" || this.user) {
@@ -486,10 +486,14 @@ export default class GrantProposalsDetailPage extends HTMLElement {
                     console.log(status);
                     this.finalizeWorkflow(status.type);
                     if (status.isInBlock) {
-                        const $inBlock = this.shadowRoot?.getElementById("in-block") as HTMLElement;
-                        $inBlock.innerText = `Completed at block hash #${status.asInBlock.toString()}`;
+                        const $inBlock =
+                            this.shadowRoot?.getElementById("in-block") as
+                                HTMLElement;
+                        $inBlock.innerText = `Completed at block hash #${
+                            status.asInBlock.toString()
+                        }`;
                         $inBlock.classList.remove("hidden");
-                        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+                        console.log($inBlock.textContent);
                     } else {
                         console.log(`Current status: ${status.type}`);
                     }
@@ -545,7 +549,6 @@ export default class GrantProposalsDetailPage extends HTMLElement {
                 this.$finalize.classList.add("blob");
             }
             this.$finalize.innerText = event;
-            console.warn("Invalid finalize workflow state.");
         }
     }
 

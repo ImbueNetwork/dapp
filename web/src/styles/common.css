@@ -56,6 +56,7 @@
 
     --button-border-radius: 3px;
     --button-padding: 20px;
+    --button-font-size: 12pt;
     --primary-button-background-color: var(--theme-secondary);
     --primary-button-background-hover-color: var(--theme-primary);
     --secondary-button-background-color: #555;
@@ -63,11 +64,31 @@
     --secondary-button-background-hover-color: #656565;
     --secondary-button-color: white;
     --secondary-button-border: 1px solid var(--dialog-content-color);
-
     --disabled-button-background-color: #676767;
     --disabled-button-color: #b5b5b5;
-
     --base-transition: all 200ms ease-in-out;
+
+
+    --hq-dialog-content-color: var(--dialog-content-color);
+    --hq-dialog-strong-color: var(--dialog-strong-color);
+    --hq-dialog-title-color: var(--dialog-title-color);
+    --hq-dialog-anchor-color: var(--dialog-anchor-color);
+    --hq-dialog-scrim-background: var(--dialog-scrim-background);
+    --hq-dialog-box-shadow: var(--dialog-box-shadow);
+    --hq-dialog-z-index: var(--dialog-z-index);
+    --hq-dialog-font-family: var(--theme-font-family);
+    --hq-button-font-size: var(--button-font-size);
+    --hq-button-padding: var(--button-padding);
+    --hq-button-border-radius: var(--button-border-radius);
+    --hq-primary-button-background-color: var(--primary-button-background-color);
+    --hq-primary-button-background-hover-color: var(--primary-button-background-hover-color);
+    --hq-secondary-button-background-color: var(--secondary-button-background-color);
+    --hq-secondary-button-background-hover-color: var(--secondary-button-background-hover-color);
+    --hq-secondary-button-color: var(--secondary-button-color);
+    --hq-secondary-button-border: var(--secondary-button-border);
+    --hq-disabled-button-background-color: var(--disabled-button-background-color);
+    --hq-disabled-button-color: var(--disabled-button-color);
+    --hq-base-transition: var(--base-transition);
 }
 
 body {

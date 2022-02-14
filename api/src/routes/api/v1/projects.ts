@@ -8,10 +8,29 @@ type ProjectPkg = models.Project & {
 }
 
 /**
- * FIXME: all of this is terrible
+ * FIXME: all of this is terriblme
  */
 
 const router = express.Router();
+
+router.get("/", (req, res, next) => {
+
+    console.log("************** Looking for projects **************");
+
+    db.transaction(async tx => {
+        try {
+            const projects = await models.fetchAllProjects()(tx);
+            console.log("************** projects are " + projects + "**************");
+            res.send(projects);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch all projects`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
+
 
 router.get("/:id", (req, res, next) => {
     const id = req.params.id;

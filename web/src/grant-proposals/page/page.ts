@@ -39,8 +39,7 @@ template.innerHTML = `
 
 export default class ProposalsListPage extends HTMLElement {
     private _projectId?: string;
-    projects?: GrantProposal | Project[];
-    // project?: {};
+    projects?: Project[];
     address?: string;
     user?: User;
     private [CONTENT]: DocumentFragment;
@@ -51,6 +50,8 @@ export default class ProposalsListPage extends HTMLElement {
     $dialog: Dialog;
     $tabContentContainer: HTMLElement;
 
+
+    $projects: HTMLOListElement;
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
@@ -80,6 +81,10 @@ export default class ProposalsListPage extends HTMLElement {
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
                 HTMLElement;
+
+        this.$projects =
+        this[CONTENT].getElementById("projects") as
+            HTMLOListElement;
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
                 HTMLElement;
@@ -100,11 +105,6 @@ export default class ProposalsListPage extends HTMLElement {
                 HTMLOListElement;
     }
 
-
-    // set toggleSave(force: boolean) {
-
-
-
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
         /**
@@ -117,25 +117,11 @@ export default class ProposalsListPage extends HTMLElement {
 
     async init() {
         await this.fetchProjects().then(projects => {
+            if (projects) {
+                this.renderProjects(projects);
+                this.renderProjects(projects);
+            }
             console.log(projects);
-            // projects.forEach(project => {
-            //     /**
-            //      * We await this here because if there's no draft, we don't want to
-            //      * bother with any other confusing and/or expensive tasks.
-            //      */
-            //     await this.fetchProject(project.id).then(draft => {
-            //         if (draft) {
-            //             this.renderDraft(draft);
-            //         } else {
-            //             /**
-            //              * Same as FIXME above. Do we want a 404 page here, dialog,
-            //              * or what?
-            //              */
-            //             window.location.href = config.grantProposalsURL;
-            //             return;
-            //         }
-            //     });
-            // });
         });
 
 
@@ -197,7 +183,6 @@ export default class ProposalsListPage extends HTMLElement {
 
     }
 
-
     async fetchProjects() {
         // fetch project (i.e., rather than Proposal)
         const resp = await fetch(
@@ -209,7 +194,6 @@ export default class ProposalsListPage extends HTMLElement {
             return this.projects;
         }
     }
-
 
     get projectId() {
         if (this._projectId) {
@@ -240,43 +224,25 @@ export default class ProposalsListPage extends HTMLElement {
         });
     }
 
-    renderDraft(draft: GrantProposal | Project) {
-        if (!draft) {
-            throw new Error(
-                "Attempt to render nonexistent draft."
-            );
-        }
-
-        // this.$["about-project"].innerText = proposal.name;
-        this.$projectName.innerText = draft.name;
-        this.$projectWebsite.innerHTML = `
-            <a href="${draft.website}" target="_blank">${
-                draft.website
-            }</a>
-        `;
-        this.$projectDescription.innerHTML = marked.parse(draft.description);
-        this.$projectLogo.setAttribute("srcset", draft.logo);
-        this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
-
-        draft.milestones.forEach(milestone => {
-            this.$milestones.appendChild(
+    renderProjects(projects:Project[]) {
+        projects.forEach(project => {
+            this.$projects.appendChild(
                 document.createRange().createContextualFragment(`
-                    <li class="mdc-deprecated-list-item" tabindex="0">
-                        <span class="mdc-deprecated-list-item__ripple"></span>
-                        <span class="mdc-deprecated-list-item__graphic">
-                            <i class="material-icons">pending_actions</i>
-                        </span>
-                        <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${
-                                milestone.name
-                            }</span>
-                            <span class="mdc-deprecated-list-item__secondary-text"><!--
-                            -->${milestone.percentage_to_unlock}%
-                            </span>
-                        </span>
-                    </li>
+                <div role="listitem" class="collection-item w-dyn-item w-col w-col-4">
+                    <div class="vote-box">
+                        <img id="project-list-logo" loading="lazy" alt="" srcset=${project.logo}
+                            sizes="(max-width: 479px) 87vw, (max-width: 767px) 92vw, (max-width: 1279px) 30vw, 390px">
+                        <div class="desc">
+                            <h2 class="heading-7"><span id="project-list-name">${project.name}</span>
+                            </h2>
+                        </div>
+
+                        <a href="/dapp/proposals/preview?id=${project.id}"
+                            class="button vote-btn w-button">Contribute</a>
+                    </div>
+                </div>
                 `)
-            );
+            )
         });
     }
 }

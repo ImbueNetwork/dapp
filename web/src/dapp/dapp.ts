@@ -8,6 +8,10 @@ import Layout from "@pojagi/hoquet/lib/layout/layout";
 
 import "../grant-submission/page/page";
 import GrantSubmissionPage from "../grant-submission/page/page";
+
+import "../grant-proposals/page/page";
+import ProposalsListPage from "../grant-proposals/page/page";
+
 import "../grant-proposals/detail/page/page";
 import GrantProposalsDetailPage from "../grant-proposals/detail/page/page";
 
@@ -17,6 +21,7 @@ import logo from "../../assets/logo.svg";
 
 import html from "./dapp.html";
 import styles from "./dapp.css";
+
 
 
 const template = document.createElement("template");
@@ -163,7 +168,25 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
     async routeProposalsListing() {
         // TODO:
-        this.$pages.select("not-implemented");
+        console.log("********* routing to proposals *********");
+        console.log(this.$pages);
+        var test = this.$pages.select("pages");
+        console.log(test);
+
+        var test2 = this.$pages.select("grant-submission-page");
+        console.log(test2);
+
+        var test3 = this.$pages.select("not-implemented");
+        console.log(test3);
+
+        console.log(this.$pages.select("proposals"));
+
+        console.log("********* selected proposals *********");
+        // (this.$pages.selected as ProposalsListPage).init();
+        // this.$pages.select("proposals");
+        // (this.$pages.selected as ProposalsListPage);
+        this.$pages.select("proposals");
+        (this.$pages.selected as ProposalsListPage).init();
     }
 
     async route() {

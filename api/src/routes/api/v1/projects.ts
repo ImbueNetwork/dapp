@@ -14,13 +14,9 @@ type ProjectPkg = models.Project & {
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
-
-    console.log("************** Looking for projects **************");
-
     db.transaction(async tx => {
         try {
             const projects = await models.fetchAllProjects()(tx);
-            console.log("************** projects are " + projects + "**************");
             res.send(projects);
         } catch (e) {
             next(new Error(

@@ -7,7 +7,7 @@ const WebpackBundleAnalyzer = require('webpack-bundle-analyzer');
 module.exports = {
     entry: {
         "grant-submission/index": "./src/grant-submission/index.ts",
-        "grant-proposals/index": "./src/grant-proposals/index.ts",
+        "proposals/index": "./src/proposals/index.ts",
         "grant-proposals/detail": "./src/grant-proposals/detail.ts",
         "material-components": "./src/material-components.ts",
         "dapp": "./src/dapp/dapp.ts",

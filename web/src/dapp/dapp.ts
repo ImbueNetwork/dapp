@@ -9,11 +9,16 @@ import Layout from "@pojagi/hoquet/lib/layout/layout";
 import "../grant-submission/page/page";
 import GrantSubmissionPage from "../grant-submission/page/page";
 
-import "../grant-proposals/page/page";
-import ProposalsListPage from "../grant-proposals/page/page";
 
 import "../grant-proposals/detail/page/page";
 import GrantProposalsDetailPage from "../grant-proposals/detail/page/page";
+
+
+import "../proposals/page/page";
+import ProposalsListPage from "../proposals/page/page";
+
+import "../proposals/detail/page/page";
+import ProposalsDetailPage from "../proposals/detail/page/page";
 
 import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
@@ -157,6 +162,10 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             case "preview":
                 this.$pages.select("preview");
                 (this.$pages.selected as GrantProposalsDetailPage).init();
+                break;
+            case "details":
+                this.$pages.select("details");
+                (this.$pages.selected as ProposalsDetailPage).init();
                 break;
             case "search":
                 this.$pages.select("not-implemented");

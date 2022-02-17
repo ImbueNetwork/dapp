@@ -12,7 +12,7 @@ if ($section && $parent) {
         $section.removeChild($section.firstChild);
 
     $section.appendChild(document.createRange().createContextualFragment(`
-    <imbu-grant-proposals-detail-page></imbu-grant-proposals-detail-page>
+    <imbu-proposal-detail-page></imbu-proposal-detail-page>
     `))
 
     $parent.prepend($section);

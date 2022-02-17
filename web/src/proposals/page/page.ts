@@ -237,7 +237,7 @@ export default class ProposalsListPage extends HTMLElement {
                             </h2>
                         </div>
 
-                        <a href="/dapp/proposals/preview?id=${project.id}"
+                        <a href="/dapp/proposals/details?id=${project.id}"
                             class="button vote-btn w-button">Contribute</a>
                     </div>
                 </div>

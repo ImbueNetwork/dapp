@@ -24,6 +24,16 @@ export const grantProposalsURL = "/dapp/proposals";
 export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
 
 /**
+ * Event names to be used sort of globally.
+ */
+export const event = {
+    authenticationRequired: "imbu:dapp:authentication-required",
+    notification: "imbu:dapp:dialog:create",
+    badRoute: "imbu:dapp:bad-route",
+    accountChoice: "imbu:dapp:account-choice",
+}
+
+/**
  * https://www.hachettebookgroup.com/travel/trip-ideas/types-of-volunteer-opportunities/
  * https://sbg.sg/business_category_list.pdf
  */

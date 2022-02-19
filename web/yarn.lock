@@ -837,10 +837,10 @@
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.3.4.tgz#158ded712d09237c0d3428be60dc01ce8ebab9fb"
   integrity sha512-ZVRouDO5mbdCiDg4zCd3ZZABduRtpy4tCnB33Gh9upHe9tRzpiqbRSN1VTjrj/2g8u2c6MBi0YLNnNQpBYOiWg==
 
-"@pojagi/hoquet@^9.0.0-SNAPSHOT.26":
-  version "9.0.0-SNAPSHOT.26"
-  resolved "https://registry.yarnpkg.com/@pojagi/hoquet/-/hoquet-9.0.0-SNAPSHOT.26.tgz#ddc0c4c3186ee662bd2a0771a5fcd9f5447dd667"
-  integrity sha512-NCBCODcKfXZQA6lzfrIOdrV/XTctN80MSp6dWIyuaE5NJN8ROInTbIV9mM6Zf1igNuNa8iIGvCM6kMh4h04+Xw==
+"@pojagi/hoquet@^9.0.0-SNAPSHOT.28":
+  version "9.0.0-SNAPSHOT.28"
+  resolved "https://registry.yarnpkg.com/@pojagi/hoquet/-/hoquet-9.0.0-SNAPSHOT.28.tgz#8effd63861bafe152ec8b9991e0b9891c9ac223c"
+  integrity sha512-MIJSNdIyGFDvxTr5BurVFymWwQT8nPPYL5dxATz4G7PqGNbVkIU/BZzkTRlBi3HuzmjNXt3z7mQk7lNQr0MOGw==
   dependencies:
     "@material/dialog" "^13.0.0"
     "@material/textfield" "^13.0.0"

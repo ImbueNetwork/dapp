@@ -10,14 +10,11 @@ import type { ISubmittableResult } from "@polkadot/types/types";
 
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
-import templateSrc from "./index.html";
-import authDialogContent from "./auth-dialog-content.html";
+import html from "./index.html";
 import localDraftDialogContent from "./local-draft-dialog-content.html";
-import styles from "./index.css";
+import authDialogContent from "./auth-dialog-content.html";
+import css from "./index.css";
 import type { GrantProposal, Project, User } from "../../../model";
-
-import "../../../auth-dialog/auth-dialog";
-import type AuthDialog from "../../../auth-dialog/auth-dialog";
 
 import { getWeb3Accounts, signWeb3Challenge } from "../../../utils/polkadot";
 import * as config from "../../../config";
@@ -30,22 +27,20 @@ const template = document.createElement("template");
 template.innerHTML = `
     ${materialComponentsLink}
     ${materialIconsLink}
-    <style>${styles}</style>
-    ${templateSrc}
+    <style>${css}</style>
+    ${html}
 `;
 
 
 export default class Preview extends HTMLElement {
     private _projectId?: string;
     draft?: GrantProposal | Project;
-    // project?: {};
     address?: string;
     user?: User;
     private [CONTENT]: DocumentFragment;
 
     $tabBar: HTMLElement;
     tabBar: MDCTabBar;
-    $authDialog: AuthDialog;
     $dialog: Dialog;
     $tabContentContainer: HTMLElement;
 
@@ -74,9 +69,6 @@ export default class Preview extends HTMLElement {
         this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
-        this.$authDialog =
-            this[CONTENT].getElementById("auth-dialog") as
-                AuthDialog;
         this.$dialog =
             this[CONTENT].getElementById("dialog") as
                 Dialog;
@@ -162,7 +154,6 @@ export default class Preview extends HTMLElement {
         this.toggleSave = false;
 
         this.bind();
-        // this.init();
     }
 
     async init() {
@@ -193,7 +184,14 @@ export default class Preview extends HTMLElement {
                  * Same as FIXME above. Do we want a 404 page here, dialog,
                  * or what?
                  */
-                window.location.href = config.grantProposalsURL;
+                this.dispatchEvent(new CustomEvent(
+                    config.event.badRoute,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: "not-found",
+                    }
+                ));
                 return;
             }
         });
@@ -298,7 +296,7 @@ export default class Preview extends HTMLElement {
              * 
              * Here we want to give them both an "edit" and a "save" button.
              */
-            this.dialog(
+            this.$dialog.create(
                 "Note",
                 localDraftDialogContent,
                 {
@@ -318,13 +316,13 @@ export default class Preview extends HTMLElement {
         )).imbueNetworkWebsockAddr;
         const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
-            // this.dialog("PolkadotJS API Connection Error", "", {
+            // this.$dialog.create("PolkadotJS API Connection Error", "", {
             //     "dismiss": {label: "Okay"}
             // }, true);
             console.log(e);
         });
         provider.on("disconnected", e => {
-            // this.dialog("PolkadotJS API Disconnected", "", {
+            // this.$dialog.create("PolkadotJS API Disconnected", "", {
             //     "dismiss": {label: "Okay"}
             // }, true);
             console.log(e);
@@ -333,7 +331,7 @@ export default class Preview extends HTMLElement {
          * TODO: any reason to report this, specifically?
          */
         provider.on("connected", e => {
-            // this.dialog("PolkadotJS API Connected", "", {
+            // this.$dialog.create("PolkadotJS API Connected", "", {
             //     "dismiss": {label: "Okay"}
             // }, true);
             console.log("Polkadot JS connected", e);
@@ -342,7 +340,7 @@ export default class Preview extends HTMLElement {
         await ApiPromise.create({provider}).then(api => {
             this.api = api;
         }).catch(e => {
-            this.dialog("PolkadotJS API Error", e.message, {
+            this.$dialog.create("PolkadotJS API Error", e.message, {
                 "dismiss": {label: "Okay"}
             }, true);
         });
@@ -409,6 +407,7 @@ export default class Preview extends HTMLElement {
         });
 
         this.$edit.addEventListener("click", e => {
+            console.log("edit clicked");
             const edit = () => {
                 window.location.href = `${
                     config.grantProposalsURL
@@ -418,7 +417,7 @@ export default class Preview extends HTMLElement {
             if (this.projectId === "local-draft" || this.user) {
                 edit();
             } else {
-                this.launchAuthDialog(edit);
+                this.wrapAuthentication(edit);
             }
         });
 
@@ -441,7 +440,7 @@ export default class Preview extends HTMLElement {
             };
 
             if (!this.user) {
-                this.launchAuthDialog(save);
+                this.wrapAuthentication(save);
             } else {
                 /**
                  * Save and redirect back to legit projectId? Or do we want to
@@ -460,10 +459,44 @@ export default class Preview extends HTMLElement {
         });
 
         this.$finalize.addEventListener("click", e => {
-            if (this.projectId === "local-draft" || this.user) {
+            const userOwnsDraft = this.projectId === "local-draft"
+                || (this.user && (this.user?.id === this.draft?.usr_id));
+
+            if (userOwnsDraft) {
                 this.finalizeWorkflow();
+            } else if (!this.user) {
+                this.wrapAuthentication(() => {
+                    // call this handler "recursively"
+                    this.$finalize.click();
+                });
             }
         });
+    }
+
+    wrapAuthentication(action: CallableFunction) {
+        const callback = (state: any) => {
+            console.log("post auth STATE!!!", state);
+            this.user = state.user;
+            action();
+        }
+
+        this.dispatchEvent(new CustomEvent(
+            config.event.authenticationRequired,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    callback,
+                    content: authDialogContent,
+                    actions: {
+                        dismiss: {
+                            handler: () => {},
+                            label: "Continue using local storage"
+                        }
+                    }
+                },
+            }
+        ));
     }
 
     async finalizeWorkflow(
@@ -503,14 +536,21 @@ export default class Preview extends HTMLElement {
         } break;
         case "extrinsic-created":
         {
-            const account = await this.accountChoice();
-
-            if (account) {
-                return this.finalizeWorkflow(
-                    "account-chosen",
-                    {...state, account},
-                );
-            }
+            this.dispatchEvent(new CustomEvent(
+                config.event.accountChoice,
+                {
+                    bubbles: true,
+                    composed: true,
+                    detail: (account?: InjectedAccountWithMeta) => {
+                        if (account) {
+                            this.finalizeWorkflow(
+                                "account-chosen",
+                                {...state, account},
+                            );
+                        }
+                    }
+                }
+            ));
         } break;
         case "begin":
         {
@@ -550,192 +590,6 @@ export default class Preview extends HTMLElement {
             }
             this.$finalize.innerText = event;
         }
-    }
-
-
-    /**
-     * The user needs to be notified that they can't do anything
-     * if they aren't credentialed except view the preview.
-     * 
-     * So they have two options at this point:
-     * 
-     * 1. Create a web 2.0 based account and log in
-     *      - this will save the draft via the API in the
-     *        background.
-     * 2. Download the polkadot-js extension and create at least
-     *    one web3 account. Then they can either:
-     *      - Authenticate with their web3 account (saving the
-     *        draft in the background)
-     *      - Finalize the project without creating an account
-     */
-    launchAuthDialog(callback?: CallableFunction) {
-        this.dialog(
-            "You must be signed in to continue",
-            authDialogContent,
-            {
-                google: {
-                    handler: () => {
-                        window.location.href = `${
-                            config.googleAuthEndpoint
-                        }?n=${
-                            window.location.href
-                        }`;
-                    }
-                },
-                web3: {
-                    handler: () =>
-                        this.web3AuthWorkflow("begin", {callback}),
-                },
-                dismiss: {
-                    label: "Continue using local storage",
-                    handler: () => {},
-                }
-        }, true);
-    }
-
-    accountChoice() {
-        const accountActionEntry = (resolve: CallableFunction) => (
-            account: InjectedAccountWithMeta,
-        ) => [
-            account.address,
-            {
-                label: `${
-                    account.meta.name
-                } (${account.meta.source})`,
-                isPrimary: true,
-                handler: () => {
-                    resolve(account);
-                }
-            }
-        ];
-
-        return new Promise((resolve, _reject) => {
-            // do we have accounts?
-            if (!this.accounts) {
-                this.dialog(
-                    "No accounts found", "",
-                    {dismiss: {label: "Okay"}},
-                    true
-                );
-                resolve(void 0);
-            } else if (this.accounts.length === 1) {
-                resolve(this.accounts[0]);
-            } else {
-                return this.dialog(
-                    "Choose the account you'd like to use.",
-                    "",
-                    {
-                        ...Object.fromEntries(this.accounts.map(
-                            accountActionEntry(resolve)
-                        )),
-                        cancel: {label: "Cancel"}
-                    }
-                );
-            }
-        });
-    }
-
-
-    async web3AuthWorkflow(
-        event: string = "begin",
-        state?: Record<string, any>
-    ): Promise<void> {
-        switch(event) {
-        case "done":
-        {
-            const callback = state?.callback;
-            console.log("STATE", state);
-            if (callback instanceof Function) {
-                callback(state);
-            }
-        } break;
-        case "signed":
-        {
-            // post to callback
-            const signature = state?.signature as
-                SignerResult;
-            const account = state?.account as
-                InjectedAccountWithMeta;
-            const user = state?.user as
-                User;
-
-            const resp = await fetch(
-                `/auth/web3/${account.meta.source}/callback`,
-                {
-                    headers: config.postAPIHeaders,
-                    method: "post",
-                    body: JSON.stringify({
-                        signature: signature.signature,
-                        address: account.address,
-                    })
-                }
-            );
-            if (resp.ok) {
-                // authenticated. Set user.
-                this.user = user;
-                return this.web3AuthWorkflow("done", state);
-            } else {
-                // TODO: UX for 401
-            }
-        } break;
-        case "account-chosen":
-        {
-            const account = state?.account as
-                InjectedAccountWithMeta;
-
-            const resp = await fetch(
-                `/auth/web3/${account.meta.source}/`,
-                {
-                    headers: config.postAPIHeaders,
-                    method: "post",
-                    body: JSON.stringify(account)
-                }
-            );
-
-            if (resp.ok) {
-                // could be 200 or 201
-                const { user, web3Account } = await resp.json();
-                const signature = await signWeb3Challenge(
-                    account, web3Account.challenge
-                );
-                if (signature) {
-                    return this.web3AuthWorkflow(
-                        "signed",
-                        {...state, signature, user}
-                    );
-                } else {
-                    // TODO: UX for no way to sign challenge?
-                }
-            }
-        } break;
-        case "begin":
-        {
-            const account = await this.accountChoice();
-
-            if (account) {
-                return this.web3AuthWorkflow(
-                    "account-chosen",
-                    {...state, account},
-                );
-            }
-        } break;
-        default:
-            console.warn(`Invalid web3AuthWorkflow event: ${event}`);
-        }
-    }
-
-    dialog(
-        title: string,
-        content: string,
-        actions: Record<string,ActionConfig>,
-        isDismissable = false
-    ) {
-        this.$dialog.create(
-            title,
-            content,
-            actions,
-            isDismissable,
-        );
     }
 
     renderDraft(draft: GrantProposal | Project) {

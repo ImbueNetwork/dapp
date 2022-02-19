@@ -13,6 +13,8 @@ import List from "../proposals/listing";
 import "../proposals/detail";
 import Detail from "../proposals/detail";
 
+import * as config from "../config";
+
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -23,7 +25,7 @@ ${html}
 
 const CONTENT = Symbol();
 const badRouteEvent = (detail: string) =>
-    new CustomEvent("proposals:bad-route", {
+    new CustomEvent(config.event.badRoute, {
         bubbles: true,
         composed: true,
         detail,

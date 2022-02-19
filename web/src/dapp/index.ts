@@ -13,9 +13,17 @@ import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
 import logo from "../../assets/logo.svg";
 
+import "../authentication"
+import Authentication from "../authentication";
+
+import * as config from "../config";
+import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
+
+import "../account-choice";
+import AccountChoice from "../account-choice";
+
 import html from "./index.html";
 import styles from "./index.css";
-
 
 
 const template = document.createElement("template");
@@ -72,6 +80,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     $layout: Layout;
     $mainMenuButton: HTMLAnchorElement;
     $pages: Pages;
+    $dialog: Dialog;
+    $accountChoice: AccountChoice;
+    $auth: Authentication;
 
 
     constructor() {
@@ -89,10 +100,18 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$mainMenuButton =
             this[CONTENT].getElementById("main-menu") as
                 HTMLAnchorElement;
-
         this.$pages =
             this[CONTENT].getElementById("pages") as
                 Pages;
+        this.$dialog =
+            this[CONTENT].getElementById("dialog") as
+                Dialog;
+        this.$auth =
+            this[CONTENT].getElementById("auth") as
+                Authentication;
+        this.$accountChoice =
+            this[CONTENT].getElementById("account-choice") as
+                AccountChoice;
 
         (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
@@ -105,17 +124,41 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         });
         
         this.initNavigation(navigationItems);
+        this.initAuthentication();
+        this.bind();
 
-        this.addEventListener("proposals:bad-route", e => {
+        this.route(window.location.pathname);
+    }
+
+    bind() {
+        this.addEventListener(config.event.badRoute, e => {
             this.$pages.select((e as CustomEvent).detail);
+        });
+
+        this.addEventListener(config.event.notification, e => {
+            const { title, content, actions, isDismissable } =
+                (e as CustomEvent).detail;
+
+            this.$dialog.create(
+                title, content, actions, isDismissable
+            );
+        });
+
+        this.addEventListener(config.event.accountChoice, async e => {
+            const callback = (e as CustomEvent).detail;
+            callback(await this.$accountChoice.accountChoice());
         });
 
         window.addEventListener("popstate", e => {
             this.route(window.location.pathname);
             this.$layout.closeDrawer("right");
         });
+    }
 
-        this.route(window.location.pathname);
+    initAuthentication() {
+        this.addEventListener(config.event.authenticationRequired, e => {
+            this.$auth.launchAuthDialog((e as CustomEvent).detail);
+        });
     }
 
     navRelocate(

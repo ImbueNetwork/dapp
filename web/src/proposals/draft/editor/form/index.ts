@@ -159,7 +159,7 @@ export default class Form extends HTMLElement {
             ? "Save Draft Proposal"
             : "Preview Draft Proposal";
 
-        this.accounts = getWeb3Accounts().then(accounts =>{
+        this.accounts = getWeb3Accounts().then(accounts => {
             const $select = this.$web3AccountSelect;
 
             accounts.forEach(account => {
@@ -224,6 +224,12 @@ export default class Form extends HTMLElement {
         this.bind();
     }
 
+    redirectToNewDraft() {
+        // window.location.href = `${config.grantProposalsURL}/draft`;
+        window.history.pushState({}, "", `${config.grantProposalsURL}/draft`);
+        this.dispatchEvent(new Event("popstate"));
+    }
+
     async setupExistingDraft(projectId: string) {
         let draft: GrantProposal;
         
@@ -233,30 +239,45 @@ export default class Form extends HTMLElement {
             );
 
             if (!local) {
-                window.location.href = "/grant-submission";
+                this.redirectToNewDraft();
             }
 
             draft = JSON.parse(String(local));
         } else {
+            if (!this.user) {
+                this.redirectToNewDraft();
+            }
+
             try {
                 draft = await fetch(
                     `${config.apiBase}/projects/${projectId}`,
                     {headers: config.getAPIHeaders}
-                ).then(resp => {
+                ).then(async resp => {
                     if (resp.ok) {
-                        return resp.json();
+                        const project = await resp.json();
+                        if (this.user?.id === project.usr_id) {
+                            return project;
+                        } else {
+                            this.redirectToNewDraft();
+                        }
                     } else if (resp.status === 404) {
                         // FIXME: 404 page or some other UX
                         // throw new Error("Not found");
-                        window.location.href = `${config.grantProposalsURL}/draft`;
+                        this.redirectToNewDraft();
                     } else {
                         throw resp;
                     }
                 });
             } catch (cause) {
-                // FIXME: if you get here, it should be because of a
-                // 500 level error, because we should be handling 
-                // 400 level stuff above.
+                this.dispatchEvent(new CustomEvent(
+                    config.event.badRoute,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: "server-error",
+                    }
+                ));
+
                 throw new Error(
                     `Server error fetching project with id ${projectId}`,
                     {cause: cause as Error}

@@ -310,15 +310,30 @@ export default class Preview extends HTMLElement {
         }
     }
 
+    errorNotification(e: Error) {
+        console.log(e);
+        this.dispatchEvent(new CustomEvent(
+            config.event.notification,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    title: e.name,
+                    content: e.message,
+                    actions: {},
+                    isDismissable: true,
+                }
+            }
+        ));
+    }
+
     async apiSetup() {
         const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
             resp => resp.json()
         )).imbueNetworkWebsockAddr;
         const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
-            // this.$dialog.create("PolkadotJS API Connection Error", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
+            this.errorNotification(e);
             console.log(e);
         });
         provider.on("disconnected", e => {
@@ -460,7 +475,7 @@ export default class Preview extends HTMLElement {
 
         this.$finalize.addEventListener("click", e => {
             const userOwnsDraft = this.projectId === "local-draft"
-                || (this.user && (this.user?.id === this.draft?.usr_id));
+                || (this.user && (this.user.id === this.draft?.usr_id));
 
             if (userOwnsDraft) {
                 this.finalizeWorkflow();
@@ -531,7 +546,9 @@ export default class Preview extends HTMLElement {
                         console.log(`Current status: ${status.type}`);
                     }
                 }
-            );
+            ).catch((e: any) => {
+                this.errorNotification(e);
+            });
             console.log(`Transaction hash: ${txHash}`);
         } break;
         case "extrinsic-created":

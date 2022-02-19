@@ -1,8 +1,9 @@
-import "../form/form";
+import html from "./index.html";
+import css from "./index.css";
 
-import html from "./page.html";
-import css from "./page.css";
-import GrantSubmissionForm from "../form/form";
+import "./form";
+import ProposalsDraftEditorForm from "./form";
+
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -12,9 +13,9 @@ ${html}
 const CONTENT = Symbol();
 
 
-export default class Page extends HTMLElement {
+export default class Editor extends HTMLElement {
     [CONTENT]: DocumentFragment;
-    $form: GrantSubmissionForm
+    $form: ProposalsDraftEditorForm
 
     constructor() {
         super();
@@ -26,7 +27,7 @@ export default class Page extends HTMLElement {
 
         this.$form =
             this[CONTENT].getElementById("form") as
-                GrantSubmissionForm;
+                ProposalsDraftEditorForm;
     }
 
     connectedCallback() {
@@ -38,4 +39,4 @@ export default class Page extends HTMLElement {
     }
 }
 
-window.customElements.define("imbu-grant-submission-page", Page);
+window.customElements.define("imbu-proposals-draft-editor", Editor);

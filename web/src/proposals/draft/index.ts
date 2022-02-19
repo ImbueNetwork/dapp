@@ -4,14 +4,11 @@ import css from "./index.css";
 import Pages from "@pojagi/hoquet/lib/pages/pages";
 import Route from "@pojagi/hoquet/lib/route/route";
 
-import "../proposals/draft";
-import ProposalsDraft from "../proposals/draft";
+import "./editor";
+import ProposalsDraftEditor from "./editor";
 
-import "../proposals/listing";
-import List from "../proposals/listing";
-
-import "../proposals/detail";
-import Detail from "../proposals/detail";
+import "./preview";
+import ProposalsDraftPreview from "./preview";
 
 
 const template = document.createElement("template");
@@ -30,7 +27,7 @@ const badRouteEvent = (detail: string) =>
     });
 
 
-export default class Proposals extends HTMLElement {
+export default class ProposalsDraft extends HTMLElement {
     [CONTENT]: DocumentFragment;
     $pages: Pages;
 
@@ -53,21 +50,17 @@ export default class Proposals extends HTMLElement {
 
     route(path?: string) {
         if (!path) {
-            this.$pages.select("listing");
-            (this.$pages.selected as List).init();
+            this.$pages.select("editor");
+            (this.$pages.selected as ProposalsDraftEditor).init();
             return;
         }
 
         const route = new Route("/:page", path);
 
         switch (route.data?.page) {
-            case "draft":
-                this.$pages.select("draft");
-                (this.$pages.selected as ProposalsDraft).route(route.tail);
-                break;
-            case "detail":
-                this.$pages.select("detail");
-                (this.$pages.selected as Detail).init();
+            case "preview":
+                this.$pages.select("preview");
+                (this.$pages.selected as ProposalsDraftPreview).init();
                 break;
             default:
                 this.dispatchEvent(badRouteEvent("not-found"));
@@ -75,4 +68,4 @@ export default class Proposals extends HTMLElement {
     }
 }
 
-window.customElements.define("imbu-proposals", Proposals);
+window.customElements.define("imbu-proposals-draft", ProposalsDraft);

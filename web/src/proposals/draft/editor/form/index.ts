@@ -2,17 +2,17 @@ import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import "@pojagi/hoquet/lib/forms/textfield/textfield";
 import TextField from '@pojagi/hoquet/lib/forms/textfield/textfield';
 
-import "../../material-components";
-import formStyles from "../../styles/forms.css";
+import "../../../../material-components";
+import formStyles from "../../../../styles/forms.css";
 
-import templateSrc from "./form.html";
-import styles from "./form.css";
-import { categories } from "../../config";
+import templateSrc from "./index.html";
+import styles from "./index.css";
+import { categories } from "../../../../config";
 
-import type { ProposedMilestone, GrantProposal, User, Project } from "../../model";
-import { getWeb3Accounts } from "../../utils/polkadot";
-import * as model from "../../model";
-import * as config from "../../config";
+import type { ProposedMilestone, GrantProposal, User, Project } from "../../../../model";
+import { getWeb3Accounts } from "../../../../utils/polkadot";
+import * as model from "../../../../model";
+import * as config from "../../../../config";
 
 
 declare global {
@@ -39,7 +39,7 @@ const ordinals = [
 const CONTENT = Symbol();
 
 
-export default class GrantSubmissionForm extends HTMLElement {
+export default class Form extends HTMLElement {
     private [CONTENT]: DocumentFragment;
     private _projectId?: string;
     milestoneIdx: number = 0;
@@ -229,7 +229,7 @@ export default class GrantSubmissionForm extends HTMLElement {
         
         if (projectId === "local-draft") {
             const local = localStorage.getItem(
-                "imbu-draft-proposal:local-draft"
+                "imbu-proposals-draft:local-draft"
             );
 
             if (!local) {
@@ -534,7 +534,7 @@ export default class GrantSubmissionForm extends HTMLElement {
             }
 
             if (project) {
-                window.location.href = `/dapp/proposals/preview?id=${project.id}`;
+                window.location.href = `/dapp/proposals/draft/preview?id=${project.id}`;
             } else {
                 // FIXME: UX needed
                 this.disabled = false;
@@ -543,16 +543,16 @@ export default class GrantSubmissionForm extends HTMLElement {
             // Not logged in, save it to localStorage and redirect to
             // preview page as "local-draft"
             this.savetoLocalStorage(proposal, account);
-            window.location.href = "/dapp/proposals/preview?id=local-draft";
+            window.location.href = "/dapp/proposals/draft/preview?id=local-draft";
         }
     }
 
     savetoLocalStorage(proposal: GrantProposal, account?: InjectedAccountWithMeta) {
         window.localStorage.setItem(
-            "imbu-draft-proposal:local-draft",
+            "imbu-proposals-draft:local-draft",
             JSON.stringify(proposal)
         );
     }
 }
 
-window.customElements.define("imbu-grant-submission-form", GrantSubmissionForm);
+window.customElements.define("imbu-proposals-draft-submission-form", Form);

@@ -11,6 +11,9 @@
     --theme-ink-color: #ebeae2;
     --theme-font-family: "Aeonik", sans-serif;
 
+    --theme-h1-size: 54px;
+    --theme-h1-weight: normal;
+
     --dialog-title-color: var(--theme-title-color);
     --dialog-content-color: #a9a9a9; /** FIXME: really? why not theme-ink-color? */
     --dialog-scrim-background: rgba(0, 0, 0, 0.75);

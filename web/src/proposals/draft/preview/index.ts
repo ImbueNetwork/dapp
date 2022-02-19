@@ -8,13 +8,12 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { ISubmittableResult } from "@polkadot/types/types";
 
-import webflowCSSLink from "../../../../webflow-css-link.html";
-import materialComponentsLink from "../../../../material-components-link.html";
-import materialIconsLink from "../../../../material-icons-link.html";
-import templateSrc from "./page.html";
+import materialComponentsLink from "/material-components-link.html";
+import materialIconsLink from "/material-icons-link.html";
+import templateSrc from "./index.html";
 import authDialogContent from "./auth-dialog-content.html";
 import localDraftDialogContent from "./local-draft-dialog-content.html";
-import styles from "./page.css";
+import styles from "./index.css";
 import type { GrantProposal, Project, User } from "../../../model";
 
 import "../../../auth-dialog/auth-dialog";
@@ -29,14 +28,14 @@ const CONTENT = Symbol();
 
 const template = document.createElement("template");
 template.innerHTML = `
-    ${webflowCSSLink}
     ${materialComponentsLink}
     ${materialIconsLink}
     <style>${styles}</style>
     ${templateSrc}
 `;
 
-export default class ProposalsDetailPage extends HTMLElement {
+
+export default class Preview extends HTMLElement {
     private _projectId?: string;
     draft?: GrantProposal | Project;
     // project?: {};
@@ -51,7 +50,9 @@ export default class ProposalsDetailPage extends HTMLElement {
     $tabContentContainer: HTMLElement;
 
     $actionButtonContainers: HTMLElement[];
-    $contribute: HTMLButtonElement;
+    $edit: HTMLButtonElement;
+    $save: HTMLButtonElement;
+    $finalize: HTMLButtonElement;
 
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
@@ -82,10 +83,15 @@ export default class ProposalsDetailPage extends HTMLElement {
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
                 HTMLElement;
-        this.$contribute =
-            this[CONTENT].getElementById("contribute") as
+        this.$edit =
+            this[CONTENT].getElementById("edit") as
                 HTMLButtonElement;
-   
+        this.$save =
+            this[CONTENT].getElementById("save") as
+                HTMLButtonElement;
+        this.$finalize =
+            this[CONTENT].getElementById("finalize") as
+                HTMLButtonElement;
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
                 HTMLElement;
@@ -106,10 +112,17 @@ export default class ProposalsDetailPage extends HTMLElement {
                 HTMLOListElement;
         this.$actionButtonContainers =
             Array.from(
-                this.$contribute.parentElement?.parentElement?.children as
+                this.$save.parentElement?.parentElement?.children as
                     HTMLCollection
             ) as HTMLElement[];
     }
+
+
+    // set toggleSave(force: boolean) {
+    //     this.$save.parentElement
+    //         ?.classList.toggle("hidden", !force);
+    //     this._rebalanceActionButtons();
+    // }
 
     toggleActionButton(which: string, force: boolean) {
         ((this as any)[`$${which}`] as HTMLElement).parentElement
@@ -117,6 +130,19 @@ export default class ProposalsDetailPage extends HTMLElement {
         this._rebalanceActionButtons();
     }
 
+    set toggleSave(force: boolean) {
+        this.toggleActionButton("save", force);
+    }
+    set toggleFinalize(force: boolean) {
+        this.toggleActionButton("finalize", force);
+    }
+    set toggleEdit(force: boolean) {
+        this.toggleActionButton("edit", force);
+    }
+
+    /**
+     * FIXME: do this with CSS-flex-only solution
+     */
     private _rebalanceActionButtons() {
         const $visible = this.$actionButtonContainers.filter($el => {
             return !$el.classList.contains("hidden");
@@ -133,6 +159,7 @@ export default class ProposalsDetailPage extends HTMLElement {
         /**
          * default
          */
+        this.toggleSave = false;
 
         this.bind();
         // this.init();
@@ -152,6 +179,7 @@ export default class ProposalsDetailPage extends HTMLElement {
 
         const isLocalDraft = projectId === "local-draft";
 
+        this.toggleSave = isLocalDraft;
 
         /**
          * We await this here because if there's no draft, we don't want to
@@ -170,13 +198,118 @@ export default class ProposalsDetailPage extends HTMLElement {
             }
         });
 
+        /**
+         * From here on out we know a draft exists in one form or another. So
+         * we go about the business of communicating state and enabling
+         * features.
+         */
+
         this.apiSetup();
 
         getWeb3Accounts().then(accounts => {
             this.accounts = accounts;
         });
 
+        await fetch(`${config.apiBase}/user`).then(async resp => {
+            if (resp.ok) {
+                /**
+                 * User is logged in with a session.
+                 * 
+                 * XXX: We have to assume that since the user is logged in at
+                 * this point, there's no reason to "save" -- only edit or
+                 * finalize.
+                 */
+                const user = await resp.json();
+                if (user?.id) {
+                    this.user = user;
+                    /**
+                     * Toggling save false because if user is logged in, we
+                     * automatically save and refresh for them.
+                     */
+                    this.toggleSave = false;
+                    /**
+                     * Should only be able to edit or finalize if user
+                     * is the usr_id on the project.
+                     */
+                    if (!isLocalDraft && this.user?.id !== this.draft?.usr_id) {
+                        this.toggleFinalize = false;
+                        this.toggleEdit = false;
+                    }
 
+                    if (isLocalDraft) {
+                        // save and redirect to legit URL
+                        if (!this.draft) {
+                            // TODO: shouldn't happen, but UX if it does
+                            return;
+                        }
+
+                        fetch(
+                            `${config.apiBase}/projects/`,
+                            {
+                                method: "post",
+                                headers: config.postAPIHeaders,
+                                body: JSON.stringify({proposal: this.draft}),
+                            },
+                        ).then(async resp => {
+                            if (resp.ok) {
+                                // redirect
+                                const project = await resp.json();
+                                window.location.href = `${
+                                    config.grantProposalsURL
+                                }/preview?id=${project.id}`
+                            } else {
+                                // TODO: dialog or 500 page
+                            }
+                        })
+                    }
+                }
+            } else if (!isLocalDraft) {
+                /**
+                 * Legit draft exists but not logged in.
+                 *
+                 * Buttons: all will simply launch the authDialog, because user
+                 * has no session. Not even edit will work.
+                 * 
+                 * FIXME: not sure if there's any additional UX needed here.
+                 * Maybe the auth dialog should just preemptively load.
+                 */
+                // this.launchAuthDialog();
+            }
+        });
+
+        if (isLocalDraft) {
+            /**
+             * `localStorage` draft. User may or may not be logged in.
+             * 
+             * This is a special case where the user was probably
+             * redirected here from the grant-submission form to "preview"
+             * their draft. But there's nothing stopping someone from arriving
+             * here directly (i.e., potentially even logged in).
+             * 
+             * All `local-draft` it means in any case is that they have an
+             * unsaved draft in `localStorage` and they specifically navigated
+             * here to view it and edit/save/finalize.
+             * 
+             * So, in this case, we want to provide a nice and simple
+             * dialog that explains that their draft is only saved
+             * temporarily in the browser's local storage. Don't mention
+             * authentication at this point. We can launch that dialog
+             * when they click "save" or "finalize!".
+             * 
+             * Here we want to give them both an "edit" and a "save" button.
+             */
+            this.dialog(
+                "Note",
+                localDraftDialogContent,
+                {
+                    "dismiss": {
+                        label: "Got it",
+                        handler: () => {}
+                    }
+                },
+                false
+            );
+        }
     }
 
     async apiSetup() {
@@ -215,7 +348,6 @@ export default class ProposalsDetailPage extends HTMLElement {
         });
     }
 
-    // Should return finalised projects
     async fetchDraft(projectId: string) {
         if (this.draft) {
             return this.draft;
@@ -223,7 +355,8 @@ export default class ProposalsDetailPage extends HTMLElement {
 
         if (projectId === "local-draft") {
             const draftSrc =
-                window.localStorage["imbu-draft-proposal:local-draft"];
+                window.localStorage["imbu-proposals-draft:local-draft"];
+            
             if (draftSrc) {
                 const draft: GrantProposal = JSON.parse(draftSrc);
                 this.draft = draft;
@@ -275,23 +408,166 @@ export default class ProposalsDetailPage extends HTMLElement {
             $container.children[detail.index].classList.add("active");
         });
 
-
-        this.$contribute.addEventListener("click", e => {
-            const contribute = async () => {
-                // coontribution logic
-                console.log("**************** contribution logic goes here ****************");
+        this.$edit.addEventListener("click", e => {
+            const edit = () => {
+                window.location.href = `${
+                    config.grantProposalsURL
+                }/draft?id=${this.projectId}`;
             };
 
-            if (!this.user) {
-                this.launchAuthDialog(contribute);
+            if (this.projectId === "local-draft" || this.user) {
+                edit();
             } else {
-                 contribute();
+                this.launchAuthDialog(edit);
             }
         });
 
+        this.$save.addEventListener("click", e => {
+            const save = async () => {
+                if (this.draft) {
+                    const resp = await model.postGrantProposal(this.draft);
+                    if (resp.ok) {
+                        const project = await resp.json();
+                        window.location.href = `${
+                            config.grantProposalsURL
+                        }/draft/preview?id=${project.id}`;
+                    } else {
+                        // TODO: UX for bad request posting draft
+                        console.warn("Bad request posting draft", this.draft);
+                    }
+                } else {
+                    // shouldn't happen?
+                }
+            };
 
+            if (!this.user) {
+                this.launchAuthDialog(save);
+            } else {
+                /**
+                 * Save and redirect back to legit projectId? Or do we want to
+                 * bring them back here so that they can decide whether or not
+                 * to save?
+                 * 
+                 * I think we should just handle it in the background --
+                 * user logs in, and gets redirected back here to `local-draft`
+                 * but we detect that from the URL and then go through a save
+                 * workflow (the same one we would do in this else block),
+                 * which would redirect them to this "preview" page, but with a
+                 * legit `projectId` instead of `local-draft`.
+                 */
+                 save();
+            }
+        });
+
+        this.$finalize.addEventListener("click", e => {
+            if (this.projectId === "local-draft" || this.user) {
+                this.finalizeWorkflow();
+            }
+        });
     }
 
+    async finalizeWorkflow(
+        event: string = "begin",
+        state?: Record<string,any>
+    ): Promise<void> {
+        switch(event) {
+        case "account-chosen":
+        {
+            const extrinsic = state?.extrinsic as
+                SubmittableExtrinsic<"promise", ISubmittableResult>;
+            const account = state?.account as
+                InjectedAccountWithMeta;
+            const injector = await web3FromSource(account.meta.source);
+
+            const txHash = await extrinsic.signAndSend(
+                account.address,
+                {signer: injector.signer},
+                ({ status }) => {
+                    console.log(status);
+                    this.finalizeWorkflow(status.type);
+                    if (status.isInBlock) {
+                        const $inBlock =
+                            this.shadowRoot?.getElementById("in-block") as
+                                HTMLElement;
+                        $inBlock.innerText = `Completed at block hash #${
+                            status.asInBlock.toString()
+                        }`;
+                        $inBlock.classList.remove("hidden");
+                        console.log($inBlock.textContent);
+                    } else {
+                        console.log(`Current status: ${status.type}`);
+                    }
+                }
+            );
+            console.log(`Transaction hash: ${txHash}`);
+        } break;
+        case "extrinsic-created":
+        {
+            const account = await this.accountChoice();
+
+            if (account) {
+                return this.finalizeWorkflow(
+                    "account-chosen",
+                    {...state, account},
+                );
+            }
+        } break;
+        case "begin":
+        {
+            if (!this.draft) {
+                // FIXME: UX
+                return;
+            }
+
+            const extrinsic = this.api?.tx.imbueProposals.createProject(
+                this.draft.name,
+                this.draft.logo,
+                this.draft.description,
+                this.draft.website,
+                this.draft.milestones,
+                this.draft.required_funds,
+            );
+
+            if (!extrinsic) {
+                // FIXME: UX
+                return;
+            }
+
+            return this.finalizeWorkflow(
+                "extrinsic-created",
+                {...state, extrinsic},
+            );
+        } break;
+        default:
+            this.toggleEdit = false;
+            this.toggleSave = false;
+            this.$finalize.disabled = true;
+            if (event === "Finalized") {
+                this.$finalize.classList.remove("blob");
+                this.$finalize.classList.add("finalized");
+            } else {
+                this.$finalize.classList.add("blob");
+            }
+            this.$finalize.innerText = event;
+        }
+    }
+
+
+    /**
+     * The user needs to be notified that they can't do anything
+     * if they aren't credentialed except view the preview.
+     * 
+     * So they have two options at this point:
+     * 
+     * 1. Create a web 2.0 based account and log in
+     *      - this will save the draft via the API in the
+     *        background.
+     * 2. Download the polkadot-js extension and create at least
+     *    one web3 account. Then they can either:
+     *      - Authenticate with their web3 account (saving the
+     *        draft in the background)
+     *      - Finalize the project without creating an account
+     */
     launchAuthDialog(callback?: CallableFunction) {
         this.dialog(
             "You must be signed in to continue",
@@ -358,6 +634,7 @@ export default class ProposalsDetailPage extends HTMLElement {
             }
         });
     }
+
 
     async web3AuthWorkflow(
         event: string = "begin",
@@ -460,6 +737,7 @@ export default class ProposalsDetailPage extends HTMLElement {
             isDismissable,
         );
     }
+
     renderDraft(draft: GrantProposal | Project) {
         if (!draft) {
             throw new Error(
@@ -501,4 +779,4 @@ export default class ProposalsDetailPage extends HTMLElement {
     }
 }
 
-window.customElements.define("imbu-proposal-detail-page", ProposalsDetailPage);
+window.customElements.define("imbu-proposals-draft-preview", Preview);

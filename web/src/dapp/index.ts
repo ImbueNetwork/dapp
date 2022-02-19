@@ -6,26 +6,15 @@ import Pages from "@pojagi/hoquet/lib/pages/pages";
 import Route from "@pojagi/hoquet/lib/route/route";
 import Layout from "@pojagi/hoquet/lib/layout/layout";
 
-import "../grant-submission/page/page";
-import GrantSubmissionPage from "../grant-submission/page/page";
-
-
-import "../grant-proposals/detail/page/page";
-import GrantProposalsDetailPage from "../grant-proposals/detail/page/page";
-
-
-import "../proposals/page/page";
-import ProposalsListPage from "../proposals/page/page";
-
-import "../proposals/detail/page/page";
-import ProposalsDetailPage from "../proposals/detail/page/page";
+import "../proposals";
+import Proposals from "../proposals";
 
 import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
 import logo from "../../assets/logo.svg";
 
-import html from "./dapp.html";
-import styles from "./dapp.css";
+import html from "./index.html";
+import styles from "./index.css";
 
 
 
@@ -47,16 +36,16 @@ const navigationItems: MenuItem[] = [
     },
     // FIXME: only if logged in:
     {
-        name: "my-proposals",
-        label: "List",
-        href: "/dapp/proposals",
+        name: "drafts",
+        label: "Drafts",
+        href: "/dapp/proposals/draft/list",
         icon: "library_books",
         spa: true,
     },
     {
-        name: "search-proposals",
-        label: "Search",
-        href: "/dapp/proposals/search",
+        name: "discover-proposals",
+        label: "Discover",
+        href: "/dapp/proposals",
         icon: "search",
         spa: true,
     },
@@ -110,14 +99,23 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
+        
         this.$mainMenuButton.addEventListener("click", e => {
             this.$layout.openDrawer("right");
         });
+        
         this.initNavigation(navigationItems);
-        window.addEventListener("popstate", e => {
-            this.route();
+
+        this.addEventListener("proposals:bad-route", e => {
+            this.$pages.select((e as CustomEvent).detail);
         });
-        this.route();
+
+        window.addEventListener("popstate", e => {
+            this.route(window.location.pathname);
+            this.$layout.closeDrawer("right");
+        });
+
+        this.route(window.location.pathname);
     }
 
     navRelocate(
@@ -150,53 +148,23 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$layout.breakpointer.addHandler(this.navRelocate.bind(this));
     }
 
-    routeProposalAction(path: string) {
-        const route = new Route("/:action", path)
-
-        // Available actions: "draft", "preview", "search"
-        switch (route.data?.action) {
-            case "draft":
-                 this.$pages.select("draft");
-                (this.$pages.selected as GrantSubmissionPage).init();
-                break;
-            case "preview":
-                this.$pages.select("preview");
-                (this.$pages.selected as GrantProposalsDetailPage).init();
-                break;
-            case "details":
-                this.$pages.select("details");
-                (this.$pages.selected as ProposalsDetailPage).init();
-                break;
-            case "search":
-                this.$pages.select("not-implemented");
-                break;
-            default:
-                this.$pages.select("not-found");
+    async route(path?: string) {
+        if (!path) {
+            return this.$pages.select("not-found");
         }
-    }
 
-    async routeProposalsListing() {
-        this.$pages.select("proposals");
-        (this.$pages.selected as ProposalsListPage).init();
-    }
-
-    async route() {
-        const route = new Route("/dapp/:app");
+        const route = new Route("/dapp/:app", path);
 
         if (!route.active) {
-            // FIXME: no app/page to route to
-            // is this 404, etc?
             this.$pages.select("not-found");
             return;
         }
 
         switch (route.data?.app) {
             case "proposals":
-                if (!route.tail) {
-                    // i.e., /dapp/proposals
-                    return await this.routeProposalsListing();
-                }
-                return await this.routeProposalAction(route.tail);
+                this.$pages.select("proposals");
+                (this.$pages.selected as Proposals).route(route.tail);
+                break;
             case "settings":
                 this.$pages.select("not-implemented");
                 break;

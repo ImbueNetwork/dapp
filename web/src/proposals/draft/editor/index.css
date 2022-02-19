@@ -10,14 +10,14 @@ header {
     padding: 0 40px 0 0;
 }
 
-imbu-grant-submission-form {
+imbu-proposals-draft-submission-form {
     flex-grow: 1;
 }
 
 header h1 {
     margin: 0;
-    font-size: 54px;
-    font-weight: normal;
+    font-size: var(--theme-h1-size);
+    font-weight: var(--theme-h1-weight);
 }
 
 @media screen and (max-width: 868px) {

@@ -10,10 +10,7 @@
 
     <div id="main" slot="main">
         <hq-pages id="pages" attr-for-selected="name" default-selection="not-found">
-            <imbu-grant-submission-page id="grant-submission-page" name="draft"></imbu-grant-submission-page>
-            <imbu-proposals-list-page id="proposals" name="proposals"></imbu-proposals-list-page>
-            <imbu-grant-proposals-detail-page name="preview"></imbu-grant-proposals-detail-page>
-            <imbu-proposal-detail-page name="details"></imbu-proposal-detail-page>
+            <imbu-proposals name="proposals"></imbu-proposals>
             <h1 name="not-found" id="not-found">Not found</h1>
             <h1 name="not-implemented">Not implemented yet</h1>
             <h1 name="server-error">Service down</h1>
@@ -21,4 +18,15 @@
     </div>
 
     <hq-nav id="nav" slot="right-drawer" display-mode="stack"></hq-nav>
+
+    <!--
+        TODO: some kind of notification system. Notifications might rise to
+        the level of:
+
+        1. Toast message or snackbar: just info that doesn't get in the way
+           but provides useful information
+        2. Dialog: requires user action, even if all it is is to dismiss it
+        3. Badges: red dot notifications on some menu item, directing the user
+           to go check it out on their own
+    -->
 </hq-layout>

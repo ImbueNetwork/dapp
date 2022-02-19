@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: imbue
     ports:
     - 5433:5432
+    volumes:
+    - "/var/log/imbue/dapp/postgres-data:/var/lib/postgresql/data"
 
   api:
     build: ./api

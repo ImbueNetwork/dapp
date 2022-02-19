@@ -60,7 +60,7 @@ export default class List extends HTMLElement {
 
     renderProjects(projects: Project[]) {
 
-        for (let i of [1,1,1,1,1,1,1,1,1,1])
+        // for (let i of [1,1,1,1,1,1,1,1,1,1])
         projects.forEach(project => {
             this.$list.appendChild(new ProposalItem(project));
         });

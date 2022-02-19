@@ -24,6 +24,7 @@ import AccountChoice from "../account-choice";
 
 import html from "./index.html";
 import styles from "./index.css";
+import { User } from "../model";
 
 
 const template = document.createElement("template");
@@ -83,6 +84,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     $dialog: Dialog;
     $accountChoice: AccountChoice;
     $auth: Authentication;
+    user?: Promise<User>;
 
 
     constructor() {
@@ -112,6 +114,14 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$accountChoice =
             this[CONTENT].getElementById("account-choice") as
                 AccountChoice;
+
+        this.user = fetch(`${config.apiBase}/user`).then(
+            resp => {
+                if (resp.ok) {
+                    return resp.json();
+                }
+            }
+        );
 
         (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
@@ -206,7 +216,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         switch (route.data?.app) {
             case "proposals":
                 this.$pages.select("proposals");
-                (this.$pages.selected as Proposals).route(route.tail);
+                (this.$pages.selected as Proposals).route(route.tail, this.user);
                 break;
             case "settings":
                 this.$pages.select("not-implemented");

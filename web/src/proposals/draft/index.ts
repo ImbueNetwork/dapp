@@ -11,6 +11,7 @@ import "./preview";
 import ProposalsDraftPreview from "./preview";
 
 import * as config from "../../config";
+import { User } from "../../model";
 
 
 const template = document.createElement("template");
@@ -50,10 +51,10 @@ export default class ProposalsDraft extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path?: string) {
+    route(path?: string, user?: Promise<User>) {
         if (!path) {
             this.$pages.select("editor");
-            (this.$pages.selected as ProposalsDraftEditor).init();
+            (this.$pages.selected as ProposalsDraftEditor).init(user);
             return;
         }
 
@@ -62,7 +63,7 @@ export default class ProposalsDraft extends HTMLElement {
         switch (route.data?.page) {
             case "preview":
                 this.$pages.select("preview");
-                (this.$pages.selected as ProposalsDraftPreview).init();
+                (this.$pages.selected as ProposalsDraftPreview).init(user);
                 break;
             default:
                 this.dispatchEvent(badRouteEvent("not-found"));

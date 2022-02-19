@@ -3,6 +3,7 @@ import css from "./index.css";
 
 import "./form";
 import ProposalsDraftEditorForm from "./form";
+import { User } from "../../../model";
 
 
 const template = document.createElement("template");
@@ -34,8 +35,8 @@ export default class Editor extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    init() {
-        return this.$form?.init();
+    init(user?: Promise<User>) {
+        return this.$form?.init(user);
     }
 }
 

@@ -156,7 +156,7 @@ export default class Preview extends HTMLElement {
         this.bind();
     }
 
-    async init() {
+    async init(user?: Promise<User>) {
         const projectId = this.projectId;
         
         if (!projectId) {
@@ -164,7 +164,9 @@ export default class Preview extends HTMLElement {
              * FIXME: Just redirect back to listing page? Or
              * better to have a 404 page.
              */
-            window.location.href = config.grantProposalsURL;
+            window.history.pushState({}, "", config.grantProposalsURL);
+            window.dispatchEvent(new Event("popstate"));
+            // window.location.href = config.grantProposalsURL;
             return;
         }
 
@@ -208,72 +210,73 @@ export default class Preview extends HTMLElement {
             this.accounts = accounts;
         });
 
-        await fetch(`${config.apiBase}/user`).then(async resp => {
-            if (resp.ok) {
-                /**
-                 * User is logged in with a session.
-                 * 
-                 * XXX: We have to assume that since the user is logged in at
-                 * this point, there's no reason to "save" -- only edit or
-                 * finalize.
-                 */
-                const user = await resp.json();
-                if (user?.id) {
-                    this.user = user;
-                    /**
-                     * Toggling save false because if user is logged in, we
-                     * automatically save and refresh for them.
-                     */
-                    this.toggleSave = false;
-                    /**
-                     * Should only be able to edit or finalize if user
-                     * is the usr_id on the project.
-                     */
-                    if (!isLocalDraft && this.user?.id !== this.draft?.usr_id) {
-                        this.toggleFinalize = false;
-                        this.toggleEdit = false;
-                    }
+        if (user) {
+            this.user = await user;
+        }
 
-                    if (isLocalDraft) {
-                        // save and redirect to legit URL
-                        if (!this.draft) {
-                            // TODO: shouldn't happen, but UX if it does
-                            return;
-                        }
+        if (this.user) {
+            /**
+             * User is logged in with a session.
+             * 
+             * XXX: We have to assume that since the user is logged in at
+             * this point, there's no reason to "save" -- only edit or
+             * finalize.
+             */
 
-                        fetch(
-                            `${config.apiBase}/projects/`,
-                            {
-                                method: "post",
-                                headers: config.postAPIHeaders,
-                                body: JSON.stringify({proposal: this.draft}),
-                            },
-                        ).then(async resp => {
-                            if (resp.ok) {
-                                // redirect
-                                const project = await resp.json();
-                                window.location.href = `${
-                                    config.grantProposalsURL
-                                }/preview?id=${project.id}`
-                            } else {
-                                // TODO: dialog or 500 page
-                            }
-                        })
-                    }
-                }
-            } else if (!isLocalDraft) {
-                /**
-                 * Legit draft exists but not logged in.
-                 *
-                 * Buttons: all will simply launch the authDialog, because user
-                 * has no session. Not even edit will work.
-                 * 
-                 * FIXME: not sure if there's any additional UX needed here.
-                 * Maybe the auth dialog should just preemptively load.
-                 */
-                // this.launchAuthDialog();
+            /**
+             * Toggling save false because if user is logged in, we
+             * automatically save and refresh for them.
+             */
+            this.toggleSave = false;
+
+            /**
+             * Should only be able to edit or finalize if user
+             * is the usr_id on the project.
+             */
+            if (!isLocalDraft && this.user?.id !== this.draft?.usr_id) {
+                this.toggleFinalize = false;
+                this.toggleEdit = false;
             }
-        });
+
+            if (isLocalDraft) {
+                // save and redirect to legit URL
+                if (!this.draft) {
+                    // TODO: shouldn't happen, but UX if it does
+                    return;
+                }
+
+                fetch(
+                    `${config.apiBase}/projects/`,
+                    {
+                        method: "post",
+                        headers: config.postAPIHeaders,
+                        body: JSON.stringify({proposal: this.draft}),
+                    },
+                ).then(async resp => {
+                    if (resp.ok) {
+                        // redirect
+                        const project = await resp.json();
+                        window.history.pushState({}, "", `${
+                            config.grantProposalsURL
+                        }/draft/preview?id=${
+                            project.id
+                        }`);
+                        window.dispatchEvent(new Event("popstate"));
+                    } else {
+                        // TODO: dialog or 500 page
+                        this.dispatchEvent(new CustomEvent(
+                            config.event.badRoute,
+                            {
+                                bubbles: true,
+                                composed: true,
+                                detail: "server-error",
+                            }
+                        ));
+                        return;
+                    }
+                })
+            }
+        }
 
         if (isLocalDraft) {
             /**
@@ -377,7 +380,9 @@ export default class Preview extends HTMLElement {
             }
             // redirect to "new" grant submission, because there isn't a reason
             // to be here without something to view.
-            window.location.href = `${config.grantProposalsURL}/draft`;
+            window.history.pushState({}, "", `${config.grantProposalsURL}/draft`);
+            window.dispatchEvent(new Event("popstate"));
+            // window.location.href = `${config.grantProposalsURL}/draft`;
             return;
         }
 
@@ -422,11 +427,13 @@ export default class Preview extends HTMLElement {
         });
 
         this.$edit.addEventListener("click", e => {
-            console.log("edit clicked");
             const edit = () => {
-                window.location.href = `${
+                window.history.pushState({}, "", `${
                     config.grantProposalsURL
-                }/draft?id=${this.projectId}`;
+                }/draft?id=${
+                    this.projectId
+                }`);
+                window.dispatchEvent(new Event("popstate"));
             };
 
             if (this.projectId === "local-draft" || this.user) {
@@ -442,9 +449,12 @@ export default class Preview extends HTMLElement {
                     const resp = await model.postGrantProposal(this.draft);
                     if (resp.ok) {
                         const project = await resp.json();
-                        window.location.href = `${
+                        window.history.pushState({}, "", `${
                             config.grantProposalsURL
-                        }/draft/preview?id=${project.id}`;
+                        }/draft/preview?id=${
+                            project.id
+                        }`);
+                        window.dispatchEvent(new Event("popstate"));
                     } else {
                         // TODO: UX for bad request posting draft
                         console.warn("Bad request posting draft", this.draft);
@@ -490,7 +500,6 @@ export default class Preview extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            console.log("post auth STATE!!!", state);
             this.user = state.user;
             action();
         }

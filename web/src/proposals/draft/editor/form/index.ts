@@ -140,13 +140,11 @@ export default class Form extends HTMLElement {
         `);
     }
 
-    async init() {
+    async init(user?: Promise<User>) {
         this.reset();
 
-        // fetch authenticated user
-        const resp = await fetch(`${config.apiBase}/user`);
-        if (resp.ok) {
-            this.user = await resp.json();
+        if (user) {
+            this.user = await user;
         }
 
         /**

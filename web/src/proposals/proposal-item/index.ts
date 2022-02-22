@@ -36,7 +36,7 @@ export default class Item extends HTMLElement {
         if (proposal) {
             this.$img.src = proposal.logo;
             this.$name.innerText = proposal.name;
-            this.$contribute.href = `/dapp/proposals/${proposal.id}`;
+            this.$contribute.href = `/dapp/proposals/detail/${proposal.id}`;
         }
     }
 

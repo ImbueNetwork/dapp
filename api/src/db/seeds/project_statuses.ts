@@ -5,9 +5,13 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("project_status").del();
 
     // Inserts seed entries
-    await knex("project_status").insert([
-        { status: "draft" },
-        { status: "submitted" },
-        { status: "finalized" },
-    ]);
+    try {
+        await knex("project_status").insert([
+            { status: "draft" },
+            { status: "submitted" },
+            { status: "finalized" },
+        ]);
+    } catch (e) {
+        //
+    }
 };

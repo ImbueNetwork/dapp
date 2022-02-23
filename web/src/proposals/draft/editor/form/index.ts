@@ -123,6 +123,7 @@ export default class Form extends HTMLElement {
         });
 
         this.milestoneIdx = 0;
+        this.disabled = false;
     }
 
     connectedCallback() {
@@ -391,7 +392,6 @@ export default class Form extends HTMLElement {
             $inputs["milestone-percent-to-unlock"].value =
                 String(milestone.percentage_to_unlock);
         }
-        this.disabled = false;
     }
 
     reportValidity($input: HTMLInputElement, submitting: boolean = false) {

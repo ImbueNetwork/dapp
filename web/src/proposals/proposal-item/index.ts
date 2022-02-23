@@ -10,6 +10,7 @@ ${html}
 
 const CONTENT = Symbol();
 
+
 export default class Item extends HTMLElement {
     [CONTENT]: DocumentFragment;
     $name: HTMLElement;

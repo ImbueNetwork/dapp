@@ -13,6 +13,8 @@ import type { ProposedMilestone, GrantProposal, User, Project } from "../../../.
 import { getWeb3Accounts } from "../../../../utils/polkadot";
 import * as model from "../../../../model";
 import * as config from "../../../../config";
+import * as utils from '../../../../utils';
+import { ImbueRequest } from '../../../../dapp';
 
 
 declare global {
@@ -41,9 +43,8 @@ const CONTENT = Symbol();
 
 export default class Form extends HTMLElement {
     private [CONTENT]: DocumentFragment;
-    private _projectId?: string;
     milestoneIdx: number = 0;
-    user?: User;
+    user?: User | null;
     accounts?: Promise<InjectedAccountWithMeta[]>;
     $submitProject: HTMLInputElement;
     $categorySelect: HTMLSelectElement;
@@ -120,10 +121,13 @@ export default class Form extends HTMLElement {
                 }
             }
         });
+
+        this.milestoneIdx = 0;
     }
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
+        this.bind();
     }
 
     accountFragment(account: InjectedAccountWithMeta) {
@@ -140,12 +144,10 @@ export default class Form extends HTMLElement {
         `);
     }
 
-    async init(user?: Promise<User>) {
+    async init(request: ImbueRequest) {
         this.reset();
 
-        if (user) {
-            this.user = await user;
-        }
+        this.user = await request.user;
 
         /**
          * If not logged in, we can't submit the proposal to the API for
@@ -157,12 +159,13 @@ export default class Form extends HTMLElement {
             ? "Save Draft Proposal"
             : "Preview Draft Proposal";
 
-        this.accounts = getWeb3Accounts().then(accounts => {
+        this.accounts = request.accounts.then(accounts => {
             const $select = this.$web3AccountSelect;
 
             accounts.forEach(account => {
                 $select.appendChild(this.accountFragment(account));
             });
+
             $select.appendChild(this.accountFragment({
                 address: "other",
                 meta: {
@@ -203,6 +206,7 @@ export default class Form extends HTMLElement {
         });
 
         const projectId = this.projectId;
+
         try {
             if (projectId) {
                 await this.setupExistingDraft(projectId);
@@ -218,14 +222,10 @@ export default class Form extends HTMLElement {
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
         }
-
-        this.bind();
     }
 
     redirectToNewDraft() {
-        // window.location.href = `${config.grantProposalsURL}/draft`;
-        window.history.pushState({}, "", `${config.grantProposalsURL}/draft`);
-        this.dispatchEvent(new Event("popstate"));
+        utils.redirect(`${config.grantProposalsURL}/draft`);
     }
 
     async setupExistingDraft(projectId: string) {
@@ -233,17 +233,23 @@ export default class Form extends HTMLElement {
         
         if (projectId === "local-draft") {
             const local = localStorage.getItem(
-                "imbu-proposals-draft:local-draft"
+                config.proposalsDraftLocalDraftKey
             );
 
             if (!local) {
                 this.redirectToNewDraft();
+                return;
             }
 
             draft = JSON.parse(String(local));
         } else {
             if (!this.user) {
+                /**
+                 * No user means not logged in, so don't bother trying to
+                 * fetch, etc., because the server will only respond 401.
+                 */
                 this.redirectToNewDraft();
+                return;
             }
 
             try {
@@ -262,6 +268,7 @@ export default class Form extends HTMLElement {
                         // FIXME: 404 page or some other UX
                         // throw new Error("Not found");
                         this.redirectToNewDraft();
+                        return;
                     } else {
                         throw resp;
                     }
@@ -283,31 +290,22 @@ export default class Form extends HTMLElement {
             }
         }
         
-        this.proposalIntoForm(draft);
+        setTimeout(() => {
+            this.proposalIntoForm(draft);
+        }, 0);
     }
 
-    get projectId() {
-        if (this._projectId) {
-            return this._projectId;
-        }
-
+    get projectId(): string | null {
         const entries = window.location.search
             .split("?")[1]
             ?.split("&")
             .map(x => x.split("="));
 
         if (!entries) {
-            return;
+            return null;
         }
 
-        const id = Object.fromEntries(entries).id;
-
-        if (id) {
-            this._projectId = id;
-            return this._projectId;
-        }
-        
-        return;
+        return Object.fromEntries(entries).id;
     }
 
     bind() {
@@ -393,6 +391,7 @@ export default class Form extends HTMLElement {
             $inputs["milestone-percent-to-unlock"].value =
                 String(milestone.percentage_to_unlock);
         }
+        this.disabled = false;
     }
 
     reportValidity($input: HTMLInputElement, submitting: boolean = false) {
@@ -553,7 +552,9 @@ export default class Form extends HTMLElement {
             }
 
             if (project) {
-                window.location.href = `/dapp/proposals/draft/preview?id=${project.id}`;
+                utils.redirect(`${
+                    config.grantProposalsURL
+                }/draft/preview?id=${project.id}`);
             } else {
                 // FIXME: UX needed
                 this.disabled = false;
@@ -561,14 +562,17 @@ export default class Form extends HTMLElement {
         } else {
             // Not logged in, save it to localStorage and redirect to
             // preview page as "local-draft"
+            console.log(JSON.stringify(proposal));
             this.savetoLocalStorage(proposal, account);
-            window.location.href = "/dapp/proposals/draft/preview?id=local-draft";
+            utils.redirect(`${
+                config.grantProposalsURL
+            }/draft/preview?id=local-draft`);
         }
     }
 
     savetoLocalStorage(proposal: GrantProposal, account?: InjectedAccountWithMeta) {
         window.localStorage.setItem(
-            "imbu-proposals-draft:local-draft",
+            config.proposalsDraftLocalDraftKey,
             JSON.stringify(proposal)
         );
     }

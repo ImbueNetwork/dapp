@@ -15,6 +15,7 @@ import Detail from "../proposals/detail";
 
 import * as config from "../config";
 import { User } from "../model";
+import { ImbueRequest } from "../dapp";
 
 
 const template = document.createElement("template");
@@ -54,7 +55,7 @@ export default class Proposals extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path?: string, user?: Promise<User>) {
+    route(path: string | null, request: ImbueRequest) {
         if (!path) {
             this.$pages.select("listing");
             (this.$pages.selected as List).init();
@@ -66,7 +67,7 @@ export default class Proposals extends HTMLElement {
         switch (route.data?.page) {
             case "draft":
                 this.$pages.select("draft");
-                (this.$pages.selected as ProposalsDraft).route(route.tail, user);
+                (this.$pages.selected as ProposalsDraft).route(route.tail, request);
                 break;
             case "detail":
                 this.$pages.select("detail");

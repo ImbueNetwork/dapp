@@ -29,6 +29,6 @@
         <script type="module" src="/dist/dapp.js"></script>
     </head>
     <body>
-        <imbu-dapp id="dapp"></imbu-dapp>
+        <imbu-dapp id="dapp" default-route="/proposals/draft"></imbu-dapp>
     </body>
 </html>

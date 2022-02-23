@@ -1,10 +1,21 @@
 import "@pojagi/hoquet/lib/pages/pages";
+import Pages from "@pojagi/hoquet/lib/pages/pages";
+
 import "@pojagi/hoquet/lib/layout/layout";
+import Layout from "@pojagi/hoquet/lib/layout/layout";
+
+import "@pojagi/hoquet/lib/dialog/dialog";
+import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
+
 import "@pojagi/hoquet/lib/nav/nav";
 import Nav, { MenuItem } from "@pojagi/hoquet/lib/nav/nav";
-import Pages from "@pojagi/hoquet/lib/pages/pages";
+
 import Route from "@pojagi/hoquet/lib/route/route";
-import Layout from "@pojagi/hoquet/lib/layout/layout";
+
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+
+import * as utils from "../utils";
+import * as config from "../config";
 
 import "../proposals";
 import Proposals from "../proposals";
@@ -16,15 +27,28 @@ import logo from "../../assets/logo.svg";
 import "../authentication"
 import Authentication from "../authentication";
 
-import * as config from "../config";
-import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
-
 import "../account-choice";
 import AccountChoice from "../account-choice";
 
+import { User } from "../model";
+import { getWeb3Accounts } from "../utils/polkadot";
+
 import html from "./index.html";
 import styles from "./index.css";
-import { User } from "../model";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+
+
+export type ImbueRequest = {
+    user: Promise<User | null>;
+    accounts: Promise<InjectedAccountWithMeta[]>;
+    apiInfo: Promise<polkadotJsApiInfo>;
+};
+
+export type polkadotJsApiInfo = {
+    api: ApiPromise;
+    provider: WsProvider;
+    webSockAddr: string;
+}
 
 
 const template = document.createElement("template");
@@ -84,7 +108,10 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     $dialog: Dialog;
     $accountChoice: AccountChoice;
     $auth: Authentication;
-    user?: Promise<User>;
+
+    user: Promise<User>;
+    accounts: Promise<InjectedAccountWithMeta[]>;
+    apiInfo: Promise<polkadotJsApiInfo>;
 
 
     constructor() {
@@ -120,21 +147,19 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
                 if (resp.ok) {
                     return resp.json();
                 }
+                return null;
             }
         );
+
+        this.accounts = getWeb3Accounts();
+        this.apiInfo = this.initPolkadotJSAPI();
 
         (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
-        
-        this.$mainMenuButton.addEventListener("click", e => {
-            this.$layout.openDrawer("right");
-        });
-        
-        this.initNavigation(navigationItems);
-        this.initAuthentication();
+
         this.bind();
 
         this.route(window.location.pathname);
@@ -159,7 +184,18 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             callback(await this.$accountChoice.accountChoice());
         });
 
+        this.$mainMenuButton.addEventListener("click", e => {
+            this.$layout.openDrawer("right");
+        });
+
+        this.initNavigation(navigationItems);
+        this.initAuthentication();
+        this.initRouting();
+    }
+
+    initRouting() {
         window.addEventListener("popstate", e => {
+            console.log("popstate", window.location.href);
             this.route(window.location.pathname);
             this.$layout.closeDrawer("right");
         });
@@ -201,22 +237,98 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$layout.breakpointer.addHandler(this.navRelocate.bind(this));
     }
 
+    errorNotification(e: Error) {
+        console.log(e);
+        this.dispatchEvent(new CustomEvent(
+            config.event.notification,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    title: e.name,
+                    content: e.message,
+                    actions: {},
+                    isDismissable: true,
+                }
+            }
+        ));
+    }
+
+    async initPolkadotJSAPI(): Promise<polkadotJsApiInfo> {
+        const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
+            resp => resp.json()
+        )).imbueNetworkWebsockAddr as string;
+
+        const provider = new WsProvider(webSockAddr);
+        provider.on("error", e => {
+            this.errorNotification(e);
+            console.log(e);
+        });
+        provider.on("disconnected", e => {
+            // this.$dialog.create("PolkadotJS API Disconnected", "", {
+            //     "dismiss": {label: "Okay"}
+            // }, true);
+            console.log(e);
+        });
+        /**
+         * TODO: any reason to report this, specifically?
+         */
+        provider.on("connected", e => {
+            // this.$dialog.create("PolkadotJS API Connected", "", {
+            //     "dismiss": {label: "Okay"}
+            // }, true);
+            console.log("Polkadot JS connected", e);
+        });
+
+        try {
+            const api = await ApiPromise.create({provider});
+            
+            return {
+                api,
+                provider,
+                webSockAddr,
+            }
+        } catch (e) {
+            let cause = e as Error;
+
+            this.$dialog.create("PolkadotJS API Error", cause.message, {
+                "dismiss": {label: "Okay"}
+            }, true);
+
+            throw new Error(
+                "Unable to initialize PolkadotJS API",
+                {cause: cause}
+            );
+        }
+    }
+
     async route(path?: string) {
         if (!path) {
             return this.$pages.select("not-found");
         }
 
-        const route = new Route("/dapp/:app", path);
+        const route = new Route(`${config.context}/:app`, path);
+        const request: ImbueRequest = {
+            user: this.user,
+            accounts: this.accounts,
+            apiInfo: this.apiInfo,
+        }
 
         if (!route.active) {
-            this.$pages.select("not-found");
+            /**
+             * the path == `/dapp`, so we redirect to the default "app", which
+             * is currently "/dapp/proposals"
+             */
+            utils.redirect(
+                this.getAttribute("default-route") || "/proposals/draft"
+            );
             return;
         }
 
         switch (route.data?.app) {
             case "proposals":
                 this.$pages.select("proposals");
-                (this.$pages.selected as Proposals).route(route.tail, this.user);
+                (this.$pages.selected as Proposals).route(route.tail, request);
                 break;
             case "settings":
                 this.$pages.select("not-implemented");

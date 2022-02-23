@@ -19,6 +19,8 @@ import type { GrantProposal, Project, User } from "../../../model";
 import { getWeb3Accounts, signWeb3Challenge } from "../../../utils/polkadot";
 import * as config from "../../../config";
 import * as model from "../../../model";
+import * as utils from "../../../utils";
+import { ImbueRequest, polkadotJsApiInfo } from "../../../dapp";
 
 
 const CONTENT = Symbol();
@@ -36,7 +38,7 @@ export default class Preview extends HTMLElement {
     private _projectId?: string;
     draft?: GrantProposal | Project;
     address?: string;
-    user?: User;
+    user?: User | null;
     private [CONTENT]: DocumentFragment;
 
     $tabBar: HTMLElement;
@@ -45,7 +47,7 @@ export default class Preview extends HTMLElement {
     $tabContentContainer: HTMLElement;
 
     $actionButtonContainers: HTMLElement[];
-    $edit: HTMLButtonElement;
+    $edit: HTMLAnchorElement;
     $save: HTMLButtonElement;
     $finalize: HTMLButtonElement;
 
@@ -57,7 +59,7 @@ export default class Preview extends HTMLElement {
     $milestones: HTMLOListElement;
 
     accounts?: InjectedAccountWithMeta[];
-    api?: ApiPromise;
+    apiInfo?: polkadotJsApiInfo;
 
 
     constructor() {
@@ -75,15 +77,17 @@ export default class Preview extends HTMLElement {
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
                 HTMLElement;
+
         this.$edit =
             this[CONTENT].getElementById("edit") as
-                HTMLButtonElement;
+                HTMLAnchorElement;
         this.$save =
             this[CONTENT].getElementById("save") as
                 HTMLButtonElement;
         this.$finalize =
             this[CONTENT].getElementById("finalize") as
                 HTMLButtonElement;
+
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
                 HTMLElement;
@@ -108,13 +112,6 @@ export default class Preview extends HTMLElement {
                     HTMLCollection
             ) as HTMLElement[];
     }
-
-
-    // set toggleSave(force: boolean) {
-    //     this.$save.parentElement
-    //         ?.classList.toggle("hidden", !force);
-    //     this._rebalanceActionButtons();
-    // }
 
     toggleActionButton(which: string, force: boolean) {
         ((this as any)[`$${which}`] as HTMLElement).parentElement
@@ -154,9 +151,17 @@ export default class Preview extends HTMLElement {
         this.toggleSave = false;
 
         this.bind();
+
+        /**
+         * This is just for a11y. Do not use this value unless you know what
+         * you're doing.
+         */
+        this.$edit.href = `${config.context}${
+            config.grantProposalsURL
+        }/draft?id=${this.projectId}`;
     }
 
-    async init(user?: Promise<User>) {
+    async init(request: ImbueRequest) {
         const projectId = this.projectId;
         
         if (!projectId) {
@@ -164,9 +169,7 @@ export default class Preview extends HTMLElement {
              * FIXME: Just redirect back to listing page? Or
              * better to have a 404 page.
              */
-            window.history.pushState({}, "", config.grantProposalsURL);
-            window.dispatchEvent(new Event("popstate"));
-            // window.location.href = config.grantProposalsURL;
+            utils.redirect(config.grantProposalsURL);
             return;
         }
 
@@ -198,21 +201,9 @@ export default class Preview extends HTMLElement {
             }
         });
 
-        /**
-         * From here on out we know a draft exists in one form or another. So
-         * we go about the business of communicating state and enabling
-         * features.
-         */
-
-        this.apiSetup();
-
-        getWeb3Accounts().then(accounts => {
-            this.accounts = accounts;
-        });
-
-        if (user) {
-            this.user = await user;
-        }
+        this.accounts = await request.accounts;
+        this.user = await request.user;
+        this.apiInfo = await request.apiInfo;
 
         if (this.user) {
             /**
@@ -256,12 +247,11 @@ export default class Preview extends HTMLElement {
                     if (resp.ok) {
                         // redirect
                         const project = await resp.json();
-                        window.history.pushState({}, "", `${
+                        utils.redirect(`${
                             config.grantProposalsURL
                         }/draft/preview?id=${
                             project.id
                         }`);
-                        window.dispatchEvent(new Event("popstate"));
                     } else {
                         // TODO: dialog or 500 page
                         this.dispatchEvent(new CustomEvent(
@@ -330,40 +320,6 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async apiSetup() {
-        const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
-            resp => resp.json()
-        )).imbueNetworkWebsockAddr;
-        const provider = new WsProvider(webSockAddr);
-        provider.on("error", e => {
-            this.errorNotification(e);
-            console.log(e);
-        });
-        provider.on("disconnected", e => {
-            // this.$dialog.create("PolkadotJS API Disconnected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
-            console.log(e);
-        });
-        /**
-         * TODO: any reason to report this, specifically?
-         */
-        provider.on("connected", e => {
-            // this.$dialog.create("PolkadotJS API Connected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
-            console.log("Polkadot JS connected", e);
-        });
-
-        await ApiPromise.create({provider}).then(api => {
-            this.api = api;
-        }).catch(e => {
-            this.$dialog.create("PolkadotJS API Error", e.message, {
-                "dismiss": {label: "Okay"}
-            }, true);
-        });
-    }
-
     async fetchDraft(projectId: string) {
         if (this.draft) {
             return this.draft;
@@ -371,7 +327,7 @@ export default class Preview extends HTMLElement {
 
         if (projectId === "local-draft") {
             const draftSrc =
-                window.localStorage["imbu-proposals-draft:local-draft"];
+                window.localStorage[config.proposalsDraftLocalDraftKey];
             
             if (draftSrc) {
                 const draft: GrantProposal = JSON.parse(draftSrc);
@@ -380,9 +336,7 @@ export default class Preview extends HTMLElement {
             }
             // redirect to "new" grant submission, because there isn't a reason
             // to be here without something to view.
-            window.history.pushState({}, "", `${config.grantProposalsURL}/draft`);
-            window.dispatchEvent(new Event("popstate"));
-            // window.location.href = `${config.grantProposalsURL}/draft`;
+            utils.redirect(`${config.grantProposalsURL}/draft`);
             return;
         }
 
@@ -427,13 +381,12 @@ export default class Preview extends HTMLElement {
         });
 
         this.$edit.addEventListener("click", e => {
+            e.preventDefault();
+
             const edit = () => {
-                window.history.pushState({}, "", `${
+                utils.redirect(`${
                     config.grantProposalsURL
-                }/draft?id=${
-                    this.projectId
-                }`);
-                window.dispatchEvent(new Event("popstate"));
+                }/draft?id=${this.projectId}`);
             };
 
             if (this.projectId === "local-draft" || this.user) {
@@ -449,12 +402,9 @@ export default class Preview extends HTMLElement {
                     const resp = await model.postGrantProposal(this.draft);
                     if (resp.ok) {
                         const project = await resp.json();
-                        window.history.pushState({}, "", `${
+                        utils.redirect(`${
                             config.grantProposalsURL
-                        }/draft/preview?id=${
-                            project.id
-                        }`);
-                        window.dispatchEvent(new Event("popstate"));
+                        }/draft/preview?id=${project.id}`);
                     } else {
                         // TODO: UX for bad request posting draft
                         console.warn("Bad request posting draft", this.draft);
@@ -585,7 +535,7 @@ export default class Preview extends HTMLElement {
                 return;
             }
 
-            const extrinsic = this.api?.tx.imbueProposals.createProject(
+            const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
                 this.draft.name,
                 this.draft.logo,
                 this.draft.description,
@@ -632,10 +582,12 @@ export default class Preview extends HTMLElement {
                 draft.website
             }</a>
         `;
-        this.$projectDescription.innerHTML = marked.parse(draft.description);
+        this.$projectDescription.innerHTML =
+            draft.description && marked.parse(draft.description);
         this.$projectLogo.setAttribute("srcset", draft.logo);
         this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
 
+        this.$milestones.innerHTML = "";
         draft.milestones.forEach(milestone => {
             this.$milestones.appendChild(
                 document.createRange().createContextualFragment(`

@@ -102,12 +102,13 @@ export default class Form extends HTMLElement {
             "$categorySelect",
             "$web3AccountSelect",
             "$milestones"
-        ] as const).forEach($container => {
-            while (this[$container].firstChild) {
-                this[$container].removeChild(
-                    this[$container].lastChild as Element
-                );
-            }
+        ] as const).forEach(prop => {
+            /**
+             * `cloneNode(false)` means shallow clone, i.e., no children.
+             */
+            const $clone = this[prop].cloneNode(false);
+            this[prop].parentElement?.replaceChild($clone, this[prop]);
+            this[prop] = $clone as any;
         });
 
         this.$fields.forEach($field => {
@@ -123,7 +124,6 @@ export default class Form extends HTMLElement {
         });
 
         this.milestoneIdx = 0;
-        this.disabled = false;
     }
 
     connectedCallback() {
@@ -146,6 +146,7 @@ export default class Form extends HTMLElement {
     }
 
     async init(request: ImbueRequest) {
+        this.disabled = false;
         this.reset();
 
         this.user = await request.user;

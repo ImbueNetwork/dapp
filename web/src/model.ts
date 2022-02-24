@@ -1,9 +1,16 @@
 import * as config from "./config";
 
+
+/**
+ * Models the milestone data that appears in the /proposals/draft form
+ */
 export type DraftMilestone = {
     name: string;
     percentage_to_unlock: number;
 }
+/**
+ * Models the data from inputs that appears in the /proposals/draft form
+ */
 export type DraftProposal = {
     name: string;
     logo: string;
@@ -16,6 +23,9 @@ export type DraftProposal = {
     category?: string | number;
 };
 
+/**
+ * Models a "project" saved to the db, but not on chain.
+ */
 export type Proposal = DraftProposal & {
     id: number;
     status: string;
@@ -26,6 +36,9 @@ export type Proposal = DraftProposal & {
     milestones: Milestone[];
 }
 
+/**
+ * Models a "milestone" saved to the db (and also as it will appear on chain).
+ */
 export type Milestone = DraftMilestone & {
     milestone_index?: number;
     project_id: number;
@@ -43,7 +56,12 @@ export type User = {
     web3Accounts: Web3Account[];
 };
 
-export const postGrantProposal = (
+
+/**
+ * CRUD Methods 
+ */
+
+export const postDraftProposal = (
     proposal: DraftProposal
 ) => fetch(`${config.apiBase}/projects/`, {
     method: "post",
@@ -51,7 +69,7 @@ export const postGrantProposal = (
     body: JSON.stringify({proposal})
 });
 
-export const updateGrantProposal = (
+export const updateProposal = (
     proposal: DraftProposal,
     id: string | number
 ) => fetch(`${config.apiBase}/projects/${id}`, {

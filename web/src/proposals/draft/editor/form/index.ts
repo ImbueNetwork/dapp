@@ -46,7 +46,7 @@ export default class Form extends HTMLElement {
     milestoneIdx: number = 0;
     user?: User | null;
     accounts?: Promise<InjectedAccountWithMeta[]>;
-    $submitProject: HTMLInputElement;
+    $submitProposal: HTMLInputElement;
     $categorySelect: HTMLSelectElement;
     $web3AccountSelect: HTMLSelectElement;
     $web3Address: HTMLInputElement;
@@ -71,8 +71,8 @@ export default class Form extends HTMLElement {
         this[CONTENT] = template.content.cloneNode(true) as
             DocumentFragment;
 
-        this.$submitProject =
-            this[CONTENT].getElementById("submit-project") as
+        this.$submitProposal =
+            this[CONTENT].getElementById("submit-proposal") as
                 HTMLInputElement;
         this.$categorySelect =
             this[CONTENT].getElementById("category-select") as
@@ -157,7 +157,7 @@ export default class Form extends HTMLElement {
          * it. We say instead "preview" because they will be redirected to the
          * detail page, where they have other options.
          */
-        this.$submitProject.value = this.user
+        this.$submitProposal.value = this.user
             ? "Save Draft Proposal"
             : "Preview Draft Proposal";
 
@@ -402,7 +402,7 @@ export default class Form extends HTMLElement {
     }
 
     toggleInputsAttribute(qualifiedName: string, force?: boolean): boolean[] {
-        return [...this.$fields, this.$submitProject, this.$addMilestone].map(
+        return [...this.$fields, this.$submitProposal, this.$addMilestone].map(
             $field => $field.toggleAttribute(qualifiedName, force)
         );
     }
@@ -507,12 +507,12 @@ export default class Form extends HTMLElement {
     }
 
     async postGrantProposal(proposal: DraftProposal) {
-        const resp = await model.postGrantProposal(proposal);
+        const resp = await model.postDraftProposal(proposal);
 
         if (resp.ok) {
-            const project: Proposal = await resp.json();
+            const proposal: Proposal = await resp.json();
             // FIXME: delete from localStorage?
-            return project;
+            return proposal;
         } else {
             // TODO: UX for submission failed
             // maybe `this.dialog(...)`
@@ -521,34 +521,34 @@ export default class Form extends HTMLElement {
     }
 
     async updateGrantProposal(proposal: DraftProposal, id: string | number) {
-        const resp = await model.updateGrantProposal(proposal, id);
+        const resp = await model.updateProposal(proposal, id);
 
         if (resp.ok) {
-            const project: Proposal = await resp.json();
-            return project;
+            const proposal: Proposal = await resp.json();
+            return proposal;
         }
     }
 
     async submitGrantProposal(
-        proposal: DraftProposal,
+        draft: DraftProposal,
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
         // Are we logged in?
         if (this.user) {
             // if yes, go ahead and post the draft with the `usr_id`
-            proposal.usr_id = this.user.id;
-            let project;
+            draft.usr_id = this.user.id;
+            let proposal;
 
             if (this.projectId && this.projectId !== "local-draft") {
-                project = await this.updateGrantProposal(proposal, this.projectId);
+                proposal = await this.updateGrantProposal(draft, this.projectId);
             } else {
-                project = await this.postGrantProposal(proposal);
+                proposal = await this.postGrantProposal(draft);
             }
 
-            if (project) {
+            if (proposal) {
                 utils.redirect(`${
                     config.grantProposalsURL
-                }/draft/preview?id=${project.id}`);
+                }/draft/preview?id=${proposal.id}`);
             } else {
                 // FIXME: UX needed
                 this.disabled = false;
@@ -556,8 +556,8 @@ export default class Form extends HTMLElement {
         } else {
             // Not logged in, save it to localStorage and redirect to
             // preview page as "local-draft"
-            console.log(JSON.stringify(proposal));
-            this.savetoLocalStorage(proposal);
+            console.log(JSON.stringify(draft));
+            this.savetoLocalStorage(draft);
             utils.redirect(`${
                 config.grantProposalsURL
             }/draft/preview?id=local-draft`);

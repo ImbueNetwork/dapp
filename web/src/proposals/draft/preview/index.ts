@@ -35,7 +35,6 @@ template.innerHTML = `
 
 
 export default class Preview extends HTMLElement {
-    private _projectId?: string;
     draft?: DraftProposal | Proposal;
     address?: string;
     user?: User | null;
@@ -229,14 +228,7 @@ export default class Preview extends HTMLElement {
                     return;
                 }
 
-                fetch(
-                    `${config.apiBase}/projects/`,
-                    {
-                        method: "post",
-                        headers: config.postAPIHeaders,
-                        body: JSON.stringify({proposal: this.draft}),
-                    },
-                ).then(async resp => {
+                model.postDraftProposal(this.draft).then(async resp => {
                     if (resp.ok) {
                         // redirect
                         const project = await resp.json();
@@ -325,11 +317,7 @@ export default class Preview extends HTMLElement {
             return;
         }
 
-        // fetch project (i.e., rather than Proposal)
-        const resp = await fetch(
-            `${config.apiBase}/projects/${projectId}`,
-            {headers: config.getAPIHeaders}
-        );
+        const resp = await model.fetchProject(projectId);
         if (resp.ok) {
             this.draft = await resp.json();
             return this.draft;
@@ -338,10 +326,6 @@ export default class Preview extends HTMLElement {
     }
 
     get projectId() {
-        if (this._projectId) {
-            return this._projectId;
-        }
-
         const entry = window.location.search
             .split("?")[1]
             ?.split("&")
@@ -349,10 +333,9 @@ export default class Preview extends HTMLElement {
             .find(([k,_]) => k === "id");
             
         if (entry) {
-            this._projectId = entry[1];
-            return this._projectId;
+            return entry[1];
         }
-        return;
+        return null;
     }
 
     bind() {
@@ -384,7 +367,7 @@ export default class Preview extends HTMLElement {
         this.$save.addEventListener("click", e => {
             const save = async () => {
                 if (this.draft) {
-                    const resp = await model.postGrantProposal(this.draft);
+                    const resp = await model.postDraftProposal(this.draft);
                     if (resp.ok) {
                         const project = await resp.json();
                         utils.redirect(`${

@@ -1,6 +1,6 @@
 import html from "./index.html";
 import css from "./index.css";
-import type { Project } from "../../model";
+import type { Proposal } from "../../model";
 
 import "../proposal-item";
 import ProposalItem from "../proposal-item";
@@ -58,11 +58,11 @@ export default class List extends HTMLElement {
         }
     }
 
-    renderProjects(projects: Project[]) {
+    renderProjects(proposals: Proposal[]) {
 
         // for (let i of [1,1,1,1,1,1,1,1,1,1])
-        projects.forEach(project => {
-            this.$list.appendChild(new ProposalItem(project));
+        proposals.forEach(proposal => {
+            this.$list.appendChild(new ProposalItem(proposal));
         });
     }
 }

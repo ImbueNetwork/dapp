@@ -11,7 +11,7 @@ import "./preview";
 import ProposalsDraftPreview from "./preview";
 
 import * as config from "../../config";
-import { User } from "../../model";
+import * as utils from "../../utils";
 import { ImbueRequest } from "../../dapp";
 
 
@@ -23,12 +23,6 @@ ${html}
 
 
 const CONTENT = Symbol();
-const badRouteEvent = (detail: string) =>
-    new CustomEvent(config.event.badRoute, {
-        bubbles: true,
-        composed: true,
-        detail,
-    });
 
 
 export default class ProposalsDraft extends HTMLElement {
@@ -67,7 +61,7 @@ export default class ProposalsDraft extends HTMLElement {
                 (this.$pages.selected as ProposalsDraftPreview).init(request);
                 break;
             default:
-                this.dispatchEvent(badRouteEvent("not-found"));
+                this.dispatchEvent(utils.badRouteEvent("not-found"));
         }
     }
 }

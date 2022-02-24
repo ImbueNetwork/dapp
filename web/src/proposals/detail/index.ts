@@ -6,23 +6,24 @@ import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import authDialogContent from "./auth-dialog-content.html";
 import { MDCTabBar } from "@material/tab-bar";
 
-import webflowCSSLink from "/webflow-css-link.html";
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import templateSrc from "./index.html";
 import styles from "./index.css";
 
-import type { GrantProposal, Project, User } from "../../model";
+import { fetchProject, DraftProposal, Proposal, User } from "../../model";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getWeb3Accounts, signWeb3Challenge } from "../../utils/polkadot";
 import * as config from "../../config";
-import * as model from "../../model";
+import * as utils from "../../utils";
+import type { ImbueRequest } from "../../dapp";
+
+
 const CONTENT = Symbol();
 
 const template = document.createElement("template");
 template.innerHTML = `
-    ${webflowCSSLink}
     ${materialComponentsLink}
     ${materialIconsLink}
     <style>${styles}</style>
@@ -30,17 +31,12 @@ template.innerHTML = `
 `;
 
 export default class Detail extends HTMLElement {
-    private _projectId?: string;
-    project?: Project;
-    address?: string;
     user?: User;
     $contribute: HTMLButtonElement;
     $tabContentContainer: HTMLElement;
     $tabBar: HTMLElement;
     tabBar: MDCTabBar;
 
-
-    
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
@@ -48,20 +44,15 @@ export default class Detail extends HTMLElement {
     $fundsRequired: HTMLElement;
     $milestones: HTMLOListElement;
 
-    $actionButtonContainers: HTMLElement[];
-    accounts?: InjectedAccountWithMeta[];
-    $dialog: Dialog;
-    api?: ApiPromise;
     private [CONTENT]: DocumentFragment;
 
     constructor() {
         super();
         this.attachShadow({mode:"open"});
-        this[CONTENT] = template.content.cloneNode(true) as DocumentFragment;
+        this[CONTENT] =
+            template.content.cloneNode(true) as
+                DocumentFragment;
 
-        this.$dialog =
-        this[CONTENT].getElementById("dialog") as
-            Dialog;
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
                 HTMLElement;
@@ -69,7 +60,6 @@ export default class Detail extends HTMLElement {
          this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
-
 
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
@@ -93,115 +83,42 @@ export default class Detail extends HTMLElement {
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
                 HTMLOListElement;
-        this.$actionButtonContainers =
-            Array.from(
-                this.$contribute.parentElement?.parentElement?.children as
-                    HTMLCollection
-            ) as HTMLElement[];
-
     }
 
-    async apiSetup() {
-        const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
-            resp => resp.json()
-        )).imbueNetworkWebsockAddr;
-        const provider = new WsProvider(webSockAddr);
-        provider.on("error", e => {
-            // this.dialog("PolkadotJS API Connection Error", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
-            console.log(e);
-        });
-        provider.on("disconnected", e => {
-            // this.dialog("PolkadotJS API Disconnected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
-            console.log(e);
-        });
-        /**
-         * TODO: any reason to report this, specifically?
-         */
-        provider.on("connected", e => {
-            // this.dialog("PolkadotJS API Connected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
-            console.log("Polkadot JS connected", e);
-        });
-
-        await ApiPromise.create({provider}).then(api => {
-            this.api = api;
-        }).catch(e => {
-            this.$dialog.create("PolkadotJS API Error", e.message, {
-                "dismiss": {label: "Okay"}
-            }, true);
-        });
-    }
-
-    async fetchProject(projectId: string) {
-        // fetch project (i.e., rather than Proposal)
-        const resp = await fetch(
-            `${config.apiBase}/projects/${projectId}`,
-            {headers: config.getAPIHeaders}
-        );
-        if (resp.ok) {
-            this.project = await resp.json();
-            return this.project;
+    get projectId(): string | null {
+        const candidate = window.location.pathname.split("/").pop();
+        
+        if (utils.validProjectId(candidate)) {
+            return candidate as string;
         }
-        // TODO: 404 or dialog UX
-    }
-
-    get projectId() {
-        if (this._projectId) {
-            return this._projectId;
-        }
-        const projectId = window.location.pathname.split("/")[4];
-
-        if (projectId) {
-            this._projectId = projectId;
-            return this._projectId;
-        }
-        return;
+        
+        return null;
     }
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
-        /**
-         * default
-         */
-
         this.bind();
-        // this.init();
     }
     
-    async init() {
+    async init(request: ImbueRequest) {
         const projectId = this.projectId;
         if (!projectId) {
             /**
-             * FIXME: Just redirect back to listing page? Or
-             * better to have a 404 page.
+             * "bad-route" because a candidate id was found, but it was
+             * invalid (i.e., 400)
              */
-
-            window.location.href = config.grantProposalsURL;
+            this.dispatchEvent(utils.badRouteEvent("bad-route"));
             return;
         }
 
-        await this.fetchProject(projectId).then(project => {
-            if (project) {
-                this.renderProject(project);
+        await fetchProject(projectId).then(async resp => {
+            if (resp.ok) {
+                this.renderProject(await resp.json());
+            } else if (resp.status === 404) {
+                this.dispatchEvent(utils.badRouteEvent("not-found"));
             } else {
-                /**
-                 * Same as FIXME above. Do we want a 404 page here, dialog,
-                 * or what?
-                 */
-                window.location.href = config.grantProposalsURL;
-                return;
+                this.dispatchEvent(utils.badRouteEvent("server-error"));
             }
-        });
-
-        this.apiSetup();
-
-        getWeb3Accounts().then(accounts => {
-            this.accounts = accounts;
         });
     }
 
@@ -227,7 +144,7 @@ export default class Detail extends HTMLElement {
                     contribute();
                 });
             } else {
-                 contribute();
+                contribute();
             }
         });
     }
@@ -258,7 +175,7 @@ export default class Detail extends HTMLElement {
         ));
     }
     
-    renderProject(draft: GrantProposal | Project) {
+    renderProject(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
                 "Attempt to render nonexistent draft."

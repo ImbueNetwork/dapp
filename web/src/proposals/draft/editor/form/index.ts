@@ -9,7 +9,7 @@ import templateSrc from "./index.html";
 import styles from "./index.css";
 import { categories } from "../../../../config";
 
-import type { ProposedMilestone, GrantProposal, User, Project } from "../../../../model";
+import type { DraftMilestone, DraftProposal, User, Proposal } from "../../../../model";
 import { getWeb3Accounts } from "../../../../utils/polkadot";
 import * as model from "../../../../model";
 import * as config from "../../../../config";
@@ -231,7 +231,7 @@ export default class Form extends HTMLElement {
     }
 
     async setupExistingDraft(projectId: string) {
-        let draft: GrantProposal;
+        let draft: DraftProposal;
         
         if (projectId === "local-draft") {
             const local = localStorage.getItem(
@@ -276,14 +276,7 @@ export default class Form extends HTMLElement {
                     }
                 });
             } catch (cause) {
-                this.dispatchEvent(new CustomEvent(
-                    config.event.badRoute,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: "server-error",
-                    }
-                ));
+                this.dispatchEvent(utils.badRouteEvent("server-error"));
 
                 throw new Error(
                     `Server error fetching project with id ${projectId}`,
@@ -346,7 +339,7 @@ export default class Form extends HTMLElement {
      * user submits here, we are ultimately submitting
      * $number * 1_000_000_000_000 to the blockchain.
      */
-    proposalFromForm(formData: FormData): GrantProposal {
+    proposalFromForm(formData: FormData): DraftProposal {
         console.log(Object.fromEntries(formData));
         return {
             name: formData.get("imbu-name") as string,
@@ -362,7 +355,7 @@ export default class Form extends HTMLElement {
         }
     }
 
-    proposalIntoForm(proposal: GrantProposal): void {
+    proposalIntoForm(proposal: DraftProposal): void {
         const $inputFields: Record<string, HTMLInputElement> =
             this.$fields.reduce((p, c: Element) => ({
                 ...p, [c.getAttribute("name") as string]: c
@@ -496,7 +489,7 @@ export default class Form extends HTMLElement {
         };
     }
 
-    get milestones(): ProposedMilestone[] {
+    get milestones(): DraftMilestone[] {
         return Array.from(
             this.$milestones.querySelectorAll(".milestone")
         ).map(($li: Element) => {
@@ -505,7 +498,7 @@ export default class Form extends HTMLElement {
             return {
                 name: $name.value.trim(),
                 percentage_to_unlock: parseInt($percentageToUnlock.value),
-            } as ProposedMilestone;
+            } as DraftMilestone;
         });
     }
 
@@ -513,11 +506,11 @@ export default class Form extends HTMLElement {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    async postGrantProposal(proposal: GrantProposal) {
+    async postGrantProposal(proposal: DraftProposal) {
         const resp = await model.postGrantProposal(proposal);
 
         if (resp.ok) {
-            const project: Project = await resp.json();
+            const project: Proposal = await resp.json();
             // FIXME: delete from localStorage?
             return project;
         } else {
@@ -527,17 +520,17 @@ export default class Form extends HTMLElement {
         }
     }
 
-    async updateGrantProposal(proposal: GrantProposal, id: string | number) {
+    async updateGrantProposal(proposal: DraftProposal, id: string | number) {
         const resp = await model.updateGrantProposal(proposal, id);
 
         if (resp.ok) {
-            const project: Project = await resp.json();
+            const project: Proposal = await resp.json();
             return project;
         }
     }
 
     async submitGrantProposal(
-        proposal: GrantProposal,
+        proposal: DraftProposal,
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
         // Are we logged in?
@@ -564,14 +557,14 @@ export default class Form extends HTMLElement {
             // Not logged in, save it to localStorage and redirect to
             // preview page as "local-draft"
             console.log(JSON.stringify(proposal));
-            this.savetoLocalStorage(proposal, account);
+            this.savetoLocalStorage(proposal);
             utils.redirect(`${
                 config.grantProposalsURL
             }/draft/preview?id=local-draft`);
         }
     }
 
-    savetoLocalStorage(proposal: GrantProposal, account?: InjectedAccountWithMeta) {
+    savetoLocalStorage(proposal: DraftProposal) {
         window.localStorage.setItem(
             config.proposalsDraftLocalDraftKey,
             JSON.stringify(proposal)

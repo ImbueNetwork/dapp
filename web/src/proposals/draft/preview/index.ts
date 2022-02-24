@@ -14,7 +14,7 @@ import html from "./index.html";
 import localDraftDialogContent from "./local-draft-dialog-content.html";
 import authDialogContent from "./auth-dialog-content.html";
 import css from "./index.css";
-import type { GrantProposal, Project, User } from "../../../model";
+import type { DraftProposal, Proposal, User } from "../../../model";
 
 import { getWeb3Accounts, signWeb3Challenge } from "../../../utils/polkadot";
 import * as config from "../../../config";
@@ -36,7 +36,7 @@ template.innerHTML = `
 
 export default class Preview extends HTMLElement {
     private _projectId?: string;
-    draft?: GrantProposal | Project;
+    draft?: DraftProposal | Proposal;
     address?: string;
     user?: User | null;
     private [CONTENT]: DocumentFragment;
@@ -189,14 +189,7 @@ export default class Preview extends HTMLElement {
                  * Same as FIXME above. Do we want a 404 page here, dialog,
                  * or what?
                  */
-                this.dispatchEvent(new CustomEvent(
-                    config.event.badRoute,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: "not-found",
-                    }
-                ));
+                this.dispatchEvent(utils.badRouteEvent("not-found"));
                 return;
             }
         });
@@ -253,15 +246,7 @@ export default class Preview extends HTMLElement {
                             project.id
                         }`);
                     } else {
-                        // TODO: dialog or 500 page
-                        this.dispatchEvent(new CustomEvent(
-                            config.event.badRoute,
-                            {
-                                bubbles: true,
-                                composed: true,
-                                detail: "server-error",
-                            }
-                        ));
+                        this.dispatchEvent(utils.badRouteEvent("server-error"));
                         return;
                     }
                 })
@@ -330,7 +315,7 @@ export default class Preview extends HTMLElement {
                 window.localStorage[config.proposalsDraftLocalDraftKey];
             
             if (draftSrc) {
-                const draft: GrantProposal = JSON.parse(draftSrc);
+                const draft: DraftProposal = JSON.parse(draftSrc);
                 this.draft = draft;
                 return this.draft;
             }
@@ -568,7 +553,7 @@ export default class Preview extends HTMLElement {
         }
     }
 
-    renderDraft(draft: GrantProposal | Project) {
+    renderDraft(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
                 "Attempt to render nonexistent draft."

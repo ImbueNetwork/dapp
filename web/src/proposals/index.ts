@@ -13,8 +13,7 @@ import List from "../proposals/listing";
 import "../proposals/detail";
 import Detail from "../proposals/detail";
 
-import * as config from "../config";
-import { User } from "../model";
+import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
 
 
@@ -26,12 +25,6 @@ ${html}
 
 
 const CONTENT = Symbol();
-const badRouteEvent = (detail: string) =>
-    new CustomEvent(config.event.badRoute, {
-        bubbles: true,
-        composed: true,
-        detail,
-    });
 
 
 export default class Proposals extends HTMLElement {
@@ -67,14 +60,17 @@ export default class Proposals extends HTMLElement {
         switch (route.data?.page) {
             case "draft":
                 this.$pages.select("draft");
-                (this.$pages.selected as ProposalsDraft).route(route.tail, request);
+                (this.$pages.selected as ProposalsDraft).route(
+                    route.tail,
+                    request
+                );
                 break;
             case "detail":
                 this.$pages.select("detail");
-                (this.$pages.selected as Detail).init();
+                (this.$pages.selected as Detail).init(request);
                 break;
             default:
-                this.dispatchEvent(badRouteEvent("not-found"));
+                this.dispatchEvent(utils.badRouteEvent("not-found"));
         }
     }
 }

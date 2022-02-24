@@ -5,8 +5,8 @@ import type { Proposal } from "../../model";
 import "../proposal-item";
 import ProposalItem from "../proposal-item";
 
-import * as config from "../../config";
-
+import * as model from "../../model";
+import * as utils from "../../utils";
 
 const CONTENT = Symbol();
 
@@ -49,18 +49,16 @@ export default class List extends HTMLElement {
     }
 
     async fetchProjects() {
-        const resp = await fetch(
-            `${config.apiBase}/projects/`,
-            {headers: config.getAPIHeaders}
-        );
+        const resp = await model.fetchProjects();
         if (resp.ok) {
             return await resp.json();
+        } else {
+            // probably only 500+ here since this is a listing route
+            this.dispatchEvent(utils.badRouteEvent("server-error"));
         }
     }
 
     renderProjects(proposals: Proposal[]) {
-
-        // for (let i of [1,1,1,1,1,1,1,1,1,1])
         proposals.forEach(proposal => {
             this.$list.appendChild(new ProposalItem(proposal));
         });

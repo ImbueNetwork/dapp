@@ -82,3 +82,11 @@ export const fetchProject = (projectId: string) => fetch(
     `${config.apiBase}/projects/${projectId}`,
     {headers: config.getAPIHeaders}
 );
+
+/**
+ * FIXME: configurable limit, filters, pagination, etc.
+ */
+export const fetchProjects = () => fetch(
+    `${config.apiBase}/projects/`,
+    {headers: config.getAPIHeaders}
+);

@@ -17,9 +17,9 @@ services:
       POSTGRES_USER: imbue
       POSTGRES_PASSWORD: imbue
     ports:
-    - 5433:5432
-    #volumes:
-    #- /tmp/imbue/postgres:/var/lib/postgresql/data
+      - 5433:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
 
   api:
     build: ./api

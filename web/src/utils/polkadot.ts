@@ -69,5 +69,3 @@ export const signWeb3Challenge = async (
         return signature;
     }
 }
-
-export const getPolkadotJSAPI = (provider: WsProvider) => ApiPromise.create({provider});

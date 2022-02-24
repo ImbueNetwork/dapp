@@ -130,6 +130,14 @@ export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) => 
         tx<Project>("project").select().where({id}).first();
 
+
+
+export const fetchAllProjects = () =>
+    (tx: Knex.Transaction) => 
+        tx<Project>("project").select();
+
+
+        
 export const insertMilestones = (
     milestones: ProposedMilestone[],
     project_id: string | number,

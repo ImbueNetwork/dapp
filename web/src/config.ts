@@ -9,7 +9,7 @@ export const appName = "Imbue Network";
 // export const webSocketAddr = "ws://3.9.171.186:9944";
 // export const webSocketAddr = "ws://127.0.0.1:9944";
 
-
+export const context = "/dapp";
 export const apiBase = "/api/v1";
 export const getAPIHeaders = {
     "accept": "application/json",
@@ -19,9 +19,21 @@ export const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-export const grantProposalsURL = "/dapp/proposals";
+export const grantProposalsURL = "/proposals";
 
 export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
+
+export const proposalsDraftLocalDraftKey = "imbu-proposals-draft:local-draft";
+
+/**
+ * Event names to be used sort of globally.
+ */
+export const event = {
+    authenticationRequired: "imbu:dapp:authentication-required",
+    notification: "imbu:dapp:dialog:create",
+    badRoute: "imbu:dapp:bad-route",
+    accountChoice: "imbu:dapp:account-choice",
+}
 
 /**
  * https://www.hachettebookgroup.com/travel/trip-ideas/types-of-volunteer-opportunities/

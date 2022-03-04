@@ -44,9 +44,11 @@ export default class Detail extends HTMLElement {
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
     $projectLogo: HTMLImageElement;
-    $fundsRequired: HTMLElement;
     $milestones: HTMLOListElement;
     apiInfo?: polkadotJsApiInfo;
+    $fundsRequired: HTMLElement;
+    $imbuContribution: HTMLElement;
+    $contributionSubmissionForm: HTMLFormElement;
 
     private [CONTENT]: DocumentFragment;
 
@@ -81,12 +83,21 @@ export default class Detail extends HTMLElement {
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
                 HTMLImageElement;
-        this.$fundsRequired =
-            this[CONTENT].getElementById("funds-required") as
-                HTMLElement;
+
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
                 HTMLOListElement;
+            
+        this.$fundsRequired =
+            this[CONTENT].getElementById("funds-required") as
+                HTMLElement;
+            
+        this.$imbuContribution =
+            this[CONTENT].getElementById("imbu-contribution") as
+                HTMLElement;
+        this.$contributionSubmissionForm =
+            this[CONTENT].getElementById("contribution-submission-form") as
+                HTMLFormElement;
     }
 
     get projectId(): string | null {
@@ -168,7 +179,6 @@ export default class Detail extends HTMLElement {
             }
         ));
     }
-    
     renderProject(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
@@ -214,6 +224,12 @@ export default class Detail extends HTMLElement {
         event: string = "begin",
         state?: Record<string,any>
     ): Promise<void> {
+        const formData = new FormData(this.$contributionSubmissionForm);
+        const contribution = parseInt(
+            formData.get("imbu-contribution") as string
+        ) * 1e12;
+
+
         switch(event) {
             case "account-chosen":
             {
@@ -267,12 +283,9 @@ export default class Detail extends HTMLElement {
             } break;
             case "begin":
             {
-
-                const hardcodedProjectID = 0
-                const hardcodedContribution = 1 * 1e12
                 const extrinsic = this.apiInfo?.api.tx.imbueProposals.contribute(
-                    hardcodedProjectID,
-                    hardcodedContribution
+                    this.projectId,
+                    contribution
                 );
 
                 if (!extrinsic) {

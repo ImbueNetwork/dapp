@@ -15,7 +15,7 @@ import * as model from "../../../../model";
 import * as config from "../../../../config";
 import * as utils from '../../../../utils';
 import { ImbueRequest } from '../../../../dapp';
-
+import authDialogContent from "./auth-dialog-content.html";
 
 declare global {
     interface ErrorConstructor {
@@ -148,8 +148,8 @@ export default class Form extends HTMLElement {
     async init(request: ImbueRequest) {
         this.disabled = false;
         this.reset();
-
         this.user = await request.user;
+
 
         /**
          * If not logged in, we can't submit the proposal to the API for
@@ -224,10 +224,17 @@ export default class Form extends HTMLElement {
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
         }
+
+        // Are we logged in?
+        if (!this.user) {
+            this.wrapAuthentication(() => {
+                location.reload()
+            });
+        }
     }
 
     redirectToNewDraft() {
-        utils.redirect(`${config.grantProposalsURL}/draft`);
+        utils.redirect(`${config.grantProposalsURL}`);
     }
 
     async setupExistingDraft(projectId: string) {
@@ -261,7 +268,7 @@ export default class Form extends HTMLElement {
                 ).then(async resp => {
                     if (resp.ok) {
                         const project = await resp.json();
-                        if (this.user?.id === project.usr_id) {
+                        if (this.user?.id === project.user_id) {
                             return project;
                         } else {
                             this.redirectToNewDraft();
@@ -533,37 +540,52 @@ export default class Form extends HTMLElement {
         draft: DraftProposal,
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
-        // Are we logged in?
-        if (this.user) {
-            // if yes, go ahead and post the draft with the `usr_id`
-            draft.usr_id = this.user.id;
-            let proposal;
 
-            if (this.projectId && this.projectId !== "local-draft") {
-                proposal = await this.updateGrantProposal(draft, this.projectId);
-            } else {
-                proposal = await this.postGrantProposal(draft);
-            }
+        // if yes, go ahead and post the draft with the `user_id`
+        draft.user_id = this.user?.id;
+        let proposal;
 
-            if (proposal) {
-                utils.redirect(`${
-                    config.grantProposalsURL
-                }/draft/preview?id=${proposal.id}`);
-            } else {
-                // FIXME: UX needed
-                this.disabled = false;
-            }
-        } else {
-            // Not logged in, save it to localStorage and redirect to
-            // preview page as "local-draft"
-            console.log(JSON.stringify(draft));
-            this.savetoLocalStorage(draft);
+        const resp = await model.postDraftProposal(draft);
+        if (resp.ok) {
+            const proposal = await resp.json();
             utils.redirect(`${
                 config.grantProposalsURL
-            }/draft/preview?id=local-draft`);
+            }/draft/preview?id=${proposal.id}`);
+        } else {
+            // TODO: UX for bad request posting draft
+            console.warn("Bad request posting draft", draft);
         }
+
     }
 
+    wrapAuthentication(action: CallableFunction) {
+        const callback = (state: any) => {
+            this.user = state.user;
+            console.log(state);
+            console.log(state.user);
+            action();
+        }
+
+
+        this.dispatchEvent(new CustomEvent(
+            config.event.authenticationRequired,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    callback,
+                    content: authDialogContent,
+                    actions: {
+                        dismiss: {
+                            handler: () => {},
+                            label: "Continue using local storage"
+                        }
+                    }
+                },
+            }
+        ));
+    }
+    
     savetoLocalStorage(proposal: DraftProposal) {
         window.localStorage.setItem(
             config.proposalsDraftLocalDraftKey,

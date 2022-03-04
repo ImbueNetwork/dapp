@@ -20,12 +20,12 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id: string, done) => {
     try {
-        const user = await db.select().from<User>("usr").where({"id": Number(id)}).first();
+        const user = await db.select().from<User>("users").where({"id": Number(id)}).first();
         if (!user) {
             done(new Error(`No user found with id: ${id}`));
         } else {
-            user.web3Accounts = await db<Web3Account>("web3_account").select().where({
-                usr_id: user.id
+            user.web3Accounts = await db<Web3Account>("web3_accounts").select().where({
+                user_id: user.id
             });
             return done(null, user);
         }

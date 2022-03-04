@@ -54,10 +54,7 @@ router.get("/:id", (req, res, next) => {
     });
 });
 
-const projectKeyset = new Set([
-    "name", "logo", "description", "website", "category", "required_funds",
-    "owner", "usr_id", "milestones",
-]);
+
 
 /**
  * TODO: json schema or something better instead.
@@ -68,18 +65,6 @@ const validateProposal = (proposal: models.GrantProposal) => {
     }
 
     const entries = Object.entries(proposal);
-
-    if (
-        entries.filter(([k,v]) => {
-            // must be from keyset
-            return !projectKeyset.has(k)
-        }).length
-    ) {
-        throw new Error(
-            `Proposal entries can only be one of [${[...projectKeyset].join(", ")}]`
-        )
-    }
-
     if (entries.filter(([_,v]) => {
             // undefined not allowed
             return v === void 0;
@@ -126,7 +111,7 @@ router.post("/", (req, res, next) => {
                 category,
                 required_funds,
                 owner,
-                usr_id: (req.user as any).id,
+                user_id: (req.user as any).id,
             })(tx);
     
             if (!project.id) {
@@ -175,12 +160,13 @@ router.put("/:id", (req, res, next) => {
         description,
         website,
         category,
+        chain_project_id,
         required_funds,
         owner,
         milestones,
     } = req.body.proposal as models.GrantProposal;
 
-    const usr_id = (req.user as any).id;
+    const user_id = (req.user as any).id;
 
     db.transaction(async tx => {
         try {
@@ -191,7 +177,7 @@ router.put("/:id", (req, res, next) => {
                 return res.status(404).end();
             }
 
-            if (exists.usr_id !== usr_id) {
+            if (exists.user_id !== user_id) {
                 return res.status(403).end();
             }
 
@@ -201,9 +187,10 @@ router.put("/:id", (req, res, next) => {
                 description,
                 website,
                 category,
+                chain_project_id,
                 required_funds,
                 owner,
-                // usr_id,
+                // user_id,
             })(tx);
     
             if (!project.id) {

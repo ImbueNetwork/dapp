@@ -35,7 +35,7 @@ template.innerHTML = `
 
 
 export default class Preview extends HTMLElement {
-    draft?: DraftProposal | Proposal;
+    project?: Proposal;
     address?: string;
     user?: User | null;
     private [CONTENT]: DocumentFragment;
@@ -63,52 +63,52 @@ export default class Preview extends HTMLElement {
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({ mode: "open" });
         this[CONTENT] = template.content.cloneNode(true) as DocumentFragment
 
         this.$tabBar =
-        this[CONTENT].getElementById("tab-bar") as
+            this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
         this.$dialog =
             this[CONTENT].getElementById("dialog") as
-                Dialog;
+            Dialog;
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-                HTMLElement;
+            HTMLElement;
 
         this.$edit =
             this[CONTENT].getElementById("edit") as
-                HTMLAnchorElement;
+            HTMLAnchorElement;
         this.$save =
             this[CONTENT].getElementById("save") as
-                HTMLButtonElement;
+            HTMLButtonElement;
         this.$finalize =
             this[CONTENT].getElementById("finalize") as
-                HTMLButtonElement;
+            HTMLButtonElement;
 
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-                HTMLElement;
+            HTMLElement;
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-                HTMLElement;
+            HTMLElement;
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-                HTMLElement;
+            HTMLElement;
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-                HTMLImageElement;
+            HTMLImageElement;
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-                HTMLElement;
+            HTMLElement;
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-                HTMLOListElement;
+            HTMLOListElement;
         this.$actionButtonContainers =
             Array.from(
                 this.$save.parentElement?.parentElement?.children as
-                    HTMLCollection
+                HTMLCollection
             ) as HTMLElement[];
     }
 
@@ -155,14 +155,17 @@ export default class Preview extends HTMLElement {
          * This is just for a11y. Do not use this value unless you know what
          * you're doing.
          */
-        this.$edit.href = `${config.context}${
-            config.grantProposalsURL
-        }/draft?id=${this.projectId}`;
+        this.$edit.href = `${config.context}${config.grantProposalsURL
+            }/draft?id=${this.projectId}`;
     }
 
     async init(request: ImbueRequest) {
+
         const projectId = this.projectId;
-        
+        this.user = await request.user;
+        this.accounts = await request.accounts;
+        this.apiInfo = await request.apiInfo;
+
         if (!projectId) {
             /**
              * FIXME: Just redirect back to listing page? Or
@@ -171,18 +174,13 @@ export default class Preview extends HTMLElement {
             utils.redirect(config.grantProposalsURL);
             return;
         }
-
-        const isLocalDraft = projectId === "local-draft";
-
-        this.toggleSave = isLocalDraft;
-
         /**
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
          */
-        await this.fetchDraft(projectId).then(draft => {
-            if (draft) {
-                this.renderDraft(draft);
+        await this.fetchProject(projectId).then(project => {
+            if (project) {
+                this.renderProject(project);
             } else {
                 /**
                  * Same as FIXME above. Do we want a 404 page here, dialog,
@@ -193,9 +191,7 @@ export default class Preview extends HTMLElement {
             }
         });
 
-        this.accounts = await request.accounts;
-        this.user = await request.user;
-        this.apiInfo = await request.apiInfo;
+
 
         if (this.user) {
             /**
@@ -214,69 +210,12 @@ export default class Preview extends HTMLElement {
 
             /**
              * Should only be able to edit or finalize if user
-             * is the usr_id on the project.
+             * is the user_id on the project.
              */
-            if (!isLocalDraft && this.user?.id !== this.draft?.usr_id) {
+            if (this.user?.id !== this.project?.user_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
-
-            if (isLocalDraft) {
-                // save and redirect to legit URL
-                if (!this.draft) {
-                    // TODO: shouldn't happen, but UX if it does
-                    return;
-                }
-
-                model.postDraftProposal(this.draft).then(async resp => {
-                    if (resp.ok) {
-                        // redirect
-                        const project = await resp.json();
-                        utils.redirect(`${
-                            config.grantProposalsURL
-                        }/draft/preview?id=${
-                            project.id
-                        }`);
-                    } else {
-                        this.dispatchEvent(utils.badRouteEvent("server-error"));
-                        return;
-                    }
-                })
-            }
-        }
-
-        if (isLocalDraft) {
-            /**
-             * `localStorage` draft. User may or may not be logged in.
-             * 
-             * This is a special case where the user was probably
-             * redirected here from the grant-submission form to "preview"
-             * their draft. But there's nothing stopping someone from arriving
-             * here directly (i.e., potentially even logged in).
-             * 
-             * All `local-draft` it means in any case is that they have an
-             * unsaved draft in `localStorage` and they specifically navigated
-             * here to view it and edit/save/finalize.
-             * 
-             * So, in this case, we want to provide a nice and simple
-             * dialog that explains that their draft is only saved
-             * temporarily in the browser's local storage. Don't mention
-             * authentication at this point. We can launch that dialog
-             * when they click "save" or "finalize!".
-             * 
-             * Here we want to give them both an "edit" and a "save" button.
-             */
-            this.$dialog.create(
-                "Note",
-                localDraftDialogContent,
-                {
-                    "dismiss": {
-                        label: "Got it",
-                        handler: () => {}
-                    }
-                },
-                false
-            );
         }
     }
 
@@ -297,32 +236,15 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async fetchDraft(projectId: string) {
-        if (this.draft) {
-            return this.draft;
+    async fetchProject(projectId: string) {
+        if (this.project) {
+            return this.project;
         }
-
-        if (projectId === "local-draft") {
-            const draftSrc =
-                window.localStorage[config.proposalsDraftLocalDraftKey];
-            
-            if (draftSrc) {
-                const draft: DraftProposal = JSON.parse(draftSrc);
-                this.draft = draft;
-                return this.draft;
-            }
-            // redirect to "new" grant submission, because there isn't a reason
-            // to be here without something to view.
-            utils.redirect(`${config.grantProposalsURL}/draft`);
-            return;
-        }
-
         const resp = await model.fetchProject(projectId);
         if (resp.ok) {
-            this.draft = await resp.json();
-            return this.draft;
+            this.project = await resp.json();
+            return this.project;
         }
-        // TODO: 404 or dialog UX
     }
 
     get projectId() {
@@ -330,8 +252,8 @@ export default class Preview extends HTMLElement {
             .split("?")[1]
             ?.split("&")
             .map(str => str.split("="))
-            .find(([k,_]) => k === "id");
-            
+            .find(([k, _]) => k === "id");
+
         if (entry) {
             return entry[1];
         }
@@ -352,9 +274,8 @@ export default class Preview extends HTMLElement {
             e.preventDefault();
 
             const edit = () => {
-                utils.redirect(`${
-                    config.grantProposalsURL
-                }/draft?id=${this.projectId}`);
+                utils.redirect(`${config.grantProposalsURL
+                    }/draft?id=${this.projectId}`);
             };
 
             if (this.projectId === "local-draft" || this.user) {
@@ -366,16 +287,15 @@ export default class Preview extends HTMLElement {
 
         this.$save.addEventListener("click", e => {
             const save = async () => {
-                if (this.draft) {
-                    const resp = await model.postDraftProposal(this.draft);
+                if (this.project) {
+                    const resp = await model.postDraftProposal(this.project);
                     if (resp.ok) {
                         const project = await resp.json();
-                        utils.redirect(`${
-                            config.grantProposalsURL
-                        }/draft/preview?id=${project.id}`);
+                        utils.redirect(`${config.grantProposalsURL
+                            }/draft/preview?id=${project.id}`);
                     } else {
                         // TODO: UX for bad request posting draft
-                        console.warn("Bad request posting draft", this.draft);
+                        console.warn("Bad request posting draft", this.project);
                     }
                 } else {
                     // shouldn't happen?
@@ -397,21 +317,19 @@ export default class Preview extends HTMLElement {
                  * which would redirect them to this "preview" page, but with a
                  * legit `projectId` instead of `local-draft`.
                  */
-                 save();
+                save();
             }
         });
 
         this.$finalize.addEventListener("click", e => {
-            const userOwnsDraft = this.projectId === "local-draft"
-                || (this.user && (this.user.id === this.draft?.usr_id));
-
-            if (userOwnsDraft) {
-                this.finalizeWorkflow();
-            } else if (!this.user) {
+            const userOwnsDraft = (this.user && (this.user.id === this.project?.user_id));
+            if (!this.user && !userOwnsDraft) {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
                 });
+            } else {
+                this.finalizeWorkflow();
             }
         });
     }
@@ -432,7 +350,7 @@ export default class Preview extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => {},
+                            handler: () => { },
                             label: "Continue using local storage"
                         }
                     }
@@ -441,122 +359,128 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async finalizeWorkflow(
-        event: string = "begin",
-        state?: Record<string,any>
-    ): Promise<void> {
-        switch(event) {
-        case "account-chosen":
-        {
-            const extrinsic = state?.extrinsic as
-                SubmittableExtrinsic<"promise", ISubmittableResult>;
-            const account = state?.account as
-                InjectedAccountWithMeta;
-            const injector = await web3FromSource(account.meta.source);
-
-            const txHash = await extrinsic.signAndSend(
-                account.address,
-                {signer: injector.signer},
-                ({ status }) => {
-                    console.log(status);
-                    this.finalizeWorkflow(status.type);
-                    if (status.isInBlock) {
-                        const $inBlock =
-                            this.shadowRoot?.getElementById("in-block") as
-                                HTMLElement;
-                        $inBlock.innerText = `Completed at block hash #${
-                            status.asInBlock.toString()
-                        }`;
-                        $inBlock.classList.remove("hidden");
-                        console.log($inBlock.textContent);
-                    } else {
-                        console.log(`Current status: ${status.type}`);
-                    }
-                }
-            ).catch((e: any) => {
-                this.errorNotification(e);
-            });
-            console.log(`Transaction hash: ${txHash}`);
-        } break;
-        case "extrinsic-created":
-        {
-            this.dispatchEvent(new CustomEvent(
-                config.event.accountChoice,
-                {
-                    bubbles: true,
-                    composed: true,
-                    detail: (account?: InjectedAccountWithMeta) => {
-                        if (account) {
-                            this.finalizeWorkflow(
-                                "account-chosen",
-                                {...state, account},
-                            );
-                        }
-                    }
-                }
-            ));
-        } break;
-        case "begin":
-        {
-            if (!this.draft) {
-                // FIXME: UX
-                return;
-            }
-
-            const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
-                this.draft.name,
-                this.draft.logo,
-                this.draft.description,
-                this.draft.website,
-                this.draft.milestones,
-                this.draft.required_funds,
-            );
-
-            if (!extrinsic) {
-                // FIXME: UX
-                return;
-            }
-
-            return this.finalizeWorkflow(
-                "extrinsic-created",
-                {...state, extrinsic},
-            );
-        } break;
-        default:
-            this.toggleEdit = false;
-            this.toggleSave = false;
-            this.$finalize.disabled = true;
-            if (event === "Finalized") {
-                this.$finalize.classList.remove("blob");
-                this.$finalize.classList.add("finalized");
-            } else {
-                this.$finalize.classList.add("blob");
-            }
-            this.$finalize.innerText = event;
+    async updateGrantProposal(proposal: DraftProposal, id: string | number) {
+        const resp = await model.updateProposal(proposal, id);
+        if (resp.ok) {
+            const proposal: Proposal = await resp.json();
+            return proposal;
         }
     }
 
-    renderDraft(draft: DraftProposal | Proposal) {
-        if (!draft) {
+    async finalizeWorkflow(
+        event: string = "begin",
+        state?: Record<string, any>
+    ): Promise<void> {
+        const api = this.apiInfo?.api;
+        switch (event) {
+            case "begin":
+                {
+                    if (!this.project) {
+                        return;
+                    }
+                    this.$finalize.disabled = true;
+                    this.$finalize.classList.add("blob");
+                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
+                        this.project.name,
+                        this.project.logo,
+                        this.project.description,
+                        this.project.website,
+                        this.project.milestones,
+                        this.project.required_funds,
+                    );
+
+                    if (!extrinsic) {
+                        // FIXME: UX
+                        return;
+                    }
+
+                    return this.finalizeWorkflow(
+                        "extrinsic-created",
+                        { ...state, extrinsic },
+                    );
+                } break;
+            case "extrinsic-created":
+                {
+                    this.dispatchEvent(new CustomEvent(
+                        config.event.accountChoice,
+                        {
+                            bubbles: true,
+                            composed: true,
+                            detail: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.finalizeWorkflow(
+                                        "account-chosen",
+                                        { ...state, account },
+                                    );
+                                }
+                            }
+                        }
+                    ));
+                } break;
+            case "account-chosen":
+                {
+                    const extrinsic = state?.extrinsic as
+                        SubmittableExtrinsic<"promise", ISubmittableResult>;
+                    const account = state?.account as
+                        InjectedAccountWithMeta;
+                    const injector = await web3FromSource(account.meta.source);
+                    const txHash = await extrinsic.signAndSend(
+                        account.address,
+                        { signer: injector.signer },
+                        ({ status }) => {
+                            api?.query.system.events((events: any) => {
+                                if (events) {
+                                    // Loop through the Vec<EventRecord>
+                                    events.forEach((record: any) => {
+                                        // Extract the phase, event and the event types
+                                        const { event, phase } = record;
+                                        const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
+                                        if (projectCreated) {
+
+                                            const types = event.typeDef;
+                                            const createdAccountId = event.data[0];
+                                            const createdProjectId = parseInt(event.data[2].toString());
+                                            if (createdAccountId == account.address && this.project && this.projectId) {
+                                                this.project.chain_project_id = createdProjectId;
+                                                this.updateGrantProposal(this.project, this.projectId);
+                                                this.toggleEdit = false;
+                                                this.toggleSave = false;
+                                                // this.$finalize.classList.remove("blob");
+                                                this.$finalize.classList.add("finalized");
+                                                this.$finalize.innerText = "Proposal Created";
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    ).catch((e: any) => {
+                        this.errorNotification(e);
+                    });
+                } break;
+        }
+    }
+
+    renderProject(project: DraftProposal | Proposal) {
+        if (!project) {
             throw new Error(
                 "Attempt to render nonexistent draft."
             );
         }
 
         // this.$["about-project"].innerText = proposal.name;
-        this.$projectName.innerText = draft.name;
+        this.$projectName.innerText = project.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${draft.website}" target="_blank">${
-                draft.website
+            <a href="${project.website}" target="_blank">${project.website
             }</a>
         `;
         this.$projectDescription.innerHTML =
-            draft.description && marked.parse(draft.description);
-        this.$projectLogo.setAttribute("srcset", draft.logo);
-        this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
+            project.description && marked.parse(project.description);
+        this.$projectLogo.setAttribute("srcset", project.logo);
+        this.$fundsRequired.innerText = String(project.required_funds / 1e12);
 
         this.$milestones.innerHTML = "";
-        draft.milestones.forEach(milestone => {
+        project.milestones.forEach(milestone => {
             this.$milestones.appendChild(
                 document.createRange().createContextualFragment(`
                     <li class="mdc-deprecated-list-item" tabindex="0">
@@ -565,9 +489,8 @@ export default class Preview extends HTMLElement {
                             <i class="material-icons">pending_actions</i>
                         </span>
                         <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${
-                                milestone.name
-                            }</span>
+                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name
+                    }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>

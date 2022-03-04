@@ -3,8 +3,12 @@ import { marked } from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
 import "@pojagi/hoquet/lib/dialog/dialog";
 import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
+
 import authDialogContent from "./auth-dialog-content.html";
 import { MDCTabBar } from "@material/tab-bar";
+import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
+import type { ISubmittableResult } from "@polkadot/types/types";
+import { web3FromSource } from "@polkadot/extension-dapp";
 
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
@@ -17,8 +21,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getWeb3Accounts, signWeb3Challenge } from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
-import type { ImbueRequest } from "../../dapp";
-
+import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
 
 const CONTENT = Symbol();
 
@@ -43,6 +46,7 @@ export default class Detail extends HTMLElement {
     $projectLogo: HTMLImageElement;
     $fundsRequired: HTMLElement;
     $milestones: HTMLOListElement;
+    apiInfo?: polkadotJsApiInfo;
 
     private [CONTENT]: DocumentFragment;
 
@@ -111,6 +115,8 @@ export default class Detail extends HTMLElement {
             return;
         }
 
+        this.apiInfo = await request.apiInfo;
+
         await fetchProject(projectId).then(async resp => {
             if (resp.ok) {
                 this.renderProject(await resp.json());
@@ -133,19 +139,7 @@ export default class Detail extends HTMLElement {
         });
 
         this.$contribute.addEventListener("click", e => {
-            console.log("***************** cick *****************");
-
-            const contribute = async () => {
-                console.log("***************** CONTRIBUTION LOGIC HERE *****************");
-            };
-
-            if (!this.user) {
-                this.wrapAuthentication(() => {
-                    contribute();
-                });
-            } else {
-                contribute();
-            }
+            this.contribute();
         });
     }
 
@@ -216,6 +210,101 @@ export default class Detail extends HTMLElement {
     }
 
 
+    async contribute(
+        event: string = "begin",
+        state?: Record<string,any>
+    ): Promise<void> {
+        switch(event) {
+            case "account-chosen":
+            {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
+
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({ status }) => {
+                        console.log(status);
+                        this.contribute(status.type);
+                        if (status.isInBlock) {
+                            const $inBlock =
+                                this.shadowRoot?.getElementById("in-block") as
+                                    HTMLElement;
+                            $inBlock.innerText = `Completed at block hash #${
+                                status.asInBlock.toString()
+                            }`;
+                            $inBlock.classList.remove("hidden");
+                            console.log($inBlock.textContent);
+                        } else {
+                            console.log(`Current status: ${status.type}`);
+                        }
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+                console.log(`Transaction hash: ${txHash}`);
+            } break;
+            case "extrinsic-created":
+            {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.contribute(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
+                            }
+                        }
+                    }
+                ));
+            } break;
+            case "begin":
+            {
+
+                const hardcodedProjectID = 0
+                const hardcodedContribution = 1 * 1e12
+                const extrinsic = this.apiInfo?.api.tx.imbueProposals.contribute(
+                    hardcodedProjectID,
+                    hardcodedContribution
+                );
+
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
+                }
+
+                return this.contribute(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+
+        }
+    }
+
+    errorNotification(e: Error) {
+        console.log(e);
+        this.dispatchEvent(new CustomEvent(
+            config.event.notification,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    title: e.name,
+                    content: e.message,
+                    actions: {},
+                    isDismissable: true,
+                }
+            }
+        ));
+    }
 }
 
 window.customElements.define("imbu-proposals-detail", Detail);

@@ -161,8 +161,9 @@ export default class Preview extends HTMLElement {
     }
 
     async init(request: ImbueRequest) {
-        const projectId = this.projectId;
         
+        const projectId = this.projectId;
+
         if (!projectId) {
             /**
              * FIXME: Just redirect back to listing page? Or
@@ -453,12 +454,38 @@ export default class Preview extends HTMLElement {
             const account = state?.account as
                 InjectedAccountWithMeta;
             const injector = await web3FromSource(account.meta.source);
-
+            
             const txHash = await extrinsic.signAndSend(
                 account.address,
                 {signer: injector.signer},
                 ({ status }) => {
                     console.log(status);
+                    const api = this.apiInfo?.api;
+                    api.query.system.events((events) => {
+                        // Loop through the Vec<EventRecord>
+                        events.forEach((record) => {
+                        // Extract the phase, event and the event types
+                        const { event, phase } = record;
+                        const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
+                        if (projectCreated) {
+
+                            console.log(projectCreated);
+                            console.log(event.data);
+                            const types = event.typeDef;
+                            const createdAccountId = event.data[0].toString();
+                            const createdProjectId = event.data[2].toString();
+
+                            if (event.data[0] == account.address) {
+                                console.log("************** matching accounts **************");
+                                // Update project ID in the DB 
+                                console.log(`User ${createdAccountId} created a project with ID ${createdProjectId}`);
+                                console.log(`Current account is ${account.address.toString()}`);
+                                console.log(account);
+                                console.log(account.address);
+                            }
+                        }
+                        });
+                    });
                     this.finalizeWorkflow(status.type);
                     if (status.isInBlock) {
                         const $inBlock =

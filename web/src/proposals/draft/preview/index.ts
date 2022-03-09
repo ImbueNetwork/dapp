@@ -35,7 +35,7 @@ template.innerHTML = `
 
 
 export default class Preview extends HTMLElement {
-    draft?: DraftProposal | Proposal;
+    draft?: DraftProposal;
     address?: string;
     user?: User | null;
     private [CONTENT]: DocumentFragment;
@@ -172,11 +172,6 @@ export default class Preview extends HTMLElement {
             utils.redirect(config.grantProposalsURL);
             return;
         }
-
-        const isLocalDraft = projectId === "local-draft";
-
-        this.toggleSave = isLocalDraft;
-
         /**
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
@@ -217,68 +212,17 @@ export default class Preview extends HTMLElement {
              * Should only be able to edit or finalize if user
              * is the usr_id on the project.
              */
-            if (!isLocalDraft && this.user?.id !== this.draft?.usr_id) {
+            if (this.user?.id !== this.draft?.usr_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
-
-            if (isLocalDraft) {
-                // save and redirect to legit URL
-                if (!this.draft) {
-                    // TODO: shouldn't happen, but UX if it does
-                    return;
-                }
-
-                model.postDraftProposal(this.draft).then(async resp => {
-                    if (resp.ok) {
-                        // redirect
-                        const project = await resp.json();
-                        utils.redirect(`${
-                            config.grantProposalsURL
-                        }/draft/preview?id=${
-                            project.id
-                        }`);
-                    } else {
-                        this.dispatchEvent(utils.badRouteEvent("server-error"));
-                        return;
-                    }
-                })
-            }
         }
 
-        if (isLocalDraft) {
-            /**
-             * `localStorage` draft. User may or may not be logged in.
-             * 
-             * This is a special case where the user was probably
-             * redirected here from the grant-submission form to "preview"
-             * their draft. But there's nothing stopping someone from arriving
-             * here directly (i.e., potentially even logged in).
-             * 
-             * All `local-draft` it means in any case is that they have an
-             * unsaved draft in `localStorage` and they specifically navigated
-             * here to view it and edit/save/finalize.
-             * 
-             * So, in this case, we want to provide a nice and simple
-             * dialog that explains that their draft is only saved
-             * temporarily in the browser's local storage. Don't mention
-             * authentication at this point. We can launch that dialog
-             * when they click "save" or "finalize!".
-             * 
-             * Here we want to give them both an "edit" and a "save" button.
-             */
-            this.$dialog.create(
-                "Note",
-                localDraftDialogContent,
-                {
-                    "dismiss": {
-                        label: "Got it",
-                        handler: () => {}
-                    }
-                },
-                false
-            );
-        }
+        console.log("************* attempting to update project *************");
+        console.log(this.projectId);
+        this.draft?.name="update"
+        this.updateGrantProposal(this.draft,this.projectId)
+
     }
 
     errorNotification(e: Error) {
@@ -302,28 +246,11 @@ export default class Preview extends HTMLElement {
         if (this.draft) {
             return this.draft;
         }
-
-        if (projectId === "local-draft") {
-            const draftSrc =
-                window.localStorage[config.proposalsDraftLocalDraftKey];
-            
-            if (draftSrc) {
-                const draft: DraftProposal = JSON.parse(draftSrc);
-                this.draft = draft;
-                return this.draft;
-            }
-            // redirect to "new" grant submission, because there isn't a reason
-            // to be here without something to view.
-            utils.redirect(`${config.grantProposalsURL}/draft`);
-            return;
-        }
-
         const resp = await model.fetchProject(projectId);
         if (resp.ok) {
             this.draft = await resp.json();
             return this.draft;
         }
-        // TODO: 404 or dialog UX
     }
 
     get projectId() {
@@ -404,16 +331,15 @@ export default class Preview extends HTMLElement {
 
         this.$finalize.addEventListener("click", e => {
             const userOwnsDraft = this.projectId === "local-draft"
-                || (this.user && (this.user.id === this.draft?.usr_id));
+            || (this.user && (this.user.id === this.draft?.usr_id));
 
-            if (userOwnsDraft) {
-                this.finalizeWorkflow();
-            } else if (!this.user) {
+            if (!this.user)  {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
                 });
             }
+            this.finalizeWorkflow();
         });
     }
 
@@ -442,11 +368,70 @@ export default class Preview extends HTMLElement {
         ));
     }
 
+    async updateGrantProposal(proposal: DraftProposal, id: string | number) {
+
+        console.log("************* updating project ***********");
+        console.log(id);
+        console.log(proposal);
+
+
+        const resp = await model.updateProposal(proposal, id);
+
+        if (resp.ok) {
+            const proposal: Proposal = await resp.json();
+            return proposal;
+        }
+    }
+
     async finalizeWorkflow(
         event: string = "begin",
         state?: Record<string,any>
     ): Promise<void> {
+
         switch(event) {
+        case "begin":
+            {
+                if (!this.draft) {
+                    return;
+                }
+    
+                const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
+                    this.draft.name,
+                    this.draft.logo,
+                    this.draft.description,
+                    this.draft.website,
+                    this.draft.milestones,
+                    this.draft.required_funds,
+                );
+    
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
+                }
+    
+                return this.finalizeWorkflow(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            } break;
+        case "extrinsic-created":
+            {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.finalizeWorkflow(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
+                            }
+                        }
+                    }
+                ));
+            } break;
         case "account-chosen":
         {
             const extrinsic = state?.extrinsic as
@@ -454,7 +439,6 @@ export default class Preview extends HTMLElement {
             const account = state?.account as
                 InjectedAccountWithMeta;
             const injector = await web3FromSource(account.meta.source);
-            
             const txHash = await extrinsic.signAndSend(
                 account.address,
                 {signer: injector.signer},
@@ -477,6 +461,8 @@ export default class Preview extends HTMLElement {
 
                             if (event.data[0] == account.address) {
                                 console.log("************** matching accounts **************");
+                                this.draft.id = createdProjectId;
+                                this.updateGrantProposal(this.draft, this.projectId);
                                 // Update project ID in the DB 
                                 console.log(`User ${createdAccountId} created a project with ID ${createdProjectId}`);
                                 console.log(`Current account is ${account.address.toString()}`);
@@ -504,50 +490,6 @@ export default class Preview extends HTMLElement {
                 this.errorNotification(e);
             });
             console.log(`Transaction hash: ${txHash}`);
-        } break;
-        case "extrinsic-created":
-        {
-            this.dispatchEvent(new CustomEvent(
-                config.event.accountChoice,
-                {
-                    bubbles: true,
-                    composed: true,
-                    detail: (account?: InjectedAccountWithMeta) => {
-                        if (account) {
-                            this.finalizeWorkflow(
-                                "account-chosen",
-                                {...state, account},
-                            );
-                        }
-                    }
-                }
-            ));
-        } break;
-        case "begin":
-        {
-            if (!this.draft) {
-                // FIXME: UX
-                return;
-            }
-
-            const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
-                this.draft.name,
-                this.draft.logo,
-                this.draft.description,
-                this.draft.website,
-                this.draft.milestones,
-                this.draft.required_funds,
-            );
-
-            if (!extrinsic) {
-                // FIXME: UX
-                return;
-            }
-
-            return this.finalizeWorkflow(
-                "extrinsic-created",
-                {...state, extrinsic},
-            );
         } break;
         default:
             this.toggleEdit = false;

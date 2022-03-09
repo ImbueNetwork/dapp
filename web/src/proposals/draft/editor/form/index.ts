@@ -15,7 +15,7 @@ import * as model from "../../../../model";
 import * as config from "../../../../config";
 import * as utils from '../../../../utils';
 import { ImbueRequest } from '../../../../dapp';
-
+import authDialogContent from "./auth-dialog-content.html";
 
 declare global {
     interface ErrorConstructor {
@@ -534,36 +534,61 @@ export default class Form extends HTMLElement {
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
         // Are we logged in?
-        if (this.user) {
-            // if yes, go ahead and post the draft with the `usr_id`
-            draft.usr_id = this.user.id;
-            let proposal;
+        if (!this.user) {
+            this.wrapAuthentication(() => {
+                this.submitGrantProposal(draft,account);
+            });
+        }
+        // if yes, go ahead and post the draft with the `usr_id`
+        draft.usr_id = this.user.id;
+        let proposal;
 
-            if (this.projectId && this.projectId !== "local-draft") {
-                proposal = await this.updateGrantProposal(draft, this.projectId);
-            } else {
-                proposal = await this.postGrantProposal(draft);
-            }
-
-            if (proposal) {
-                utils.redirect(`${
-                    config.grantProposalsURL
-                }/draft/preview?id=${proposal.id}`);
-            } else {
-                // FIXME: UX needed
-                this.disabled = false;
-            }
+        if (this.projectId && this.projectId !== "local-draft") {
+            proposal = await this.updateGrantProposal(draft, this.projectId);
         } else {
-            // Not logged in, save it to localStorage and redirect to
-            // preview page as "local-draft"
-            console.log(JSON.stringify(draft));
-            this.savetoLocalStorage(draft);
+            proposal = await this.postGrantProposal(draft);
+        }
+
+        if (proposal) {
             utils.redirect(`${
                 config.grantProposalsURL
-            }/draft/preview?id=local-draft`);
+            }/draft/preview?id=${proposal.id}`);
+        } else {
+            // FIXME: UX needed
+            this.disabled = false;
         }
     }
 
+    wrapAuthentication(action: CallableFunction) {
+        const callback = (state: any) => {
+            this.user = state.user;
+            console.log("******************* user at authentication is ***************");
+            console.log(this.user);
+            console.log(state);
+            console.log(state.user);
+            action();
+        }
+
+
+        this.dispatchEvent(new CustomEvent(
+            config.event.authenticationRequired,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    callback,
+                    content: authDialogContent,
+                    actions: {
+                        dismiss: {
+                            handler: () => {},
+                            label: "Continue using local storage"
+                        }
+                    }
+                },
+            }
+        ));
+    }
+    
     savetoLocalStorage(proposal: DraftProposal) {
         window.localStorage.setItem(
             config.proposalsDraftLocalDraftKey,

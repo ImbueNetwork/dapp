@@ -55,7 +55,7 @@ router.get("/:id", (req, res, next) => {
 });
 
 const projectKeyset = new Set([
-    "name", "logo", "description", "website", "category", "required_funds",
+    "id","name", "logo", "description", "website", "category", "required_funds",
     "owner", "usr_id", "milestones",
 ]);
 
@@ -159,7 +159,7 @@ router.put("/:id", (req, res, next) => {
         return res.status(401).end();
     }
 
-    const id = req.params.id;
+    const old_id = req.params.id;
 
     try {
         validateProposal(req.body.proposal);
@@ -181,11 +181,12 @@ router.put("/:id", (req, res, next) => {
     } = req.body.proposal as models.GrantProposal;
 
     const usr_id = (req.user as any).id;
+    const new_id = (req.body.proposal).id
 
     db.transaction(async tx => {
         try {
             // ensure the project exists first
-            const exists = await models.fetchProject(id)(tx);
+            const exists = await models.fetchProject(old_id)(tx);
 
             if (!exists) {
                 return res.status(404).end();
@@ -195,7 +196,8 @@ router.put("/:id", (req, res, next) => {
                 return res.status(403).end();
             }
 
-            const project = await models.updateProject(id, {
+            const project = await models.updateProject(old_id, {
+                id: new_id,
                 name,
                 logo,
                 description,
@@ -213,7 +215,7 @@ router.put("/:id", (req, res, next) => {
             }
     
             // drop then recreate
-            await models.deleteMilestones(id)(tx);
+            await models.deleteMilestones(old_id)(tx);
 
             const pkg: ProjectPkg = {
                 ...project,

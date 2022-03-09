@@ -540,23 +540,24 @@ export default class Form extends HTMLElement {
             });
         }
         // if yes, go ahead and post the draft with the `usr_id`
-        draft.usr_id = this.user.id;
+        draft.usr_id = this.user?.id;
         let proposal;
 
-        if (this.projectId && this.projectId !== "local-draft") {
-            proposal = await this.updateGrantProposal(draft, this.projectId);
-        } else {
-            proposal = await this.postGrantProposal(draft);
-        }
+        console.log("*************** Draft is ***************");
+        console.log(draft);
 
-        if (proposal) {
-            utils.redirect(`${
-                config.grantProposalsURL
-            }/draft/preview?id=${proposal.id}`);
-        } else {
-            // FIXME: UX needed
-            this.disabled = false;
-        }
+        console.log("*************** user id is ***************");
+        console.log(this.user?.id);
+        proposal = await model.postDraftProposal(draft);
+        
+        // if (proposal) {
+        //     utils.redirect(`${
+        //         config.grantProposalsURL
+        //     }/draft/preview?id=${proposal.id}`);
+        // } else {
+        //     // FIXME: UX needed
+        //     this.disabled = false;
+        // }
     }
 
     wrapAuthentication(action: CallableFunction) {

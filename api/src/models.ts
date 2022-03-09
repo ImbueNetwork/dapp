@@ -152,9 +152,13 @@ export const insertMilestones = (
         tx<Milestone>("milestone").insert(values).returning("*");
 };
 
-export const deleteMilestones = (project_id: string | number) =>
-    (tx: Knex.Transaction) =>
-        tx<Milestone>("milestone").delete().where({project_id});
+export const deleteMilestones = (project_id: string | number) => 
+
+    (tx: Knex.Transaction) => {
+        console.log("************** running delete function **************");
+        console.log(project_id);
+        tx<Milestone>("milestone").delete().where({project_id})};
+
 
 export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) => 

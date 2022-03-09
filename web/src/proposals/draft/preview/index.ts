@@ -35,7 +35,7 @@ template.innerHTML = `
 
 
 export default class Preview extends HTMLElement {
-    draft?: DraftProposal;
+    project?: Proposal;
     address?: string;
     user?: User | null;
     private [CONTENT]: DocumentFragment;
@@ -176,9 +176,9 @@ export default class Preview extends HTMLElement {
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
          */
-        await this.fetchDraft(projectId).then(draft => {
-            if (draft) {
-                this.renderDraft(draft);
+        await this.fetchProject(projectId).then(project => {
+            if (project) {
+                this.renderProject(project);
             } else {
                 /**
                  * Same as FIXME above. Do we want a 404 page here, dialog,
@@ -212,16 +212,16 @@ export default class Preview extends HTMLElement {
              * Should only be able to edit or finalize if user
              * is the usr_id on the project.
              */
-            if (this.user?.id !== this.draft?.usr_id) {
+            if (this.user?.id !== this.project?.usr_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
         }
 
-        console.log("************* attempting to update project *************");
-        console.log(this.projectId);
-        this.draft?.name="update"
-        this.updateGrantProposal(this.draft,this.projectId)
+
+        console.log("************ this user is **********");
+        console.log(this.user);
+        console.log(!this.user);
 
     }
 
@@ -242,14 +242,14 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async fetchDraft(projectId: string) {
-        if (this.draft) {
-            return this.draft;
+    async fetchProject(projectId: string) {
+        if (this.project) {
+            return this.project;
         }
         const resp = await model.fetchProject(projectId);
         if (resp.ok) {
-            this.draft = await resp.json();
-            return this.draft;
+            this.project = await resp.json();
+            return this.project;
         }
     }
 
@@ -294,8 +294,8 @@ export default class Preview extends HTMLElement {
 
         this.$save.addEventListener("click", e => {
             const save = async () => {
-                if (this.draft) {
-                    const resp = await model.postDraftProposal(this.draft);
+                if (this.project) {
+                    const resp = await model.postDraftProposal(this.project);
                     if (resp.ok) {
                         const project = await resp.json();
                         utils.redirect(`${
@@ -303,7 +303,7 @@ export default class Preview extends HTMLElement {
                         }/draft/preview?id=${project.id}`);
                     } else {
                         // TODO: UX for bad request posting draft
-                        console.warn("Bad request posting draft", this.draft);
+                        console.warn("Bad request posting draft", this.project);
                     }
                 } else {
                     // shouldn't happen?
@@ -330,16 +330,20 @@ export default class Preview extends HTMLElement {
         });
 
         this.$finalize.addEventListener("click", e => {
-            const userOwnsDraft = this.projectId === "local-draft"
-            || (this.user && (this.user.id === this.draft?.usr_id));
+            const userOwnsDraft = (this.user && (this.user.id === this.project?.usr_id));
+            console.log("************ this user is **********");
+            console.log(this.user);
+            console.log(!this.user);
 
-            if (!this.user)  {
+
+            if (!this.user && !userOwnsDraft)  {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
                 });
+            } else {
+                this.finalizeWorkflow();
             }
-            this.finalizeWorkflow();
         });
     }
 
@@ -369,14 +373,7 @@ export default class Preview extends HTMLElement {
     }
 
     async updateGrantProposal(proposal: DraftProposal, id: string | number) {
-
-        console.log("************* updating project ***********");
-        console.log(id);
-        console.log(proposal);
-
-
         const resp = await model.updateProposal(proposal, id);
-
         if (resp.ok) {
             const proposal: Proposal = await resp.json();
             return proposal;
@@ -387,21 +384,20 @@ export default class Preview extends HTMLElement {
         event: string = "begin",
         state?: Record<string,any>
     ): Promise<void> {
-
+        const api = this.apiInfo?.api;
         switch(event) {
         case "begin":
             {
-                if (!this.draft) {
+                if (!this.project) {
                     return;
                 }
-    
                 const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
-                    this.draft.name,
-                    this.draft.logo,
-                    this.draft.description,
-                    this.draft.website,
-                    this.draft.milestones,
-                    this.draft.required_funds,
+                    this.project.name,
+                    this.project.logo,
+                    this.project.description,
+                    this.project.website,
+                    this.project.milestones,
+                    this.project.required_funds,
                 );
     
                 if (!extrinsic) {
@@ -443,34 +439,29 @@ export default class Preview extends HTMLElement {
                 account.address,
                 {signer: injector.signer},
                 ({ status }) => {
-                    console.log(status);
-                    const api = this.apiInfo?.api;
-                    api.query.system.events((events) => {
+                    api?.query.system.events((events: any) => {
+                        if(events) {
                         // Loop through the Vec<EventRecord>
-                        events.forEach((record) => {
+                        events.forEach((record: any) => {
                         // Extract the phase, event and the event types
                         const { event, phase } = record;
                         const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
                         if (projectCreated) {
 
-                            console.log(projectCreated);
-                            console.log(event.data);
                             const types = event.typeDef;
                             const createdAccountId = event.data[0].toString();
-                            const createdProjectId = event.data[2].toString();
+                            const createdProjectId = parseInt(event.data[2].toString());
 
-                            if (event.data[0] == account.address) {
+                            if (event.data[0] == account.address && this.project && this.projectId) {
                                 console.log("************** matching accounts **************");
-                                this.draft.id = createdProjectId;
-                                this.updateGrantProposal(this.draft, this.projectId);
-                                // Update project ID in the DB 
-                                console.log(`User ${createdAccountId} created a project with ID ${createdProjectId}`);
-                                console.log(`Current account is ${account.address.toString()}`);
-                                console.log(account);
-                                console.log(account.address);
+                                // this.draft.id = createdProjectId;
+                                this.project.id = createdProjectId;
+                                console.log(this.project);
+                                this.updateGrantProposal(this.project, this.projectId);
                             }
                         }
                         });
+                    }
                     });
                     this.finalizeWorkflow(status.type);
                     if (status.isInBlock) {
@@ -481,15 +472,11 @@ export default class Preview extends HTMLElement {
                             status.asInBlock.toString()
                         }`;
                         $inBlock.classList.remove("hidden");
-                        console.log($inBlock.textContent);
-                    } else {
-                        console.log(`Current status: ${status.type}`);
-                    }
+                    } 
                 }
             ).catch((e: any) => {
                 this.errorNotification(e);
             });
-            console.log(`Transaction hash: ${txHash}`);
         } break;
         default:
             this.toggleEdit = false;
@@ -505,27 +492,27 @@ export default class Preview extends HTMLElement {
         }
     }
 
-    renderDraft(draft: DraftProposal | Proposal) {
-        if (!draft) {
+    renderProject(project: DraftProposal | Proposal) {
+        if (!project) {
             throw new Error(
                 "Attempt to render nonexistent draft."
             );
         }
 
         // this.$["about-project"].innerText = proposal.name;
-        this.$projectName.innerText = draft.name;
+        this.$projectName.innerText = project.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${draft.website}" target="_blank">${
-                draft.website
+            <a href="${project.website}" target="_blank">${
+                project.website
             }</a>
         `;
         this.$projectDescription.innerHTML =
-            draft.description && marked.parse(draft.description);
-        this.$projectLogo.setAttribute("srcset", draft.logo);
-        this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
+            project.description && marked.parse(project.description);
+        this.$projectLogo.setAttribute("srcset", project.logo);
+        this.$fundsRequired.innerText = String(project.required_funds / 1e12);
 
         this.$milestones.innerHTML = "";
-        draft.milestones.forEach(milestone => {
+        project.milestones.forEach(milestone => {
             this.$milestones.appendChild(
                 document.createRange().createContextualFragment(`
                     <li class="mdc-deprecated-list-item" tabindex="0">

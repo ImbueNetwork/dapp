@@ -1,9 +1,7 @@
 import { marked } from "marked";
-
 import "@pojagi/hoquet/lib/dialog/dialog";
 import "@pojagi/hoquet/lib/dialog/dialog";
 import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
-
 import authDialogContent from "./auth-dialog-content.html";
 import { MDCTabBar } from "@material/tab-bar";
 import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
@@ -14,8 +12,8 @@ import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import templateSrc from "./index.html";
 import styles from "./index.css";
-
-import { fetchProject, DraftProposal, Proposal, User } from "../../model";
+import { DraftProposal, Proposal, User } from "../../model";
+import * as model from "../../model";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getWeb3Accounts, signWeb3Challenge } from "../../utils/polkadot";
@@ -34,7 +32,8 @@ template.innerHTML = `
 `;
 
 export default class Detail extends HTMLElement {
-    user?: User;
+    user?: User | null;
+    project?: Proposal;
     $contribute: HTMLButtonElement;
     $tabContentContainer: HTMLElement;
     $tabBar: HTMLElement;
@@ -54,59 +53,60 @@ export default class Detail extends HTMLElement {
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({ mode: "open" });
         this[CONTENT] =
             template.content.cloneNode(true) as
-                DocumentFragment;
+            DocumentFragment;
 
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-                HTMLElement;
+            HTMLElement;
         this.$tabBar =
-         this[CONTENT].getElementById("tab-bar") as
+            this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
 
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
-                HTMLButtonElement;
+            HTMLButtonElement;
+
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-                HTMLElement;
+            HTMLElement;
 
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-                HTMLElement;
+            HTMLElement;
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-                HTMLElement;
+            HTMLElement;
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-                HTMLImageElement;
+            HTMLImageElement;
 
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-                HTMLOListElement;
-            
+            HTMLOListElement;
+
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-                HTMLElement;
-            
+            HTMLElement;
+
         this.$imbuContribution =
             this[CONTENT].getElementById("imbu-contribution") as
-                HTMLElement;
+            HTMLElement;
         this.$contributionSubmissionForm =
             this[CONTENT].getElementById("contribution-submission-form") as
-                HTMLFormElement;
+            HTMLFormElement;
     }
 
     get projectId(): string | null {
         const candidate = window.location.pathname.split("/").pop();
-        
+
         if (utils.validProjectId(candidate)) {
             return candidate as string;
         }
-        
+
         return null;
     }
 
@@ -114,7 +114,7 @@ export default class Detail extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
         this.bind();
     }
-    
+
     async init(request: ImbueRequest) {
         const projectId = this.projectId;
         if (!projectId) {
@@ -127,16 +127,37 @@ export default class Detail extends HTMLElement {
         }
 
         this.apiInfo = await request.apiInfo;
+        this.user = await request.user;
 
-        await fetchProject(projectId).then(async resp => {
-            if (resp.ok) {
-                this.renderProject(await resp.json());
-            } else if (resp.status === 404) {
-                this.dispatchEvent(utils.badRouteEvent("not-found"));
+
+        /**
+         * We await this here because if there's no draft, we don't want to
+         * bother with any other confusing and/or expensive tasks.
+         */
+        await this.fetchProject(projectId).then(project => {
+            if (project) {
+                this.renderProject(project);
             } else {
-                this.dispatchEvent(utils.badRouteEvent("server-error"));
+                /**
+                 * Same as FIXME above. Do we want a 404 page here, dialog,
+                 * or what?
+                 */
+                this.dispatchEvent(utils.badRouteEvent("not-found"));
+                return;
             }
         });
+    }
+
+
+    async fetchProject(projectId: string) {
+        if (this.project) {
+            return this.project;
+        }
+        const resp = await model.fetchProject(projectId);
+        if (resp.ok) {
+            this.project = await resp.json();
+            return this.project;
+        }
     }
 
     bind() {
@@ -171,7 +192,7 @@ export default class Detail extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => {},
+                            handler: () => { },
                             label: "Continue using local storage"
                         }
                     }
@@ -189,8 +210,7 @@ export default class Detail extends HTMLElement {
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = draft.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${draft.website}" target="_blank">${
-                draft.website
+            <a href="${draft.website}" target="_blank">${draft.website
             }</a>
         `;
         this.$projectDescription.innerHTML = marked.parse(draft.description);
@@ -206,9 +226,8 @@ export default class Detail extends HTMLElement {
                             <i class="material-icons">pending_actions</i>
                         </span>
                         <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${
-                                milestone.name
-                            }</span>
+                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name
+                    }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>
@@ -222,83 +241,92 @@ export default class Detail extends HTMLElement {
 
     async contribute(
         event: string = "begin",
-        state?: Record<string,any>
+        state?: Record<string, any>
     ): Promise<void> {
         const formData = new FormData(this.$contributionSubmissionForm);
         const contribution = parseInt(
             formData.get("imbu-contribution") as string
         ) * 1e12;
-
-
-        switch(event) {
-            case "account-chosen":
-            {
-                const extrinsic = state?.extrinsic as
-                    SubmittableExtrinsic<"promise", ISubmittableResult>;
-                const account = state?.account as
-                    InjectedAccountWithMeta;
-                const injector = await web3FromSource(account.meta.source);
-
-                const txHash = await extrinsic.signAndSend(
-                    account.address,
-                    {signer: injector.signer},
-                    ({ status }) => {
-                        console.log(status);
-                        this.contribute(status.type);
-                        if (status.isInBlock) {
-                            const $inBlock =
-                                this.shadowRoot?.getElementById("in-block") as
-                                    HTMLElement;
-                            $inBlock.innerText = `Completed at block hash #${
-                                status.asInBlock.toString()
-                            }`;
-                            $inBlock.classList.remove("hidden");
-                            console.log($inBlock.textContent);
-                        } else {
-                            console.log(`Current status: ${status.type}`);
-                        }
+        const api = this.apiInfo?.api;
+        switch (event) {
+            case "begin":
+                {
+                    this.$contribute.disabled = true;
+                    this.$contribute.classList.add("blob");
+                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.contribute(
+                        this.project?.chain_project_id,
+                        contribution
+                    );
+                    if (!extrinsic) {
+                        // FIXME: UX
+                        return;
                     }
-                ).catch((e: any) => {
-                    this.errorNotification(e);
-                });
-                console.log(`Transaction hash: ${txHash}`);
-            } break;
+
+                    return this.contribute(
+                        "extrinsic-created",
+                        { ...state, extrinsic },
+                    );
+                }
             case "extrinsic-created":
-            {
-                this.dispatchEvent(new CustomEvent(
-                    config.event.accountChoice,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.contribute(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                {
+                    this.dispatchEvent(new CustomEvent(
+                        config.event.accountChoice,
+                        {
+                            bubbles: true,
+                            composed: true,
+                            detail: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.contribute(
+                                        "account-chosen",
+                                        { ...state, account },
+                                    );
+                                }
                             }
                         }
-                    }
-                ));
-            } break;
-            case "begin":
-            {
-                const extrinsic = this.apiInfo?.api.tx.imbueProposals.contribute(
-                    this.projectId,
-                    contribution
-                );
+                    ));
+                } break;
+            case "account-chosen":
+                {
+                    const extrinsic = state?.extrinsic as
+                        SubmittableExtrinsic<"promise", ISubmittableResult>;
+                    const account = state?.account as
+                        InjectedAccountWithMeta;
+                    const injector = await web3FromSource(account.meta.source);
 
-                if (!extrinsic) {
-                    // FIXME: UX
-                    return;
-                }
+                    const txHash = await extrinsic.signAndSend(
+                        account.address,
+                        { signer: injector.signer },
+                        ({ status }) => {
 
-                return this.contribute(
-                    "extrinsic-created",
-                    {...state, extrinsic},
-                );
-            }
+                            api?.query.system.events((events: any) => {
+                                if (events) {
+                                    // Loop through the Vec<EventRecord>
+                                    events.forEach((record: any) => {
+                                        // Extract the phase, event and the event types
+                                        const { event, phase } = record;
+                                        const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceed";
+ 
+                                        if (contributionSucceeded) {
+                                            const types = event.typeDef;
+                                            const contributionAccountId = event.data[0];
+                                            const contributionProjectId = parseInt(event.data[1].toString());
 
+                                            if (contributionAccountId == account.address && contributionProjectId ==this.project?.chain_project_id && this.project && this.projectId) {
+                                                this.$contribute.classList.remove("blob");
+                                                this.$contribute.disabled = false;
+                                                this.$contribute.classList.add("finalized");
+                                                this.$contribute.innerText = "Contribution Succeeded";
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    ).catch((e: any) => {
+                        this.errorNotification(e);
+                    });
+                    console.log(`Transaction hash: ${txHash}`);
+                } break;
         }
     }
 

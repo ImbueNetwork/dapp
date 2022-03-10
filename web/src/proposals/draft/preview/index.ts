@@ -163,6 +163,8 @@ export default class Preview extends HTMLElement {
 
         const projectId = this.projectId;
         this.user = await request.user;
+        this.accounts = await request.accounts;
+        this.apiInfo = await request.apiInfo;
 
         if (!projectId) {
             /**
@@ -189,9 +191,7 @@ export default class Preview extends HTMLElement {
             }
         });
 
-        this.accounts = await request.accounts;
-        this.user = await request.user;
-        this.apiInfo = await request.apiInfo;
+
 
         if (this.user) {
             /**
@@ -378,6 +378,8 @@ export default class Preview extends HTMLElement {
                     if (!this.project) {
                         return;
                     }
+                    this.$finalize.disabled = true;
+                    this.$finalize.classList.add("blob");
                     const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
                         this.project.name,
                         this.project.logo,

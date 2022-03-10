@@ -13,26 +13,26 @@
 
 </div>
 
-<form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form" autocomplete="off"
-    novalidate>
-    <div class="columns-10 w-row">
-        <div class="column-19 w-col w-col-4">
-            <div class="pr0">
 
+<div class="columns-10 w-row">
+    <div class="column-19 w-col w-col-4">
+        <div class="pr0">
+            <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"
+                autocomplete="off" novalidate>
                 <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number"
                     helper="The total amount to contribute for the project." step="1" min="1" max="1e127" required>
-                <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
-                <span slot="suffix">.00</span>
-                <span slot="floating-label">Contribution amount</span>
+                    <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
+                    <span slot="suffix">.00</span>
+                    <span slot="floating-label">Contribution amount</span>
                 </hq-forms-textfield>
+            </form>
 
-
-
-                <a href="#" class="button vote-btn _w-button w-button" id="contribute">Contribute</a>
-            </div>
+            <button href="javascript:void(0)" class="button primary" id="contribute">Contribute</button>
         </div>
     </div>
-</form>
+</div>
+
+
 
 <div class="tabs-menu w-tab-menu" role="tablist">
     <div class="mdc-tab-bar" role="tablist" id="tab-bar">

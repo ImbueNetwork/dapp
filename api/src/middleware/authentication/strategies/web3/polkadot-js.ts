@@ -44,7 +44,7 @@ export class Web3Strategy extends passport.Strategy {
                 if (!web3Account) {
                     this.fail();
                 } else {
-                    const user = await fetchUser(web3Account.usr_id)(tx);
+                    const user = await fetchUser(web3Account.user_id)(tx);
                     if (user?.id) {
                         if (
                             signatureVerify(
@@ -128,7 +128,7 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
         next(err);
     }
  
-    // If no address can be found, create a `usr` and then a
+    // If no address can be found, create a `users` and then a
     // `federated_credential`
     getOrCreateFederatedUser(
         req.body.meta.source,
@@ -144,7 +144,7 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
             }
 
             try {
-                // create a `challenge` uuid and insert it into the usr
+                // create a `challenge` uuid and insert it into the users
                 // table respond with the challenge
                 db.transaction(async tx => {
                     const challenge = uuid();

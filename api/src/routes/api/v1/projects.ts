@@ -54,10 +54,7 @@ router.get("/:id", (req, res, next) => {
     });
 });
 
-const projectKeyset = new Set([
-    "id","name", "logo", "description", "website", "category", "required_funds",
-    "owner", "usr_id", "milestones",
-]);
+
 
 /**
  * TODO: json schema or something better instead.
@@ -68,18 +65,6 @@ const validateProposal = (proposal: models.GrantProposal) => {
     }
 
     const entries = Object.entries(proposal);
-
-    if (
-        entries.filter(([k,v]) => {
-            // must be from keyset
-            return !projectKeyset.has(k)
-        }).length
-    ) {
-        throw new Error(
-            `Proposal entries can only be one of [${[...projectKeyset].join(", ")}]`
-        )
-    }
-
     if (entries.filter(([_,v]) => {
             // undefined not allowed
             return v === void 0;
@@ -126,7 +111,7 @@ router.post("/", (req, res, next) => {
                 category,
                 required_funds,
                 owner,
-                usr_id: (req.user as any).id,
+                user_id: (req.user as any).id,
             })(tx);
     
             if (!project.id) {
@@ -159,7 +144,7 @@ router.put("/:id", (req, res, next) => {
         return res.status(401).end();
     }
 
-    const old_id = req.params.id;
+    const id = req.params.id;
 
     try {
         validateProposal(req.body.proposal);
@@ -175,37 +160,37 @@ router.put("/:id", (req, res, next) => {
         description,
         website,
         category,
+        chain_project_id,
         required_funds,
         owner,
         milestones,
     } = req.body.proposal as models.GrantProposal;
 
-    const usr_id = (req.user as any).id;
-    const new_id = (req.body.proposal).id
+    const user_id = (req.user as any).id;
 
     db.transaction(async tx => {
         try {
             // ensure the project exists first
-            const exists = await models.fetchProject(old_id)(tx);
+            const exists = await models.fetchProject(id)(tx);
 
             if (!exists) {
                 return res.status(404).end();
             }
 
-            if (exists.usr_id !== usr_id) {
+            if (exists.user_id !== user_id) {
                 return res.status(403).end();
             }
 
-            const project = await models.updateProject(old_id, {
-                id: new_id,
+            const project = await models.updateProject(id, {
                 name,
                 logo,
                 description,
                 website,
                 category,
+                chain_project_id,
                 required_funds,
                 owner,
-                // usr_id,
+                // user_id,
             })(tx);
     
             if (!project.id) {
@@ -215,7 +200,7 @@ router.put("/:id", (req, res, next) => {
             }
     
             // drop then recreate
-            await models.deleteMilestones(old_id)(tx);
+            await models.deleteMilestones(id)(tx);
 
             const pkg: ProjectPkg = {
                 ...project,

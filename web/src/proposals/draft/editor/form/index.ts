@@ -148,8 +148,8 @@ export default class Form extends HTMLElement {
     async init(request: ImbueRequest) {
         this.disabled = false;
         this.reset();
-
         this.user = await request.user;
+
 
         /**
          * If not logged in, we can't submit the proposal to the API for
@@ -224,10 +224,17 @@ export default class Form extends HTMLElement {
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
         }
+
+        // Are we logged in?
+        if (!this.user) {
+            this.wrapAuthentication(() => {
+                location.reload()
+            });
+        }
     }
 
     redirectToNewDraft() {
-        utils.redirect(`${config.grantProposalsURL}/draft`);
+        utils.redirect(`${config.grantProposalsURL}`);
     }
 
     async setupExistingDraft(projectId: string) {
@@ -261,7 +268,7 @@ export default class Form extends HTMLElement {
                 ).then(async resp => {
                     if (resp.ok) {
                         const project = await resp.json();
-                        if (this.user?.id === project.usr_id) {
+                        if (this.user?.id === project.user_id) {
                             return project;
                         } else {
                             this.redirectToNewDraft();
@@ -533,38 +540,27 @@ export default class Form extends HTMLElement {
         draft: DraftProposal,
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
-        // Are we logged in?
-        if (!this.user) {
-            this.wrapAuthentication(() => {
-                this.submitGrantProposal(draft,account);
-            });
-        }
-        // if yes, go ahead and post the draft with the `usr_id`
-        draft.usr_id = this.user?.id;
+
+        // if yes, go ahead and post the draft with the `user_id`
+        draft.user_id = this.user?.id;
         let proposal;
 
-        console.log("*************** Draft is ***************");
-        console.log(draft);
+        const resp = await model.postDraftProposal(draft);
+        if (resp.ok) {
+            const proposal = await resp.json();
+            utils.redirect(`${
+                config.grantProposalsURL
+            }/draft/preview?id=${proposal.id}`);
+        } else {
+            // TODO: UX for bad request posting draft
+            console.warn("Bad request posting draft", draft);
+        }
 
-        console.log("*************** user id is ***************");
-        console.log(this.user?.id);
-        proposal = await model.postDraftProposal(draft);
-        
-        // if (proposal) {
-        //     utils.redirect(`${
-        //         config.grantProposalsURL
-        //     }/draft/preview?id=${proposal.id}`);
-        // } else {
-        //     // FIXME: UX needed
-        //     this.disabled = false;
-        // }
     }
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
             this.user = state.user;
-            console.log("******************* user at authentication is ***************");
-            console.log(this.user);
             console.log(state);
             console.log(state.user);
             action();

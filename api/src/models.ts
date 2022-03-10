@@ -10,7 +10,7 @@ export type FederatedCredential = {
 
 export type Web3Account = {
     address: string,
-    usr_id: number;
+    user_id: number;
     type: string;
     challenge: string;
 };
@@ -34,8 +34,9 @@ export type GrantProposal = {
     milestones: ProposedMilestone[];
     required_funds: number;
     owner?: string;
-    usr_id?: number;
+    user_id?: number;
     category?: string | number;
+    chain_project_id?: number;
 };
 
 export type Milestone = ProposedMilestone & {
@@ -51,21 +52,22 @@ export type Project = {
     description: string;
     website: string;
     category?: string | number;
+    chain_project_id?: number;
     required_funds: number;
     owner?: string;
-    usr_id?: number;
+    user_id?: number;
 };
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
-        tx<Web3Account>("web3_account")
+        tx<Web3Account>("web3_accounts")
             .select()
             .where({address,})
             .first();
 
 export const fetchUser = (id: number) =>
     (tx: Knex.Transaction) =>
-        tx<User>("usr").where({id}).first();
+        tx<User>("users").where({id}).first();
 
 export const upsertWeb3Challenge = (
     user: User,
@@ -75,19 +77,19 @@ export const upsertWeb3Challenge = (
 ) => async (tx: Knex.Transaction):
     Promise<[web3Account: Web3Account, isInsert: boolean]> => {
 
-    let web3Account = await tx<Web3Account>("web3_account")
+    let web3Account = await tx<Web3Account>("web3_accounts")
         .select()
         .where({
-            usr_id: user?.id
+            user_id: user?.id
         })
         .first();
 
     if (!web3Account) {
         return [
             (
-                await tx<Web3Account>("web3_account").insert({
+                await tx<Web3Account>("web3_accounts").insert({
                     address,
-                    usr_id: user.id,
+                    user_id: user.id,
                     type,
                     challenge,
                 }).returning("*")
@@ -98,8 +100,8 @@ export const upsertWeb3Challenge = (
     
     return [
         (
-            await tx<Web3Account>("web3_account").update({challenge}).where(
-                {usr_id: user.id}
+            await tx<Web3Account>("web3_accounts").update({challenge}).where(
+                {user_id: user.id}
             ).returning("*")
         )[0],
         false
@@ -108,19 +110,19 @@ export const upsertWeb3Challenge = (
 
 export const insertUserByDisplayName = (displayName: string) =>
     async (tx: Knex.Transaction) => (
-        await tx<User>("usr").insert({
+        await tx<User>("users").insert({
             display_name: displayName
         }).returning("*")
     )[0];
 
 export const insertProject = (project: Project) =>
     async (tx: Knex.Transaction) => (
-        await tx<Project>("project").insert(project).returning("*")
+        await tx<Project>("projects").insert(project).returning("*")
     )[0];
 
 export const updateProject = (id: string | number, project: Project) =>
     async (tx: Knex.Transaction) => (
-        await tx<Project>("project")
+        await tx<Project>("projects")
             .update(project)
             .where({id})
             .returning("*")
@@ -128,13 +130,13 @@ export const updateProject = (id: string | number, project: Project) =>
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) => 
-        tx<Project>("project").select().where({id}).first();
+        tx<Project>("projects").select().where({id}).first();
 
 
 
 export const fetchAllProjects = () =>
     (tx: Knex.Transaction) => 
-        tx<Project>("project").select();
+        tx<Project>("projects").select();
 
 
         
@@ -149,27 +151,23 @@ export const insertMilestones = (
     }));
 
     return (tx: Knex.Transaction) =>
-        tx<Milestone>("milestone").insert(values).returning("*");
+        tx<Milestone>("milestones").insert(values).returning("*");
 };
 
-export const deleteMilestones = (project_id: string | number) => 
-
-    (tx: Knex.Transaction) => {
-        console.log("************** running delete function **************");
-        console.log(project_id);
-        tx<Milestone>("milestone").delete().where({project_id})};
-
+export const deleteMilestones = (project_id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx<Milestone>("milestones").delete().where({project_id});
 
 export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) => 
-        tx<Milestone>("milestone").select().where({project_id: id});
+        tx<Milestone>("milestones").select().where({project_id: id});
 
 export const insertFederatedCredential = (
     id: number,
     issuer: string,
     subject: string,
 ) => async (tx: Knex.Transaction) => (
-    await tx<FederatedCredential>("federated_credential").insert({
+    await tx<FederatedCredential>("federated_credentials").insert({
         id, issuer, subject
     }).returning("*")
 )[0];
@@ -187,7 +185,7 @@ export const getOrCreateFederatedUser = (
             /**
              * Do we already have a federated_credential ?
              */
-            const federated = await tx<FederatedCredential>("federated_credential").select().where({
+            const federated = await tx<FederatedCredential>("federated_credentials").select().where({
                 issuer,
                 subject,
             }).first();
@@ -199,7 +197,7 @@ export const getOrCreateFederatedUser = (
                 user = await insertUserByDisplayName(displayName)(tx);
                 await insertFederatedCredential(user.id, issuer, subject)(tx);
             } else {
-                const user_ = await db.select().from<User>("usr").where({
+                const user_ = await db.select().from<User>("users").where({
                     id: federated.id
                 }).first();
     

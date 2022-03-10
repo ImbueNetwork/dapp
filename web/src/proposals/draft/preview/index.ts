@@ -63,52 +63,52 @@ export default class Preview extends HTMLElement {
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({ mode: "open" });
         this[CONTENT] = template.content.cloneNode(true) as DocumentFragment
 
         this.$tabBar =
-        this[CONTENT].getElementById("tab-bar") as
+            this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
         this.$dialog =
             this[CONTENT].getElementById("dialog") as
-                Dialog;
+            Dialog;
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-                HTMLElement;
+            HTMLElement;
 
         this.$edit =
             this[CONTENT].getElementById("edit") as
-                HTMLAnchorElement;
+            HTMLAnchorElement;
         this.$save =
             this[CONTENT].getElementById("save") as
-                HTMLButtonElement;
+            HTMLButtonElement;
         this.$finalize =
             this[CONTENT].getElementById("finalize") as
-                HTMLButtonElement;
+            HTMLButtonElement;
 
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-                HTMLElement;
+            HTMLElement;
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-                HTMLElement;
+            HTMLElement;
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-                HTMLElement;
+            HTMLElement;
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-                HTMLImageElement;
+            HTMLImageElement;
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-                HTMLElement;
+            HTMLElement;
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-                HTMLOListElement;
+            HTMLOListElement;
         this.$actionButtonContainers =
             Array.from(
                 this.$save.parentElement?.parentElement?.children as
-                    HTMLCollection
+                HTMLCollection
             ) as HTMLElement[];
     }
 
@@ -155,14 +155,14 @@ export default class Preview extends HTMLElement {
          * This is just for a11y. Do not use this value unless you know what
          * you're doing.
          */
-        this.$edit.href = `${config.context}${
-            config.grantProposalsURL
-        }/draft?id=${this.projectId}`;
+        this.$edit.href = `${config.context}${config.grantProposalsURL
+            }/draft?id=${this.projectId}`;
     }
 
     async init(request: ImbueRequest) {
-        
+
         const projectId = this.projectId;
+        this.user = await request.user;
 
         if (!projectId) {
             /**
@@ -210,19 +210,13 @@ export default class Preview extends HTMLElement {
 
             /**
              * Should only be able to edit or finalize if user
-             * is the usr_id on the project.
+             * is the user_id on the project.
              */
-            if (this.user?.id !== this.project?.usr_id) {
+            if (this.user?.id !== this.project?.user_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
         }
-
-
-        console.log("************ this user is **********");
-        console.log(this.user);
-        console.log(!this.user);
-
     }
 
     errorNotification(e: Error) {
@@ -258,8 +252,8 @@ export default class Preview extends HTMLElement {
             .split("?")[1]
             ?.split("&")
             .map(str => str.split("="))
-            .find(([k,_]) => k === "id");
-            
+            .find(([k, _]) => k === "id");
+
         if (entry) {
             return entry[1];
         }
@@ -280,9 +274,8 @@ export default class Preview extends HTMLElement {
             e.preventDefault();
 
             const edit = () => {
-                utils.redirect(`${
-                    config.grantProposalsURL
-                }/draft?id=${this.projectId}`);
+                utils.redirect(`${config.grantProposalsURL
+                    }/draft?id=${this.projectId}`);
             };
 
             if (this.projectId === "local-draft" || this.user) {
@@ -298,9 +291,8 @@ export default class Preview extends HTMLElement {
                     const resp = await model.postDraftProposal(this.project);
                     if (resp.ok) {
                         const project = await resp.json();
-                        utils.redirect(`${
-                            config.grantProposalsURL
-                        }/draft/preview?id=${project.id}`);
+                        utils.redirect(`${config.grantProposalsURL
+                            }/draft/preview?id=${project.id}`);
                     } else {
                         // TODO: UX for bad request posting draft
                         console.warn("Bad request posting draft", this.project);
@@ -325,18 +317,13 @@ export default class Preview extends HTMLElement {
                  * which would redirect them to this "preview" page, but with a
                  * legit `projectId` instead of `local-draft`.
                  */
-                 save();
+                save();
             }
         });
 
         this.$finalize.addEventListener("click", e => {
-            const userOwnsDraft = (this.user && (this.user.id === this.project?.usr_id));
-            console.log("************ this user is **********");
-            console.log(this.user);
-            console.log(!this.user);
-
-
-            if (!this.user && !userOwnsDraft)  {
+            const userOwnsDraft = (this.user && (this.user.id === this.project?.user_id));
+            if (!this.user && !userOwnsDraft) {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
@@ -363,7 +350,7 @@ export default class Preview extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => {},
+                            handler: () => { },
                             label: "Continue using local storage"
                         }
                     }
@@ -382,113 +369,93 @@ export default class Preview extends HTMLElement {
 
     async finalizeWorkflow(
         event: string = "begin",
-        state?: Record<string,any>
+        state?: Record<string, any>
     ): Promise<void> {
         const api = this.apiInfo?.api;
-        switch(event) {
-        case "begin":
-            {
-                if (!this.project) {
-                    return;
-                }
-                const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
-                    this.project.name,
-                    this.project.logo,
-                    this.project.description,
-                    this.project.website,
-                    this.project.milestones,
-                    this.project.required_funds,
-                );
-    
-                if (!extrinsic) {
-                    // FIXME: UX
-                    return;
-                }
-    
-                return this.finalizeWorkflow(
-                    "extrinsic-created",
-                    {...state, extrinsic},
-                );
-            } break;
-        case "extrinsic-created":
-            {
-                this.dispatchEvent(new CustomEvent(
-                    config.event.accountChoice,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.finalizeWorkflow(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+        switch (event) {
+            case "begin":
+                {
+                    if (!this.project) {
+                        return;
+                    }
+                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
+                        this.project.name,
+                        this.project.logo,
+                        this.project.description,
+                        this.project.website,
+                        this.project.milestones,
+                        this.project.required_funds,
+                    );
+
+                    if (!extrinsic) {
+                        // FIXME: UX
+                        return;
+                    }
+
+                    return this.finalizeWorkflow(
+                        "extrinsic-created",
+                        { ...state, extrinsic },
+                    );
+                } break;
+            case "extrinsic-created":
+                {
+                    this.dispatchEvent(new CustomEvent(
+                        config.event.accountChoice,
+                        {
+                            bubbles: true,
+                            composed: true,
+                            detail: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.finalizeWorkflow(
+                                        "account-chosen",
+                                        { ...state, account },
+                                    );
+                                }
                             }
                         }
-                    }
-                ));
-            } break;
-        case "account-chosen":
-        {
-            const extrinsic = state?.extrinsic as
-                SubmittableExtrinsic<"promise", ISubmittableResult>;
-            const account = state?.account as
-                InjectedAccountWithMeta;
-            const injector = await web3FromSource(account.meta.source);
-            const txHash = await extrinsic.signAndSend(
-                account.address,
-                {signer: injector.signer},
-                ({ status }) => {
-                    api?.query.system.events((events: any) => {
-                        if(events) {
-                        // Loop through the Vec<EventRecord>
-                        events.forEach((record: any) => {
-                        // Extract the phase, event and the event types
-                        const { event, phase } = record;
-                        const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
-                        if (projectCreated) {
+                    ));
+                } break;
+            case "account-chosen":
+                {
+                    const extrinsic = state?.extrinsic as
+                        SubmittableExtrinsic<"promise", ISubmittableResult>;
+                    const account = state?.account as
+                        InjectedAccountWithMeta;
+                    const injector = await web3FromSource(account.meta.source);
+                    const txHash = await extrinsic.signAndSend(
+                        account.address,
+                        { signer: injector.signer },
+                        ({ status }) => {
+                            api?.query.system.events((events: any) => {
+                                if (events) {
+                                    // Loop through the Vec<EventRecord>
+                                    events.forEach((record: any) => {
+                                        // Extract the phase, event and the event types
+                                        const { event, phase } = record;
+                                        const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
+                                        if (projectCreated) {
 
-                            const types = event.typeDef;
-                            const createdAccountId = event.data[0].toString();
-                            const createdProjectId = parseInt(event.data[2].toString());
-
-                            if (event.data[0] == account.address && this.project && this.projectId) {
-                                console.log("************** matching accounts **************");
-                                // this.draft.id = createdProjectId;
-                                this.project.id = createdProjectId;
-                                console.log(this.project);
-                                this.updateGrantProposal(this.project, this.projectId);
-                            }
+                                            const types = event.typeDef;
+                                            const createdAccountId = event.data[0];
+                                            const createdProjectId = parseInt(event.data[2].toString());
+                                            if (createdAccountId == account.address && this.project && this.projectId) {
+                                                this.project.chain_project_id = createdProjectId;
+                                                this.updateGrantProposal(this.project, this.projectId);
+                                                this.toggleEdit = false;
+                                                this.toggleSave = false;
+                                                // this.$finalize.classList.remove("blob");
+                                                this.$finalize.classList.add("finalized");
+                                                this.$finalize.innerText = "Proposal Created";
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         }
-                        });
-                    }
+                    ).catch((e: any) => {
+                        this.errorNotification(e);
                     });
-                    this.finalizeWorkflow(status.type);
-                    if (status.isInBlock) {
-                        const $inBlock =
-                            this.shadowRoot?.getElementById("in-block") as
-                                HTMLElement;
-                        $inBlock.innerText = `Completed at block hash #${
-                            status.asInBlock.toString()
-                        }`;
-                        $inBlock.classList.remove("hidden");
-                    } 
-                }
-            ).catch((e: any) => {
-                this.errorNotification(e);
-            });
-        } break;
-        default:
-            this.toggleEdit = false;
-            this.toggleSave = false;
-            this.$finalize.disabled = true;
-            if (event === "Finalized") {
-                this.$finalize.classList.remove("blob");
-                this.$finalize.classList.add("finalized");
-            } else {
-                this.$finalize.classList.add("blob");
-            }
-            this.$finalize.innerText = event;
+                } break;
         }
     }
 
@@ -502,8 +469,7 @@ export default class Preview extends HTMLElement {
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = project.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${project.website}" target="_blank">${
-                project.website
+            <a href="${project.website}" target="_blank">${project.website
             }</a>
         `;
         this.$projectDescription.innerHTML =
@@ -521,9 +487,8 @@ export default class Preview extends HTMLElement {
                             <i class="material-icons">pending_actions</i>
                         </span>
                         <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${
-                                milestone.name
-                            }</span>
+                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name
+                    }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>

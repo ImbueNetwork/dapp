@@ -19,7 +19,8 @@ export type DraftProposal = {
     milestones: DraftMilestone[];
     required_funds: number;
     owner: string;
-    usr_id?: number;
+    user_id?: number;
+    chain_project_id?: number;
     category?: string | number;
 };
 
@@ -29,7 +30,7 @@ export type DraftProposal = {
 export type Proposal = DraftProposal & {
     id: number;
     status: string;
-    usr_id: number;
+    user_id: number;
     create_block_number?: number;
     created: string;
     modified: string;

@@ -6,8 +6,8 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.raw(ON_UPDATE_TIMESTAMP_FUNCTION);
 
-    const usrTableName = "usr";
-    await knex.schema.createTable(usrTableName, (builder) => {
+    const usersTableName = "users";
+    await knex.schema.createTable(usersTableName, (builder) => {
         /**
          * We need to be able to capture users who are just casually creating
          * a Project without any web3 functionality yet. So we lazily require
@@ -17,40 +17,40 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("display_name");
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, usrTableName));
+    }).then(onUpdateTrigger(knex, usersTableName));
 
     /**
      * Without at least one of these, a usr can't really do much beyond saving
      * a draft proposal.
      */
-    const web3AccountTableName = "web3_account";
-    await knex.schema.createTable(web3AccountTableName, (builder) => {
+    const web3AccountsTableName = "web3_accounts";
+    await knex.schema.createTable(web3AccountsTableName, (builder) => {
         builder.text("address");
-        builder.integer("usr_id").notNullable();
+        builder.integer("user_id").notNullable();
 
         builder.text("type");
         builder.text("challenge");
 
         builder.primary(["address"]);
-        builder.foreign("usr_id").references("usr.id");
+        builder.foreign("user_id").references("users.id");
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, web3AccountTableName));
+    }).then(onUpdateTrigger(knex, web3AccountsTableName));
 
-    const federatedCredTableName = "federated_credential";
-    await knex.schema.createTable(federatedCredTableName, (builder) => {
+    const federatedCredsTableName = "federated_credentials";
+    await knex.schema.createTable(federatedCredsTableName, (builder) => {
         builder.integer("id");
         builder.text("issuer");
         builder.text("subject");
         builder.primary(["issuer", "subject"]);
 
         builder.foreign("id")
-            .references("usr.id")
+            .references("users.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, federatedCredTableName));
+    }).then(onUpdateTrigger(knex, federatedCredsTableName));
 
     const projectStatusTableName = "project_status";
     await knex.schema.createTable(projectStatusTableName, builder => {
@@ -75,14 +75,15 @@ export async function up(knex: Knex): Promise<void> {
      *      create_block_number: BlockNumber,
      *  }
      */
-    const projectTableName = "project";
-    await knex.schema.createTable(projectTableName, (builder: Knex.CreateTableBuilder) => {
+    const projectsTableName = "projects";
+    await knex.schema.createTable(projectsTableName, (builder: Knex.CreateTableBuilder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("name"); // project name
         builder.text("logo"); // URL or dataURL (i.e., base64 encoded)
         builder.text("description");
         builder.text("website");
         builder.integer("category");
+        builder.integer("chain_project_id");
 
         builder.text("status").notNullable().defaultTo("draft");
         builder.foreign("status")
@@ -122,12 +123,12 @@ export async function up(knex: Knex): Promise<void> {
          * create an account and associate it with a web3 address, we can update
          * all of the projects whose "owner" is a `web3_account` associated with
          * the `usr` account. Likewise, when a user decides to delete their
-         * account, we don't CASCADE in that case -- only nullify the `usr_id`
+         * account, we don't CASCADE in that case -- only nullify the `user_id`
          * here, as it wouldn't point to anything useful.
          */
-        builder.integer("usr_id");
-        builder.foreign("usr_id")
-            .references("usr.id")
+        builder.integer("user_id");
+        builder.foreign("user_id")
+            .references("users.id")
             .onUpdate("CASCADE")
             .onDelete("SET NULL");
 
@@ -149,7 +150,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.bigInteger("create_block_number").nullable(); //.unsigned();
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, projectTableName));
+    }).then(onUpdateTrigger(knex, projectsTableName));
 
     /**
      *  pub struct Milestone {
@@ -160,13 +161,13 @@ export async function up(knex: Knex): Promise<void> {
      *      is_approved: bool
      *  }
      */
-    const milestoneTableName = "milestone";
-    await knex.schema.createTable(milestoneTableName, (builder) => {
+    const milestonesTableName = "milestones";
+    await knex.schema.createTable(milestonesTableName, (builder) => {
         builder.integer("milestone_index");
         builder.integer("project_id").notNullable();
         builder.primary(["project_id","milestone_index"]);
         builder.foreign("project_id")
-            .references("project.id")
+            .references("projects.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
 
@@ -175,7 +176,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.boolean("is_approved").defaultTo(false);
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, milestoneTableName));
+    }).then(onUpdateTrigger(knex, milestonesTableName));
 
     /**
      * TODO: ? votes and contributions
@@ -229,11 +230,11 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.schema.dropTableIfExists("milestone");
-    await knex.schema.dropTableIfExists("project");
+    await knex.schema.dropTableIfExists("milestones");
+    await knex.schema.dropTableIfExists("projects");
     await knex.schema.dropTableIfExists("project_status");
-    await knex.schema.dropTableIfExists("federated_credential");
-    await knex.schema.dropTableIfExists("web3_account");
-    await knex.schema.dropTableIfExists("usr");
+    await knex.schema.dropTableIfExists("federated_credentials");
+    await knex.schema.dropTableIfExists("web3_accounts");
+    await knex.schema.dropTableIfExists("users");
     await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }

@@ -25,3 +25,24 @@ export const badRouteEvent = (type: BadRoute) => new CustomEvent(
         detail: type,
     }
 );
+
+export function validateForm(form: HTMLFormElement): boolean {
+    const fields: HTMLInputElement[] = Array.from(
+        form.querySelectorAll(".input-field")
+    );
+    fields.forEach(input => reportValidity(input, true));
+
+    const valid = fields.every(
+        $input => $input.checkValidity()
+    );
+    return valid;
+}
+
+function reportValidity(input: HTMLInputElement, submitting: boolean = false) {
+    if (input.validity.valueMissing) {
+        input.setAttribute(
+            "validationmessage", "This field is required."
+        );
+    }
+    input.reportValidity();
+}

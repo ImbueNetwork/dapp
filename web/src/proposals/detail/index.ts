@@ -35,9 +35,11 @@ export default class Detail extends HTMLElement {
     user?: User | null;
     project?: Proposal;
     $contribute: HTMLButtonElement;
+    $vote: HTMLButtonElement;
     $tabContentContainer: HTMLElement;
     $tabBar: HTMLElement;
     tabBar: MDCTabBar;
+    openForVoting: boolean;
 
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
@@ -48,12 +50,18 @@ export default class Detail extends HTMLElement {
     $fundsRequired: HTMLElement;
     $imbuContribution: HTMLElement;
     $contributionSubmissionForm: HTMLFormElement;
+    $voteSubmissionForm: HTMLFormElement;
+    $projectMilestoneSelect: HTMLSelectElement;
 
     private [CONTENT]: DocumentFragment;
 
     constructor() {
         super();
+        
         this.attachShadow({ mode: "open" });
+
+        this.openForVoting = false;
+
         this[CONTENT] =
             template.content.cloneNode(true) as
             DocumentFragment;
@@ -61,13 +69,19 @@ export default class Detail extends HTMLElement {
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
             HTMLElement;
+
         this.$tabBar =
             this[CONTENT].getElementById("tab-bar") as
             HTMLElement;
+
         this.tabBar = new MDCTabBar(this.$tabBar);
 
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
+            HTMLButtonElement;
+
+        this.$vote =
+            this[CONTENT].getElementById("vote") as
             HTMLButtonElement;
 
         this.$projectName =
@@ -95,9 +109,18 @@ export default class Detail extends HTMLElement {
         this.$imbuContribution =
             this[CONTENT].getElementById("imbu-contribution") as
             HTMLElement;
+
         this.$contributionSubmissionForm =
             this[CONTENT].getElementById("contribution-submission-form") as
             HTMLFormElement;
+
+        this.$voteSubmissionForm =
+            this[CONTENT].getElementById("vote-submission-form") as
+            HTMLFormElement;
+
+        this.$projectMilestoneSelect =
+            this[CONTENT].getElementById("milestone-select") as
+            HTMLSelectElement;
     }
 
     get projectId(): string | null {
@@ -129,7 +152,6 @@ export default class Detail extends HTMLElement {
         this.apiInfo = await request.apiInfo;
         this.user = await request.user;
 
-
         /**
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
@@ -146,8 +168,35 @@ export default class Detail extends HTMLElement {
                 return;
             }
         });
+
+        const projectOnChain: any = await (await this.apiInfo?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+        if (projectOnChain && projectOnChain.approvedForFunding) {
+            this.openForVoting = projectOnChain.approvedForFunding;
+            this.$contributionSubmissionForm.hidden = this.openForVoting;
+            this.$contribute.hidden = this.openForVoting;
+            projectOnChain.milestones.forEach((milestone: any) => {
+                const $select = this.$projectMilestoneSelect;
+                this.$projectMilestoneSelect.appendChild(this.milestoneFragment(milestone));
+            });
+            this.$voteSubmissionForm.hidden = !this.openForVoting;
+            this.$vote.hidden = !this.openForVoting;
+        } else {
+            this.$contributionSubmissionForm.hidden = this.openForVoting;
+            this.$contribute.hidden = this.openForVoting;
+        }
     }
 
+    milestoneFragment(milestone: any) {
+        return document.createRange().createContextualFragment(`
+            <mwc-list-item
+             twoline
+             value="${milestone.milestoneIndex}">
+                <span>${milestone.name}</span>
+                <span class="select-source" slot="secondary">${milestone.percentageToUnlock
+            }%</span>
+            </mwc-list-item>
+        `);
+    }
 
     async fetchProject(projectId: string) {
         if (this.project) {
@@ -173,8 +222,15 @@ export default class Detail extends HTMLElement {
         this.$contribute.addEventListener("click", e => {
             this.contribute();
         });
-    }
 
+        this.$vote.addEventListener("click", e => {
+            const valid = utils.validateForm(this.$voteSubmissionForm);
+            if (!valid) {
+                throw new Error("Invalid form data.");
+            }
+            this.vote();
+        });
+    }
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
@@ -200,6 +256,7 @@ export default class Detail extends HTMLElement {
             }
         ));
     }
+
     renderProject(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
@@ -237,7 +294,6 @@ export default class Detail extends HTMLElement {
             );
         });
     }
-
 
     async contribute(
         event: string = "begin",
@@ -305,17 +361,109 @@ export default class Detail extends HTMLElement {
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceed";
- 
+
                                         if (contributionSucceeded) {
                                             const types = event.typeDef;
                                             const contributionAccountId = event.data[0];
                                             const contributionProjectId = parseInt(event.data[1].toString());
 
-                                            if (contributionAccountId == account.address && contributionProjectId ==this.project?.chain_project_id && this.project && this.projectId) {
+                                            if (contributionAccountId == account.address && contributionProjectId == this.project?.chain_project_id && this.project && this.projectId) {
                                                 this.$contribute.classList.remove("blob");
                                                 this.$contribute.disabled = false;
                                                 this.$contribute.classList.add("finalized");
                                                 this.$contribute.innerText = "Contribution Succeeded";
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    ).catch((e: any) => {
+                        this.errorNotification(e);
+                    });
+                    console.log(`Transaction hash: ${txHash}`);
+                } break;
+        }
+    }
+
+    async vote(
+        event: string = "begin",
+        state?: Record<string, any>
+    ): Promise<void> {
+        const formData = new FormData(this.$voteSubmissionForm);
+        const userVote = (formData.get("vote-select") as string).toLowerCase() == "true";
+        const milestoneIndex = parseInt(formData.get("milestone-select") as string);
+        const api = this.apiInfo?.api;
+
+        switch (event) {
+            case "begin":
+                {
+                    this.$vote.disabled = true;
+                    this.$vote.classList.add("blob");
+
+                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.voteOnMilestone(
+                        this.project?.chain_project_id,
+                        milestoneIndex,
+                        userVote
+                    );
+
+                    if (!extrinsic) {
+                        // FIXME: UX
+                        return;
+                    }
+
+                    return this.vote(
+                        "extrinsic-created",
+                        { ...state, extrinsic },
+                    );
+                }
+            case "extrinsic-created":
+                {
+                    this.dispatchEvent(new CustomEvent(
+                        config.event.accountChoice,
+                        {
+                            bubbles: true,
+                            composed: true,
+                            detail: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.vote(
+                                        "account-chosen",
+                                        { ...state, account },
+                                    );
+                                }
+                            }
+                        }
+                    ));
+                } break;
+            case "account-chosen":
+                {
+                    const extrinsic = state?.extrinsic as
+                        SubmittableExtrinsic<"promise", ISubmittableResult>;
+                    const account = state?.account as
+                        InjectedAccountWithMeta;
+                    const injector = await web3FromSource(account.meta.source);
+
+                    const txHash = await extrinsic.signAndSend(
+                        account.address,
+                        { signer: injector.signer },
+                        ({ status }) => {
+
+                            api?.query.system.events((events: any) => {
+                                if (events) {
+                                    // Loop through the Vec<EventRecord>
+                                    events.forEach((record: any) => {
+                                        // Extract the phase, event and the event types
+                                        const { event, phase } = record;
+                                        const voteSucceeded = `${event.section}:${event.method}` == "imbueProposals:VoteComplete";
+                                        if (voteSucceeded) {
+                                            const types = event.typeDef;
+                                            const voterAccountId = event.data[0];
+                                            const voterProjectId = parseInt(event.data[1].toString());
+                                            if (voterAccountId == account.address && voterProjectId == this.project?.chain_project_id && this.project && this.projectId) {
+                                                this.$vote.classList.remove("blob");
+                                                this.$vote.disabled = false;
+                                                this.$vote.classList.add("finalized");
+                                                this.$vote.innerText = "Vote Registered";
                                             }
                                         }
                                     });

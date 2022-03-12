@@ -1,0 +1,91 @@
+.select-source {
+    color: #999;
+}
+
+fieldset, legend {
+    margin: 0;
+    padding: 0;
+}
+fieldset:first-of-type {
+    margin-top: 0;
+}
+fieldset {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    border: none;
+}
+legend {
+    margin: 0 0 inherit 0;
+    width: 100%;
+}
+
+.input-field {
+    margin: 0 0 5px 0;
+    display: block;
+}
+
+#submit-milestone {
+    margin-top: 20px;
+}
+
+#submit-milestone:not(:disabled):hover {
+    background-color: var(--mdc-theme-primary);
+    color: black;
+}
+
+.primary-btn.fullwidth:disabled {
+    background-color: var(--disabled-button-background-color);
+    color: var(--disabled-button-color);
+}
+
+.imbu-symbol-prefix {
+    padding-right: 5px;
+}
+
+.input-field mwc-list-item {
+    color: inherit;
+}
+.input-field mwc-list-item:focus,
+.input-field mwc-list-item:hover {
+    background-color: rgb(178, 255, 11, 0.2);
+    background-color: rgba(255,255,255, 0.1);
+    /* outline-color: rgb(178, 255, 11);
+    outline: 1px  solid var(--mdc-theme-primary); */
+}
+
+#submit-milestone.blob {
+	/* background: black; */
+	/* border-radius: 25%; */
+	/* margin: 10px; */
+	/* height: 20px; */
+	width: 32%;
+
+	box-shadow: 0 0 0 0 rgba(178, 255, 11, 1);
+	transform: scale(1);
+	animation: pulse 2s infinite;
+}
+
+#submit-milestone.finalized {
+    width: 32%;
+    background-color: var(--theme-primary);
+    color: black;
+    font-weight: bolder;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(178, 255, 11, 0.7);
+	}
+
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+	}
+
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(178, 255, 11, 0.7);
+	}
+}

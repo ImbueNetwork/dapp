@@ -19,8 +19,7 @@ export type DraftProposal = {
     milestones: DraftMilestone[];
     required_funds: number;
     owner: string;
-    user_id?: number;
-    chain_project_id?: number;
+    usr_id?: number;
     category?: string | number;
 };
 
@@ -30,7 +29,7 @@ export type DraftProposal = {
 export type Proposal = DraftProposal & {
     id: number;
     status: string;
-    user_id: number;
+    usr_id: number;
     create_block_number?: number;
     created: string;
     modified: string;
@@ -57,6 +56,10 @@ export type User = {
     web3Accounts: Web3Account[];
 };
 
+export type MilestoneProposal = {
+    projectKey: number;
+    milestoneIndex: number;
+};
 
 /**
  * CRUD Methods 

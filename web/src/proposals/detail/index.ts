@@ -190,7 +190,7 @@ export default class Detail extends HTMLElement {
         return document.createRange().createContextualFragment(`
             <mwc-list-item
              twoline
-             value="${milestone.milestoneIndex}">
+             value="${milestone.milestoneKey}">
                 <span>${milestone.name}</span>
                 <span class="select-source" slot="secondary">${milestone.percentageToUnlock
             }%</span>
@@ -392,7 +392,7 @@ export default class Detail extends HTMLElement {
     ): Promise<void> {
         const formData = new FormData(this.$voteSubmissionForm);
         const userVote = (formData.get("vote-select") as string).toLowerCase() == "true";
-        const milestoneIndex = parseInt(formData.get("milestone-select") as string);
+        const milestoneKey = parseInt(formData.get("milestone-select") as string);
         const api = this.apiInfo?.api;
 
         switch (event) {
@@ -403,7 +403,7 @@ export default class Detail extends HTMLElement {
 
                     const extrinsic = this.apiInfo?.api.tx.imbueProposals.voteOnMilestone(
                         this.project?.chain_project_id,
-                        milestoneIndex,
+                        milestoneKey,
                         userVote
                     );
 

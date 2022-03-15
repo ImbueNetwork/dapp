@@ -296,6 +296,12 @@ ul.project-details li {
   font-weight: bolder;
 }
 
+#vote.finalized {
+  background-color: var(--theme-primary);
+  color: black;
+  font-weight: bolder;
+}
+
 @keyframes pulse {
 	0% {
 		transform: scale(0.95);

@@ -18,7 +18,7 @@
     <div class="column-19 w-col w-col-4">
         <div class="pr0">
             <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"
-                autocomplete="off" novalidate>
+                autocomplete="off" hidden="true" novalidate>
                 <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number"
                     helper="The total amount to contribute for the project." step="1" min="1" max="1e127" required>
                     <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
@@ -27,12 +27,29 @@
                 </hq-forms-textfield>
             </form>
 
-            <button href="javascript:void(0)" class="button primary" id="contribute">Contribute</button>
+            <button href="javascript:void(0)" class="button primary" id="contribute" hidden="true">Contribute</button>
+
+            <form id="vote-submission-form" name="vote-submission-form" method="get" class="form" hidden="true" autocomplete="off"
+                novalidate>
+                <mwc-select id="vote-select" class="input-field" label="Vote" name="vote-select"  required>
+                    <mwc-list-item twoline value="False">
+                        <span>No</span>
+                    </mwc-list-item>
+                    <mwc-list-item twoline value="True">
+                        <span>Yes</span>
+                    </mwc-list-item>
+                </mwc-select>
+
+                <mwc-select id="milestone-select" class="input-field" label="Milestone" name="milestone-select" hidden="true" required>
+                </mwc-select>
+                </hq-forms-textfield>
+            </form>
+
+
+            <button href="javascript:void(0)" class="button primary" hidden="true" id="vote">Vote</button>
         </div>
     </div>
 </div>
-
-
 
 <div class="tabs-menu w-tab-menu" role="tablist">
     <div class="mdc-tab-bar" role="tablist" id="tab-bar">

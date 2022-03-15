@@ -59,9 +59,7 @@ export default class Form extends HTMLElement {
         return Array.from(
             this.$grantSubmissionForm.querySelectorAll(".input-field")
         );
-    }
-
-    get nextMilestoneOrdinal(): string {
+    }    get nextMilestoneOrdinal(): string {
         return ordinals[this.milestoneIdx++] ?? "next";
     }
 
@@ -529,7 +527,6 @@ export default class Form extends HTMLElement {
 
     async updateGrantProposal(proposal: DraftProposal, id: string | number) {
         const resp = await model.updateProposal(proposal, id);
-
         if (resp.ok) {
             const proposal: Proposal = await resp.json();
             return proposal;
@@ -545,16 +542,25 @@ export default class Form extends HTMLElement {
         draft.user_id = this.user?.id;
         let proposal;
 
-        const resp = await model.postDraftProposal(draft);
-        if (resp.ok) {
-            const proposal = await resp.json();
+        if (this.projectId) {
+            proposal = this.updateGrantProposal(draft,this.projectId);
             utils.redirect(`${
                 config.grantProposalsURL
-            }/draft/preview?id=${proposal.id}`);
+            }/draft/preview?id=${this.projectId}`);
+
         } else {
-            // TODO: UX for bad request posting draft
-            console.warn("Bad request posting draft", draft);
+            const resp = await model.postDraftProposal(draft);
+            if (resp.ok) {
+                const proposal = await resp.json();
+                utils.redirect(`${
+                    config.grantProposalsURL
+                }/draft/preview?id=${proposal.id}`);
+            } else {
+                // TODO: UX for bad request posting draft
+                console.warn("Bad request posting draft", draft);
+            }
         }
+    
 
     }
 

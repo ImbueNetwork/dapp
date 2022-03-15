@@ -57,10 +57,6 @@ export type User = {
     web3Accounts: Web3Account[];
 };
 
-export type MilestoneProposal = {
-    projectKey: number;
-    milestoneIndex: number;
-};
 
 /**
  * CRUD Methods 

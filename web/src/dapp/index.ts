@@ -86,7 +86,7 @@ const navigationItems: MenuItem[] = [
     {
         name: "account-settings",
         label: "Me",
-        href: "/dapp/proposals/submit",
+        href: "/dapp/settings",
         icon: "face",
         spa: true,
     },

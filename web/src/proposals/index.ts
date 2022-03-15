@@ -13,9 +13,6 @@ import List from "../proposals/listing";
 import "../proposals/detail";
 import Detail from "../proposals/detail";
 
-import "../proposals/submit-milestone";
-import SubmitMilestone from "../proposals/submit-milestone";
-
 import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
 
@@ -67,10 +64,6 @@ export default class Proposals extends HTMLElement {
                     route.tail,
                     request
                 );
-                break;
-            case "submit":
-                this.$pages.select("submit-milestone");
-                (this.$pages.selected as SubmitMilestone).init(request);
                 break;
             case "detail":
                 this.$pages.select("detail");

@@ -15,7 +15,7 @@ import * as model from "../../../../model";
 import * as config from "../../../../config";
 import * as utils from '../../../../utils';
 import { ImbueRequest } from '../../../../dapp';
-import authDialogContent from "./auth-dialog-content.html";
+import authDialogContent from "../../../../dapp/auth-dialog-content.html";
 
 declare global {
     interface ErrorConstructor {

@@ -20,6 +20,9 @@ import * as config from "../config";
 import "../proposals";
 import Proposals from "../proposals";
 
+import "../my-projects";
+import MyProjects from "../my-projects";
+
 import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
 import logo from "../../assets/logo.svg";
@@ -86,7 +89,7 @@ const navigationItems: MenuItem[] = [
     {
         name: "account-settings",
         label: "Me",
-        href: "/dapp/settings",
+        href: "/dapp/myprojects",
         icon: "face",
         spa: true,
     },
@@ -320,7 +323,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
              * is currently "/dapp/proposals"
              */
             utils.redirect(
-                this.getAttribute("default-route") || "/proposals/draft"
+                this.getAttribute("default-route") || "/proposals/"
             );
             return;
         }
@@ -330,8 +333,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
                 this.$pages.select("proposals");
                 (this.$pages.selected as Proposals).route(route.tail, request);
                 break;
-            case "settings":
-                this.$pages.select("not-implemented");
+            case "myprojects":
+                this.$pages.select("my-projects");
+                (this.$pages.selected as MyProjects).route(route.tail, request);
                 break;
             default:
                 this.$pages.select("not-found");

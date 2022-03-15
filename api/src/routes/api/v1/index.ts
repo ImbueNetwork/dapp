@@ -2,6 +2,7 @@ import express from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import projectsRouter from "./projects";
+import usersRouter from "./users";
 import config from "../../../config";
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.get("/info", (req, res) => {
 });
 
 router.use("/projects", projectsRouter);
+router.use("/users", usersRouter);
 
 export default router;

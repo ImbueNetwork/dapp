@@ -55,19 +55,21 @@ export type Project = {
     chain_project_id?: number;
     required_funds: number;
     owner?: string;
-    user_id?: number;
+    user_id?: string | number;
 };
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
             .select()
-            .where({address,})
+            .where({ address, })
             .first();
 
 export const fetchUser = (id: number) =>
     (tx: Knex.Transaction) =>
-        tx<User>("users").where({id}).first();
+        tx<User>("users").where({ id }).first();
+
+
 
 export const upsertWeb3Challenge = (
     user: User,
@@ -75,38 +77,38 @@ export const upsertWeb3Challenge = (
     type: string,
     challenge: string,
 ) => async (tx: Knex.Transaction):
-    Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+        Promise<[web3Account: Web3Account, isInsert: boolean]> => {
 
-    let web3Account = await tx<Web3Account>("web3_accounts")
-        .select()
-        .where({
-            user_id: user?.id
-        })
-        .first();
+        let web3Account = await tx<Web3Account>("web3_accounts")
+            .select()
+            .where({
+                user_id: user?.id
+            })
+            .first();
 
-    if (!web3Account) {
+        if (!web3Account) {
+            return [
+                (
+                    await tx<Web3Account>("web3_accounts").insert({
+                        address,
+                        user_id: user.id,
+                        type,
+                        challenge,
+                    }).returning("*")
+                )[0],
+                true
+            ];
+        }
+
         return [
             (
-                await tx<Web3Account>("web3_accounts").insert({
-                    address,
-                    user_id: user.id,
-                    type,
-                    challenge,
-                }).returning("*")
+                await tx<Web3Account>("web3_accounts").update({ challenge }).where(
+                    { user_id: user.id }
+                ).returning("*")
             )[0],
-            true
+            false
         ];
-    }
-    
-    return [
-        (
-            await tx<Web3Account>("web3_accounts").update({challenge}).where(
-                {user_id: user.id}
-            ).returning("*")
-        )[0],
-        false
-    ];
-};
+    };
 
 export const insertUserByDisplayName = (displayName: string) =>
     async (tx: Knex.Transaction) => (
@@ -124,22 +126,25 @@ export const updateProject = (id: string | number, project: Project) =>
     async (tx: Knex.Transaction) => (
         await tx<Project>("projects")
             .update(project)
-            .where({id})
+            .where({ id })
             .returning("*")
     )[0];
 
 export const fetchProject = (id: string | number) =>
-    (tx: Knex.Transaction) => 
-        tx<Project>("projects").select().where({id}).first();
-
-
+    (tx: Knex.Transaction) =>
+        tx<Project>("projects").select().where({ id }).first();
 
 export const fetchAllProjects = () =>
-    (tx: Knex.Transaction) => 
+    (tx: Knex.Transaction) =>
         tx<Project>("projects").select();
 
+export const fetchUserProjects = (id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx<Project>("projects").select().where({
+            user_id: id
+        }).select();
 
-        
+
 export const insertMilestones = (
     milestones: ProposedMilestone[],
     project_id: string | number,
@@ -156,11 +161,11 @@ export const insertMilestones = (
 
 export const deleteMilestones = (project_id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Milestone>("milestones").delete().where({project_id});
+        tx<Milestone>("milestones").delete().where({ project_id });
 
 export const fetchProjectMilestones = (id: string | number) =>
-    (tx: Knex.Transaction) => 
-        tx<Milestone>("milestones").select().where({project_id: id});
+    (tx: Knex.Transaction) =>
+        tx<Milestone>("milestones").select().where({ project_id: id });
 
 export const insertFederatedCredential = (
     id: number,
@@ -189,7 +194,7 @@ export const getOrCreateFederatedUser = (
                 issuer,
                 subject,
             }).first();
-    
+
             /**
              * If not, create the `usr`, then the `federated_credential`
              */
@@ -200,22 +205,21 @@ export const getOrCreateFederatedUser = (
                 const user_ = await db.select().from<User>("users").where({
                     id: federated.id
                 }).first();
-    
+
                 if (!user_) {
                     throw new Error(
-                        `Unable to find matching user by \`federated_credential.id\`: ${
-                            federated.id
+                        `Unable to find matching user by \`federated_credential.id\`: ${federated.id
                         }`
                     );
                 }
                 user = user_;
             }
-    
+
             done(null, user);
         } catch (err) {
             done(new Error(
                 "Failed to upsert federated authentication.",
-                {cause: err as Error}
+                { cause: err as Error }
             ));
         }
     });

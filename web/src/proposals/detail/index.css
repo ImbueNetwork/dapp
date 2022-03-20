@@ -38,7 +38,7 @@
 
 
 .button {
-    width: 100%;
+    width: 45%;
     padding-top: 20px;
     padding-bottom: 20px;
     background-color: #411dc9;
@@ -297,6 +297,18 @@ ul.project-details li {
 }
 
 #vote.finalized {
+  background-color: var(--theme-primary);
+  color: black;
+  font-weight: bolder;
+}
+
+#submit-milestone.finalized {
+  background-color: var(--theme-primary);
+  color: black;
+  font-weight: bolder;
+}
+
+#withdraw.finalized {
   background-color: var(--theme-primary);
   color: black;
   font-weight: bolder;

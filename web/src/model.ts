@@ -91,3 +91,9 @@ export const fetchProjects = () => fetch(
     `${config.apiBase}/projects/`,
     {headers: config.getAPIHeaders}
 );
+
+
+ export const fetchUserProjects = (userId: number) => fetch(
+    `${config.apiBase}/users/${userId}/projects/`,
+    {headers: config.getAPIHeaders}
+);

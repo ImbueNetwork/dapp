@@ -12,11 +12,10 @@ import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import html from "./index.html";
 import localDraftDialogContent from "./local-draft-dialog-content.html";
-import authDialogContent from "./auth-dialog-content.html";
+import authDialogContent from "../../../dapp/auth-dialog-content.html";
 import css from "./index.css";
 import type { DraftProposal, Proposal, User } from "../../../model";
 
-import { getWeb3Accounts, signWeb3Challenge } from "../../../utils/polkadot";
 import * as config from "../../../config";
 import * as model from "../../../model";
 import * as utils from "../../../utils";
@@ -380,6 +379,7 @@ export default class Preview extends HTMLElement {
                     }
                     this.$finalize.disabled = true;
                     this.$finalize.classList.add("blob");
+                    this.$finalize.innerText = "Saving.....";
                     const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
                         this.project.name,
                         this.project.logo,

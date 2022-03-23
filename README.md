@@ -3,9 +3,19 @@ Imbue Network is a decentralised crowdfunding DAO built on top of the Polkadot b
 
 
 
-# DAPP
 
-Imbue Network Dapp
+
+# Imbue Network Dapp
+
+## Requirements
+
+To go through this guide you will need:
+
+1. An account on the target testnet with funds. Our public testnet can be found [here](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.imbue.network#/explorer)
+2. Polkadot-js wallet extention, you can install one from [here](https://polkadot.js.org/extension/)
+3. If launching locally, you need to have the env `GOOGLE_OAUTH2_CLIENT_ID` and `GOOGLE_OAUTH2_CLIENT_SECRET` variables set. You can set an empty value to them if you dont plan to sign in using OAuth
+
+
 
 ## Local deployment quickstart with docker-compose
 
@@ -15,22 +25,80 @@ From the top-level of the repo, all that's required is to run
 docker-compose up -d
 ```
 
-to build the associated images and start all services.
+to build the associated images and start all services. 
+
+Once all the services are build you need to set up the databases using the command `docker exec api make db_up;`
+
+If you face any issues after the databases are created then restart the services using `docker-compose down;docker-compose up -d`
+
+_Please note if you are using a Apple silicon e.g. M1 then you need to replace the Docker files_
+
 
 ## Steps to create a new Imbue Network Project
 
-1. Navigate to https://localhost:8443/ (currently, because we're using self-signed certs, the only browsers that can be used for testing are Chromium (i.e., not Google Chrome) and Firefox.
-2. In the navigation, click "Start a project"
-    - Note that the website's navigation currently only shows up when the screen size is at a small breakpoint. You can alternatively navigate directly to "Start a project" by going to https://localhost:8443/grant-submission
-3. The site will start to try connect to the configured websocket, as well as search for a web3 extension, etc. This will require you to grant permission to the site on your extension. If there is no extension found, the site should notify you and link to the download page.
-4. Enter all of the required information (i.e., every field except "category", which appeared in the exported webflow design, so I kept it in, but not sure what the values should be)
-5. Add at least one milestone. The "percent to unlock" for all of the milestones should add up to 100%. (Known issue: currently you can add more milestones, but you can't delete them)
-6. Click "Create Project Proposal" to start the process of submitting the transaction to the chain.
-7. If you have enough funds in your account, it will start to display status messages about what part of the process you're in in terms of creating the project and finalization.
-    - known issue: no spinner or progress bar
-    - If you don't have enough funds, the dialog will say so; dismiss the dialog and go to https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A8081%2Fwsapp%2F#/accounts to get Alice to send you some funds
-    - Once you have enough funds, resubmit and everything should work
-8. Once the status is "Finalized", hit escape (or click anywhere) and you should see the form with all of the controls disabled.
+For the purpose of this tutorial we will be using a local environment but you can just as easily follow it by going to the public staging url https://dev.imbue.network/dapp
+
+We also advise to use two completely different browsers (e.g. Chrome and Firefox) because you will be effectively using two different personas
+
+
+### _(Initiator)_ Create the proposal 
+1. Navigate to http://localhost:8081/dapp/proposals/draft
+2. The site will ask you to connect to your wallet, chose the required account who will act as the initiator for this project.
+![Sign-in](./assets/imgs/sign-in.png)
+3. Enter all of the required information for the project and the required funds. Add at least one milestone. The "percent to unlock" for all of the milestones should add up to 100%.
+![new-project](./assets/imgs/new-project.png)
+4. Click "Save Draft Proposal Proposal" to start the process of submitting the transaction to the chain.
+5. Review the project and if acceptable click on `Finalise!`
+![finalise](./assets/imgs/finalise.png)
+6. Once you see the `Proposal Created` message, congratulations your proposal is now onchain!
+![proposal-created](./assets/imgs/proposal-created.png)
+
+
+### _(ADMIN/COUNCIL)_ Schedule round
+1. The UI for a super user has not been built yet, but you can use polkadotJS to open the funding round, its fairly simple and can be followed [here](https://github.com/ImbueNetwork/imbue#proposal-pallet-interaction)
+
+
+### _(Contributor)_ Contribute
+1. To contribute you need to ensure you are using a different browser or incognito because initators of projects cannot contribute to their own projects
+2. Navigate to http://localhost:8081/dapp/proposals/
+3. You should the project see a list of projects that have been created via the UI
+![project-list](./assets/imgs/project-list.png)
+4. Click the project you want to fund and you will be navigated to the details page. Notice that contribution section will now be available
+![contribute](./assets/imgs/contribute.png)
+Enter the amount you want to contribute and click the `Contribute` button
+![contribution-success](./assets/imgs/contribution-success.png)
+
+
+### _(ADMIN/COUNCIL)_ Approve Project
+1. The UI for a super user has not been built yet, but you can use polkadotJS to approve a project [here](https://github.com/ImbueNetwork/imbue#proposal-pallet-interaction)
+
+_Please note the role of the council here to define what success looks like, answer questions around whether of not a fund raise can be considered successful if it only hit 70% or 80% of its target. The role of the council will be reduced once these thresholds are set_
+
+
+### _(Initiator)_ Submit Milestone
+1. Once a project has been approved, switch back to the initator - go to the details page and you will see that it has changed to reflect milestone submission
+![submit-milestone](./assets/imgs/submit-milestone.png)
+
+2. Once the submission gets saved onchain, you should see confirmation of it
+ and submit your first milestone.
+ ![submit-milestone-success](./assets/imgs/submit-milestone-success.png)
+
+
+### _(Contributor)_  Vote On Milestone
+1. Switch back to the contributor and you will see that you can now vote on the milestone
+![vote-milestone](./assets/imgs/vote-milestone.png)
+
+2. Choose your vote and the milestone you want to vote on, and click vote. Once the vote gets saved on chain you should see the confirmation
+![vote-success](./assets/imgs/vote-success.png)
+
+
+### _(ADMIN/COUNCIL)_ Approve Milestone
+1. The UI for a super user has not been built yet, but you can use polkadotJS to approve a milestone [here](https://github.com/ImbueNetwork/imbue#proposal-pallet-interaction)
+
+_Please note just like the funding decision, the council comes in here to define what a successful vote looks like. This is a form of protection while we work with the community build the foundations of what success looks like. Once thresholds are set we can reduce the role of the council_
+
+### _(Initiator)_ Withdraw Funds
+1. Switch back to the initator and now you can successfully withdraw the funds
 
 
 ## Services

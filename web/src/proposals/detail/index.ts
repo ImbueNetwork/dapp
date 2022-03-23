@@ -422,7 +422,7 @@ export default class Detail extends HTMLElement {
                                     events.forEach((record: any) => {
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
-                                        const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceed";
+                                        const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
 
                                         if (contributionSucceeded) {
                                             const types = event.typeDef;

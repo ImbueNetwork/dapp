@@ -1,7 +1,16 @@
-FROM node:16-slim AS builder
+ARG IMBUE_DOCKERFILE_NODE_IMAGE="node:16-slim"
+
+FROM ${IMBUE_DOCKERFILE_NODE_IMAGE} AS builder
+
+ARG IMBUE_LOCAL_INIT_SCRIPTS
 
 WORKDIR /builds/imbue
 ADD . .
+
+RUN if [ "${IMBUE_LOCAL_INIT_SCRIPTS}x" != "x" ]; then \
+        for file in ${IMBUE_LOCAL_INIT_SCRIPTS}/*; do bash -l $file; done;\
+    fi
+
 RUN yarn install
 RUN yarn run webpack build
 

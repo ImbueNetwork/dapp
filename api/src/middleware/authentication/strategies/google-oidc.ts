@@ -7,6 +7,19 @@ import config from "../../../config";
 // No @types yet :(
 const OIDCStrategy = require("passport-openidconnect");
 
+/**
+ * When developing locally, not having a `clientID` and `clientSecret` will
+ * prevent the server from starting, so instead of allowing that to happen, we
+ * just spoof these values which effectively disables google OIDC locally.
+ */
+const hasGoogleCreds = Object.entries(config.oidc.google).every(([_,v]) => v);
+const googleClientCredentials = hasGoogleCreds
+    ? config.oidc.google
+    : {
+        clientID: "garbage",
+        clientSecret: "garbage",
+    };
+
 
 export class GoogleOIDCStrategy extends OIDCStrategy {
     name: string;
@@ -14,6 +27,10 @@ export class GoogleOIDCStrategy extends OIDCStrategy {
     constructor(options: Record<string,any>, verify: CallableFunction) {
         super({
             ...config.oidc.google,
+            // i.e., this will override the `clientID` and `clientSecret` from
+            // `config.oicd.google`, but preserve the other entries it had (see
+            // comment above for declaration of `googleClientCredentials`):
+            ...googleClientCredentials,
             ...options
         }, verify);
         this.name = "google";
@@ -23,7 +40,6 @@ export class GoogleOIDCStrategy extends OIDCStrategy {
         super.authenticate(req, opts);
     }
 }
-
 
 export const googleOIDCStrategy = new GoogleOIDCStrategy(
     {
@@ -39,7 +55,6 @@ export const googleOIDCStrategy = new GoogleOIDCStrategy(
 export const googleOIDCRouter = express.Router();
 
 googleOIDCRouter.get("/login", (req, _res, next) => {
-    console.log("QUERY", req.query);
     if (req.query.n) {
         (req.session as any).next = req.query.n;
     }

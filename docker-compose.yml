@@ -22,7 +22,11 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
 
   api:
-    build: ./api
+    build:
+      context: ./api
+      args:
+      - "IMBUE_DOCKERFILE_NODE_IMAGE=${IMBUE_DOCKERFILE_NODE_IMAGE:-node:16-slim}"
+      - "IMBUE_LOCAL_INIT_SCRIPTS=${IMBUE_LOCAL_INIT_SCRIPTS}"
     container_name: api
     ports:
     - "3000:3000"
@@ -39,7 +43,11 @@ services:
     - "./api/views:/api/views"
 
   web:
-    build: ./web
+    build:
+      context: ./web
+      args:
+      - "IMBUE_DOCKERFILE_NODE_IMAGE=${IMBUE_DOCKERFILE_NODE_IMAGE:-node:16-slim}"
+      - "IMBUE_LOCAL_INIT_SCRIPTS=${IMBUE_LOCAL_INIT_SCRIPTS}"
     container_name: web
     ports:
     - "8081:80"

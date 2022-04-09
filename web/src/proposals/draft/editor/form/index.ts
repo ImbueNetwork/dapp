@@ -527,7 +527,10 @@ export default class Form extends HTMLElement {
         } else {
             // TODO: UX for submission failed
             // maybe `this.dialog(...)`
-            this.disabled = false;
+            // this.disabled = false;
+            throw new Error("Failed to create draft proposal", {
+                cause: {...resp, name: "fetch", message: resp.statusText}
+            });
         }
     }
 
@@ -537,6 +540,9 @@ export default class Form extends HTMLElement {
             const proposal: Proposal = await resp.json();
             return proposal;
         }
+        throw new Error("Failed to update draft proposal", {
+            cause: {...resp, name: "fetch", message: resp.statusText}
+        });
     }
 
     async submitGrantProposal(
@@ -546,14 +552,14 @@ export default class Form extends HTMLElement {
 
         // if yes, go ahead and post the draft with the `imbuer_id`
         draft.imbuer_id = this.imbuer?.id;
-        let _proposal;
-
 
         if (this.projectId) {
+            // TODO: UX/error handling -- we probably don't want to redirect
+            // here if the update went wrong.
             await this.updateGrantProposal(draft, this.projectId);
             utils.redirect(`${
                 config.grantProposalsURL
-            }/draft/preview?id=${this.projectId}`);
+            }/draft/preview?id=${this.projectId}&update`);
         } else {
             const resp = await model.postDraftProposal(draft);
             if (resp.ok) {

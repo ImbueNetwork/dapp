@@ -179,7 +179,7 @@ export default class Preview extends HTMLElement {
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
          */
-        await this.fetchProject(projectId).then(project => {
+        await this.fetchProject(projectId, this.updateDeclared).then(project => {
             if (project) {
                 this.renderProject(project);
             } else {
@@ -237,8 +237,8 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async fetchProject(projectId: string) {
-        if (this.project) {
+    async fetchProject(projectId: string, force = false) {
+        if (!force && this.project) {
             return this.project;
         }
         const resp = await model.fetchProject(projectId);
@@ -259,6 +259,14 @@ export default class Preview extends HTMLElement {
             return entry[1];
         }
         return null;
+    }
+
+    get updateDeclared() {
+        return window.location.search
+            .split("?")[1]
+            ?.split("&")
+            .map(str => str.split("="))
+            .find(([k, _]) => k === "update")?.[0] === "update";
     }
 
     bind() {
@@ -473,7 +481,8 @@ export default class Preview extends HTMLElement {
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = project.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${project.website}" target="_blank">${project.website
+            <a href="${project.website}" target="_blank">${
+                project.website
             }</a>
         `;
         this.$projectDescription.innerHTML =
@@ -491,11 +500,12 @@ export default class Preview extends HTMLElement {
                             <i class="material-icons">pending_actions</i>
                         </span>
                         <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name
-                    }</span>
-                            <span class="mdc-deprecated-list-item__secondary-text"><!--
-                            -->${milestone.percentage_to_unlock}%
-                            </span>
+                            <span class="mdc-deprecated-list-item__primary-text">${
+                                milestone.name
+                            }</span>
+                            <span class="mdc-deprecated-list-item__secondary-text">${
+                                milestone.percentage_to_unlock
+                            }%</span>
                         </span>
                     </li>
                 `)

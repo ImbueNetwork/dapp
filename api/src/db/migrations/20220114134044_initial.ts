@@ -37,7 +37,7 @@ export async function up(knex: Knex): Promise<void> {
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, web3AccountsTableName));
 
-    const federatedCredsTableName = "federated_credentials";
+    const federatedCredsTableName = "federated_credential";
     await knex.schema.createTable(federatedCredsTableName, (builder) => {
         builder.integer("id");
         builder.text("issuer");
@@ -75,8 +75,8 @@ export async function up(knex: Knex): Promise<void> {
      *      create_block_number: BlockNumber,
      *  }
      */
-    const projectsTableName = "projects";
-    await knex.schema.createTable(projectsTableName, (builder: Knex.CreateTableBuilder) => {
+    const projectTableName = "project";
+    await knex.schema.createTable(projectTableName, (builder: Knex.CreateTableBuilder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("name"); // project name
         builder.text("logo"); // URL or dataURL (i.e., base64 encoded)
@@ -150,7 +150,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.bigInteger("create_block_number").nullable(); //.unsigned();
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, projectsTableName));
+    }).then(onUpdateTrigger(knex, projectTableName));
 
     /**
      *  pub struct Milestone {
@@ -161,13 +161,13 @@ export async function up(knex: Knex): Promise<void> {
      *      is_approved: bool
      *  }
      */
-    const milestonesTableName = "milestones";
-    await knex.schema.createTable(milestonesTableName, (builder) => {
+    const milestoneTableName = "milestone";
+    await knex.schema.createTable(milestoneTableName, (builder) => {
         builder.integer("milestone_index");
         builder.integer("project_id").notNullable();
         builder.primary(["project_id","milestone_index"]);
         builder.foreign("project_id")
-            .references("projects.id")
+            .references("project.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
 
@@ -176,7 +176,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.boolean("is_approved").defaultTo(false);
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, milestonesTableName));
+    }).then(onUpdateTrigger(knex, milestoneTableName));
 
     /**
      * TODO: ? votes and contributions
@@ -230,10 +230,10 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.schema.dropTableIfExists("milestones");
-    await knex.schema.dropTableIfExists("projects");
+    await knex.schema.dropTableIfExists("milestone");
+    await knex.schema.dropTableIfExists("project");
     await knex.schema.dropTableIfExists("project_status");
-    await knex.schema.dropTableIfExists("federated_credentials");
+    await knex.schema.dropTableIfExists("federated_credential");
     await knex.schema.dropTableIfExists("web3_account");
     await knex.schema.dropTableIfExists("imbuer");
     await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);

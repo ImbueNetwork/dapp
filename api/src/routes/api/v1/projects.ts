@@ -66,7 +66,8 @@ const validateProposal = (proposal: models.GrantProposal) => {
     }
 
     const entries = Object.entries(proposal);
-    if (entries.filter(([_,v]) => {
+    if (
+        entries.filter(([_,v]) => {
             // undefined not allowed
             return v === void 0;
         }).length

@@ -119,12 +119,12 @@ export const insertImbuerByDisplayName = (displayName: string) =>
 
 export const insertProject = (project: Project) =>
     async (tx: Knex.Transaction) => (
-        await tx<Project>("projects").insert(project).returning("*")
+        await tx<Project>("project").insert(project).returning("*")
     )[0];
 
 export const updateProject = (id: string | number, project: Project) =>
     async (tx: Knex.Transaction) => (
-        await tx<Project>("projects")
+        await tx<Project>("project")
             .update(project)
             .where({ id })
             .returning("*")
@@ -132,15 +132,15 @@ export const updateProject = (id: string | number, project: Project) =>
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select().where({ id }).first();
+        tx<Project>("project").select().where({ id }).first();
 
 export const fetchAllProjects = () =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select();
+        tx<Project>("project").select();
 
 export const fetchImbuerProjects = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select().where({
+        tx<Project>("project").select().where({
             imbuer_id: id
         }).select();
 
@@ -156,23 +156,23 @@ export const insertMilestones = (
     }));
 
     return (tx: Knex.Transaction) =>
-        tx<Milestone>("milestones").insert(values).returning("*");
+        tx<Milestone>("milestone").insert(values).returning("*");
 };
 
 export const deleteMilestones = (project_id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Milestone>("milestones").delete().where({ project_id });
+        tx<Milestone>("milestone").delete().where({ project_id });
 
 export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Milestone>("milestones").select().where({ project_id: id });
+        tx<Milestone>("milestone").select().where({ project_id: id });
 
 export const insertFederatedCredential = (
     id: number,
     issuer: string,
     subject: string,
 ) => async (tx: Knex.Transaction) => (
-    await tx<FederatedCredential>("federated_credentials").insert({
+    await tx<FederatedCredential>("federated_credential").insert({
         id, issuer, subject
     }).returning("*")
 )[0];
@@ -190,7 +190,7 @@ export const getOrCreateFederatedImbuer = (
             /**
              * Do we already have a federated_credential ?
              */
-            const federated = await tx<FederatedCredential>("federated_credentials").select().where({
+            const federated = await tx<FederatedCredential>("federated_credential").select().where({
                 issuer,
                 subject,
             }).first();

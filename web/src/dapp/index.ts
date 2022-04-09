@@ -41,7 +41,7 @@ import styles from "./index.css";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
 
-export type ImbueRequest = {
+export type DappRequest = {
     imbuer: Promise<Imbuer | null>;
     accounts: Promise<InjectedAccountWithMeta[]>;
     apiInfo: Promise<PolkadotJsApiInfo>;
@@ -311,7 +311,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         }
 
         const route = new Route(`${config.context}/:app`, path);
-        const request: ImbueRequest = {
+        const request: DappRequest = {
             imbuer: this.imbuer,
             accounts: this.accounts,
             apiInfo: this.apiInfo,
@@ -329,6 +329,12 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         }
 
         switch (route.data?.app) {
+            /**
+             * This is the app intended to be used for creating/editing project
+             * proposal drafts. Once the draft has been finalized, it's been
+             * promoted to a "project" and should be dealt with in the "projects"
+             * app (below).
+             */
             case "proposals":
                 this.$pages.select("proposals");
                 (this.$pages.selected as Proposals).route(route.tail, request);

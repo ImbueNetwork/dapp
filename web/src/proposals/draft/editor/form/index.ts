@@ -14,7 +14,7 @@ import { getWeb3Accounts } from "../../../../utils/polkadot";
 import * as model from "../../../../model";
 import * as config from "../../../../config";
 import * as utils from '../../../../utils';
-import { ImbueRequest } from '../../../../dapp';
+import { DappRequest } from '../../../../dapp';
 import authDialogContent from "../../../../dapp/auth-dialog-content.html";
 
 declare global {
@@ -143,7 +143,7 @@ export default class Form extends HTMLElement {
         `);
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
         this.disabled = true;
         this.reset();
         this.imbuer = await request.imbuer;

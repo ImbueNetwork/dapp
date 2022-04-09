@@ -18,7 +18,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getWeb3Accounts } from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
-import type { ImbueRequest, PolkadotJsApiInfo } from "../../dapp";
+import type { DappRequest, PolkadotJsApiInfo } from "../../dapp";
 
 const CONTENT = Symbol();
 
@@ -169,7 +169,7 @@ export default class Detail extends HTMLElement {
         this.bind();
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
         const projectId = this.projectId;
         if (!projectId) {
             /**
@@ -200,7 +200,13 @@ export default class Detail extends HTMLElement {
             }
         });
 
-        const projectOnChain: any = await (await this.apiInfo?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+        const projectOnChain = await (
+            await this.apiInfo
+                ?.api
+                .query
+                .imbueProposals
+                .projects(this.project?.chain_project_id)
+        ).toHuman() as unknown as model.ImbueProject;
 
         if (projectOnChain) {
             if (this.imbuer) {
@@ -219,13 +225,13 @@ export default class Detail extends HTMLElement {
             if (this.imbuerIsInitiator) {
                 this.contributionSubmissionForm.hidden = this.imbuerIsInitiator;
                 this.$contribute.hidden = this.imbuerIsInitiator;
-                if (projectOnChain.approvedForFunding) {
+                if (projectOnChain.approved_for_funding) {
                     this.$submitMilestoneForm.hidden = !this.imbuerIsInitiator
                     this.$submitMilestone.hidden = !this.imbuerIsInitiator
                     this.$withdraw.hidden = !this.imbuerIsInitiator
                 }
-            } else if (projectOnChain.approvedForFunding) {
-                this.openForVoting = projectOnChain.approvedForFunding;
+            } else if (projectOnChain.approved_for_funding) {
+                this.openForVoting = projectOnChain.approved_for_funding;
                 this.$voteSubmissionForm.hidden = !this.openForVoting
                 this.$vote.hidden = !this.openForVoting;
             } else {
@@ -235,13 +241,13 @@ export default class Detail extends HTMLElement {
         }
     }
 
-    milestoneFragment(milestone: any) {
+    milestoneFragment(milestone: model.Milestone) {
         return document.createRange().createContextualFragment(`
             <mwc-list-item
              twoline
-             value="${milestone.milestoneKey}">
+             value="${milestone.milestone_key}">
                 <span>${milestone.name}</span>
-                <span class="select-source" slot="secondary">${milestone.percentageToUnlock
+                <span class="select-source" slot="secondary">${milestone.percentage_to_unlock
             }%</span>
             </mwc-list-item>
         `);

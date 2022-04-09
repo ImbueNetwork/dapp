@@ -1,17 +1,15 @@
 import { marked } from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
-import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
+import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { MDCTabBar } from "@material/tab-bar";
-import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import type { SubmittableExtrinsic } from "@polkadot/api/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { ISubmittableResult } from "@polkadot/types/types";
 
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import html from "./index.html";
-import localDraftDialogContent from "./local-draft-dialog-content.html";
 import authDialogContent from "../../../dapp/auth-dialog-content.html";
 import css from "./index.css";
 import type { DraftProposal, Proposal, Imbuer } from "../../../model";
@@ -19,7 +17,7 @@ import type { DraftProposal, Proposal, Imbuer } from "../../../model";
 import * as config from "../../../config";
 import * as model from "../../../model";
 import * as utils from "../../../utils";
-import { ImbueRequest, PolkadotJsApiInfo } from "../../../dapp";
+import { DappRequest, PolkadotJsApiInfo } from "../../../dapp";
 
 
 const CONTENT = Symbol();
@@ -160,7 +158,7 @@ export default class Preview extends HTMLElement {
             }/draft?id=${this.projectId}`;
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
 
         const projectId = this.projectId;
         this.imbuer = await request.imbuer;
@@ -287,46 +285,10 @@ export default class Preview extends HTMLElement {
                     }/draft?id=${this.projectId}`);
             };
 
-            if (this.projectId === "local-draft" || this.imbuer) {
+            if (this.imbuer) {
                 edit();
             } else {
                 this.wrapAuthentication(edit);
-            }
-        });
-
-        this.$save.addEventListener("click", e => {
-            const save = async () => {
-                if (this.project) {
-                    const resp = await model.postDraftProposal(this.project);
-                    if (resp.ok) {
-                        const project = await resp.json();
-                        utils.redirect(`${config.grantProposalsURL
-                            }/draft/preview?id=${project.id}`);
-                    } else {
-                        // TODO: UX for bad request posting draft
-                        console.warn("Bad request posting draft", this.project);
-                    }
-                } else {
-                    // shouldn't happen?
-                }
-            };
-
-            if (!this.imbuer) {
-                this.wrapAuthentication(save);
-            } else {
-                /**
-                 * Save and redirect back to legit projectId? Or do we want to
-                 * bring them back here so that they can decide whether or not
-                 * to save?
-                 * 
-                 * I think we should just handle it in the background --
-                 * imbuer logs in, and gets redirected back here to `local-draft`
-                 * but we detect that from the URL and then go through a save
-                 * workflow (the same one we would do in this else block),
-                 * which would redirect them to this "preview" page, but with a
-                 * legit `projectId` instead of `local-draft`.
-                 */
-                save();
             }
         });
 

@@ -7,7 +7,7 @@ import { Proposal, Imbuer } from "../../model";
 import * as model from "../../model";
 import * as utils from "../../utils";
 import * as config from "../../config";
-import type { ImbueRequest, PolkadotJsApiInfo } from "../../dapp";
+import type { DappRequest, PolkadotJsApiInfo } from "../../dapp";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
 
 const CONTENT = Symbol();
@@ -43,7 +43,7 @@ export default class List extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
         this.apiInfo = await request.apiInfo;
         this.imbuer = await request.imbuer;
 
@@ -67,8 +67,8 @@ export default class List extends HTMLElement {
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
             this.imbuer = state.imbuer;
-            console.log(state);
-            console.log(state.imbuer);
+            // console.log(state);
+            // console.log(state.imbuer);
             action();
         }
 
@@ -86,7 +86,7 @@ export default class List extends HTMLElement {
                             handler: () => {},
                             label: "Continue using local storage"
                         }
-                    }
+                    },
                 },
             }
         ));
@@ -94,7 +94,7 @@ export default class List extends HTMLElement {
 
 
     async fetchImbuerProjects() {
-        const resp = await model.fetchImbuerProjects(this.imbuer?.id!);
+        const resp = await model.fetchProjectsByImbuerId(this.imbuer?.id!);
         if (resp.ok) {
             return await resp.json();
         } else {

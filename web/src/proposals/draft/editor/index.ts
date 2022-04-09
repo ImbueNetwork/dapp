@@ -4,7 +4,7 @@ import css from "./index.css";
 import "./form";
 import ProposalsDraftEditorForm from "./form";
 import { Imbuer } from "../../../model";
-import { ImbueRequest } from "../../../dapp";
+import { DappRequest } from "../../../dapp";
 
 
 const template = document.createElement("template");
@@ -36,7 +36,7 @@ export default class Editor extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    init(request: ImbueRequest) {
+    init(request: DappRequest) {
         return this.$form?.init(request);
     }
 }

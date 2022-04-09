@@ -2,6 +2,10 @@ server {
 	listen ${HTTP_PORT};
 	listen [::]:${HTTP_PORT};
 
+# We're not doing HTTPS here because we're assuming 
+# that we'll be deployed behind a load balancer. But
+# this is how you might do it:
+#
 ###	# Change 302 to 301 to make the redirect permanent.
 ###	return 302 https://$host:${HTTPS_PORT}$request_uri;
 ###}

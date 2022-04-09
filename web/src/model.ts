@@ -37,12 +37,28 @@ export type Proposal = DraftProposal & {
     milestones: Milestone[];
 }
 
+/** Models the Project type from the chain */
+export type ImbueProject = {
+    name: string;
+    logo: string;
+    description: string;
+    website: string;
+    milestones: Milestone[];
+    contributions: any[]; // in the future, something like `Contribution[]`
+    required_funds: number;
+    withdrawn_funds: number;
+    /// The account that will receive the funds if the campaign is successful
+    initiator: string, // public address
+    create_block_number: number;
+    approved_for_funding: boolean;
+}
+
 /**
  * Models a "milestone" saved to the db (and also as it will appear on chain).
  */
 export type Milestone = DraftMilestone & {
-    milestone_index?: number;
-    project_id: number;
+    milestone_key?: number;
+    project_key: number;
     is_approved: boolean;
     created: string;
     modified: string;
@@ -93,7 +109,7 @@ export const fetchProjects = () => fetch(
 );
 
 
- export const fetchImbuerProjects = (imbuerId: number) => fetch(
+ export const fetchProjectsByImbuerId = (imbuerId: number) => fetch(
     `${config.apiBase}/imbuers/${imbuerId}/projects/`,
     {headers: config.getAPIHeaders}
 );

@@ -5,7 +5,7 @@ import { SignerResult } from "@polkadot/api/types";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 import * as config from "../config";
-import { User } from "../model";
+import { Imbuer } from "../model";
 import { signWeb3Challenge } from "../utils/polkadot";
 
 import authDialogContent from "./auth-dialog-content.html";
@@ -22,7 +22,7 @@ type AuthenticationDialogOptions = {
 
 export default class Authentication extends HTMLElement {
 
-    user?: User;
+    imbuer?: Imbuer;
 
     launchAuthDialog(opts?: AuthenticationDialogOptions) {
         const callback = opts?.callback || (() => {});
@@ -79,8 +79,8 @@ export default class Authentication extends HTMLElement {
                 SignerResult;
             const account = state?.account as
                 InjectedAccountWithMeta;
-            const user = state?.user as
-                User;
+            const imbuer = state?.imbuer as
+                Imbuer;
 
             const resp = await fetch(
                 `/auth/web3/${account.meta.source}/callback`,
@@ -94,8 +94,8 @@ export default class Authentication extends HTMLElement {
                 }
             );
             if (resp.ok) {
-                // authenticated. Set user.
-                this.user = user;
+                // authenticated. Set imbuer.
+                this.imbuer = imbuer;
                 return this.web3AuthWorkflow("done", state);
             } else {
                 // TODO: UX for 401
@@ -117,14 +117,14 @@ export default class Authentication extends HTMLElement {
 
             if (resp.ok) {
                 // could be 200 or 201
-                const { user, web3Account } = await resp.json();
+                const { imbuer, web3Account } = await resp.json();
                 const signature = await signWeb3Challenge(
                     account, web3Account.challenge
                 );
                 if (signature) {
                     return this.web3AuthWorkflow(
                         "signed",
-                        {...state, signature, user}
+                        {...state, signature, imbuer}
                     );
                 } else {
                     // TODO: UX for no way to sign challenge?

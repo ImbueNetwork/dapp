@@ -54,6 +54,10 @@
     --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
     --mdc-theme-text-icon-on-background: var(--mdc-text-field-label-ink-color);
 
+    /** This seems to fix the bug where letter "tails" are being cut off
+        inexplicably */
+    --mdc-typography-subtitle1-font-size: 1.05rem;
+
     /* --mdc-dialog-content-ink-color: var(--mdc-text-field-ink-color);
     --mdc-dialog-scrim-color: rgba(200, 200, 255, 0.5); */
 

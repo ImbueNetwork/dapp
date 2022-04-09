@@ -3,7 +3,7 @@ import css from "./index.css";
 
 import "./form";
 import ProposalsDraftEditorForm from "./form";
-import { User } from "../../../model";
+import { Imbuer } from "../../../model";
 import { ImbueRequest } from "../../../dapp";
 
 

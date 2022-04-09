@@ -33,7 +33,7 @@ import Authentication from "../authentication";
 import "../account-choice";
 import AccountChoice from "../account-choice";
 
-import { User } from "../model";
+import { Imbuer } from "../model";
 import { getWeb3Accounts } from "../utils/polkadot";
 
 import html from "./index.html";
@@ -42,12 +42,12 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 
 
 export type ImbueRequest = {
-    user: Promise<User | null>;
+    imbuer: Promise<Imbuer | null>;
     accounts: Promise<InjectedAccountWithMeta[]>;
-    apiInfo: Promise<polkadotJsApiInfo>;
+    apiInfo: Promise<PolkadotJsApiInfo>;
 };
 
-export type polkadotJsApiInfo = {
+export type PolkadotJsApiInfo = {
     api: ApiPromise;
     provider: WsProvider;
     webSockAddr: string;
@@ -112,9 +112,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     $accountChoice: AccountChoice;
     $auth: Authentication;
 
-    user: Promise<User>;
+    imbuer: Promise<Imbuer>;
     accounts: Promise<InjectedAccountWithMeta[]>;
-    apiInfo: Promise<polkadotJsApiInfo>;
+    apiInfo: Promise<PolkadotJsApiInfo>;
 
 
     constructor() {
@@ -145,7 +145,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             this[CONTENT].getElementById("account-choice") as
                 AccountChoice;
 
-        this.user = fetch(`${config.apiBase}/user`).then(
+        this.imbuer = fetch(`${config.apiBase}/me`).then(
             resp => {
                 if (resp.ok) {
                     return resp.json();
@@ -198,7 +198,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
     initRouting() {
         window.addEventListener("popstate", e => {
-            console.log("popstate", window.location.href);
+            console.log("Dapp/top-level: popstate", window.location.href);
             this.route(window.location.pathname);
             this.$layout.closeDrawer("right");
         });
@@ -257,14 +257,14 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         ));
     }
 
-    async initPolkadotJSAPI(): Promise<polkadotJsApiInfo> {
+    async initPolkadotJSAPI(): Promise<PolkadotJsApiInfo> {
         const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
             resp => resp.json()
         )).imbueNetworkWebsockAddr as string;
 
         const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
-            this.errorNotification(e);
+            // this.errorNotification(e);
             console.log(e);
         });
         provider.on("disconnected", e => {
@@ -312,7 +312,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
         const route = new Route(`${config.context}/:app`, path);
         const request: ImbueRequest = {
-            user: this.user,
+            imbuer: this.imbuer,
             accounts: this.accounts,
             apiInfo: this.apiInfo,
         }
@@ -348,6 +348,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
  * such that `<link>`s within `shadowRoot` can render the font.
  * 
  * We do this here because this should be considered the entrypoint of the app.
+ * 
+ * XXX: However, couldn't this also just be hard-coded in the index.html file
+ * instead?
  */
 document.head.appendChild(
     document.createRange().createContextualFragment(`

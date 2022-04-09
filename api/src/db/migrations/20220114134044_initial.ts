@@ -6,8 +6,8 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.raw(ON_UPDATE_TIMESTAMP_FUNCTION);
 
-    const usersTableName = "users";
-    await knex.schema.createTable(usersTableName, (builder) => {
+    const imbuerTableName = "imbuer";
+    await knex.schema.createTable(imbuerTableName, (builder) => {
         /**
          * We need to be able to capture users who are just casually creating
          * a Project without any web3 functionality yet. So we lazily require
@@ -17,22 +17,22 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("display_name");
 
         auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, usersTableName));
+    }).then(onUpdateTrigger(knex, imbuerTableName));
 
     /**
      * Without at least one of these, a usr can't really do much beyond saving
      * a draft proposal.
      */
-    const web3AccountsTableName = "web3_accounts";
+    const web3AccountsTableName = "web3_account";
     await knex.schema.createTable(web3AccountsTableName, (builder) => {
         builder.text("address");
-        builder.integer("user_id").notNullable();
+        builder.integer("imbuer_id").notNullable();
 
         builder.text("type");
         builder.text("challenge");
 
         builder.primary(["address"]);
-        builder.foreign("user_id").references("users.id");
+        builder.foreign("imbuer_id").references("imbuer.id");
 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, web3AccountsTableName));
@@ -45,7 +45,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.primary(["issuer", "subject"]);
 
         builder.foreign("id")
-            .references("users.id")
+            .references("imbuer.id")
             .onDelete("CASCADE")
             .onUpdate("CASCADE");
 
@@ -123,12 +123,12 @@ export async function up(knex: Knex): Promise<void> {
          * create an account and associate it with a web3 address, we can update
          * all of the projects whose "owner" is a `web3_account` associated with
          * the `usr` account. Likewise, when a user decides to delete their
-         * account, we don't CASCADE in that case -- only nullify the `user_id`
+         * account, we don't CASCADE in that case -- only nullify the `imbuer_id`
          * here, as it wouldn't point to anything useful.
          */
-        builder.integer("user_id");
-        builder.foreign("user_id")
-            .references("users.id")
+        builder.integer("imbuer_id");
+        builder.foreign("imbuer_id")
+            .references("imbuer.id")
             .onUpdate("CASCADE")
             .onDelete("SET NULL");
 
@@ -234,7 +234,7 @@ export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("projects");
     await knex.schema.dropTableIfExists("project_status");
     await knex.schema.dropTableIfExists("federated_credentials");
-    await knex.schema.dropTableIfExists("web3_accounts");
-    await knex.schema.dropTableIfExists("users");
+    await knex.schema.dropTableIfExists("web3_account");
+    await knex.schema.dropTableIfExists("imbuer");
     await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }

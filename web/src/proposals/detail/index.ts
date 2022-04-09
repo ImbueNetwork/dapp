@@ -11,14 +11,14 @@ import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import templateSrc from "./index.html";
 import styles from "./index.css";
-import { DraftProposal, Proposal, User } from "../../model";
+import { DraftProposal, Proposal, Imbuer } from "../../model";
 import * as model from "../../model";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getWeb3Accounts } from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
-import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
+import type { ImbueRequest, PolkadotJsApiInfo } from "../../dapp";
 
 const CONTENT = Symbol();
 
@@ -31,20 +31,20 @@ template.innerHTML = `
 `;
 
 export default class Detail extends HTMLElement {
-    user?: User | null;
+    imbuer?: Imbuer | null;
     project?: Proposal;
     $tabContentContainer: HTMLElement;
     $tabBar: HTMLElement;
     tabBar: MDCTabBar;
     openForVoting: boolean;
-    userIsInitiator: boolean;
+    imbuerIsInitiator: boolean;
 
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
     $projectLogo: HTMLImageElement;
     $milestones: HTMLOListElement;
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo?: PolkadotJsApiInfo;
     $fundsRequired: HTMLElement;
 
     contributionSubmissionForm: HTMLFormElement;
@@ -70,7 +70,7 @@ export default class Detail extends HTMLElement {
         this.attachShadow({ mode: "open" });
 
         this.openForVoting = false;
-        this.userIsInitiator = false;
+        this.imbuerIsInitiator = false;
 
         this[CONTENT] =
             template.content.cloneNode(true) as
@@ -181,7 +181,7 @@ export default class Detail extends HTMLElement {
         }
 
         this.apiInfo = await request.apiInfo;
-        this.user = await request.user;
+        this.imbuer = await request.imbuer;
 
         /**
          * We await this here because if there's no draft, we don't want to
@@ -203,10 +203,10 @@ export default class Detail extends HTMLElement {
         const projectOnChain: any = await (await this.apiInfo?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
 
         if (projectOnChain) {
-            if (this.user) {
-                this.user?.web3Accounts.forEach(web3Account => {
+            if (this.imbuer) {
+                this.imbuer?.web3Accounts.forEach(web3Account => {
                     if (web3Account.address == projectOnChain.initiator) {
-                        this.userIsInitiator = true;
+                        this.imbuerIsInitiator = true;
                     }
                 });
             }
@@ -216,13 +216,13 @@ export default class Detail extends HTMLElement {
                 this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
             });
 
-            if (this.userIsInitiator) {
-                this.contributionSubmissionForm.hidden = this.userIsInitiator;
-                this.$contribute.hidden = this.userIsInitiator;
+            if (this.imbuerIsInitiator) {
+                this.contributionSubmissionForm.hidden = this.imbuerIsInitiator;
+                this.$contribute.hidden = this.imbuerIsInitiator;
                 if (projectOnChain.approvedForFunding) {
-                    this.$submitMilestoneForm.hidden = !this.userIsInitiator
-                    this.$submitMilestone.hidden = !this.userIsInitiator
-                    this.$withdraw.hidden = !this.userIsInitiator
+                    this.$submitMilestoneForm.hidden = !this.imbuerIsInitiator
+                    this.$submitMilestone.hidden = !this.imbuerIsInitiator
+                    this.$withdraw.hidden = !this.imbuerIsInitiator
                 }
             } else if (projectOnChain.approvedForFunding) {
                 this.openForVoting = projectOnChain.approvedForFunding;
@@ -295,7 +295,7 @@ export default class Detail extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            this.user = state.user;
+            this.imbuer = state.imbuer;
             action();
         }
 
@@ -453,7 +453,7 @@ export default class Detail extends HTMLElement {
         state?: Record<string, any>
     ): Promise<void> {
         const formData = new FormData(this.$voteSubmissionForm);
-        const userVote = (formData.get("vote-select") as string).toLowerCase() == "true";
+        const imbuerVote = (formData.get("vote-select") as string).toLowerCase() == "true";
         const milestoneKey = parseInt(formData.get("vote-milestone-select") as string);
         const api = this.apiInfo?.api;
 
@@ -467,7 +467,7 @@ export default class Detail extends HTMLElement {
                     const extrinsic = this.apiInfo?.api.tx.imbueProposals.voteOnMilestone(
                         this.project?.chain_project_id,
                         milestoneKey,
-                        userVote
+                        imbuerVote
                     );
 
                     if (!extrinsic) {

@@ -10,12 +10,12 @@ export type FederatedCredential = {
 
 export type Web3Account = {
     address: string,
-    user_id: number;
+    imbuer_id: number;
     type: string;
     challenge: string;
 };
 
-export type User = {
+export type Imbuer = {
     id: number;
     display_name: string;
     web3Accounts: Web3Account[];
@@ -34,7 +34,7 @@ export type GrantProposal = {
     milestones: ProposedMilestone[];
     required_funds: number;
     owner?: string;
-    user_id?: number;
+    imbuer_id?: number;
     category?: string | number;
     chain_project_id?: number;
 };
@@ -55,43 +55,43 @@ export type Project = {
     chain_project_id?: number;
     required_funds: number;
     owner?: string;
-    user_id?: string | number;
+    imbuer_id?: string | number;
 };
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
-        tx<Web3Account>("web3_accounts")
+        tx<Web3Account>("web3_account")
             .select()
             .where({ address, })
             .first();
 
-export const fetchUser = (id: number) =>
+export const fetchImbuer = (id: number) =>
     (tx: Knex.Transaction) =>
-        tx<User>("users").where({ id }).first();
+        tx<Imbuer>("imbuer").where({ id }).first();
 
 
 
 export const upsertWeb3Challenge = (
-    user: User,
+    imbuer: Imbuer,
     address: string,
     type: string,
     challenge: string,
 ) => async (tx: Knex.Transaction):
         Promise<[web3Account: Web3Account, isInsert: boolean]> => {
 
-        let web3Account = await tx<Web3Account>("web3_accounts")
+        let web3Account = await tx<Web3Account>("web3_account")
             .select()
             .where({
-                user_id: user?.id
+                imbuer_id: imbuer?.id
             })
             .first();
 
         if (!web3Account) {
             return [
                 (
-                    await tx<Web3Account>("web3_accounts").insert({
+                    await tx<Web3Account>("web3_account").insert({
                         address,
-                        user_id: user.id,
+                        imbuer_id: imbuer.id,
                         type,
                         challenge,
                     }).returning("*")
@@ -102,17 +102,17 @@ export const upsertWeb3Challenge = (
 
         return [
             (
-                await tx<Web3Account>("web3_accounts").update({ challenge }).where(
-                    { user_id: user.id }
+                await tx<Web3Account>("web3_account").update({ challenge }).where(
+                    { imbuer_id: imbuer.id }
                 ).returning("*")
             )[0],
             false
         ];
     };
 
-export const insertUserByDisplayName = (displayName: string) =>
+export const insertImbuerByDisplayName = (displayName: string) =>
     async (tx: Knex.Transaction) => (
-        await tx<User>("users").insert({
+        await tx<Imbuer>("imbuer").insert({
             display_name: displayName
         }).returning("*")
     )[0];
@@ -138,10 +138,10 @@ export const fetchAllProjects = () =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select();
 
-export const fetchUserProjects = (id: string | number) =>
+export const fetchImbuerProjects = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select().where({
-            user_id: id
+            imbuer_id: id
         }).select();
 
 
@@ -177,14 +177,14 @@ export const insertFederatedCredential = (
     }).returning("*")
 )[0];
 
-export const getOrCreateFederatedUser = (
+export const getOrCreateFederatedImbuer = (
     issuer: string,
     subject: string,
     displayName: string,
     done: CallableFunction
 ) => {
     db.transaction(async tx => {
-        let user: User;
+        let imbuer: Imbuer;
 
         try {
             /**
@@ -196,26 +196,27 @@ export const getOrCreateFederatedUser = (
             }).first();
 
             /**
-             * If not, create the `usr`, then the `federated_credential`
+             * If not, create the `imbuer`, then the `federated_credential`
              */
             if (!federated) {
-                user = await insertUserByDisplayName(displayName)(tx);
-                await insertFederatedCredential(user.id, issuer, subject)(tx);
+                imbuer = await insertImbuerByDisplayName(displayName)(tx);
+                await insertFederatedCredential(imbuer.id, issuer, subject)(tx);
             } else {
-                const user_ = await db.select().from<User>("users").where({
+                const imbuer_ = await db.select().from<Imbuer>("imbuer").where({
                     id: federated.id
                 }).first();
 
-                if (!user_) {
+                if (!imbuer_) {
                     throw new Error(
-                        `Unable to find matching user by \`federated_credential.id\`: ${federated.id
+                        `Unable to find matching imbuer by \`federated_credential.id\`: ${
+                            federated.id
                         }`
                     );
                 }
-                user = user_;
+                imbuer = imbuer_;
             }
 
-            done(null, user);
+            done(null, imbuer);
         } catch (err) {
             done(new Error(
                 "Failed to upsert federated authentication.",

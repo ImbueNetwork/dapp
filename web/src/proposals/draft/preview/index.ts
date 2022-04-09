@@ -14,12 +14,12 @@ import html from "./index.html";
 import localDraftDialogContent from "./local-draft-dialog-content.html";
 import authDialogContent from "../../../dapp/auth-dialog-content.html";
 import css from "./index.css";
-import type { DraftProposal, Proposal, User } from "../../../model";
+import type { DraftProposal, Proposal, Imbuer } from "../../../model";
 
 import * as config from "../../../config";
 import * as model from "../../../model";
 import * as utils from "../../../utils";
-import { ImbueRequest, polkadotJsApiInfo } from "../../../dapp";
+import { ImbueRequest, PolkadotJsApiInfo } from "../../../dapp";
 
 
 const CONTENT = Symbol();
@@ -36,7 +36,7 @@ template.innerHTML = `
 export default class Preview extends HTMLElement {
     project?: Proposal;
     address?: string;
-    user?: User | null;
+    imbuer?: Imbuer | null;
     private [CONTENT]: DocumentFragment;
 
     $tabBar: HTMLElement;
@@ -57,7 +57,7 @@ export default class Preview extends HTMLElement {
     $milestones: HTMLOListElement;
 
     accounts?: InjectedAccountWithMeta[];
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo?: PolkadotJsApiInfo;
 
 
     constructor() {
@@ -153,6 +153,8 @@ export default class Preview extends HTMLElement {
         /**
          * This is just for a11y. Do not use this value unless you know what
          * you're doing.
+         * 
+         * To be clear, this `href` is not used. We are using the history API.
          */
         this.$edit.href = `${config.context}${config.grantProposalsURL
             }/draft?id=${this.projectId}`;
@@ -161,7 +163,7 @@ export default class Preview extends HTMLElement {
     async init(request: ImbueRequest) {
 
         const projectId = this.projectId;
-        this.user = await request.user;
+        this.imbuer = await request.imbuer;
         this.accounts = await request.accounts;
         this.apiInfo = await request.apiInfo;
 
@@ -192,26 +194,26 @@ export default class Preview extends HTMLElement {
 
 
 
-        if (this.user) {
+        if (this.imbuer) {
             /**
-             * User is logged in with a session.
+             * Imbuer is logged in with a session.
              * 
-             * XXX: We have to assume that since the user is logged in at
+             * XXX: We have to assume that since the imbuer is logged in at
              * this point, there's no reason to "save" -- only edit or
              * finalize.
              */
 
             /**
-             * Toggling save false because if user is logged in, we
+             * Toggling save false because if imbuer is logged in, we
              * automatically save and refresh for them.
              */
             this.toggleSave = false;
 
             /**
-             * Should only be able to edit or finalize if user
-             * is the user_id on the project.
+             * Should only be able to edit or finalize if imbuer
+             * is the imbuer_id on the project.
              */
-            if (this.user?.id !== this.project?.user_id) {
+            if (this.imbuer?.id !== this.project?.imbuer_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
@@ -277,7 +279,7 @@ export default class Preview extends HTMLElement {
                     }/draft?id=${this.projectId}`);
             };
 
-            if (this.projectId === "local-draft" || this.user) {
+            if (this.projectId === "local-draft" || this.imbuer) {
                 edit();
             } else {
                 this.wrapAuthentication(edit);
@@ -301,7 +303,7 @@ export default class Preview extends HTMLElement {
                 }
             };
 
-            if (!this.user) {
+            if (!this.imbuer) {
                 this.wrapAuthentication(save);
             } else {
                 /**
@@ -310,7 +312,7 @@ export default class Preview extends HTMLElement {
                  * to save?
                  * 
                  * I think we should just handle it in the background --
-                 * user logs in, and gets redirected back here to `local-draft`
+                 * imbuer logs in, and gets redirected back here to `local-draft`
                  * but we detect that from the URL and then go through a save
                  * workflow (the same one we would do in this else block),
                  * which would redirect them to this "preview" page, but with a
@@ -321,8 +323,8 @@ export default class Preview extends HTMLElement {
         });
 
         this.$finalize.addEventListener("click", e => {
-            const userOwnsDraft = (this.user && (this.user.id === this.project?.user_id));
-            if (!this.user && !userOwnsDraft) {
+            const imbuerOwnsDraft = (this.imbuer && (this.imbuer.id === this.project?.imbuer_id));
+            if (!this.imbuer && !imbuerOwnsDraft) {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
@@ -335,7 +337,7 @@ export default class Preview extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            this.user = state.user;
+            this.imbuer = state.imbuer;
             action();
         }
 

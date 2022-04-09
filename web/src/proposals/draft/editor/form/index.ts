@@ -9,12 +9,12 @@ import templateSrc from "./index.html";
 import styles from "./index.css";
 import { categories } from "../../../../config";
 
-import type { DraftMilestone, DraftProposal, User, Proposal } from "../../../../model";
+import type { DraftMilestone, DraftProposal, Imbuer, Proposal } from "../../../../model";
 import { getWeb3Accounts } from "../../../../utils/polkadot";
 import * as model from "../../../../model";
 import * as config from "../../../../config";
 import * as utils from '../../../../utils';
-import { ImbueRequest } from '../../../../dapp';
+import { DappRequest } from '../../../../dapp';
 import authDialogContent from "../../../../dapp/auth-dialog-content.html";
 
 declare global {
@@ -44,7 +44,7 @@ const CONTENT = Symbol();
 export default class Form extends HTMLElement {
     private [CONTENT]: DocumentFragment;
     milestoneIdx: number = 0;
-    user?: User | null;
+    imbuer?: Imbuer | null;
     accounts?: Promise<InjectedAccountWithMeta[]>;
     $submitProposal: HTMLInputElement;
     $categorySelect: HTMLSelectElement;
@@ -143,10 +143,11 @@ export default class Form extends HTMLElement {
         `);
     }
 
-    async init(request: ImbueRequest) {
-        this.disabled = false;
+    async init(request: DappRequest) {
+        this.disabled = true;
         this.reset();
-        this.user = await request.user;
+        this.imbuer = await request.imbuer;
+        const projectId = this.projectId;
 
 
         /**
@@ -155,9 +156,14 @@ export default class Form extends HTMLElement {
          * it. We say instead "preview" because they will be redirected to the
          * detail page, where they have other options.
          */
-        this.$submitProposal.value = this.user
-            ? "Save Draft Proposal"
-            : "Preview Draft Proposal";
+        this.$submitProposal.value = this.imbuer
+            /**
+             * TODO: "Save" should only be for when you're creating a new proposal.
+             * "Update" should be for when you're `PUT`ing changes to the draft.
+             * When in an `Update` state, we should also provide a "Cancel" option.
+             */
+            ? `${projectId ? "Update" : "Save"} Draft`
+            : "Preview Draft";
 
         this.accounts = request.accounts.then(accounts => {
             const $select = this.$web3AccountSelect;
@@ -205,8 +211,6 @@ export default class Form extends HTMLElement {
             );
         });
 
-        const projectId = this.projectId;
-
         try {
             if (projectId) {
                 await this.setupExistingDraft(projectId);
@@ -221,10 +225,12 @@ export default class Form extends HTMLElement {
             // maybe 500 page.
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
+        } finally {
+            this.disabled = false;
         }
 
         // Are we logged in?
-        if (!this.user) {
+        if (!this.imbuer) {
             this.wrapAuthentication(() => {
                 location.reload()
             });
@@ -250,9 +256,9 @@ export default class Form extends HTMLElement {
 
             draft = JSON.parse(String(local));
         } else {
-            if (!this.user) {
+            if (!this.imbuer) {
                 /**
-                 * No user means not logged in, so don't bother trying to
+                 * No imbuer means not logged in, so don't bother trying to
                  * fetch, etc., because the server will only respond 401.
                  */
                 this.redirectToNewDraft();
@@ -266,7 +272,7 @@ export default class Form extends HTMLElement {
                 ).then(async resp => {
                     if (resp.ok) {
                         const project = await resp.json();
-                        if (this.user?.id === project.user_id) {
+                        if (this.imbuer?.id === project.imbuer_id) {
                             return project;
                         } else {
                             this.redirectToNewDraft();
@@ -341,7 +347,7 @@ export default class Form extends HTMLElement {
      * there won't be any undefined values.
      * 
      * Note that `requiredFunds` is multiplied by 1e12, so that whatever the
-     * user submits here, we are ultimately submitting
+     * imbuer submits here, we are ultimately submitting
      * $number * 1_000_000_000_000 to the blockchain.
      */
     proposalFromForm(formData: FormData): DraftProposal {
@@ -521,7 +527,10 @@ export default class Form extends HTMLElement {
         } else {
             // TODO: UX for submission failed
             // maybe `this.dialog(...)`
-            this.disabled = false;
+            // this.disabled = false;
+            throw new Error("Failed to create draft proposal", {
+                cause: {...resp, name: "fetch", message: resp.statusText}
+            });
         }
     }
 
@@ -531,6 +540,9 @@ export default class Form extends HTMLElement {
             const proposal: Proposal = await resp.json();
             return proposal;
         }
+        throw new Error("Failed to update draft proposal", {
+            cause: {...resp, name: "fetch", message: resp.statusText}
+        });
     }
 
     async submitGrantProposal(
@@ -538,16 +550,16 @@ export default class Form extends HTMLElement {
         account?: InjectedAccountWithMeta,
     ): Promise<void> {
 
-        // if yes, go ahead and post the draft with the `user_id`
-        draft.user_id = this.user?.id;
-        let proposal;
+        // if yes, go ahead and post the draft with the `imbuer_id`
+        draft.imbuer_id = this.imbuer?.id;
 
         if (this.projectId) {
-            proposal = this.updateGrantProposal(draft,this.projectId);
+            // TODO: UX/error handling -- we probably don't want to redirect
+            // here if the update went wrong.
+            await this.updateGrantProposal(draft, this.projectId);
             utils.redirect(`${
                 config.grantProposalsURL
-            }/draft/preview?id=${this.projectId}`);
-
+            }/draft/preview?id=${this.projectId}&update`);
         } else {
             const resp = await model.postDraftProposal(draft);
             if (resp.ok) {
@@ -566,9 +578,9 @@ export default class Form extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            this.user = state.user;
+            this.imbuer = state.imbuer;
             console.log(state);
-            console.log(state.user);
+            console.log(state.imbuer);
             action();
         }
 

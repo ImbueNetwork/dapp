@@ -12,7 +12,7 @@ import ProposalsDraftPreview from "./preview";
 
 import * as config from "../../config";
 import * as utils from "../../utils";
-import { ImbueRequest } from "../../dapp";
+import { DappRequest } from "../../dapp";
 
 
 const template = document.createElement("template");
@@ -46,7 +46,7 @@ export default class ProposalsDraft extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path: string | null, request: ImbueRequest) {
+    route(path: string | null, request: DappRequest) {
         if (!path) {
             this.$pages.select("editor");
             (this.$pages.selected as ProposalsDraftEditor).init(request);

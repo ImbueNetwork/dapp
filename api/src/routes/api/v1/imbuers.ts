@@ -13,7 +13,7 @@ router.get("/:id/projects", (req, res, next) => {
 
     db.transaction(async tx => {
         try {
-            const projects: models.Project[] = await models.fetchUserProjects(id)(tx);
+            const projects: models.Project[] = await models.fetchImbuerProjects(id)(tx);
             if (!projects) {
                 return res.status(404).end();
             }
@@ -21,7 +21,7 @@ router.get("/:id/projects", (req, res, next) => {
 
         } catch (e) {
             next(new Error(
-                `Failed to fetch projects for user id: ${id}`,
+                `Failed to fetch projects for imbuer id: ${id}`,
                 { cause: e as Error }
             ));
         }

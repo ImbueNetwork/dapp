@@ -2,12 +2,12 @@ import express from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import projectsRouter from "./projects";
-import usersRouter from "./users";
+import imbuersRouter from "./imbuers";
 import config from "../../../config";
 
 const router = express.Router();
 
-router.get("/user", (req, res) => {
+router.get("/me", (req, res) => {
     if (req.isAuthenticated()) {
         res.send(req.user);
     } else {
@@ -22,6 +22,6 @@ router.get("/info", (req, res) => {
 });
 
 router.use("/projects", projectsRouter);
-router.use("/users", usersRouter);
+router.use("/imbuers", imbuersRouter);
 
 export default router;

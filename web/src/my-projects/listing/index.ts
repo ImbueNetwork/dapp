@@ -3,11 +3,11 @@ import css from "./index.css";
 
 import "../../proposals/proposal-item";
 import ProposalItem from "../../proposals/proposal-item";
-import { Proposal, User } from "../../model";
+import { Proposal, Imbuer } from "../../model";
 import * as model from "../../model";
 import * as utils from "../../utils";
 import * as config from "../../config";
-import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
+import type { DappRequest, PolkadotJsApiInfo } from "../../dapp";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
 
 const CONTENT = Symbol();
@@ -20,8 +20,8 @@ template.innerHTML = `
 
 
 export default class List extends HTMLElement {
-    user?: User | null;
-    apiInfo?: polkadotJsApiInfo;
+    imbuer?: Imbuer | null;
+    apiInfo?: PolkadotJsApiInfo;
 
     private [CONTENT]: DocumentFragment;
 
@@ -43,20 +43,20 @@ export default class List extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
         this.apiInfo = await request.apiInfo;
-        this.user = await request.user;
+        this.imbuer = await request.imbuer;
 
         this.$list.innerHTML = "";
 
-        await this.fetchUserProjects().then(projects => {
+        await this.fetchImbuerProjects().then(projects => {
             if (projects) {
                 this.renderProjects(projects);
             }
         });
 
          // Are we logged in?
-         if (!this.user) {
+         if (!this.imbuer) {
             this.wrapAuthentication(() => {
                 location.reload()
             });
@@ -66,9 +66,9 @@ export default class List extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            this.user = state.user;
-            console.log(state);
-            console.log(state.user);
+            this.imbuer = state.imbuer;
+            // console.log(state);
+            // console.log(state.imbuer);
             action();
         }
 
@@ -86,15 +86,15 @@ export default class List extends HTMLElement {
                             handler: () => {},
                             label: "Continue using local storage"
                         }
-                    }
+                    },
                 },
             }
         ));
     }
 
 
-    async fetchUserProjects() {
-        const resp = await model.fetchUserProjects(this.user?.id!);
+    async fetchImbuerProjects() {
+        const resp = await model.fetchProjectsByImbuerId(this.imbuer?.id!);
         if (resp.ok) {
             return await resp.json();
         } else {

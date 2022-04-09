@@ -19,7 +19,7 @@ export type DraftProposal = {
     milestones: DraftMilestone[];
     required_funds: number;
     owner: string;
-    user_id?: number;
+    imbuer_id?: number;
     chain_project_id?: number;
     category?: string | number;
 };
@@ -30,19 +30,35 @@ export type DraftProposal = {
 export type Proposal = DraftProposal & {
     id: number;
     status: string;
-    user_id: number;
+    imbuer_id: number;
     create_block_number?: number;
     created: string;
     modified: string;
     milestones: Milestone[];
 }
 
+/** Models the Project type from the chain */
+export type ImbueProject = {
+    name: string;
+    logo: string;
+    description: string;
+    website: string;
+    milestones: Milestone[];
+    contributions: any[]; // in the future, something like `Contribution[]`
+    required_funds: number;
+    withdrawn_funds: number;
+    /// The account that will receive the funds if the campaign is successful
+    initiator: string, // public address
+    create_block_number: number;
+    approved_for_funding: boolean;
+}
+
 /**
  * Models a "milestone" saved to the db (and also as it will appear on chain).
  */
 export type Milestone = DraftMilestone & {
-    milestone_index?: number;
-    project_id: number;
+    milestone_key?: number;
+    project_key: number;
     is_approved: boolean;
     created: string;
     modified: string;
@@ -52,7 +68,7 @@ export type Web3Account = {
     address: string;
 };
 
-export type User = {
+export type Imbuer = {
     id: number;
     web3Accounts: Web3Account[];
 };
@@ -93,7 +109,7 @@ export const fetchProjects = () => fetch(
 );
 
 
- export const fetchUserProjects = (userId: number) => fetch(
-    `${config.apiBase}/users/${userId}/projects/`,
+ export const fetchProjectsByImbuerId = (imbuerId: number) => fetch(
+    `${config.apiBase}/imbuers/${imbuerId}/projects/`,
     {headers: config.getAPIHeaders}
 );

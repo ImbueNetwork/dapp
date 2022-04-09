@@ -1,25 +1,23 @@
 import { marked } from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
-import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
+import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { MDCTabBar } from "@material/tab-bar";
-import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import type { SubmittableExtrinsic } from "@polkadot/api/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { ISubmittableResult } from "@polkadot/types/types";
 
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import html from "./index.html";
-import localDraftDialogContent from "./local-draft-dialog-content.html";
 import authDialogContent from "../../../dapp/auth-dialog-content.html";
 import css from "./index.css";
-import type { DraftProposal, Proposal, User } from "../../../model";
+import type { DraftProposal, Proposal, Imbuer } from "../../../model";
 
 import * as config from "../../../config";
 import * as model from "../../../model";
 import * as utils from "../../../utils";
-import { ImbueRequest, polkadotJsApiInfo } from "../../../dapp";
+import { DappRequest, PolkadotJsApiInfo } from "../../../dapp";
 
 
 const CONTENT = Symbol();
@@ -36,7 +34,7 @@ template.innerHTML = `
 export default class Preview extends HTMLElement {
     project?: Proposal;
     address?: string;
-    user?: User | null;
+    imbuer?: Imbuer | null;
     private [CONTENT]: DocumentFragment;
 
     $tabBar: HTMLElement;
@@ -57,7 +55,7 @@ export default class Preview extends HTMLElement {
     $milestones: HTMLOListElement;
 
     accounts?: InjectedAccountWithMeta[];
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo?: PolkadotJsApiInfo;
 
 
     constructor() {
@@ -153,15 +151,17 @@ export default class Preview extends HTMLElement {
         /**
          * This is just for a11y. Do not use this value unless you know what
          * you're doing.
+         * 
+         * To be clear, this `href` is not used. We are using the history API.
          */
         this.$edit.href = `${config.context}${config.grantProposalsURL
             }/draft?id=${this.projectId}`;
     }
 
-    async init(request: ImbueRequest) {
+    async init(request: DappRequest) {
 
         const projectId = this.projectId;
-        this.user = await request.user;
+        this.imbuer = await request.imbuer;
         this.accounts = await request.accounts;
         this.apiInfo = await request.apiInfo;
 
@@ -177,7 +177,7 @@ export default class Preview extends HTMLElement {
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
          */
-        await this.fetchProject(projectId).then(project => {
+        await this.fetchProject(projectId, this.updateDeclared).then(project => {
             if (project) {
                 this.renderProject(project);
             } else {
@@ -192,26 +192,26 @@ export default class Preview extends HTMLElement {
 
 
 
-        if (this.user) {
+        if (this.imbuer) {
             /**
-             * User is logged in with a session.
+             * Imbuer is logged in with a session.
              * 
-             * XXX: We have to assume that since the user is logged in at
+             * XXX: We have to assume that since the imbuer is logged in at
              * this point, there's no reason to "save" -- only edit or
              * finalize.
              */
 
             /**
-             * Toggling save false because if user is logged in, we
+             * Toggling save false because if imbuer is logged in, we
              * automatically save and refresh for them.
              */
             this.toggleSave = false;
 
             /**
-             * Should only be able to edit or finalize if user
-             * is the user_id on the project.
+             * Should only be able to edit or finalize if imbuer
+             * is the imbuer_id on the project.
              */
-            if (this.user?.id !== this.project?.user_id) {
+            if (this.imbuer?.id !== this.project?.imbuer_id) {
                 this.toggleFinalize = false;
                 this.toggleEdit = false;
             }
@@ -235,8 +235,8 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async fetchProject(projectId: string) {
-        if (this.project) {
+    async fetchProject(projectId: string, force = false) {
+        if (!force && this.project) {
             return this.project;
         }
         const resp = await model.fetchProject(projectId);
@@ -259,6 +259,14 @@ export default class Preview extends HTMLElement {
         return null;
     }
 
+    get updateDeclared() {
+        return window.location.search
+            .split("?")[1]
+            ?.split("&")
+            .map(str => str.split("="))
+            .find(([k, _]) => k === "update")?.[0] === "update";
+    }
+
     bind() {
         this.shadowRoot?.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
@@ -277,52 +285,16 @@ export default class Preview extends HTMLElement {
                     }/draft?id=${this.projectId}`);
             };
 
-            if (this.projectId === "local-draft" || this.user) {
+            if (this.imbuer) {
                 edit();
             } else {
                 this.wrapAuthentication(edit);
             }
         });
 
-        this.$save.addEventListener("click", e => {
-            const save = async () => {
-                if (this.project) {
-                    const resp = await model.postDraftProposal(this.project);
-                    if (resp.ok) {
-                        const project = await resp.json();
-                        utils.redirect(`${config.grantProposalsURL
-                            }/draft/preview?id=${project.id}`);
-                    } else {
-                        // TODO: UX for bad request posting draft
-                        console.warn("Bad request posting draft", this.project);
-                    }
-                } else {
-                    // shouldn't happen?
-                }
-            };
-
-            if (!this.user) {
-                this.wrapAuthentication(save);
-            } else {
-                /**
-                 * Save and redirect back to legit projectId? Or do we want to
-                 * bring them back here so that they can decide whether or not
-                 * to save?
-                 * 
-                 * I think we should just handle it in the background --
-                 * user logs in, and gets redirected back here to `local-draft`
-                 * but we detect that from the URL and then go through a save
-                 * workflow (the same one we would do in this else block),
-                 * which would redirect them to this "preview" page, but with a
-                 * legit `projectId` instead of `local-draft`.
-                 */
-                save();
-            }
-        });
-
         this.$finalize.addEventListener("click", e => {
-            const userOwnsDraft = (this.user && (this.user.id === this.project?.user_id));
-            if (!this.user && !userOwnsDraft) {
+            const imbuerOwnsDraft = (this.imbuer && (this.imbuer.id === this.project?.imbuer_id));
+            if (!this.imbuer && !imbuerOwnsDraft) {
                 this.wrapAuthentication(() => {
                     // call this handler "recursively"
                     this.$finalize.click();
@@ -335,7 +307,7 @@ export default class Preview extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            this.user = state.user;
+            this.imbuer = state.imbuer;
             action();
         }
 
@@ -471,7 +443,8 @@ export default class Preview extends HTMLElement {
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = project.name;
         this.$projectWebsite.innerHTML = `
-            <a href="${project.website}" target="_blank">${project.website
+            <a href="${project.website}" target="_blank">${
+                project.website
             }</a>
         `;
         this.$projectDescription.innerHTML =
@@ -489,11 +462,12 @@ export default class Preview extends HTMLElement {
                             <i class="material-icons">pending_actions</i>
                         </span>
                         <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name
-                    }</span>
-                            <span class="mdc-deprecated-list-item__secondary-text"><!--
-                            -->${milestone.percentage_to_unlock}%
-                            </span>
+                            <span class="mdc-deprecated-list-item__primary-text">${
+                                milestone.name
+                            }</span>
+                            <span class="mdc-deprecated-list-item__secondary-text">${
+                                milestone.percentage_to_unlock
+                            }%</span>
                         </span>
                     </li>
                 `)

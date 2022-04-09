@@ -8,11 +8,11 @@ import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from '@polkadot/util';
 
 import {
-    fetchUser,
+    fetchImbuer,
     fetchWeb3Account,
     upsertWeb3Challenge,
-    User,
-    getOrCreateFederatedUser
+    Imbuer,
+    getOrCreateFederatedImbuer
 } from "../../../../models";
 import db from "../../../../db";
 
@@ -44,8 +44,8 @@ export class Web3Strategy extends passport.Strategy {
                 if (!web3Account) {
                     this.fail();
                 } else {
-                    const user = await fetchUser(web3Account.user_id)(tx);
-                    if (user?.id) {
+                    const imbuer = await fetchImbuer(web3Account.imbuer_id)(tx);
+                    if (imbuer?.id) {
                         if (
                             signatureVerify(
                                 web3Account.challenge,
@@ -53,11 +53,11 @@ export class Web3Strategy extends passport.Strategy {
                                 solution.address
                             ).isValid
                         ) {
-                            this.success(user);
+                            this.success(imbuer);
                         } else {
                             const challenge = uuid();
                             const [web3Account, _] = await upsertWeb3Challenge(
-                                user,
+                                imbuer,
                                 req.body.address,
                                 req.body.type,
                                 challenge
@@ -128,34 +128,34 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
         next(err);
     }
  
-    // If no address can be found, create a `users` and then a
+    // If no address can be found, create an `imbuer` and then a
     // `federated_credential`
-    getOrCreateFederatedUser(
+    getOrCreateFederatedImbuer(
         req.body.meta.source,
         address,
         req.body.meta.name,
-        async (err: Error, user: User) => {
+        async (err: Error, imbuer: Imbuer) => {
             if (err) {
                 next(err);
             }
 
-            if (!user) {
-                next(new Error("No user provided."));
+            if (!imbuer) {
+                next(new Error("No imbuer provided."));
             }
 
             try {
-                // create a `challenge` uuid and insert it into the users
+                // create a `challenge` uuid and insert it into the `imbuer`
                 // table respond with the challenge
                 db.transaction(async tx => {
                     const challenge = uuid();
                     const [web3Account, isInsert] = await upsertWeb3Challenge(
-                        user, address, req.body.type, challenge
+                        imbuer, address, req.body.type, challenge
                     )(tx);
                     
                     if (isInsert) {
                         res.status(201);
                     }
-                    res.send({user, web3Account});
+                    res.send({imbuer, web3Account});
                 });
             } catch (e) {
                 next(new Error(

@@ -14,7 +14,7 @@ import "../proposals/detail";
 import Detail from "../proposals/detail";
 
 import * as utils from "../utils";
-import { ImbueRequest } from "../dapp";
+import { DappRequest } from "../dapp";
 
 
 const template = document.createElement("template");
@@ -48,7 +48,7 @@ export default class Proposals extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path: string | null, request: ImbueRequest) {
+    route(path: string | null, request: DappRequest) {
         if (!path) {
             this.$pages.select("listing");
             (this.$pages.selected as List).init();

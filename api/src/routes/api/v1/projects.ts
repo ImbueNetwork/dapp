@@ -8,7 +8,8 @@ type ProjectPkg = models.Project & {
 }
 
 /**
- * FIXME: all of this is terriblme
+ * FIXME: all of this is terrible
+ * XXX: later... why is this terrible? Write better comments...
  */
 
 const router = express.Router();
@@ -65,7 +66,8 @@ const validateProposal = (proposal: models.GrantProposal) => {
     }
 
     const entries = Object.entries(proposal);
-    if (entries.filter(([_,v]) => {
+    if (
+        entries.filter(([_,v]) => {
             // undefined not allowed
             return v === void 0;
         }).length
@@ -111,7 +113,7 @@ router.post("/", (req, res, next) => {
                 category,
                 required_funds,
                 owner,
-                user_id: (req.user as any).id,
+                imbuer_id: (req.user as any).id,
             })(tx);
     
             if (!project.id) {
@@ -166,7 +168,7 @@ router.put("/:id", (req, res, next) => {
         milestones,
     } = req.body.proposal as models.GrantProposal;
 
-    const user_id = (req.user as any).id;
+    const imbuer_id = (req.user as any).id;
 
     db.transaction(async tx => {
         try {
@@ -177,7 +179,7 @@ router.put("/:id", (req, res, next) => {
                 return res.status(404).end();
             }
 
-            if (exists.user_id !== user_id) {
+            if (exists.imbuer_id !== imbuer_id) {
                 return res.status(403).end();
             }
 
@@ -190,7 +192,7 @@ router.put("/:id", (req, res, next) => {
                 chain_project_id,
                 required_funds,
                 owner,
-                // user_id,
+                // imbuer_id,
             })(tx);
     
             if (!project.id) {

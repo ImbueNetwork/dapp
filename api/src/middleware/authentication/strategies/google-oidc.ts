@@ -1,7 +1,7 @@
 import express from "express";
 import type { Session } from "express-session";
 import passport from "passport";
-import { getOrCreateFederatedUser } from "../../../models";
+import { getOrCreateFederatedImbuer } from "../../../models";
 import config from "../../../config";
 
 // No @types yet :(
@@ -48,7 +48,7 @@ export const googleOIDCStrategy = new GoogleOIDCStrategy(
         // state: true,
     },
     (issuer: string, profile: Record<string,any>, done: CallableFunction) => {
-        return getOrCreateFederatedUser(issuer, profile.id, profile.displayName, done);
+        return getOrCreateFederatedImbuer(issuer, profile.id, profile.displayName, done);
     }
 );
 

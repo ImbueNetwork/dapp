@@ -2,32 +2,36 @@ import express from "express";
 import passport from "passport";
 import { googleOIDCStrategy, googleOIDCRouter } from "./strategies/google-oidc";
 import { polkadotJsAuthRouter, polkadotJsStrategy } from "./strategies/web3/polkadot-js";
-import type { User, Web3Account } from "../../models";
+import type { Imbuer, Web3Account } from "../../models";
 import db from "../../db";
 
 
 passport.use(googleOIDCStrategy);
 passport.use(polkadotJsStrategy);
 
+/**
+ * The `user` term here is specific to the passport workflow, but in this
+ * system we refer to "users" as `imbuer` instead.
+ */
 passport.serializeUser((user, done) => {
     if (!(user as any).id) {
         return done(
             new Error("Failed to serialize User: no `id` found.")
         );
     }
-    return done(null, (user as User).id);
+    return done(null, (user as Imbuer).id);
 });
 
 passport.deserializeUser(async (id: string, done) => {
     try {
-        const user = await db.select().from<User>("users").where({"id": Number(id)}).first();
-        if (!user) {
+        const imbuer = await db.select().from<Imbuer>("imbuer").where({"id": Number(id)}).first();
+        if (!imbuer) {
             done(new Error(`No user found with id: ${id}`));
         } else {
-            user.web3Accounts = await db<Web3Account>("web3_accounts").select().where({
-                user_id: user.id
+            imbuer.web3Accounts = await db<Web3Account>("web3_account").select().where({
+                imbuer_id: imbuer.id
             });
-            return done(null, user);
+            return done(null, imbuer);
         }
     } catch (e) {
         return done(

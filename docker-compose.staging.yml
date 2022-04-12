@@ -12,21 +12,22 @@ services:
     - "/var/log/imbue/dapp/postgres-data:/var/lib/postgresql/data"
 
   api:
-    build: ./api
+
     container_name: api
+    image: samelamin/dapp-api
     ports:
     - "3000:3000"
     environment:
-      GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
-      GOOGLE_OAUTH2_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
+      GOOGLE_OAUTH2_CLIENT_ID: client_id
+      GOOGLE_OAUTH2_CLIENT_SECRET: client_secret
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
   
   web:
-    build: ./web
     container_name: web
+    image: samelamin/dapp-web
     ports:
     - "8081:80"
     - "8443:8443"

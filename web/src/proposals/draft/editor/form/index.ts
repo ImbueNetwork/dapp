@@ -19,7 +19,7 @@ import authDialogContent from "../../../../dapp/auth-dialog-content.html";
 
 declare global {
     interface ErrorConstructor {
-        new(message?: string, opts?: {cause: Error}): Error;
+        new(message?: string, opts?: { cause: Error }): Error;
     }
 }
 
@@ -38,6 +38,11 @@ const ordinals = [
     "third",
 ];
 
+enum CurrencyType {
+    'IMBU',
+    'KUSD'
+}
+
 const CONTENT = Symbol();
 
 
@@ -54,50 +59,57 @@ export default class Form extends HTMLElement {
     $grantSubmissionForm: HTMLFormElement;
     $milestoneItemTemplate: HTMLTemplateElement;
     $milestones: HTMLOListElement;
+    $currencySelect: HTMLSelectElement;
+    currencyType = CurrencyType;
+
 
     get $fields(): HTMLInputElement[] {
         return Array.from(
             this.$grantSubmissionForm.querySelectorAll(".input-field")
         );
-    }    get nextMilestoneOrdinal(): string {
+    } get nextMilestoneOrdinal(): string {
         return ordinals[this.milestoneIdx++] ?? "next";
     }
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({ mode: "open" });
         this[CONTENT] = template.content.cloneNode(true) as
             DocumentFragment;
 
         this.$submitProposal =
             this[CONTENT].getElementById("submit-proposal") as
-                HTMLInputElement;
+            HTMLInputElement;
         this.$categorySelect =
             this[CONTENT].getElementById("category-select") as
-                HTMLSelectElement;
+            HTMLSelectElement;
         this.$web3AccountSelect =
             this[CONTENT].getElementById("web3-account-select") as
-                HTMLSelectElement;
+            HTMLSelectElement;
         this.$addMilestone =
             this[CONTENT].getElementById("add-milestone") as
-                HTMLInputElement;
+            HTMLInputElement;
         this.$grantSubmissionForm =
             this[CONTENT].getElementById("grant-submission-form") as
-                HTMLFormElement;
+            HTMLFormElement;
         this.$milestoneItemTemplate =
             this[CONTENT].getElementById("milestone-item-template") as
-                HTMLTemplateElement;
+            HTMLTemplateElement;
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-                HTMLOListElement;
+            HTMLOListElement;
         this.$web3Address =
             this[CONTENT].getElementById("web3-address") as
-                HTMLInputElement;
+            HTMLInputElement;
+        this.$currencySelect =
+            this[CONTENT].getElementById("currency-select") as
+            HTMLSelectElement;
     }
 
     reset() {
         ([
             "$categorySelect",
+            "$currencySelect",
             "$web3AccountSelect",
             "$milestones"
         ] as const).forEach(prop => {
@@ -136,9 +148,8 @@ export default class Form extends HTMLElement {
              value="${account.address}"
              data-source="${account.meta.source}">
                 <span>${account.meta.name ?? account.address}</span>
-                <span class="select-source" slot="secondary">${
-                    account.meta.source
-                }</span>
+                <span class="select-source" slot="secondary">${account.meta.source
+            }</span>
             </mwc-list-item>
         `);
     }
@@ -197,9 +208,19 @@ export default class Form extends HTMLElement {
                 document.createRange().createContextualFragment(`
                     <mwc-list-item twoline value="${idx}">
                         <span>${category}</span>
-                        <span class="select-source" slot="secondary">${
-                            subcategies.join("; ")
-                        }</span>
+                        <span class="select-source" slot="secondary">${subcategies.join("; ")
+                    }</span>
+                    </mwc-list-item>
+                `)
+            );
+        });
+
+        const currencies = Object.keys(this.currencyType).filter((v) => isNaN(Number(v)));
+        Object.values(currencies).forEach((value) => {
+            this.$currencySelect.appendChild(
+                document.createRange().createContextualFragment(`
+                    <mwc-list-item value='${value}'>
+                        <span>${value}</span>
                     </mwc-list-item>
                 `)
             );
@@ -237,7 +258,7 @@ export default class Form extends HTMLElement {
 
     async setupExistingDraft(projectId: string) {
         let draft: DraftProposal;
-        
+
         if (projectId === "local-draft") {
             const local = localStorage.getItem(
                 config.proposalsDraftLocalDraftKey
@@ -262,7 +283,7 @@ export default class Form extends HTMLElement {
             try {
                 draft = await fetch(
                     `${config.apiBase}/projects/${projectId}`,
-                    {headers: config.getAPIHeaders}
+                    { headers: config.getAPIHeaders }
                 ).then(async resp => {
                     if (resp.ok) {
                         const project = await resp.json();
@@ -285,11 +306,11 @@ export default class Form extends HTMLElement {
 
                 throw new Error(
                     `Server error fetching project with id ${projectId}`,
-                    {cause: cause as Error}
+                    { cause: cause as Error }
                 );
             }
         }
-        
+
         setTimeout(() => {
             this.proposalIntoForm(draft);
         }, 0);
@@ -543,24 +564,22 @@ export default class Form extends HTMLElement {
         let proposal;
 
         if (this.projectId) {
-            proposal = this.updateGrantProposal(draft,this.projectId);
-            utils.redirect(`${
-                config.grantProposalsURL
-            }/draft/preview?id=${this.projectId}`);
+            proposal = this.updateGrantProposal(draft, this.projectId);
+            utils.redirect(`${config.grantProposalsURL
+                }/draft/preview?id=${this.projectId}`);
 
         } else {
             const resp = await model.postDraftProposal(draft);
             if (resp.ok) {
                 const proposal = await resp.json();
-                utils.redirect(`${
-                    config.grantProposalsURL
-                }/draft/preview?id=${proposal.id}`);
+                utils.redirect(`${config.grantProposalsURL
+                    }/draft/preview?id=${proposal.id}`);
             } else {
                 // TODO: UX for bad request posting draft
                 console.warn("Bad request posting draft", draft);
             }
         }
-    
+
 
     }
 
@@ -583,7 +602,7 @@ export default class Form extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => {},
+                            handler: () => { },
                             label: "Continue using local storage"
                         }
                     }
@@ -591,7 +610,7 @@ export default class Form extends HTMLElement {
             }
         ));
     }
-    
+
     savetoLocalStorage(proposal: DraftProposal) {
         window.localStorage.setItem(
             config.proposalsDraftLocalDraftKey,

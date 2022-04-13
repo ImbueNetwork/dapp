@@ -63,6 +63,10 @@
     <fieldset class="funding">
         <legend class="label">How much funding will your project need?</legend>
 
+        <mwc-select id="currency-select" class="input-field" label="Currency" name="currency-category" helper="">
+            <mwc-list-item></mwc-list-item>
+        </mwc-select>
+
         <div class="funding">
             <hq-forms-textfield
              class="input-field"
@@ -73,7 +77,6 @@
              min="1"
              max="1e127"
              required>
-               <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
                <span slot="suffix">.00</span>
                <span slot="floating-label">Funds required</span>
            </hq-forms-textfield>

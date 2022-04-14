@@ -22,6 +22,7 @@ export type DraftProposal = {
     user_id?: number;
     chain_project_id?: number;
     category?: string | number;
+    currency: string;
 };
 
 /**

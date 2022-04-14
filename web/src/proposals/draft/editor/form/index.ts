@@ -378,6 +378,7 @@ export default class Form extends HTMLElement {
             ) * 1e12,
             category: formData.get("imbu-category") as string,
             owner: formData.get("imbu-address") as string,
+            currency: formData.get("imbu-currency-category") as string,
         }
     }
 

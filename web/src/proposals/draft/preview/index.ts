@@ -53,6 +53,7 @@ export default class Preview extends HTMLElement {
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
     $projectLogo: HTMLImageElement;
+    $currencyLabel: HTMLElement;
     $fundsRequired: HTMLElement;
     $milestones: HTMLOListElement;
 
@@ -95,9 +96,15 @@ export default class Preview extends HTMLElement {
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
             HTMLElement;
+            
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
             HTMLImageElement;
+            
+        this.$currencyLabel =
+            this[CONTENT].getElementById("currency-label") as
+            HTMLElement;
+
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
             HTMLElement;
@@ -387,6 +394,7 @@ export default class Preview extends HTMLElement {
                         this.project.website,
                         this.project.milestones,
                         this.project.required_funds,
+                        this.project.currency_id
                     );
 
                     if (!extrinsic) {
@@ -470,6 +478,7 @@ export default class Preview extends HTMLElement {
 
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = project.name;
+        this.$currencyLabel.innerHTML = "$" + model.Currency[project.currency_id];
         this.$projectWebsite.innerHTML = `
             <a href="${project.website}" target="_blank">${project.website
             }</a>

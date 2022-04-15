@@ -44,9 +44,6 @@
 
         <mwc-select id="category-select" class="input-field" label="Category" name="imbu-category" helper="">
             <mwc-list-item></mwc-list-item>
-            <!-- <mwc-list-item value="0">First choice</mwc-list-item>
-            <mwc-list-item value="1">Second choice</mwc-list-item>
-            <mwc-list-item value="2">Third choice</mwc-list-item> -->
         </mwc-select>
 
         <mwc-textarea
@@ -63,6 +60,10 @@
     <fieldset class="funding">
         <legend class="label">How much funding will your project need?</legend>
 
+        <mwc-select id="currency-select" class="input-field" label="Currency" name="imbu-currency-category" helper="">
+            <mwc-list-item></mwc-list-item>
+        </mwc-select>
+
         <div class="funding">
             <hq-forms-textfield
              class="input-field"
@@ -73,7 +74,6 @@
              min="1"
              max="1e127"
              required>
-               <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
                <span slot="suffix">.00</span>
                <span slot="floating-label">Funds required</span>
            </hq-forms-textfield>

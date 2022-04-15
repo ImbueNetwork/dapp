@@ -97,6 +97,7 @@ router.post("/", (req, res, next) => {
         website,
         category,
         required_funds,
+        currency_id,
         owner,
         milestones,
     } = req.body.proposal as models.GrantProposal;
@@ -110,6 +111,7 @@ router.post("/", (req, res, next) => {
                 website,
                 category,
                 required_funds,
+                currency_id,
                 owner,
                 user_id: (req.user as any).id,
             })(tx);
@@ -119,7 +121,7 @@ router.post("/", (req, res, next) => {
                     "Failed to insert milestones: `project_id` missing."
                 ));
             }
-    
+
             const pkg: ProjectPkg = {
                 ...project,
                 milestones: await models.insertMilestones(
@@ -162,6 +164,7 @@ router.put("/:id", (req, res, next) => {
         category,
         chain_project_id,
         required_funds,
+        currency_id,
         owner,
         milestones,
     } = req.body.proposal as models.GrantProposal;
@@ -189,6 +192,7 @@ router.put("/:id", (req, res, next) => {
                 category,
                 chain_project_id,
                 required_funds,
+                currency_id,
                 owner,
                 // user_id,
             })(tx);

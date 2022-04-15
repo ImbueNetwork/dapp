@@ -36,6 +36,7 @@ export type GrantProposal = {
     owner?: string;
     user_id?: number;
     category?: string | number;
+    currency_id: number;
     chain_project_id?: number;
 };
 
@@ -54,6 +55,7 @@ export type Project = {
     category?: string | number;
     chain_project_id?: number;
     required_funds: number;
+    currency_id: number;
     owner?: string;
     user_id?: string | number;
 };
@@ -158,6 +160,7 @@ export const insertMilestones = (
     return (tx: Knex.Transaction) =>
         tx<Milestone>("milestones").insert(values).returning("*");
 };
+
 
 export const deleteMilestones = (project_id: string | number) =>
     (tx: Knex.Transaction) =>

@@ -122,4 +122,3 @@ yarn start
 ```
 
 which starts webpack in "watch" mode. This is connected to the running nginx server via the docker-compose `volumes` directive, which is tied to the `./web/dist` directory (where webpack outputs its bundle).
-

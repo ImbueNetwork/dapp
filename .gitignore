@@ -9,5 +9,3 @@ postgres-data/
 .DS_Store
 
 .vscode/
-
-.local/

@@ -13,12 +13,7 @@ To go through this guide you will need:
 
 1. An account on the target testnet with funds. Our public testnet can be found [here](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftestnet.imbue.network#/explorer)
 2. Polkadot-js wallet extention, you can install one from [here](https://polkadot.js.org/extension/)
-3. If launching locally, you need to have the env `GOOGLE_OAUTH2_CLIENT_ID` and `GOOGLE_OAUTH2_CLIENT_SECRET` variables set. You can set a dummy value to them if you dont plan to sign in using OAuth.
-
-```
-export GOOGLE_OAUTH2_CLIENT_ID=client_id
-export GOOGLE_OAUTH2_CLIENT_SECRET=client_secret
-```
+3. If launching locally, you need to have the env `GOOGLE_OAUTH2_CLIENT_ID` and `GOOGLE_OAUTH2_CLIENT_SECRET` variables set. You can set an empty value to them if you dont plan to sign in using OAuth
 
 
 
@@ -127,4 +122,3 @@ yarn start
 ```
 
 which starts webpack in "watch" mode. This is connected to the running nginx server via the docker-compose `volumes` directive, which is tied to the `./web/dist` directory (where webpack outputs its bundle).
-

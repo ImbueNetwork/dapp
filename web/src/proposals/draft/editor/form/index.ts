@@ -38,10 +38,6 @@ const ordinals = [
     "third",
 ];
 
-enum CurrencyType {
-    'IMBU',
-    'KUSD'
-}
 
 const CONTENT = Symbol();
 
@@ -60,7 +56,7 @@ export default class Form extends HTMLElement {
     $milestoneItemTemplate: HTMLTemplateElement;
     $milestones: HTMLOListElement;
     $currencySelect: HTMLSelectElement;
-    currencyType = CurrencyType;
+    currency = model.Currency;
 
 
     get $fields(): HTMLInputElement[] {
@@ -215,12 +211,13 @@ export default class Form extends HTMLElement {
             );
         });
 
-        const currencies = Object.keys(this.currencyType).filter((v) => isNaN(Number(v)));
-        Object.values(currencies).forEach((value) => {
+
+        const currencies = Object.keys(this.currency).filter((v) => !isNaN(Number(v)));
+        Object.values(currencies).forEach((currency) => {
             this.$currencySelect.appendChild(
                 document.createRange().createContextualFragment(`
-                    <mwc-list-item value='${value}'>
-                        <span>${value}</span>
+                    <mwc-list-item value='${currency}'>
+                        <span>${this.currency[currency as any]}</span>
                     </mwc-list-item>
                 `)
             );
@@ -250,6 +247,7 @@ export default class Form extends HTMLElement {
                 location.reload()
             });
         }
+
     }
 
     redirectToNewDraft() {
@@ -376,9 +374,9 @@ export default class Form extends HTMLElement {
             required_funds: parseInt(
                 formData.get("imbu-funds-required") as string
             ) * 1e12,
+            currency_id: parseInt(formData.get("imbu-currency-category") as string),
             category: formData.get("imbu-category") as string,
             owner: formData.get("imbu-address") as string,
-            currency: formData.get("imbu-currency-category") as string,
         }
     }
 

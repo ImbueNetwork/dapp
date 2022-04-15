@@ -216,9 +216,12 @@ export default class Detail extends HTMLElement {
                 this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
             });
 
+            // initators cannot contribute to their own project
             if (this.userIsInitiator) {
-                this.contributionSubmissionForm.hidden = this.userIsInitiator;
-                this.$contribute.hidden = this.userIsInitiator;
+
+                // TODO: for public testnet, we are removing this check. Please enable before go live
+                // this.contributionSubmissionForm.hidden = this.userIsInitiator;
+                // this.$contribute.hidden = this.userIsInitiator;
                 if (projectOnChain.approvedForFunding) {
                     this.$submitMilestoneForm.hidden = !this.userIsInitiator
                     this.$submitMilestone.hidden = !this.userIsInitiator

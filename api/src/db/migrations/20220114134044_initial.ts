@@ -75,6 +75,7 @@ export async function up(knex: Knex): Promise<void> {
      *      create_block_number: BlockNumber,
      *  }
      */
+    
     const projectsTableName = "projects";
     await knex.schema.createTable(projectsTableName, (builder: Knex.CreateTableBuilder) => {
         builder.increments("id", { primaryKey: true });
@@ -83,6 +84,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("description");
         builder.text("website");
         builder.integer("category");
+        builder.integer("currency_id");
         builder.integer("chain_project_id");
 
         builder.text("status").notNullable().defaultTo("draft");

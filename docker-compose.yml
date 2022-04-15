@@ -33,10 +33,7 @@ services:
       DB_PORT: 5432
       DB_HOST: postgres
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
-    volumes:
-    - "./api/build:/api/build"
-    - "./api/node_modules:/api/node_modules"
-    - "./api/views:/api/views"
+      # IMBUE_NETWORK_WEBSOCK_ADDR: ws://127.0.0.1:9942
 
   web:
     build: ./web
@@ -50,7 +47,6 @@ services:
     - SSL_DHPARAM=/etc/nginx/conf.d/includes/dhparam.pem
     - SSL_CERTS_CONF=conf.d/includes/self-signed.conf
     - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
-    # - IMBUE_WS_ADDR=http://3.9.171.186:9944
     - API_LOCAL=http://api:3000
     volumes:
     - "./web/dist:/usr/share/nginx/html/dist"

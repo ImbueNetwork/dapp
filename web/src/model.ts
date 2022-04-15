@@ -1,6 +1,13 @@
 import * as config from "./config";
 
 
+export enum Currency {
+    IMBU,
+    KSM,
+    KUSD
+}
+
+
 /**
  * Models the milestone data that appears in the /proposals/draft form
  */
@@ -18,11 +25,11 @@ export type DraftProposal = {
     website: string;
     milestones: DraftMilestone[];
     required_funds: number;
+    currency_id: number;
     owner: string;
     user_id?: number;
     chain_project_id?: number;
     category?: string | number;
-    currency: string;
 };
 
 /**

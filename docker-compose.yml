@@ -33,7 +33,10 @@ services:
       DB_PORT: 5432
       DB_HOST: postgres
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
-      # IMBUE_NETWORK_WEBSOCK_ADDR: ws://127.0.0.1:9942
+    volumes:
+    - "./api/build:/api/build"
+    - "./api/node_modules:/api/node_modules"
+    - "./api/views:/api/views"
 
   web:
     build: ./web

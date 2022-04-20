@@ -374,7 +374,7 @@ export default class Form extends HTMLElement {
             required_funds: parseInt(
                 formData.get("imbu-funds-required") as string
             ) * 1e12,
-            currency_id: parseInt(formData.get("imbu-currency-category") as string),
+            currency_id: parseInt(formData.get("imbu-currency") as string),
             category: formData.get("imbu-category") as string,
             owner: formData.get("imbu-address") as string,
         }
@@ -403,6 +403,8 @@ export default class Form extends HTMLElement {
         $inputFields["imbu-website"].value = proposal.website ?? "";
         $inputFields["imbu-funds-required"].value =
             String(proposal.required_funds / 1e12) ?? "";
+
+        $inputFields["imbue-currency"].value = String(proposal.currency_id);
         $inputFields["imbu-category"].value = String(proposal.category ?? "");
 
         for (let milestone of proposal.milestones) {

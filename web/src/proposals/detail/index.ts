@@ -38,7 +38,7 @@ export default class Detail extends HTMLElement {
     tabBar: MDCTabBar;
     openForVoting: boolean;
     userIsInitiator: boolean;
-
+    
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
@@ -46,8 +46,10 @@ export default class Detail extends HTMLElement {
     $milestones: HTMLOListElement;
     apiInfo?: polkadotJsApiInfo;
     $fundsRequired: HTMLElement;
+    $projectCurrency: HTMLElement;
+    $projectDetailCurrency: HTMLElement;
 
-    contributionSubmissionForm: HTMLFormElement;
+    $contributionSubmissionForm: HTMLFormElement;
     $imbuContribution: HTMLElement;
     $contribute: HTMLButtonElement;
 
@@ -94,6 +96,7 @@ export default class Detail extends HTMLElement {
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
             HTMLElement;
+
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
             HTMLElement;
@@ -109,10 +112,17 @@ export default class Detail extends HTMLElement {
             this[CONTENT].getElementById("funds-required") as
             HTMLElement;
 
-
-        this.contributionSubmissionForm =
+        this.$contributionSubmissionForm =
             this[CONTENT].getElementById("contribution-submission-form") as
             HTMLFormElement;
+
+        this.$projectCurrency =
+            this[CONTENT].getElementById("project-currency") as
+            HTMLElement;
+
+        this.$projectDetailCurrency =
+            this[CONTENT].getElementById("project-detail-currency") as
+            HTMLElement;
 
         this.$imbuContribution =
             this[CONTENT].getElementById("imbu-contribution") as
@@ -121,8 +131,6 @@ export default class Detail extends HTMLElement {
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
             HTMLButtonElement;
-
-
 
         this.$voteSubmissionForm =
             this[CONTENT].getElementById("vote-submission-form") as
@@ -217,22 +225,50 @@ export default class Detail extends HTMLElement {
             });
 
             // initators cannot contribute to their own project
+            // if (this.userIsInitiator) {
+
+            //     // TODO: for public testnet, we are removing this check. Please enable before go live
+            //     // this.contributionSubmissionForm.hidden = this.userIsInitiator;
+            //     // this.$contribute.hidden = this.userIsInitiator;
+            //     this.$contributionSubmissionForm.hidden = false;
+            //     this.$contribute.hidden = false;
+            //     if (projectOnChain.approvedForFunding) {
+            //         this.$submitMilestoneForm.hidden = !this.userIsInitiator
+            //         this.$submitMilestone.hidden = !this.userIsInitiator
+            //         this.$withdraw.hidden = !this.userIsInitiator
+            //     }
+            // } else if (projectOnChain.approvedForFunding) {
+            //     this.openForVoting = projectOnChain.approvedForFunding;
+            //     this.$voteSubmissionForm.hidden = !this.openForVoting
+            //     this.$vote.hidden = !this.openForVoting;
+            // } else {
+            //     this.$contributionSubmissionForm.hidden = this.openForVoting;
+            //     this.$contribute.hidden = this.openForVoting;
+            // }
+
+
             if (this.userIsInitiator) {
 
                 // TODO: for public testnet, we are removing this check. Please enable before go live
                 // this.contributionSubmissionForm.hidden = this.userIsInitiator;
                 // this.$contribute.hidden = this.userIsInitiator;
+                this.$contributionSubmissionForm.hidden = false;
+                this.$contribute.hidden = false;
                 if (projectOnChain.approvedForFunding) {
                     this.$submitMilestoneForm.hidden = !this.userIsInitiator
                     this.$submitMilestone.hidden = !this.userIsInitiator
                     this.$withdraw.hidden = !this.userIsInitiator
+
+                    this.openForVoting = projectOnChain.approvedForFunding;
+                    this.$voteSubmissionForm.hidden = !this.openForVoting
+                    this.$vote.hidden = !this.openForVoting;
                 }
             } else if (projectOnChain.approvedForFunding) {
                 this.openForVoting = projectOnChain.approvedForFunding;
                 this.$voteSubmissionForm.hidden = !this.openForVoting
                 this.$vote.hidden = !this.openForVoting;
             } else {
-                this.contributionSubmissionForm.hidden = this.openForVoting;
+                this.$contributionSubmissionForm.hidden = this.openForVoting;
                 this.$contribute.hidden = this.openForVoting;
             }
         }
@@ -337,6 +373,8 @@ export default class Detail extends HTMLElement {
         this.$projectDescription.innerHTML = marked.parse(draft.description);
         this.$projectLogo.setAttribute("srcset", draft.logo);
         this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
+        this.$projectCurrency.innerText = "$" + model.Currency[draft.currency_id as any];
+        this.$projectDetailCurrency.innerText = this.$projectCurrency.innerText;
 
         draft.milestones.forEach(milestone => {
             this.$milestones.appendChild(
@@ -363,7 +401,7 @@ export default class Detail extends HTMLElement {
         event: string = "begin",
         state?: Record<string, any>
     ): Promise<void> {
-        const formData = new FormData(this.contributionSubmissionForm);
+        const formData = new FormData(this.$contributionSubmissionForm);
         const contribution = parseInt(
             formData.get("imbu-contribution") as string
         ) * 1e12;

@@ -21,7 +21,7 @@
                 autocomplete="off" hidden="true" novalidate>
                 <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number"
                     helper="The total amount to contribute for the project." step="1" min="1" max="1e127" required>
-                    <span slot="prefix" class="imbu-symbol-prefix">$IMBU</span>
+                    <span slot="prefix" id="project-currency" class="imbu-symbol-prefix">$IMBU</span>
                     <span slot="suffix">.00</span>
                     <span slot="floating-label">Contribution amount</span>
                 </hq-forms-textfield>
@@ -103,7 +103,7 @@
             </li>
             <li class="project-detail">
                 <span class="detail-label"></span>
-                <span class="imbu-currency-label">$IMBU</span>
+                <span id="project-detail-currency" class="imbu-currency-label"></span>
                 <span id="funds-required"></span>
                 <!--
              --><span class="imbu-currency-label fraction">.00</span>

@@ -1,6 +1,7 @@
 import { web3Accounts, web3Enable, web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta, InjectedExtension } from "@polkadot/extension-inject/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import type { DispatchError, DispatchResult, Event, EventRecord } from '@polkadot/types/interfaces';
 
 import { Keyring } from "@polkadot/keyring";
 import { stringToHex } from "@polkadot/util";
@@ -69,3 +70,23 @@ export const signWeb3Challenge = async (
         return signature;
     }
 }
+
+
+export function getDispatchError (dispatchError: DispatchError): string {
+    let message: string = dispatchError.type;
+  
+    if (dispatchError.isModule) {
+      try {
+        const mod = dispatchError.asModule;
+        const error = dispatchError.registry.findMetaError(mod);
+  
+        message = `${error.name}`;
+      } catch (error) {
+        // swallow
+      }
+    } else if (dispatchError.isToken) {
+      message = `${dispatchError.type}.${dispatchError.asToken.type}`;
+    }
+  
+    return message;
+  }

@@ -5,7 +5,9 @@ import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
 import { MDCTabBar } from "@material/tab-bar";
 import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import type { ISubmittableResult } from "@polkadot/types/types";
+import type { ISubmittableResult, ITuple, Registry,  } from "@polkadot/types/types";
+import type { DispatchError } from '@polkadot/types/interfaces';
+
 import { web3FromSource } from "@polkadot/extension-dapp";
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
@@ -15,7 +17,7 @@ import { DraftProposal, Proposal, User } from "../../model";
 import * as model from "../../model";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { getWeb3Accounts } from "../../utils/polkadot";
+import { getWeb3Accounts, getDispatchError } from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
 import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
@@ -397,6 +399,9 @@ export default class Detail extends HTMLElement {
         });
     }
 
+
+    
+
     async contribute(
         event: string = "begin",
         state?: Record<string, any>
@@ -416,6 +421,7 @@ export default class Detail extends HTMLElement {
                         this.project?.chain_project_id,
                         contribution
                     );
+
                     if (!extrinsic) {
                         // FIXME: UX
                         return;
@@ -443,6 +449,7 @@ export default class Detail extends HTMLElement {
                             }
                         }
                     ));
+
                 } break;
             case "account-chosen":
                 {
@@ -456,14 +463,30 @@ export default class Detail extends HTMLElement {
                         account.address,
                         { signer: injector.signer },
                         ({ status }) => {
+                            // console.log(`******************** status is ${status.toString()} ********************`);
 
                             api?.query.system.events((events: any) => {
                                 if (events) {
                                     // Loop through the Vec<EventRecord>
                                     events.forEach((record: any) => {
+
+
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
+
+
+                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                        let message = dispatchError.type;
+
+                                        if (dispatchError.isModule) {
+                                            try {
+                                                let errorMessage = getDispatchError(dispatchError);
+                                                this.errorNotification(Error(errorMessage));
+                                              } catch (error) {
+                                                // swallow
+                                              }
+                                        }
 
                                         if (contributionSucceeded) {
                                             const types = event.typeDef;

@@ -345,6 +345,13 @@ export default class Detail extends HTMLElement {
             );
         }
 
+        if (!draft.chain_project_id) {
+            // If the project is not finalised, redirect to the preview page
+            let preview_url =`${config.grantProposalsURL
+            }/draft/preview?id=${this.projectId}`;
+            utils.redirect(preview_url);
+        }
+
         // this.$["about-project"].innerText = proposal.name;
         this.$projectName.innerText = draft.name;
         this.$projectWebsite.innerHTML = `

@@ -404,7 +404,7 @@ export default class Form extends HTMLElement {
         $inputFields["imbu-funds-required"].value =
             String(proposal.required_funds / 1e12) ?? "";
 
-        $inputFields["imbue-currency"].value = String(proposal.currency_id);
+        $inputFields["imbu-currency"].value = String(proposal.currency_id);
         $inputFields["imbu-category"].value = String(proposal.category ?? "");
 
         for (let milestone of proposal.milestones) {

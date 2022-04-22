@@ -5,7 +5,7 @@ import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
 import { MDCTabBar } from "@material/tab-bar";
 import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import type { ISubmittableResult, ITuple, Registry,  } from "@polkadot/types/types";
+import type { ISubmittableResult, ITuple, Registry, } from "@polkadot/types/types";
 import type { DispatchError } from '@polkadot/types/interfaces';
 
 import { web3FromSource } from "@polkadot/extension-dapp";
@@ -40,7 +40,7 @@ export default class Detail extends HTMLElement {
     tabBar: MDCTabBar;
     openForVoting: boolean;
     userIsInitiator: boolean;
-    
+
     $projectName: HTMLElement;
     $projectWebsite: HTMLElement;
     $projectDescription: HTMLElement;
@@ -226,53 +226,28 @@ export default class Detail extends HTMLElement {
                 this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
             });
 
-            // initators cannot contribute to their own project
-            // if (this.userIsInitiator) {
 
-            //     // TODO: for public testnet, we are removing this check. Please enable before go live
-            //     // this.contributionSubmissionForm.hidden = this.userIsInitiator;
-            //     // this.$contribute.hidden = this.userIsInitiator;
-            //     this.$contributionSubmissionForm.hidden = false;
-            //     this.$contribute.hidden = false;
-            //     if (projectOnChain.approvedForFunding) {
-            //         this.$submitMilestoneForm.hidden = !this.userIsInitiator
-            //         this.$submitMilestone.hidden = !this.userIsInitiator
-            //         this.$withdraw.hidden = !this.userIsInitiator
-            //     }
-            // } else if (projectOnChain.approvedForFunding) {
-            //     this.openForVoting = projectOnChain.approvedForFunding;
-            //     this.$voteSubmissionForm.hidden = !this.openForVoting
-            //     this.$vote.hidden = !this.openForVoting;
-            // } else {
-            //     this.$contributionSubmissionForm.hidden = this.openForVoting;
-            //     this.$contribute.hidden = this.openForVoting;
-            // }
+            //TODO Check if project is in the scheduled round for contribution
+            // this.openForContributions = projectIsInFundingRound;
 
 
-            if (this.userIsInitiator) {
-
-                // TODO: for public testnet, we are removing this check. Please enable before go live
-                // this.contributionSubmissionForm.hidden = this.userIsInitiator;
-                // this.$contribute.hidden = this.userIsInitiator;
-                this.$contributionSubmissionForm.hidden = false;
-                this.$contribute.hidden = false;
-                if (projectOnChain.approvedForFunding) {
+            if (projectOnChain.approvedForFunding) {
+                // Initators cannot contribute to their own project
+                if (this.userIsInitiator) {
                     this.$submitMilestoneForm.hidden = !this.userIsInitiator
                     this.$submitMilestone.hidden = !this.userIsInitiator
                     this.$withdraw.hidden = !this.userIsInitiator
 
+                } else {
                     this.openForVoting = projectOnChain.approvedForFunding;
                     this.$voteSubmissionForm.hidden = !this.openForVoting
                     this.$vote.hidden = !this.openForVoting;
                 }
-            } else if (projectOnChain.approvedForFunding) {
-                this.openForVoting = projectOnChain.approvedForFunding;
-                this.$voteSubmissionForm.hidden = !this.openForVoting
-                this.$vote.hidden = !this.openForVoting;
             } else {
                 this.$contributionSubmissionForm.hidden = this.openForVoting;
                 this.$contribute.hidden = this.openForVoting;
             }
+
         }
     }
 
@@ -330,6 +305,10 @@ export default class Detail extends HTMLElement {
         });
 
         this.$withdraw.addEventListener("click", e => {
+            const valid = utils.validateForm(this.$submitMilestoneForm);
+            if (!valid) {
+                throw new Error("Invalid form data.");
+            }
             this.withdraw();
         });
     }
@@ -399,9 +378,6 @@ export default class Detail extends HTMLElement {
         });
     }
 
-
-    
-
     async contribute(
         event: string = "begin",
         state?: Record<string, any>
@@ -463,29 +439,26 @@ export default class Detail extends HTMLElement {
                         account.address,
                         { signer: injector.signer },
                         ({ status }) => {
-                            // console.log(`******************** status is ${status.toString()} ********************`);
-
                             api?.query.system.events((events: any) => {
                                 if (events) {
                                     // Loop through the Vec<EventRecord>
                                     events.forEach((record: any) => {
 
-
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
-
-
                                         const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                                        let message = dispatchError.type;
-
                                         if (dispatchError.isModule) {
                                             try {
                                                 let errorMessage = getDispatchError(dispatchError);
                                                 this.errorNotification(Error(errorMessage));
-                                              } catch (error) {
+
+                                                this.$contribute.disabled = false;
+                                                this.$contribute.classList.remove("blob");
+                                                this.$contribute.innerText = "Contribute";
+                                            } catch (error) {
                                                 // swallow
-                                              }
+                                            }
                                         }
 
                                         if (contributionSucceeded) {
@@ -582,6 +555,20 @@ export default class Detail extends HTMLElement {
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const voteSucceeded = `${event.section}:${event.method}` == "imbueProposals:VoteComplete";
+                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                        if (dispatchError.isModule) {
+                                            try {
+                                                let errorMessage = getDispatchError(dispatchError);
+                                                this.errorNotification(Error(errorMessage));
+
+                                                this.$vote.disabled = false;
+                                                this.$vote.classList.remove("blob");
+                                                this.$vote.innerText = "Vote";
+                                            } catch (error) {
+                                                // swallow
+                                            }
+                                        }
+
                                         if (voteSucceeded) {
                                             const types = event.typeDef;
                                             const voterAccountId = event.data[0];
@@ -673,6 +660,21 @@ export default class Detail extends HTMLElement {
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const milestoneSubmitted = `${event.section}:${event.method}` == "imbueProposals:MilestoneSubmitted";
+                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                        if (dispatchError.isModule) {
+                                            try {
+                                                let errorMessage = getDispatchError(dispatchError);
+                                                this.errorNotification(Error(errorMessage));
+
+                                                this.$submitMilestone.disabled = false;
+                                                this.$submitMilestone.classList.remove("blob");
+                                                this.$submitMilestone.innerText = "Submit";
+                                            } catch (error) {
+                                                // swallow
+                                            }
+                                        }
+
+
                                         if (milestoneSubmitted) {
                                             const types = event.typeDef;
                                             const submittedProjectId = parseInt(event.data[0].toString());
@@ -764,6 +766,20 @@ export default class Detail extends HTMLElement {
                                         // Extract the phase, event and the event types
                                         const { event, phase } = record;
                                         const withdrawSuccessful = `${event.section}:${event.method}` == "imbueProposals:ProjectFundsWithdrawn";
+                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                        if (dispatchError.isModule) {
+                                            try {
+                                                let errorMessage = getDispatchError(dispatchError);
+                                                this.errorNotification(Error(errorMessage));
+
+                                                this.$withdraw.disabled = false;
+                                                this.$withdraw.classList.remove("blob");
+                                                this.$withdraw.innerText = "Withdraw";
+                                            } catch (error) {
+                                                // swallow
+                                            }
+                                        }
+
                                         if (withdrawSuccessful) {
                                             const types = event.typeDef;
                                             const withdrawalAccountId = event.data[0];

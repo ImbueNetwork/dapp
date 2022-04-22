@@ -138,7 +138,7 @@ export const fetchProject = (id: string | number) =>
 
 export const fetchAllProjects = () =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select();
+        tx<Project>("projects").whereNotNull('chain_project_id').select();
 
 export const fetchUserProjects = (id: string | number) =>
     (tx: Knex.Transaction) =>

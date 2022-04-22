@@ -49,7 +49,7 @@ const updateProject = (id, project) => async (tx) => (await tx("projects")
 exports.updateProject = updateProject;
 const fetchProject = (id) => (tx) => tx("projects").select().where({ id }).first();
 exports.fetchProject = fetchProject;
-const fetchAllProjects = () => (tx) => tx("projects").select();
+const fetchAllProjects = () => (tx) => tx("projects").whereNotNull('chain_project_id').select();
 exports.fetchAllProjects = fetchAllProjects;
 const fetchUserProjects = (id) => (tx) => tx("projects").select().where({
     user_id: id

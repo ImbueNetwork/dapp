@@ -49,6 +49,8 @@ export default class List extends HTMLElement {
 
         this.$list.innerHTML = "";
 
+        console.log(this.user)
+
         await this.fetchUserProjects().then(projects => {
             if (projects) {
                 this.renderProjects(projects);

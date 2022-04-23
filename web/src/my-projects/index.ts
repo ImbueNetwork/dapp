@@ -5,6 +5,8 @@ import Pages from "@pojagi/hoquet/lib/pages/pages";
 import Route from "@pojagi/hoquet/lib/route/route";
 
 
+import "../my-projects/edit";
+import Edit from "../my-projects/edit";
 
 import "../my-projects/listing";
 import List from "../my-projects/listing";
@@ -54,6 +56,10 @@ export default class MyProjects extends HTMLElement {
         const route = new Route("/:page", path);
 
         switch (route.data?.page) {
+            case "edit":
+                this.$pages.select("edit");
+                (this.$pages.selected as Edit).init(request);
+                break;
             default:
                 this.dispatchEvent(utils.badRouteEvent("not-found"));
         }

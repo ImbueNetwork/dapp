@@ -60,6 +60,12 @@ export type Project = {
     user_id?: string | number;
 };
 
+export type ProjectProperties = {
+    id?: string | number;
+    faq: string;
+    project_id?: string | number;
+};
+
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
@@ -132,9 +138,22 @@ export const updateProject = (id: string | number, project: Project) =>
             .returning("*")
     )[0];
 
+export const updateProjectProperties = (id: string | number, properties: ProjectProperties) =>
+    async (tx: Knex.Transaction) => (
+        await tx<ProjectProperties>("project_properties")
+            .update(properties)
+            .where({ 'project_id': id })
+            .returning("*")
+    )[0];
+
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select().where({ id }).first();
+
+
+export const fetchProjectWithProperties = (id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx<Project>("projects").join("project_properties", "projects.id", "=", "project_properties.project_id").select().where({ "project_id": id }).first();
 
 export const fetchAllProjects = () =>
     (tx: Knex.Transaction) =>

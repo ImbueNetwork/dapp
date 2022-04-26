@@ -224,5 +224,92 @@ router.put("/:id", (req, res, next) => {
     });
 });
 
+const validateProperties = (properties: models.ProjectProperties) => {
+    if (!properties) {
+        throw new Error("Missing `properties` entry.");
+    }
+
+    const entries = Object.entries(properties);
+    if (entries.filter(([_,v]) => {
+            // undefined not allowed
+            return v === void 0;
+        }).length
+    ) {
+        throw new Error(
+            `Project property entries can't have a value of \`undefined\`.`
+        );
+    }
+}
+
+router.get('/:id/properties', (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).end();
+    }
+    
+    const id = req.params.id;
+
+    db.transaction(async tx => {
+        try {
+            const project = await models.fetchProjectWithProperties(id)(tx);
+
+            if (!project) {
+                return res.status(404).end();
+            }
+
+            res.send(project);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch project by id: ${id}`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
+
+router.put("/:id/properties", (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).end();
+    }
+
+    const id = req.params.id;
+
+    try {
+        validateProperties({ ...req.body.properties, project_id: id });
+    } catch (e) {
+        res.status(400).send(
+            {message: (e as Error).message}
+        );
+    }
+
+    const {
+        faq
+    } = req.body.properties as models.ProjectProperties;
+
+    db.transaction(async tx => {
+        try {
+            // ensure the project exists first
+            const exists = await models.fetchProject(id)(tx);
+
+            if (!exists) {
+                return res.status(404).end();
+            }
+
+            const updated = await models.updateProjectProperties(id, {
+                faq
+            } as models.ProjectProperties)(tx);
+    
+            res.status(200).send({
+                ...exists,
+                properties: updated
+            });
+        } catch (cause) {
+            next(new Error(
+                `Failed to update project properties.`,
+                {cause: cause as Error}
+            ));
+        }
+    });
+});
+
 
 export default router;

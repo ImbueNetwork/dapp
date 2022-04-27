@@ -248,6 +248,12 @@ export default class Detail extends HTMLElement {
                 this.$contribute.hidden = this.openForVoting;
             }
 
+            // TODO kept for testing projectOnChain.fundingThresholdMet = true;
+            if(projectOnChain.fundingThresholdMet)
+            {
+                this.$contribute.disabled=true;
+            }
+
         }
     }
 

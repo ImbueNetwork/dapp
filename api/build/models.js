@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOrCreateFederatedUser = exports.insertFederatedCredential = exports.fetchProjectMilestones = exports.deleteMilestones = exports.insertMilestones = exports.fetchUserProjects = exports.fetchAllProjects = exports.fetchProjectWithProperties = exports.fetchProject = exports.updateProjectProperties = exports.updateProject = exports.insertProject = exports.insertUserByDisplayName = exports.upsertWeb3Challenge = exports.fetchUser = exports.fetchWeb3Account = void 0;
+exports.getOrCreateFederatedUser = exports.insertFederatedCredential = exports.fetchProjectMilestones = exports.deleteMilestones = exports.insertMilestones = exports.fetchUserProject = exports.fetchAllProjects = exports.fetchProjectWithProperties = exports.fetchProject = exports.updateProjectProperties = exports.updateProject = exports.insertProject = exports.insertUserByDisplayName = exports.upsertWeb3Challenge = exports.fetchUser = exports.fetchWeb3Account = void 0;
 const index_1 = __importDefault(require("./db/index"));
 const fetchWeb3Account = (address) => (tx) => tx("web3_accounts")
     .select()
@@ -58,10 +58,10 @@ const fetchProjectWithProperties = (id) => (tx) => tx("projects").join("project_
 exports.fetchProjectWithProperties = fetchProjectWithProperties;
 const fetchAllProjects = () => (tx) => tx("projects").whereNotNull('chain_project_id').select();
 exports.fetchAllProjects = fetchAllProjects;
-const fetchUserProjects = (id) => (tx) => tx("projects").select().where({
+const fetchUserProject = (id) => (tx) => tx("projects").select().where({
     user_id: id
-}).select();
-exports.fetchUserProjects = fetchUserProjects;
+}).first();
+exports.fetchUserProject = fetchUserProject;
 const insertMilestones = (milestones, project_id) => {
     const values = milestones.map((m, idx) => ({
         ...m,

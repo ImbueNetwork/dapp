@@ -1,18 +1,9 @@
 import html from "./index.html";
 import css from "./index.css";
 
-import Pages from "@pojagi/hoquet/lib/pages/pages";
-import Route from "@pojagi/hoquet/lib/route/route";
-
-import "./editor";
-import ProposalsDraftEditor from "./editor";
-
-import "./preview";
-import ProposalsDraftPreview from "./preview";
-
-import * as config from "../../config";
-import * as utils from "../../utils";
-import { ImbueRequest } from "../../dapp";
+import "./form";
+import ProposalsDraftEditorForm from "./form";
+import {ImbueRequest} from "../../dapp";
 
 
 const template = document.createElement("template");
@@ -20,50 +11,33 @@ template.innerHTML = `
 <style>${css}</style>
 ${html}
 `;
-
-
 const CONTENT = Symbol();
 
 
-export default class ProposalsDraft extends HTMLElement {
+export default class Editor extends HTMLElement {
     [CONTENT]: DocumentFragment;
-    $pages: Pages;
+    $form: ProposalsDraftEditorForm
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({mode: "open"});
 
         this[CONTENT] =
             template.content.cloneNode(true) as
                 DocumentFragment;
 
-        this.$pages =
-            this[CONTENT].getElementById("pages") as
-                Pages;
+        this.$form =
+            this[CONTENT].getElementById("form") as
+                ProposalsDraftEditorForm;
     }
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path: string | null, request: ImbueRequest) {
-        if (!path) {
-            this.$pages.select("editor");
-            (this.$pages.selected as ProposalsDraftEditor).init(request);
-            return;
-        }
-
-        const route = new Route("/:page", path);
-
-        switch (route.data?.page) {
-            case "preview":
-                this.$pages.select("preview");
-                (this.$pages.selected as ProposalsDraftPreview).init(request);
-                break;
-            default:
-                this.dispatchEvent(utils.badRouteEvent("not-found"));
-        }
+    init(request: ImbueRequest) {
+        return this.$form?.init(request);
     }
 }
 
-window.customElements.define("imbu-proposals-draft", ProposalsDraft);
+window.customElements.define("imbu-proposals-draft-editor", Editor);

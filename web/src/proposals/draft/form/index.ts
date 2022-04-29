@@ -2,19 +2,18 @@ import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
 import "@pojagi/hoquet/lib/forms/textfield/textfield";
 import TextField from '@pojagi/hoquet/lib/forms/textfield/textfield';
 
-import "../../../../material-components";
-import formStyles from "../../../../styles/forms.css";
+import "../../../material-components";
+import formStyles from "../../../styles/forms.css";
 
 import templateSrc from "./index.html";
 import styles from "./index.css";
-import * as config from "../../../../config";
-import {categories} from "../../../../config";
+import * as config from "../../../config";
+import {categories} from "../../../config";
 
-import type {DraftMilestone, DraftProposal, Proposal, User} from "../../../../model";
-import * as model from "../../../../model";
-import * as utils from '../../../../utils';
-import {ImbueRequest} from '../../../../dapp';
-import authDialogContent from "../../../../dapp/auth-dialog-content.html";
+import type {DraftMilestone, DraftProposal, Proposal, User} from "../../../model";
+import * as model from "../../../model";
+import * as utils from '../../../utils';
+import {ImbueRequest} from '../../../dapp';
 
 declare global {
     interface ErrorConstructor {
@@ -45,6 +44,7 @@ export default class Form extends HTMLElement {
     private [CONTENT]: DocumentFragment;
     milestoneIdx: number = 0;
     user?: User | null;
+    userProject?: Proposal | null;
     accounts?: Promise<InjectedAccountWithMeta[]>;
     $submitProposal: HTMLInputElement;
     $categorySelect: HTMLSelectElement;
@@ -62,43 +62,45 @@ export default class Form extends HTMLElement {
         return Array.from(
             this.$grantSubmissionForm.querySelectorAll(".input-field")
         );
-    } get nextMilestoneOrdinal(): string {
+    }
+
+    get nextMilestoneOrdinal(): string {
         return ordinals[this.milestoneIdx++] ?? "next";
     }
 
     constructor() {
         super();
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({mode: "open"});
         this[CONTENT] = template.content.cloneNode(true) as
             DocumentFragment;
 
         this.$submitProposal =
             this[CONTENT].getElementById("submit-proposal") as
-            HTMLInputElement;
+                HTMLInputElement;
         this.$categorySelect =
             this[CONTENT].getElementById("category-select") as
-            HTMLSelectElement;
+                HTMLSelectElement;
         this.$web3AccountSelect =
             this[CONTENT].getElementById("web3-account-select") as
-            HTMLSelectElement;
+                HTMLSelectElement;
         this.$addMilestone =
             this[CONTENT].getElementById("add-milestone") as
-            HTMLInputElement;
+                HTMLInputElement;
         this.$grantSubmissionForm =
             this[CONTENT].getElementById("grant-submission-form") as
-            HTMLFormElement;
+                HTMLFormElement;
         this.$milestoneItemTemplate =
             this[CONTENT].getElementById("milestone-item-template") as
-            HTMLTemplateElement;
+                HTMLTemplateElement;
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-            HTMLOListElement;
+                HTMLOListElement;
         this.$web3Address =
             this[CONTENT].getElementById("web3-address") as
-            HTMLInputElement;
+                HTMLInputElement;
         this.$currencySelect =
             this[CONTENT].getElementById("currency-select") as
-            HTMLSelectElement;
+                HTMLSelectElement;
     }
 
     reset() {
@@ -144,7 +146,7 @@ export default class Form extends HTMLElement {
              data-source="${account.meta.source}">
                 <span>${account.meta.name ?? account.address}</span>
                 <span class="select-source" slot="secondary">${account.meta.source
-            }</span>
+        }</span>
             </mwc-list-item>
         `);
     }
@@ -152,7 +154,9 @@ export default class Form extends HTMLElement {
     async init(request: ImbueRequest) {
         this.disabled = true;
         this.reset();
+
         this.user = await request.user;
+        this.userProject = await request.userProject;
 
         // Are we logged in?
         if (!this.user) {
@@ -173,9 +177,7 @@ export default class Form extends HTMLElement {
                     }
                 }
             ));
-        }
-        else
-        {
+        } else {
             this.disabled = false;
         }
         /**
@@ -227,7 +229,7 @@ export default class Form extends HTMLElement {
                     <mwc-list-item twoline value="${idx}">
                         <span>${category}</span>
                         <span class="select-source" slot="secondary">${subcategies.join("; ")
-                    }</span>
+                }</span>
                     </mwc-list-item>
                 `)
             );
@@ -245,7 +247,7 @@ export default class Form extends HTMLElement {
             );
         });
 
-        const projectId = this.projectId;
+        const projectId = this.userProject?.id;
 
         try {
             if (projectId) {
@@ -264,84 +266,48 @@ export default class Form extends HTMLElement {
         }
 
 
-
     }
 
     redirectToNewDraft() {
         utils.redirect(`${config.grantProposalsURL}`);
     }
 
-    async setupExistingDraft(projectId: string) {
+    async setupExistingDraft(projectId: number) {
         let draft: DraftProposal;
 
-        if (projectId === "local-draft") {
-            const local = localStorage.getItem(
-                config.proposalsDraftLocalDraftKey
-            );
-
-            if (!local) {
-                this.redirectToNewDraft();
-                return;
-            }
-
-            draft = JSON.parse(String(local));
-        } else {
-            if (!this.user) {
-                /**
-                 * No user means not logged in, so don't bother trying to
-                 * fetch, etc., because the server will only respond 401.
-                 */
-                this.redirectToNewDraft();
-                return;
-            }
-
-            try {
-                draft = await fetch(
-                    `${config.apiBase}/projects/${projectId}`,
-                    { headers: config.getAPIHeaders }
-                ).then(async resp => {
-                    if (resp.ok) {
-                        const project = await resp.json();
-                        if (this.user?.id === project.user_id) {
-                            return project;
-                        } else {
-                            this.redirectToNewDraft();
-                        }
-                    } else if (resp.status === 404) {
-                        // FIXME: 404 page or some other UX
-                        // throw new Error("Not found");
-                        this.redirectToNewDraft();
-                        return;
+        try {
+            draft = await fetch(
+                `${config.apiBase}/projects/${projectId}`,
+                {headers: config.getAPIHeaders}
+            ).then(async resp => {
+                if (resp.ok) {
+                    const project = await resp.json();
+                    if (this.user?.id === project.user_id) {
+                        return project;
                     } else {
-                        throw resp;
+                        this.redirectToNewDraft();
                     }
-                });
-            } catch (cause) {
-                this.dispatchEvent(utils.badRouteEvent("server-error"));
+                } else if (resp.status === 404) {
+                    // FIXME: 404 page or some other UX
+                    // throw new Error("Not found");
+                    this.redirectToNewDraft();
+                    return;
+                } else {
+                    throw resp;
+                }
+            });
+        } catch (cause) {
+            this.dispatchEvent(utils.badRouteEvent("server-error"));
 
-                throw new Error(
-                    `Server error fetching project with id ${projectId}`,
-                    { cause: cause as Error }
-                );
-            }
+            throw new Error(
+                `Server error fetching project with id ${projectId}`,
+                {cause: cause as Error}
+            );
         }
 
         setTimeout(() => {
             this.proposalIntoForm(draft);
         }, 0);
-    }
-
-    get projectId(): string | null {
-        const entries = window.location.search
-            .split("?")[1]
-            ?.split("&")
-            .map(x => x.split("="));
-
-        if (!entries) {
-            return null;
-        }
-
-        return Object.fromEntries(entries).id;
     }
 
     bind() {
@@ -375,7 +341,7 @@ export default class Form extends HTMLElement {
      * At this point, the form must have been validated, so we simply cast
      * the form inputs into their respective types and rely on the fact that
      * there won't be any undefined values.
-     * 
+     *
      * Note that `requiredFunds` is multiplied by 1e12, so that whatever the
      * user submits here, we are ultimately submitting
      * $number * 1_000_000_000_000 to the blockchain.
@@ -550,28 +516,6 @@ export default class Form extends HTMLElement {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    async postGrantProposal(proposal: DraftProposal) {
-        const resp = await model.postDraftProposal(proposal);
-
-        if (resp.ok) {
-            const proposal: Proposal = await resp.json();
-            // FIXME: delete from localStorage?
-            return proposal;
-        } else {
-            // TODO: UX for submission failed
-            // maybe `this.dialog(...)`
-            this.disabled = false;
-        }
-    }
-
-    async updateGrantProposal(proposal: DraftProposal, id: string | number) {
-        const resp = await model.updateProposal(proposal, id);
-        if (resp.ok) {
-            const proposal: Proposal = await resp.json();
-            return proposal;
-        }
-    }
-
     async submitGrantProposal(
         draft: DraftProposal,
         account?: InjectedAccountWithMeta,
@@ -581,17 +525,19 @@ export default class Form extends HTMLElement {
         draft.user_id = this.user?.id;
         let proposal;
 
-        if (this.projectId) {
-            proposal = this.updateGrantProposal(draft, this.projectId);
-            utils.redirect(`${config.grantProposalsURL
-                }/draft/preview?id=${this.projectId}`);
+        const projectId = this.userProject?.id;
 
+        if (projectId) {
+            const resp = await model.updateProposal(draft, projectId);
+            if (resp.ok) {
+                proposal = await resp.json();
+                location.assign(`/dapp${config.grantProposalsURL}/preview`);
+            }
         } else {
             const resp = await model.postDraftProposal(draft);
             if (resp.ok) {
-                const proposal = await resp.json();
-                utils.redirect(`${config.grantProposalsURL
-                    }/draft/preview?id=${proposal.id}`);
+                proposal = await resp.json();
+                location.assign(`/dapp${config.grantProposalsURL}/preview`);
             } else {
                 // TODO: UX for bad request posting draft
                 console.warn("Bad request posting draft", draft);
@@ -599,12 +545,6 @@ export default class Form extends HTMLElement {
         }
 
 
-    }
-    savetoLocalStorage(proposal: DraftProposal) {
-        window.localStorage.setItem(
-            config.proposalsDraftLocalDraftKey,
-            JSON.stringify(proposal)
-        );
     }
 }
 

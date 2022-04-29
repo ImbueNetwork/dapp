@@ -20,6 +20,7 @@ export const postAPIHeaders = {
 };
 
 export const grantProposalsURL = "/proposals";
+export const dashboardUrl = "/dashboard";
 
 export const googleAuthEndpoint = "/auth/oauth2/accounts.google.com/login";
 
@@ -33,6 +34,7 @@ export const event = {
     notification: "imbu:dapp:dialog:create",
     badRoute: "imbu:dapp:bad-route",
     accountChoice: "imbu:dapp:account-choice",
+    proposalUpdated: "imbu:dapp:user-proposal-updated"
 }
 
 /**

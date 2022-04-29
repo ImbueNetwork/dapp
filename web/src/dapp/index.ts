@@ -8,11 +8,11 @@ import "@pojagi/hoquet/lib/dialog/dialog";
 import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
 
 import "@pojagi/hoquet/lib/nav/nav";
-import Nav, { MenuItem } from "@pojagi/hoquet/lib/nav/nav";
+import Nav, {MenuItem} from "@pojagi/hoquet/lib/nav/nav";
 
 import Route from "@pojagi/hoquet/lib/route/route";
 
-import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
 
 import * as utils from "../utils";
 import * as config from "../config";
@@ -20,8 +20,8 @@ import * as config from "../config";
 import "../proposals";
 import Proposals from "../proposals";
 
-import "../my-projects";
-import MyProjects from "../my-projects";
+import "../dashboard";
+import Dashboard from "../dashboard";
 
 import materialIcons from "../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
@@ -33,16 +33,17 @@ import Authentication from "../authentication";
 import "../account-choice";
 import AccountChoice from "../account-choice";
 
-import { User } from "../model";
-import { getWeb3Accounts } from "../utils/polkadot";
+import * as model from "../model";
+import {Proposal, User} from "../model";
+import {getWeb3Accounts} from "../utils/polkadot";
 
 import html from "./index.html";
 import styles from "./index.css";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-
+import {ApiPromise, WsProvider} from "@polkadot/api";
 
 export type ImbueRequest = {
     user: Promise<User | null>;
+    userProject: Promise<Proposal | null>;
     accounts: Promise<InjectedAccountWithMeta[]>;
     apiInfo: Promise<polkadotJsApiInfo>;
 };
@@ -53,7 +54,6 @@ export type polkadotJsApiInfo = {
     webSockAddr: string;
 }
 
-
 const template = document.createElement("template");
 template.innerHTML = `
     ${materialIcons}
@@ -62,44 +62,47 @@ template.innerHTML = `
 `;
 const CONTENT = Symbol();
 
-const navigationItems: MenuItem[] = [
-    {
-        name: "new-proposal",
-        label: "New",
-        href: "/dapp/proposals/draft",
-        icon: "library_add",
-        spa: true,
-    },
-    // FIXME: only if logged in:
-    {
-        name: "drafts",
-        label: "Drafts",
-        href: "/dapp/proposals/draft/list",
-        icon: "library_books",
-        spa: true,
-    },
-    {
+const navigationItems = (isLoggedIn: boolean, hasProposal: boolean): MenuItem[] => {
+    const menuItems: MenuItem[] = [];
+
+    if (isLoggedIn) {
+        menuItems.push({
+            name: "account-dashboard",
+            label: "Dashboard",
+            href: "/dapp/dashboard",
+            icon: "face",
+            spa: true,
+        });
+
+        if (!hasProposal) {
+            menuItems.push({
+                name: "new-proposal",
+                label: "Create a Proposal",
+                href: "/dapp/proposals/draft",
+                icon: "library_add",
+                spa: true,
+            });
+        }
+    } else {
+        menuItems.push({
+            name: "account-dashboard",
+            label: "Log in",
+            href: "/dapp/dashboard",
+            icon: "face",
+            spa: true,
+        });
+    }
+
+    menuItems.push({
         name: "discover-proposals",
         label: "Discover",
         href: "/dapp/proposals",
         icon: "search",
         spa: true,
-    },
-    // FIXME: only when logged in:
-    {
-        name: "account-settings",
-        label: "Me",
-        href: "/dapp/myprojects",
-        icon: "face",
-        spa: true,
-    },
-    {
-        name: "contact",
-        label: "Contact",
-        href: "/#join",
-        icon: "alternate_email"
-    }
-].filter(x => x);
+    });
+
+    return menuItems;
+}
 
 
 window.customElements.define("imbu-dapp", class extends HTMLElement {
@@ -113,6 +116,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     $auth: Authentication;
 
     user: Promise<User>;
+    userProject: Promise<Proposal>;
     accounts: Promise<InjectedAccountWithMeta[]>;
     apiInfo: Promise<polkadotJsApiInfo>;
 
@@ -154,27 +158,37 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             }
         );
 
+        this.userProject = this.user
+            .then(user => model.fetchUserProject(user?.id))
+            .then(resp => {
+                if (resp.ok) {
+                    return resp.json();
+                }
+
+                return null;
+            });
+
         this.accounts = getWeb3Accounts();
         this.apiInfo = this.initPolkadotJSAPI();
 
         (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
 
-        this.bind();
+        await this.bind();
 
-        this.route(window.location.pathname);
+        await this.route(window.location.pathname);
     }
 
-    bind() {
+    async bind() {
         this.addEventListener(config.event.badRoute, e => {
             this.$pages.select((e as CustomEvent).detail);
         });
 
         this.addEventListener(config.event.notification, e => {
-            const { title, content, actions, isDismissable } =
+            const {title, content, actions, isDismissable} =
                 (e as CustomEvent).detail;
 
             this.$dialog.create(
@@ -191,7 +205,13 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             this.$layout.openDrawer("right");
         });
 
-        this.initNavigation(navigationItems);
+        const user = await this.user;
+        const userProject = await this.userProject;
+
+        const isLoggedIn = !!user;
+        const hasProposal = !!userProject;
+
+        this.initNavigation(navigationItems(isLoggedIn, hasProposal));
         this.initAuthentication();
         this.initRouting();
     }
@@ -311,8 +331,10 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         }
 
         const route = new Route(`${config.context}/:app`, path);
+
         const request: ImbueRequest = {
             user: this.user,
+            userProject: this.userProject,
             accounts: this.accounts,
             apiInfo: this.apiInfo,
         }
@@ -323,7 +345,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
              * is currently "/dapp/proposals"
              */
             utils.redirect(
-                this.getAttribute("default-route") || "/proposals/"
+                this.getAttribute("default-route") || "/dashboard/"
             );
             return;
         }
@@ -333,9 +355,9 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
                 this.$pages.select("proposals");
                 (this.$pages.selected as Proposals).route(route.tail, request);
                 break;
-            case "myprojects":
-                this.$pages.select("my-projects");
-                (this.$pages.selected as MyProjects).route(route.tail, request);
+            case "dashboard":
+                this.$pages.select("dashboard");
+                (this.$pages.selected as Dashboard).route(route.tail, request);
                 break;
             default:
                 this.$pages.select("not-found");

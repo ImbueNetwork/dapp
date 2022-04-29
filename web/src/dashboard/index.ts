@@ -5,14 +5,14 @@ import Pages from "@pojagi/hoquet/lib/pages/pages";
 import Route from "@pojagi/hoquet/lib/route/route";
 
 
-import "../my-projects/edit";
-import Edit from "../my-projects/edit";
-
-import "../my-projects/listing";
-import List from "../my-projects/listing";
+import ".//edit";
+import Edit from ".//edit";
 
 import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
+
+import ".//my-account";
+import MyAccount from ".//my-account";
 
 
 const template = document.createElement("template");
@@ -25,7 +25,7 @@ ${html}
 const CONTENT = Symbol();
 
 
-export default class MyProjects extends HTMLElement {
+export default class Dashboard extends HTMLElement {
     [CONTENT]: DocumentFragment;
     $pages: Pages;
 
@@ -48,8 +48,8 @@ export default class MyProjects extends HTMLElement {
 
     route(path: string | null, request: ImbueRequest) {
         if (!path) {
-            this.$pages.select("listing");
-            (this.$pages.selected as List).init(request);
+            this.$pages.select("my-account");
+            (this.$pages.selected as MyAccount).init(request);
             return;
         }
 
@@ -66,4 +66,4 @@ export default class MyProjects extends HTMLElement {
     }
 }
 
-window.customElements.define("imbu-my-projects", MyProjects);
+window.customElements.define("imbu-user-dashboard", Dashboard);

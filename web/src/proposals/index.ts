@@ -7,6 +7,9 @@ import Route from "@pojagi/hoquet/lib/route/route";
 import "../proposals/draft";
 import ProposalsDraft from "../proposals/draft";
 
+import "../proposals/preview";
+import ProposalsDraftPreview from "../proposals/preview";
+
 import "../proposals/listing";
 import List from "../proposals/listing";
 
@@ -15,6 +18,7 @@ import Detail from "../proposals/detail";
 
 import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
+import * as config from "../config";
 
 
 const template = document.createElement("template");
@@ -48,7 +52,7 @@ export default class Proposals extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path: string | null, request: ImbueRequest) {
+    async route(path: string | null, request: ImbueRequest) {
         if (!path) {
             this.$pages.select("listing");
             (this.$pages.selected as List).init();
@@ -56,14 +60,24 @@ export default class Proposals extends HTMLElement {
         }
 
         const route = new Route("/:page", path);
+        const userProject = await request.userProject
 
         switch (route.data?.page) {
             case "draft":
-                this.$pages.select("draft");
-                (this.$pages.selected as ProposalsDraft).route(
-                    route.tail,
-                    request
-                );
+                if (userProject?.chain_project_id) {
+                    utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
+                }
+
+                this.$pages.select("editor");
+                (this.$pages.selected as ProposalsDraft).init(request);
+                break;
+            case "preview":
+                if (userProject?.chain_project_id) {
+                    utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
+                }
+
+                this.$pages.select("preview");
+                (this.$pages.selected as ProposalsDraftPreview).init(request);
                 break;
             case "detail":
                 this.$pages.select("detail");

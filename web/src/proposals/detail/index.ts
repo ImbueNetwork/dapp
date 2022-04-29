@@ -346,8 +346,7 @@ export default class Detail extends HTMLElement {
         }
         if (draft.chain_project_id !== 0 && !draft.chain_project_id) {
             // If the project is not finalised, redirect to the preview page
-            let preview_url =`${config.grantProposalsURL
-            }/draft/preview?id=${this.projectId}`;
+            const preview_url =`${config.grantProposalsURL}/preview`;
             utils.redirect(preview_url);
         }
 

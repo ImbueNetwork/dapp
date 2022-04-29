@@ -4,11 +4,9 @@ import css from "./index.css";
 import "../../proposals/proposal-item";
 import ProposalItem from "../../proposals/proposal-item";
 import { Proposal, User } from "../../model";
-import * as model from "../../model";
-import * as utils from "../../utils";
 import * as config from "../../config";
 import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
-import authDialogContent from "../../dapp/auth-dialog-content.html";
+import NoProposal from "../no-proposal";
 
 const CONTENT = Symbol();
 
@@ -19,13 +17,13 @@ template.innerHTML = `
 `;
 
 
-export default class List extends HTMLElement {
+export default class MyAccount extends HTMLElement {
     user?: User | null;
     apiInfo?: polkadotJsApiInfo;
 
     private [CONTENT]: DocumentFragment;
 
-    $list: HTMLOListElement;
+    $projects: HTMLOListElement;
 
     constructor() {
         super();
@@ -34,8 +32,8 @@ export default class List extends HTMLElement {
             template.content.cloneNode(true) as
                 DocumentFragment;
 
-        this.$list =
-            this[CONTENT].getElementById("list") as
+        this.$projects =
+            this[CONTENT].getElementById("projects-list") as
                 HTMLOListElement;
     }
 
@@ -47,21 +45,23 @@ export default class List extends HTMLElement {
         this.apiInfo = await request.apiInfo;
         this.user = await request.user;
 
-        this.$list.innerHTML = "";
+        this.$projects.innerHTML = "";
 
-        console.log(this.user)
-
-        await this.fetchUserProjects().then(projects => {
-            if (projects) {
-                this.renderProjects(projects);
-            }
-        });
-
-         // Are we logged in?
-         if (!this.user) {
+        // Are we logged in?
+        if (!this.user) {
             this.wrapAuthentication(() => {
                 location.reload()
             });
+        }
+        else {
+            const userProject = await request.userProject;
+            if (userProject) {
+                this.renderProjects([userProject]);
+            }
+            else
+            {
+                this.$projects.appendChild(new NoProposal());
+            }
         }
     }
 
@@ -74,42 +74,23 @@ export default class List extends HTMLElement {
             action();
         }
 
-
         this.dispatchEvent(new CustomEvent(
             config.event.authenticationRequired,
             {
                 bubbles: true,
                 composed: true,
                 detail: {
-                    callback,
-                    content: authDialogContent,
-                    actions: {
-                        dismiss: {
-                            handler: () => {},
-                            label: "Continue using local storage"
-                        }
-                    }
+                    callback
                 },
             }
         ));
     }
 
-
-    async fetchUserProjects() {
-        const resp = await model.fetchUserProjects(this.user?.id!);
-        if (resp.ok) {
-            return await resp.json();
-        } else {
-            // probably only 500+ here since this is a listing route
-            this.dispatchEvent(utils.badRouteEvent("server-error"));
-        }
-    }
-
     renderProjects(proposals: Proposal[]) {
         proposals.forEach(proposal => {
-            this.$list.appendChild(new ProposalItem(proposal));
+            this.$projects.appendChild(new ProposalItem(proposal));
         });
     }
 }
 
-window.customElements.define("imbu-my-projects-list", List);
+window.customElements.define("imbu-my-account", MyAccount);

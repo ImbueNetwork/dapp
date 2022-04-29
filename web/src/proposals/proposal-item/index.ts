@@ -24,7 +24,7 @@ export default class Item extends HTMLElement {
     /**
      * Because this constructor has a param, it cannot be used declaratively
      * in HTML and must be instantiated like:
-     * 
+     *
      * ```javascript
      * const item = new Item(proposal);
      * ```
@@ -49,7 +49,14 @@ export default class Item extends HTMLElement {
                 HTMLAnchorElement;
 
         this.$img.src = proposal.logo;
-        this.$name.innerText = proposal.name;
+
+        if (proposal.chain_project_id) {
+            this.$name.innerText = proposal.name;
+        }
+        else
+        {
+            this.$name.innerText = `${proposal.name} (draft)`;
+        }
 
         /**
          * This is for a11y only. Do not use this to do any actual
@@ -59,7 +66,13 @@ export default class Item extends HTMLElement {
     }
 
     get href() {
-        return `${config.grantProposalsURL}/detail/${this.proposal.id}`;
+        if (this.proposal.chain_project_id) {
+            return `${config.grantProposalsURL}/detail/${this.proposal.id}`;
+        }
+        else
+        {
+            return `${config.grantProposalsURL}/preview`;
+        }
     }
 
     connectedCallback() {

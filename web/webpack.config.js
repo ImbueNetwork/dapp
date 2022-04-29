@@ -44,5 +44,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
     },
+    watchOptions: {
+        poll: true
+    }
     // plugins: [new WebpackBundleAnalyzer.BundleAnalyzerPlugin()]
 };

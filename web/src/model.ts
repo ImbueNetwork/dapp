@@ -67,7 +67,7 @@ export type User = {
 
 
 /**
- * CRUD Methods 
+ * CRUD Methods
  */
 
 export const postDraftProposal = (
@@ -101,7 +101,7 @@ export const fetchProjects = () => fetch(
 );
 
 
- export const fetchUserProjects = (userId: number) => fetch(
-    `${config.apiBase}/users/${userId}/projects/`,
+export const fetchUserProject = (userId: number) => fetch(
+    `${config.apiBase}/users/${userId}/project/`,
     {headers: config.getAPIHeaders}
 );

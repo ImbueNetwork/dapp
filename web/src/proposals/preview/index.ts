@@ -1,25 +1,23 @@
-import { marked } from "marked";
+import {marked} from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
-import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
-import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { MDCTabBar } from "@material/tab-bar";
-import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { web3FromSource } from "@polkadot/extension-dapp";
-import type { ISubmittableResult } from "@polkadot/types/types";
+import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
+import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
+import {MDCTabBar} from "@material/tab-bar";
+import type {SubmittableExtrinsic} from "@polkadot/api/types";
+import {web3FromSource} from "@polkadot/extension-dapp";
+import type {ISubmittableResult} from "@polkadot/types/types";
 
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import html from "./index.html";
-import localDraftDialogContent from "./local-draft-dialog-content.html";
-import authDialogContent from "../../../dapp/auth-dialog-content.html";
+import authDialogContent from "../../dapp/auth-dialog-content.html";
 import css from "./index.css";
-import type { DraftProposal, Proposal, User } from "../../../model";
+import type {DraftProposal, Proposal, User} from "../../model";
+import * as model from "../../model";
 
-import * as config from "../../../config";
-import * as model from "../../../model";
-import * as utils from "../../../utils";
-import { ImbueRequest, polkadotJsApiInfo } from "../../../dapp";
+import * as config from "../../config";
+import * as utils from "../../utils";
+import {ImbueRequest, polkadotJsApiInfo} from "../../dapp";
 
 
 const CONTENT = Symbol();
@@ -34,7 +32,7 @@ template.innerHTML = `
 
 
 export default class Preview extends HTMLElement {
-    project?: Proposal;
+    project?: Proposal | null;
     address?: string;
     user?: User | null;
     private [CONTENT]: DocumentFragment;
@@ -63,58 +61,58 @@ export default class Preview extends HTMLElement {
 
     constructor() {
         super();
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({mode: "open"});
         this[CONTENT] = template.content.cloneNode(true) as DocumentFragment
 
         this.$tabBar =
             this[CONTENT].getElementById("tab-bar") as
-            HTMLElement;
+                HTMLElement;
         this.tabBar = new MDCTabBar(this.$tabBar);
         this.$dialog =
             this[CONTENT].getElementById("dialog") as
-            Dialog;
+                Dialog;
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-            HTMLElement;
+                HTMLElement;
 
         this.$edit =
             this[CONTENT].getElementById("edit") as
-            HTMLAnchorElement;
+                HTMLAnchorElement;
         this.$save =
             this[CONTENT].getElementById("save") as
-            HTMLButtonElement;
+                HTMLButtonElement;
         this.$finalize =
             this[CONTENT].getElementById("finalize") as
-            HTMLButtonElement;
+                HTMLButtonElement;
 
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-            HTMLElement;
+                HTMLElement;
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-            HTMLElement;
+                HTMLElement;
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-            HTMLElement;
+                HTMLElement;
 
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-            HTMLImageElement;
+                HTMLImageElement;
 
         this.$currencyLabel =
             this[CONTENT].getElementById("currency-label") as
-            HTMLElement;
+                HTMLElement;
 
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-            HTMLElement;
+                HTMLElement;
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-            HTMLOListElement;
+                HTMLOListElement;
         this.$actionButtonContainers =
             Array.from(
                 this.$save.parentElement?.parentElement?.children as
-                HTMLCollection
+                    HTMLCollection
             ) as HTMLElement[];
     }
 
@@ -127,9 +125,11 @@ export default class Preview extends HTMLElement {
     set toggleSave(force: boolean) {
         this.toggleActionButton("save", force);
     }
+
     set toggleFinalize(force: boolean) {
         this.toggleActionButton("finalize", force);
     }
+
     set toggleEdit(force: boolean) {
         this.toggleActionButton("edit", force);
     }
@@ -161,68 +161,44 @@ export default class Preview extends HTMLElement {
          * This is just for a11y. Do not use this value unless you know what
          * you're doing.
          */
-        this.$edit.href = `${config.context}${config.grantProposalsURL
-            }/draft?id=${this.projectId}`;
+        this.$edit.href = `${config.context}${config.grantProposalsURL}/draft`;
     }
 
     async init(request: ImbueRequest) {
-
-        const projectId = this.projectId;
         this.user = await request.user;
+        this.project = await request.userProject;
         this.accounts = await request.accounts;
         this.apiInfo = await request.apiInfo;
 
-        if (!projectId) {
-            /**
-             * FIXME: Just redirect back to listing page? Or
-             * better to have a 404 page.
-             */
-            utils.redirect(config.grantProposalsURL);
+        if (!this.user) {
+            const callback = (state: any) => {
+                this.user = state.user;
+                console.log(state);
+                console.log(state.user);
+                location.reload();
+            }
+
+            this.dispatchEvent(new CustomEvent(
+                config.event.authenticationRequired,
+                {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        callback
+                    }
+                }
+            ));
+
             return;
         }
-        /**
-         * We await this here because if there's no draft, we don't want to
-         * bother with any other confusing and/or expensive tasks.
-         */
-        await this.fetchProject(projectId).then(project => {
-            if (project) {
-                this.renderProject(project);
-            } else {
-                /**
-                 * Same as FIXME above. Do we want a 404 page here, dialog,
-                 * or what?
-                 */
-                this.dispatchEvent(utils.badRouteEvent("not-found"));
-                return;
-            }
-        });
 
-
-
-        if (this.user) {
-            /**
-             * User is logged in with a session.
-             *
-             * XXX: We have to assume that since the user is logged in at
-             * this point, there's no reason to "save" -- only edit or
-             * finalize.
-             */
-
-            /**
-             * Toggling save false because if user is logged in, we
-             * automatically save and refresh for them.
-             */
-            this.toggleSave = false;
-
-            /**
-             * Should only be able to edit or finalize if user
-             * is the user_id on the project.
-             */
-            if (this.user?.id !== this.project?.user_id) {
-                this.toggleFinalize = false;
-                this.toggleEdit = false;
-            }
+        if (!this.project || this.project?.chain_project_id) {
+            utils.redirect(config.dashboardUrl);
+            return;
         }
+
+        this.toggleSave = false;
+        this.renderProject(this.project);
     }
 
     errorNotification(e: Error) {
@@ -242,30 +218,6 @@ export default class Preview extends HTMLElement {
         ));
     }
 
-    async fetchProject(projectId: string) {
-        if (this.project) {
-            return this.project;
-        }
-        const resp = await model.fetchProject(projectId);
-        if (resp.ok) {
-            this.project = await resp.json();
-            return this.project;
-        }
-    }
-
-    get projectId() {
-        const entry = window.location.search
-            .split("?")[1]
-            ?.split("&")
-            .map(str => str.split("="))
-            .find(([k, _]) => k === "id");
-
-        if (entry) {
-            return entry[1];
-        }
-        return null;
-    }
-
     bind() {
         this.shadowRoot?.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
@@ -278,17 +230,7 @@ export default class Preview extends HTMLElement {
 
         this.$edit.addEventListener("click", e => {
             e.preventDefault();
-
-            const edit = () => {
-                utils.redirect(`${config.grantProposalsURL
-                    }/draft?id=${this.projectId}`);
-            };
-
-            if (this.projectId === "local-draft" || this.user) {
-                edit();
-            } else {
-                this.wrapAuthentication(edit);
-            }
+            utils.redirect(`${config.grantProposalsURL}/draft`)
         });
 
         this.$save.addEventListener("click", e => {
@@ -297,8 +239,7 @@ export default class Preview extends HTMLElement {
                     const resp = await model.postDraftProposal(this.project);
                     if (resp.ok) {
                         const project = await resp.json();
-                        utils.redirect(`${config.grantProposalsURL
-                            }/draft/preview?id=${project.id}`);
+                        utils.redirect(`${config.grantProposalsURL}/preview`);
                     } else {
                         // TODO: UX for bad request posting draft
                         console.warn("Bad request posting draft", this.project);
@@ -356,7 +297,8 @@ export default class Preview extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => { },
+                            handler: () => {
+                            },
                             label: "Continue using local storage"
                         }
                     }
@@ -379,93 +321,93 @@ export default class Preview extends HTMLElement {
     ): Promise<void> {
         const api = this.apiInfo?.api;
         switch (event) {
-            case "begin":
-                {
-                    if (!this.project) {
-                        return;
-                    }
-                    this.$finalize.disabled = true;
-                    this.$finalize.classList.add("blob");
-                    this.$finalize.innerText = "Saving.....";
-                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
-                        this.project.name,
-                        this.project.logo,
-                        this.project.description,
-                        this.project.website,
-                        this.project.milestones,
-                        this.project.required_funds,
-                        this.project.currency_id
-                    );
+            case "begin": {
+                if (!this.project) {
+                    return;
+                }
+                this.$finalize.disabled = true;
+                this.$finalize.classList.add("blob");
+                this.$finalize.innerText = "Saving.....";
+                const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
+                    this.project.name,
+                    this.project.logo,
+                    this.project.description,
+                    this.project.website,
+                    this.project.milestones,
+                    this.project.required_funds,
+                    this.project.currency_id
+                );
 
-                    if (!extrinsic) {
-                        // FIXME: UX
-                        return;
-                    }
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
+                }
 
-                    return this.finalizeWorkflow(
-                        "extrinsic-created",
-                        { ...state, extrinsic },
-                    );
-                } break;
-            case "extrinsic-created":
-                {
-                    this.dispatchEvent(new CustomEvent(
-                        config.event.accountChoice,
-                        {
-                            bubbles: true,
-                            composed: true,
-                            detail: (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    this.finalizeWorkflow(
-                                        "account-chosen",
-                                        { ...state, account },
-                                    );
-                                }
+                return this.finalizeWorkflow(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+                break;
+            case "extrinsic-created": {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.finalizeWorkflow(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
                             }
                         }
-                    ));
-                } break;
-            case "account-chosen":
-                {
-                    const extrinsic = state?.extrinsic as
-                        SubmittableExtrinsic<"promise", ISubmittableResult>;
-                    const account = state?.account as
-                        InjectedAccountWithMeta;
-                    const injector = await web3FromSource(account.meta.source);
-                    const txHash = await extrinsic.signAndSend(
-                        account.address,
-                        { signer: injector.signer },
-                        ({ status }) => {
-                            api?.query.system.events((events: any) => {
-                                if (events) {
-                                    // Loop through the Vec<EventRecord>
-                                    events.forEach((record: any) => {
-                                        // Extract the phase, event and the event types
-                                        const { event, phase } = record;
-                                        const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
-                                        if (projectCreated) {
+                    }
+                ));
+            }
+                break;
+            case "account-chosen": {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({status}) => {
+                        api?.query.system.events((events: any) => {
+                            if (events) {
+                                // Loop through the Vec<EventRecord>
+                                events.forEach((record: any) => {
+                                    // Extract the phase, event and the event types
+                                    const {event, phase} = record;
+                                    const projectCreated = `${event.section}:${event.method}` == "imbueProposals:ProjectCreated";
+                                    if (projectCreated) {
 
-                                            const types = event.typeDef;
-                                            const createdAccountId = event.data[0];
-                                            const createdProjectId = parseInt(event.data[2].toString());
-                                            if (createdAccountId == account.address && this.project && this.projectId) {
-                                                this.project.chain_project_id = createdProjectId;
-                                                this.updateGrantProposal(this.project, this.projectId);
-                                                this.toggleEdit = false;
-                                                this.toggleSave = false;
-                                                // this.$finalize.classList.remove("blob");
-                                                this.$finalize.classList.add("finalized");
-                                                this.$finalize.innerText = "Proposal Created";
-                                            }
+                                        const types = event.typeDef;
+                                        const createdAccountId = event.data[0];
+                                        const createdProjectId = parseInt(event.data[2].toString());
+                                        if (createdAccountId == account.address && this.project) {
+                                            this.project.chain_project_id = createdProjectId;
+                                            this.updateGrantProposal(this.project, this.project.id);
+                                            this.toggleEdit = false;
+                                            this.toggleSave = false;
+                                            // this.$finalize.classList.remove("blob");
+                                            this.$finalize.classList.add("finalized");
+                                            this.$finalize.innerText = "Proposal Created";
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    ).catch((e: any) => {
-                        this.errorNotification(e);
-                    });
-                } break;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+            }
+                break;
         }
     }
 
@@ -481,7 +423,7 @@ export default class Preview extends HTMLElement {
         this.$currencyLabel.innerHTML = "$" + model.Currency[project.currency_id];
         this.$projectWebsite.innerHTML = `
             <a href="${project.website}" target="_blank">${project.website
-            }</a>
+        }</a>
         `;
         this.$projectDescription.innerHTML =
             project.description && marked.parse(project.description);
@@ -499,7 +441,7 @@ export default class Preview extends HTMLElement {
                         </span>
                         <span class="mdc-deprecated-list-item__text">
                             <span class="mdc-deprecated-list-item__primary-text">${milestone.name
-                    }</span>
+                }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>

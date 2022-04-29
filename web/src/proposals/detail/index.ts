@@ -65,7 +65,6 @@ export default class Detail extends HTMLElement {
 
     $withdraw: HTMLButtonElement;
 
-
     private [CONTENT]: DocumentFragment;
 
     constructor() {
@@ -226,12 +225,9 @@ export default class Detail extends HTMLElement {
                 this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
             });
 
-
             //TODO Check if project is in the scheduled round for contribution
             // this.openForContributions = projectIsInFundingRound;
-
-
-            if (projectOnChain.approvedForFunding) {
+            if (projectOnChain.fundingThresholdMet) {
                 // Initators cannot contribute to their own project
                 if (this.userIsInitiator) {
                     this.$submitMilestoneForm.hidden = !this.userIsInitiator
@@ -243,7 +239,7 @@ export default class Detail extends HTMLElement {
                     this.$voteSubmissionForm.hidden = !this.openForVoting
                     this.$vote.hidden = !this.openForVoting;
                 }
-            } else {
+            } else if (projectOnChain.approvedForFunding && !this.userIsInitiator) {
                 this.$contributionSubmissionForm.hidden = this.openForVoting;
                 this.$contribute.hidden = this.openForVoting;
             }

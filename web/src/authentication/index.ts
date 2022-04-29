@@ -38,22 +38,13 @@ export default class Authentication extends HTMLElement {
                     title,
                     content: `${content}${authDialogOptions}`,
                     actions: {
-                        google: {
-                            handler: () => {
-                                window.location.href = `${
-                                    config.googleAuthEndpoint
-                                }?n=${
-                                    window.location.href
-                                }`;
-                            }
-                        },
                         web3: {
                             handler: () =>
                                 this.web3AuthWorkflow("begin", {callback}),
                         },
                         ...opts?.actions,
                     },
-                    isDismissable: true,
+                    isDismissable: false,
                 }
             }
         ));

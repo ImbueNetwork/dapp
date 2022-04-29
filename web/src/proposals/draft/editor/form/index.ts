@@ -1,4 +1,4 @@
-import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
 import "@pojagi/hoquet/lib/forms/textfield/textfield";
 import TextField from '@pojagi/hoquet/lib/forms/textfield/textfield';
 
@@ -7,14 +7,13 @@ import formStyles from "../../../../styles/forms.css";
 
 import templateSrc from "./index.html";
 import styles from "./index.css";
-import { categories } from "../../../../config";
-
-import type { DraftMilestone, DraftProposal, User, Proposal } from "../../../../model";
-import { getWeb3Accounts } from "../../../../utils/polkadot";
-import * as model from "../../../../model";
 import * as config from "../../../../config";
+import {categories} from "../../../../config";
+
+import type {DraftMilestone, DraftProposal, Proposal, User} from "../../../../model";
+import * as model from "../../../../model";
 import * as utils from '../../../../utils';
-import { ImbueRequest } from '../../../../dapp';
+import {ImbueRequest} from '../../../../dapp';
 import authDialogContent from "../../../../dapp/auth-dialog-content.html";
 
 declare global {
@@ -151,11 +150,34 @@ export default class Form extends HTMLElement {
     }
 
     async init(request: ImbueRequest) {
-        this.disabled = false;
+        this.disabled = true;
         this.reset();
         this.user = await request.user;
 
+        // Are we logged in?
+        if (!this.user) {
+            const callback = (state: any) => {
+                this.user = state.user;
+                console.log(state);
+                console.log(state.user);
+                location.reload();
+            }
 
+            this.dispatchEvent(new CustomEvent(
+                config.event.authenticationRequired,
+                {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        callback
+                    }
+                }
+            ));
+        }
+        else
+        {
+            this.disabled = false;
+        }
         /**
          * If not logged in, we can't submit the proposal to the API for
          * saving, so we don't want to tell them we're "creating" or "saving"
@@ -241,12 +263,7 @@ export default class Form extends HTMLElement {
             setTimeout(() => this.$fields[0].focus(), 0);
         }
 
-        // Are we logged in?
-        if (!this.user) {
-            this.wrapAuthentication(() => {
-                location.reload()
-            });
-        }
+
 
     }
 
@@ -583,35 +600,6 @@ export default class Form extends HTMLElement {
 
 
     }
-
-    wrapAuthentication(action: CallableFunction) {
-        const callback = (state: any) => {
-            this.user = state.user;
-            console.log(state);
-            console.log(state.user);
-            action();
-        }
-
-
-        this.dispatchEvent(new CustomEvent(
-            config.event.authenticationRequired,
-            {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    callback,
-                    content: authDialogContent,
-                    actions: {
-                        dismiss: {
-                            handler: () => { },
-                            label: "Continue using local storage"
-                        }
-                    }
-                },
-            }
-        ));
-    }
-
     savetoLocalStorage(proposal: DraftProposal) {
         window.localStorage.setItem(
             config.proposalsDraftLocalDraftKey,

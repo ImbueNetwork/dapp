@@ -9,3 +9,4 @@ postgres-data/
 .DS_Store
 
 .vscode/
+.idea/

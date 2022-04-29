@@ -285,7 +285,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 
         try {
             const api = await ApiPromise.create({provider});
-            
+
             return {
                 api,
                 provider,
@@ -346,7 +346,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
 /**
  * This is required at the `document` level in order for the fonts to be loaded
  * such that `<link>`s within `shadowRoot` can render the font.
- * 
+ *
  * We do this here because this should be considered the entrypoint of the app.
  */
 document.head.appendChild(

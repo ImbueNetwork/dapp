@@ -16,6 +16,7 @@ services:
     environment:
       POSTGRES_USER: imbue
       POSTGRES_PASSWORD: imbue
+      PGDATA: /var/lib/postgresql/pgdata/
     ports:
       - 5433:5432
     volumes:
@@ -32,6 +33,7 @@ services:
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
+      #IMBUE_NETWORK_WEBSOCK_ADDR: wss://localhost:9942
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
     volumes:
     - "./api/build:/api/build"

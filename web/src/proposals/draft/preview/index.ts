@@ -96,11 +96,11 @@ export default class Preview extends HTMLElement {
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
             HTMLElement;
-            
+
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
             HTMLImageElement;
-            
+
         this.$currencyLabel =
             this[CONTENT].getElementById("currency-label") as
             HTMLElement;
@@ -202,7 +202,7 @@ export default class Preview extends HTMLElement {
         if (this.user) {
             /**
              * User is logged in with a session.
-             * 
+             *
              * XXX: We have to assume that since the user is logged in at
              * this point, there's no reason to "save" -- only edit or
              * finalize.
@@ -315,7 +315,7 @@ export default class Preview extends HTMLElement {
                  * Save and redirect back to legit projectId? Or do we want to
                  * bring them back here so that they can decide whether or not
                  * to save?
-                 * 
+                 *
                  * I think we should just handle it in the background --
                  * user logs in, and gets redirected back here to `local-draft`
                  * but we detect that from the URL and then go through a save

@@ -10,6 +10,7 @@
 .top-wrapper {
     margin-bottom: 10px;
 }
+
 #project-logo {
     object-fit: cover;
     height: 33vh;
@@ -45,8 +46,8 @@
     border-radius: 3px;
 
     width: 100%;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 16px;
+    padding-bottom: 16px;
     background-color: #411dc9;
     /* font-family: var(--theme-font-family); */
     font-size: var(--button-font-size);
@@ -110,7 +111,6 @@ and (max-width: 380px) {
 
 .tab-content {
     margin: 20px 0;
-    /* min-height: 33vh; */
     display: none;
 }
 

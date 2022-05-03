@@ -19,6 +19,8 @@ import Detail from "../proposals/detail";
 import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
 import * as config from "../config";
+import {getPage} from "../utils";
+import Dashboard from "../dashboard";
 
 
 const template = document.createElement("template");
@@ -68,20 +70,20 @@ export default class Proposals extends HTMLElement {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
                 }
 
+                await getPage<ProposalsDraft>(this.$pages, "editor").init(request);
                 this.$pages.select("editor");
-                (this.$pages.selected as ProposalsDraft).init(request);
                 break;
             case "preview":
                 if (userProject?.chain_project_id) {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
                 }
 
+                await getPage<ProposalsDraftPreview>(this.$pages, "preview").init(request);
                 this.$pages.select("preview");
-                (this.$pages.selected as ProposalsDraftPreview).init(request);
                 break;
             case "detail":
+                await getPage<Detail>(this.$pages, "detail").init(request);
                 this.$pages.select("detail");
-                (this.$pages.selected as Detail).init(request);
                 break;
             default:
                 this.dispatchEvent(utils.badRouteEvent("not-found"));

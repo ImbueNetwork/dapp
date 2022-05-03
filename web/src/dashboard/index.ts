@@ -9,7 +9,8 @@ import ".//edit";
 import Edit from ".//edit";
 
 import * as utils from "../utils";
-import { ImbueRequest } from "../dapp";
+import {getPage} from "../utils";
+import {ImbueRequest} from "../dapp";
 
 import ".//my-account";
 import MyAccount from ".//my-account";
@@ -46,10 +47,10 @@ export default class Dashboard extends HTMLElement {
         this.shadowRoot?.appendChild(this[CONTENT]);
     }
 
-    route(path: string | null, request: ImbueRequest) {
+    async route(path: string | null, request: ImbueRequest) {
         if (!path) {
+            await getPage<MyAccount>(this.$pages, "my-account").init(request);
             this.$pages.select("my-account");
-            (this.$pages.selected as MyAccount).init(request);
             return;
         }
 

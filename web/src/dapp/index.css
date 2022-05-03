@@ -50,11 +50,12 @@ a:hover {
     margin: 0;
     padding: 0;
 }
+
 #main {
-    /*display: flex;*/
-    margin-bottom: 100px;
+    /* margin-bottom: 100px; */
     margin-top: 5px;
 }
+
 #breadcrumbs {
     list-style: none;
     margin: 0;
@@ -137,8 +138,21 @@ a:hover {
     font-size: .9em;
 }
 
+#layout {
+    min-height: unset;
+}
+
 @media screen and (min-width: 700px) {
     #breadcrumbs {
         padding: 0;
+    }
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
     }
 }

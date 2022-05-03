@@ -40,6 +40,7 @@ import {getWeb3Accounts} from "../utils/polkadot";
 import html from "./index.html";
 import styles from "./index.css";
 import {ApiPromise, WsProvider} from "@polkadot/api";
+import {getPage} from "../utils";
 
 export type ImbueRequest = {
     user: Promise<User | null>;
@@ -342,7 +343,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         if (!route.active) {
             /**
              * the path == `/dapp`, so we redirect to the default "app", which
-             * is currently "/dapp/proposals"
+             * is currently "/dapp/dashboard"
              */
             utils.redirect(
                 this.getAttribute("default-route") || "/dashboard/"
@@ -350,14 +351,16 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             return;
         }
 
+        this.$pages.select("loading");
+
         switch (route.data?.app) {
             case "proposals":
+                await getPage<Proposals>(this.$pages, "proposals").route(route.tail, request);
                 this.$pages.select("proposals");
-                (this.$pages.selected as Proposals).route(route.tail, request);
                 break;
             case "dashboard":
+                await getPage<Dashboard>(this.$pages, "dashboard").route(route.tail, request);
                 this.$pages.select("dashboard");
-                (this.$pages.selected as Dashboard).route(route.tail, request);
                 break;
             default:
                 this.$pages.select("not-found");

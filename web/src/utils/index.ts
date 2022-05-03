@@ -1,4 +1,5 @@
 import * as config from "../config";
+import Pages from "@pojagi/hoquet/lib/pages/pages";
 
 
 export type BadRoute =
@@ -12,6 +13,18 @@ export const redirect = (path: string) => {
     window.history.pushState({}, "", `${config.context}${path}`);
     window.dispatchEvent(new Event("popstate"));
 };
+
+export function getPage<T extends HTMLElement | undefined>(pages: Pages, id: string) {
+    const items = pages.$slot.assignedElements() as HTMLElement[];
+    let selected;
+    for (const item of items) {
+        if (item.getAttribute("name") === id) {
+            selected = item;
+        }
+    }
+
+    return (selected as T)
+}
 
 export const validProjectId = (candidate: any) => {
     return !!Number(String(candidate));

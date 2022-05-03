@@ -357,7 +357,7 @@ export default class Detail extends HTMLElement {
         this.$fundsRequired.innerText = String(draft.required_funds / 1e12);
         this.$projectCurrency.innerText = "$" + model.Currency[draft.currency_id as any];
         this.$projectDetailCurrency.innerText = this.$projectCurrency.innerText;
-
+        this.$milestones.querySelectorAll('*').forEach(n => n.remove());
         draft.milestones.forEach(milestone => {
             this.$milestones.appendChild(
                 document.createRange().createContextualFragment(`

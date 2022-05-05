@@ -18,7 +18,8 @@ router.get("/user", (req, res) => {
 });
 router.get("/info", (req, res) => {
     res.send({
-        imbueNetworkWebsockAddr: config_1.default.imbueNetworkWebsockAddr
+        imbueNetworkWebsockAddr: config_1.default.imbueNetworkWebsockAddr,
+        relayChainWebsockAddr: config_1.default.relayChainWebsockAddr
     });
 });
 router.use("/projects", projects_1.default);

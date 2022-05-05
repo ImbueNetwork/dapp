@@ -42,14 +42,22 @@ import styles from "./index.css";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 import {getPage} from "../utils";
 
+import "../relay";
+import Relay from "../relay";
+
 export type ImbueRequest = {
     user: Promise<User | null>;
     userProject: Promise<Proposal | null>;
     accounts: Promise<InjectedAccountWithMeta[]>;
-    apiInfo: Promise<polkadotJsApiInfo>;
+    apiInfo: Promise<ImbueApiInfo>;
 };
 
-export type polkadotJsApiInfo = {
+export type ImbueApiInfo = {
+    imbue: PolkadotJsApiInfo;
+    relayChain: PolkadotJsApiInfo;
+}
+
+export type PolkadotJsApiInfo = {
     api: ApiPromise;
     provider: WsProvider;
     webSockAddr: string;
@@ -102,6 +110,14 @@ const navigationItems = (isLoggedIn: boolean, hasProposal: boolean): MenuItem[] 
         spa: true,
     });
 
+    menuItems.push({
+        name: "transfer-funds",
+        label: "Transfer funds",
+        href: "/dapp/relay",
+        icon: "money",
+        spa: true,
+    });
+
     return menuItems;
 }
 
@@ -119,7 +135,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     user: Promise<User>;
     userProject: Promise<Proposal>;
     accounts: Promise<InjectedAccountWithMeta[]>;
-    apiInfo: Promise<polkadotJsApiInfo>;
+    apiInfo: Promise<ImbueApiInfo>;
 
 
     constructor() {
@@ -170,7 +186,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             });
 
         this.accounts = getWeb3Accounts();
-        this.apiInfo = this.initPolkadotJSAPI();
+        this.apiInfo = this.initImbueAPIInfo();
 
         (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
@@ -278,29 +294,29 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         ));
     }
 
-    async initPolkadotJSAPI(): Promise<polkadotJsApiInfo> {
-        const webSockAddr = (await fetch(`${config.apiBase}/info`).then(
+    async initImbueAPIInfo(): Promise<ImbueApiInfo> {
+        const {imbueNetworkWebsockAddr, relayChainWebsockAddr} = (await fetch(`${config.apiBase}/info`).then(
             resp => resp.json()
-        )).imbueNetworkWebsockAddr as string;
+        ));
 
+        return {
+            imbue: await this.initPolkadotJSAPI(imbueNetworkWebsockAddr),
+            relayChain: await this.initPolkadotJSAPI(relayChainWebsockAddr)
+        }
+    }
+
+    async initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo> {
         const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
             this.errorNotification(e);
             console.log(e);
         });
+
         provider.on("disconnected", e => {
-            // this.$dialog.create("PolkadotJS API Disconnected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
             console.log(e);
         });
-        /**
-         * TODO: any reason to report this, specifically?
-         */
+
         provider.on("connected", e => {
-            // this.$dialog.create("PolkadotJS API Connected", "", {
-            //     "dismiss": {label: "Okay"}
-            // }, true);
             console.log("Polkadot JS connected", e);
         });
 
@@ -313,7 +329,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
                 webSockAddr,
             }
         } catch (e) {
-            let cause = e as Error;
+            const cause = e as Error;
 
             this.$dialog.create("PolkadotJS API Error", cause.message, {
                 "dismiss": {label: "Okay"}
@@ -361,6 +377,10 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
             case "dashboard":
                 await getPage<Dashboard>(this.$pages, "dashboard").route(route.tail, request);
                 this.$pages.select("dashboard");
+                break;
+            case "relay":
+                await getPage<Relay>(this.$pages, "relay").init(request);
+                this.$pages.select("relay");
                 break;
             default:
                 this.$pages.select("not-found");

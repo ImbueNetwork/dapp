@@ -17,7 +17,7 @@ import * as model from "../../model";
 
 import * as config from "../../config";
 import * as utils from "../../utils";
-import {ImbueRequest, polkadotJsApiInfo} from "../../dapp";
+import {ImbueApiInfo, ImbueRequest, PolkadotJsApiInfo} from "../../dapp";
 
 
 const CONTENT = Symbol();
@@ -56,7 +56,7 @@ export default class Preview extends HTMLElement {
     $milestones: HTMLOListElement;
 
     accounts?: InjectedAccountWithMeta[];
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo?: ImbueApiInfo;
 
 
     constructor() {
@@ -319,7 +319,7 @@ export default class Preview extends HTMLElement {
         event: string = "begin",
         state?: Record<string, any>
     ): Promise<void> {
-        const api = this.apiInfo?.api;
+        const api = this.apiInfo?.imbue?.api;
         switch (event) {
             case "begin": {
                 if (!this.project) {
@@ -328,7 +328,7 @@ export default class Preview extends HTMLElement {
                 this.$finalize.disabled = true;
                 this.$finalize.classList.add("blob");
                 this.$finalize.innerText = "Saving.....";
-                const extrinsic = this.apiInfo?.api.tx.imbueProposals.createProject(
+                const extrinsic = api?.tx.imbueProposals.createProject(
                     this.project.name,
                     this.project.logo,
                     this.project.description,

@@ -1,26 +1,23 @@
-import { marked } from "marked";
+import {marked} from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
-import "@pojagi/hoquet/lib/dialog/dialog";
-import Dialog, { ActionConfig } from "@pojagi/hoquet/lib/dialog/dialog";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
-import { MDCTabBar } from "@material/tab-bar";
-import type { SignerResult, SubmittableExtrinsic } from "@polkadot/api/types";
-import type { ISubmittableResult, ITuple, Registry, } from "@polkadot/types/types";
-import type { DispatchError } from '@polkadot/types/interfaces';
+import {MDCTabBar} from "@material/tab-bar";
+import type {SubmittableExtrinsic} from "@polkadot/api/types";
+import type {ISubmittableResult, ITuple,} from "@polkadot/types/types";
+import type {DispatchError} from '@polkadot/types/interfaces';
 
-import { web3FromSource } from "@polkadot/extension-dapp";
+import {web3FromSource} from "@polkadot/extension-dapp";
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import templateSrc from "./index.html";
 import styles from "./index.css";
-import { DraftProposal, Proposal, User } from "../../model";
 import * as model from "../../model";
-import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { getWeb3Accounts, getDispatchError } from "../../utils/polkadot";
+import {DraftProposal, Proposal, User} from "../../model";
+import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
+import {getDispatchError} from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
-import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
+import type {ImbueApiInfo, ImbueRequest} from "../../dapp";
 
 const CONTENT = Symbol();
 
@@ -46,7 +43,7 @@ export default class Detail extends HTMLElement {
     $projectDescription: HTMLElement;
     $projectLogo: HTMLImageElement;
     $milestones: HTMLOListElement;
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo: ImbueApiInfo | undefined;
     $fundsRequired: HTMLElement;
     $projectCurrency: HTMLElement;
     $projectDetailCurrency: HTMLElement;
@@ -70,97 +67,96 @@ export default class Detail extends HTMLElement {
     constructor() {
         super();
 
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({mode: "open"});
 
         this.openForVoting = false;
         this.userIsInitiator = false;
 
         this[CONTENT] =
             template.content.cloneNode(true) as
-            DocumentFragment;
+                DocumentFragment;
 
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-            HTMLElement;
+                HTMLElement;
 
         this.$tabBar =
             this[CONTENT].getElementById("tab-bar") as
-            HTMLElement;
+                HTMLElement;
 
         this.tabBar = new MDCTabBar(this.$tabBar);
 
 
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-            HTMLElement;
+                HTMLElement;
 
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-            HTMLElement;
+                HTMLElement;
 
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-            HTMLElement;
+                HTMLElement;
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-            HTMLImageElement;
+                HTMLImageElement;
 
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-            HTMLOListElement;
+                HTMLOListElement;
 
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-            HTMLElement;
+                HTMLElement;
 
         this.$contributionSubmissionForm =
             this[CONTENT].getElementById("contribution-submission-form") as
-            HTMLFormElement;
+                HTMLFormElement;
 
         this.$projectCurrency =
             this[CONTENT].getElementById("project-currency") as
-            HTMLElement;
+                HTMLElement;
 
         this.$projectDetailCurrency =
             this[CONTENT].getElementById("project-detail-currency") as
-            HTMLElement;
+                HTMLElement;
 
         this.$imbuContribution =
             this[CONTENT].getElementById("imbu-contribution") as
-            HTMLElement;
+                HTMLElement;
 
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
-            HTMLButtonElement;
+                HTMLButtonElement;
 
         this.$voteSubmissionForm =
             this[CONTENT].getElementById("vote-submission-form") as
-            HTMLFormElement;
+                HTMLFormElement;
 
         this.$voteMilestoneSelect =
             this[CONTENT].getElementById("vote-milestone-select") as
-            HTMLSelectElement;
+                HTMLSelectElement;
 
         this.$vote =
             this[CONTENT].getElementById("vote") as
-            HTMLButtonElement;
+                HTMLButtonElement;
 
         this.$submitMilestoneForm =
             this[CONTENT].getElementById("submit-milestone-form") as
-            HTMLFormElement;
+                HTMLFormElement;
 
         this.$submitMilestoneSelect =
             this[CONTENT].getElementById("submit-milestone-select") as
-            HTMLSelectElement;
+                HTMLSelectElement;
 
         this.$submitMilestone =
             this[CONTENT].getElementById("submit-milestone") as
-            HTMLButtonElement;
-
+                HTMLButtonElement;
 
         this.$withdraw =
             this[CONTENT].getElementById("withdraw") as
-            HTMLButtonElement;
+                HTMLButtonElement;
     }
 
     get projectId(): string | null {
@@ -209,7 +205,7 @@ export default class Detail extends HTMLElement {
             }
         });
 
-        const projectOnChain: any = await (await this.apiInfo?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+        const projectOnChain: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
 
         if (projectOnChain) {
             if (this.user) {
@@ -254,7 +250,7 @@ export default class Detail extends HTMLElement {
              value="${milestone.milestoneKey}">
                 <span>${milestone.name}</span>
                 <span class="select-source" slot="secondary">${milestone.percentageToUnlock
-            }%</span>
+        }%</span>
             </mwc-list-item>
         `);
     }
@@ -325,7 +321,8 @@ export default class Detail extends HTMLElement {
                     content: authDialogContent,
                     actions: {
                         dismiss: {
-                            handler: () => { },
+                            handler: () => {
+                            },
                             label: "Continue using local storage"
                         }
                     }
@@ -342,7 +339,7 @@ export default class Detail extends HTMLElement {
         }
         if (draft.chain_project_id !== 0 && !draft.chain_project_id) {
             // If the project is not finalised, redirect to the preview page
-            const preview_url =`${config.grantProposalsURL}/preview`;
+            const preview_url = `${config.grantProposalsURL}/preview`;
             utils.redirect(preview_url);
         }
 
@@ -350,7 +347,7 @@ export default class Detail extends HTMLElement {
         this.$projectName.innerText = draft.name;
         this.$projectWebsite.innerHTML = `
             <a href="${draft.website}" target="_blank">${draft.website
-            }</a>
+        }</a>
         `;
         this.$projectDescription.innerHTML = marked.parse(draft.description);
         this.$projectLogo.setAttribute("srcset", draft.logo);
@@ -368,7 +365,7 @@ export default class Detail extends HTMLElement {
                         </span>
                         <span class="mdc-deprecated-list-item__text">
                             <span class="mdc-deprecated-list-item__primary-text">${milestone.name
-                    }</span>
+                }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>
@@ -387,102 +384,101 @@ export default class Detail extends HTMLElement {
         const contribution = parseInt(
             formData.get("imbu-contribution") as string
         ) * 1e12;
-        const api = this.apiInfo?.api;
+        const api = this.apiInfo?.imbue?.api;
         switch (event) {
-            case "begin":
-                {
-                    this.$contribute.disabled = true;
-                    this.$contribute.classList.add("blob");
-                    this.$contribute.innerText = "Saving.....";
-                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.contribute(
-                        this.project?.chain_project_id,
-                        contribution
-                    );
+            case "begin": {
+                this.$contribute.disabled = true;
+                this.$contribute.classList.add("blob");
+                this.$contribute.innerText = "Saving.....";
+                const extrinsic = api?.tx.imbueProposals.contribute(
+                    this.project?.chain_project_id,
+                    contribution
+                );
 
-                    if (!extrinsic) {
-                        // FIXME: UX
-                        return;
-                    }
-
-                    return this.contribute(
-                        "extrinsic-created",
-                        { ...state, extrinsic },
-                    );
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
                 }
-            case "extrinsic-created":
-                {
-                    this.dispatchEvent(new CustomEvent(
-                        config.event.accountChoice,
-                        {
-                            bubbles: true,
-                            composed: true,
-                            detail: (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    this.contribute(
-                                        "account-chosen",
-                                        { ...state, account },
-                                    );
-                                }
+
+                return this.contribute(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+            case "extrinsic-created": {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.contribute(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
                             }
                         }
-                    ));
+                    }
+                ));
 
-                } break;
-            case "account-chosen":
-                {
-                    const extrinsic = state?.extrinsic as
-                        SubmittableExtrinsic<"promise", ISubmittableResult>;
-                    const account = state?.account as
-                        InjectedAccountWithMeta;
-                    const injector = await web3FromSource(account.meta.source);
+            }
+                break;
+            case "account-chosen": {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
 
-                    const txHash = await extrinsic.signAndSend(
-                        account.address,
-                        { signer: injector.signer },
-                        ({ status }) => {
-                            api?.query.system.events((events: any) => {
-                                if (events) {
-                                    // Loop through the Vec<EventRecord>
-                                    events.forEach((record: any) => {
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({status}) => {
+                        api?.query.system.events((events: any) => {
+                            if (events) {
+                                // Loop through the Vec<EventRecord>
+                                events.forEach((record: any) => {
 
-                                        // Extract the phase, event and the event types
-                                        const { event, phase } = record;
-                                        const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
-                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                                        if (dispatchError.isModule) {
-                                            try {
-                                                let errorMessage = getDispatchError(dispatchError);
-                                                this.errorNotification(Error(errorMessage));
+                                    // Extract the phase, event and the event types
+                                    const {event, phase} = record;
+                                    const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
+                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    if (dispatchError.isModule) {
+                                        try {
+                                            let errorMessage = getDispatchError(dispatchError);
+                                            this.errorNotification(Error(errorMessage));
 
-                                                this.$contribute.disabled = false;
-                                                this.$contribute.classList.remove("blob");
-                                                this.$contribute.innerText = "Contribute";
-                                            } catch (error) {
-                                                // swallow
-                                            }
+                                            this.$contribute.disabled = false;
+                                            this.$contribute.classList.remove("blob");
+                                            this.$contribute.innerText = "Contribute";
+                                        } catch (error) {
+                                            // swallow
                                         }
+                                    }
 
-                                        if (contributionSucceeded) {
-                                            const types = event.typeDef;
-                                            const contributionAccountId = event.data[0];
-                                            const contributionProjectId = parseInt(event.data[1].toString());
+                                    if (contributionSucceeded) {
+                                        const types = event.typeDef;
+                                        const contributionAccountId = event.data[0];
+                                        const contributionProjectId = parseInt(event.data[1].toString());
 
-                                            if (contributionAccountId == account.address && contributionProjectId == this.project?.chain_project_id && this.project && this.projectId) {
-                                                this.$contribute.classList.remove("blob");
-                                                this.$contribute.disabled = false;
-                                                this.$contribute.classList.add("finalized");
-                                                this.$contribute.innerText = "Contribution Succeeded";
-                                            }
+                                        if (contributionAccountId == account.address && contributionProjectId == this.project?.chain_project_id && this.project && this.projectId) {
+                                            this.$contribute.classList.remove("blob");
+                                            this.$contribute.disabled = false;
+                                            this.$contribute.classList.add("finalized");
+                                            this.$contribute.innerText = "Contribution Succeeded";
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    ).catch((e: any) => {
-                        this.errorNotification(e);
-                    });
-                    console.log(`Transaction hash: ${txHash}`);
-                } break;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+                console.log(`Transaction hash: ${txHash}`);
+            }
+                break;
         }
     }
 
@@ -493,103 +489,102 @@ export default class Detail extends HTMLElement {
         const formData = new FormData(this.$voteSubmissionForm);
         const userVote = (formData.get("vote-select") as string).toLowerCase() == "true";
         const milestoneKey = parseInt(formData.get("vote-milestone-select") as string);
-        const api = this.apiInfo?.api;
+        const api = this.apiInfo?.imbue?.api;
 
         switch (event) {
-            case "begin":
-                {
-                    this.$vote.disabled = true;
-                    this.$vote.classList.add("blob");
-                    this.$vote.innerText = "Saving.....";
+            case "begin": {
+                this.$vote.disabled = true;
+                this.$vote.classList.add("blob");
+                this.$vote.innerText = "Saving.....";
 
-                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.voteOnMilestone(
-                        this.project?.chain_project_id,
-                        milestoneKey,
-                        userVote
-                    );
+                const extrinsic = api?.tx.imbueProposals.voteOnMilestone(
+                    this.project?.chain_project_id,
+                    milestoneKey,
+                    userVote
+                );
 
-                    if (!extrinsic) {
-                        // FIXME: UX
-                        return;
-                    }
-
-                    return this.vote(
-                        "extrinsic-created",
-                        { ...state, extrinsic },
-                    );
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
                 }
-            case "extrinsic-created":
-                {
-                    this.dispatchEvent(new CustomEvent(
-                        config.event.accountChoice,
-                        {
-                            bubbles: true,
-                            composed: true,
-                            detail: (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    this.vote(
-                                        "account-chosen",
-                                        { ...state, account },
-                                    );
-                                }
+
+                return this.vote(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+            case "extrinsic-created": {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.vote(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
                             }
                         }
-                    ));
-                } break;
-            case "account-chosen":
-                {
-                    const extrinsic = state?.extrinsic as
-                        SubmittableExtrinsic<"promise", ISubmittableResult>;
-                    const account = state?.account as
-                        InjectedAccountWithMeta;
-                    const injector = await web3FromSource(account.meta.source);
+                    }
+                ));
+            }
+                break;
+            case "account-chosen": {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
 
-                    const txHash = await extrinsic.signAndSend(
-                        account.address,
-                        { signer: injector.signer },
-                        ({ status }) => {
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({status}) => {
 
-                            api?.query.system.events((events: any) => {
-                                if (events) {
-                                    // Loop through the Vec<EventRecord>
-                                    events.forEach((record: any) => {
-                                        // Extract the phase, event and the event types
-                                        const { event, phase } = record;
-                                        const voteSucceeded = `${event.section}:${event.method}` == "imbueProposals:VoteComplete";
-                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                                        if (dispatchError.isModule) {
-                                            try {
-                                                let errorMessage = getDispatchError(dispatchError);
-                                                this.errorNotification(Error(errorMessage));
+                        api?.query.system.events((events: any) => {
+                            if (events) {
+                                // Loop through the Vec<EventRecord>
+                                events.forEach((record: any) => {
+                                    // Extract the phase, event and the event types
+                                    const {event, phase} = record;
+                                    const voteSucceeded = `${event.section}:${event.method}` == "imbueProposals:VoteComplete";
+                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    if (dispatchError.isModule) {
+                                        try {
+                                            let errorMessage = getDispatchError(dispatchError);
+                                            this.errorNotification(Error(errorMessage));
 
-                                                this.$vote.disabled = false;
-                                                this.$vote.classList.remove("blob");
-                                                this.$vote.innerText = "Vote";
-                                            } catch (error) {
-                                                // swallow
-                                            }
+                                            this.$vote.disabled = false;
+                                            this.$vote.classList.remove("blob");
+                                            this.$vote.innerText = "Vote";
+                                        } catch (error) {
+                                            // swallow
                                         }
+                                    }
 
-                                        if (voteSucceeded) {
-                                            const types = event.typeDef;
-                                            const voterAccountId = event.data[0];
-                                            const voterProjectId = parseInt(event.data[1].toString());
-                                            if (voterAccountId == account.address && voterProjectId == this.project?.chain_project_id && this.project && this.projectId) {
-                                                this.$vote.classList.remove("blob");
-                                                this.$vote.disabled = false;
-                                                this.$vote.classList.add("finalized");
-                                                this.$vote.innerText = "Vote Registered";
-                                            }
+                                    if (voteSucceeded) {
+                                        const types = event.typeDef;
+                                        const voterAccountId = event.data[0];
+                                        const voterProjectId = parseInt(event.data[1].toString());
+                                        if (voterAccountId == account.address && voterProjectId == this.project?.chain_project_id && this.project && this.projectId) {
+                                            this.$vote.classList.remove("blob");
+                                            this.$vote.disabled = false;
+                                            this.$vote.classList.add("finalized");
+                                            this.$vote.innerText = "Vote Registered";
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    ).catch((e: any) => {
-                        this.errorNotification(e);
-                    });
-                    console.log(`Transaction hash: ${txHash}`);
-                } break;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+                console.log(`Transaction hash: ${txHash}`);
+            }
+                break;
         }
     }
 
@@ -599,106 +594,105 @@ export default class Detail extends HTMLElement {
     ): Promise<void> {
         const formData = new FormData(this.$submitMilestoneForm);
         const milestoneKey = parseInt(formData.get("submit-milestone-select") as string);
-        const api = this.apiInfo?.api;
+        const api = this.apiInfo?.imbue?.api;
 
         switch (event) {
-            case "begin":
-                {
-                    this.$submitMilestone.disabled = true;
-                    this.$submitMilestone.classList.add("blob");
-                    this.$submitMilestone.innerText = "Saving.....";
+            case "begin": {
+                this.$submitMilestone.disabled = true;
+                this.$submitMilestone.classList.add("blob");
+                this.$submitMilestone.innerText = "Saving.....";
 
-                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.submitMilestone(
-                        this.project?.chain_project_id,
-                        milestoneKey,
-                    );
+                const extrinsic = api?.tx.imbueProposals.submitMilestone(
+                    this.project?.chain_project_id,
+                    milestoneKey,
+                );
 
-                    if (!extrinsic) {
-                        // FIXME: UX
-                        return;
-                    }
-
-                    return this.submitMilestone(
-                        "extrinsic-created",
-                        { ...state, extrinsic },
-                    );
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
                 }
-            case "extrinsic-created":
-                {
-                    this.dispatchEvent(new CustomEvent(
-                        config.event.accountChoice,
-                        {
-                            bubbles: true,
-                            composed: true,
-                            detail: (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    this.submitMilestone(
-                                        "account-chosen",
-                                        { ...state, account },
-                                    );
-                                }
+
+                return this.submitMilestone(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+            case "extrinsic-created": {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.submitMilestone(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
                             }
                         }
-                    ));
-                } break;
-            case "account-chosen":
-                {
-                    const extrinsic = state?.extrinsic as
-                        SubmittableExtrinsic<"promise", ISubmittableResult>;
-                    const account = state?.account as
-                        InjectedAccountWithMeta;
-                    const injector = await web3FromSource(account.meta.source);
+                    }
+                ));
+            }
+                break;
+            case "account-chosen": {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
 
-                    const txHash = await extrinsic.signAndSend(
-                        account.address,
-                        { signer: injector.signer },
-                        ({ status }) => {
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({status}) => {
 
-                            api?.query.system.events((events: any) => {
-                                if (events) {
-                                    // Loop through the Vec<EventRecord>
-                                    events.forEach((record: any) => {
-                                        // Extract the phase, event and the event types
-                                        const { event, phase } = record;
-                                        const milestoneSubmitted = `${event.section}:${event.method}` == "imbueProposals:MilestoneSubmitted";
-                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                                        if (dispatchError.isModule) {
-                                            try {
-                                                let errorMessage = getDispatchError(dispatchError);
-                                                this.errorNotification(Error(errorMessage));
+                        api?.query.system.events((events: any) => {
+                            if (events) {
+                                // Loop through the Vec<EventRecord>
+                                events.forEach((record: any) => {
+                                    // Extract the phase, event and the event types
+                                    const {event, phase} = record;
+                                    const milestoneSubmitted = `${event.section}:${event.method}` == "imbueProposals:MilestoneSubmitted";
+                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    if (dispatchError.isModule) {
+                                        try {
+                                            let errorMessage = getDispatchError(dispatchError);
+                                            this.errorNotification(Error(errorMessage));
 
-                                                this.$submitMilestone.disabled = false;
-                                                this.$submitMilestone.classList.remove("blob");
-                                                this.$submitMilestone.innerText = "Submit";
-                                            } catch (error) {
-                                                // swallow
-                                            }
+                                            this.$submitMilestone.disabled = false;
+                                            this.$submitMilestone.classList.remove("blob");
+                                            this.$submitMilestone.innerText = "Submit";
+                                        } catch (error) {
+                                            // swallow
                                         }
+                                    }
 
 
-                                        if (milestoneSubmitted) {
-                                            const types = event.typeDef;
-                                            const submittedProjectId = parseInt(event.data[0].toString());
+                                    if (milestoneSubmitted) {
+                                        const types = event.typeDef;
+                                        const submittedProjectId = parseInt(event.data[0].toString());
 
-                                            const submittedMilestoneId = parseInt(event.data[1].toString());
+                                        const submittedMilestoneId = parseInt(event.data[1].toString());
 
 
-                                            if (submittedProjectId == this.project?.chain_project_id && submittedMilestoneId == milestoneKey) {
-                                                this.$submitMilestone.classList.remove("blob");
-                                                this.$submitMilestone.disabled = false;
-                                                this.$submitMilestone.classList.add("finalized");
-                                                this.$submitMilestone.innerText = "Milestone Submitted";
-                                            }
+                                        if (submittedProjectId == this.project?.chain_project_id && submittedMilestoneId == milestoneKey) {
+                                            this.$submitMilestone.classList.remove("blob");
+                                            this.$submitMilestone.disabled = false;
+                                            this.$submitMilestone.classList.add("finalized");
+                                            this.$submitMilestone.innerText = "Milestone Submitted";
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    ).catch((e: any) => {
-                        this.errorNotification(e);
-                    });
-                    console.log(`Transaction hash: ${txHash}`);
-                } break;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+                console.log(`Transaction hash: ${txHash}`);
+            }
+                break;
         }
     }
 
@@ -706,103 +700,102 @@ export default class Detail extends HTMLElement {
         event: string = "begin",
         state?: Record<string, any>
     ): Promise<void> {
-        const api = this.apiInfo?.api;
+        const api = this.apiInfo?.imbue?.api;
 
         switch (event) {
-            case "begin":
-                {
-                    this.$withdraw.disabled = true;
-                    this.$withdraw.classList.add("blob");
-                    this.$withdraw.innerText = "Saving.....";
+            case "begin": {
+                this.$withdraw.disabled = true;
+                this.$withdraw.classList.add("blob");
+                this.$withdraw.innerText = "Saving.....";
 
-                    const extrinsic = this.apiInfo?.api.tx.imbueProposals.withdraw(
-                        this.project?.chain_project_id,
-                    );
+                const extrinsic = api?.tx.imbueProposals.withdraw(
+                    this.project?.chain_project_id,
+                );
 
-                    if (!extrinsic) {
-                        // FIXME: UX
-                        return;
-                    }
-
-                    return this.withdraw(
-                        "extrinsic-created",
-                        { ...state, extrinsic },
-                    );
+                if (!extrinsic) {
+                    // FIXME: UX
+                    return;
                 }
-            case "extrinsic-created":
-                {
-                    this.dispatchEvent(new CustomEvent(
-                        config.event.accountChoice,
-                        {
-                            bubbles: true,
-                            composed: true,
-                            detail: (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    this.withdraw(
-                                        "account-chosen",
-                                        { ...state, account },
-                                    );
-                                }
+
+                return this.withdraw(
+                    "extrinsic-created",
+                    {...state, extrinsic},
+                );
+            }
+            case "extrinsic-created": {
+                this.dispatchEvent(new CustomEvent(
+                    config.event.accountChoice,
+                    {
+                        bubbles: true,
+                        composed: true,
+                        detail: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.withdraw(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
                             }
                         }
-                    ));
-                } break;
-            case "account-chosen":
-                {
-                    const extrinsic = state?.extrinsic as
-                        SubmittableExtrinsic<"promise", ISubmittableResult>;
-                    const account = state?.account as
-                        InjectedAccountWithMeta;
-                    const injector = await web3FromSource(account.meta.source);
+                    }
+                ));
+            }
+                break;
+            case "account-chosen": {
+                const extrinsic = state?.extrinsic as
+                    SubmittableExtrinsic<"promise", ISubmittableResult>;
+                const account = state?.account as
+                    InjectedAccountWithMeta;
+                const injector = await web3FromSource(account.meta.source);
 
-                    const txHash = await extrinsic.signAndSend(
-                        account.address,
-                        { signer: injector.signer },
-                        ({ status }) => {
+                const txHash = await extrinsic.signAndSend(
+                    account.address,
+                    {signer: injector.signer},
+                    ({status}) => {
 
-                            api?.query.system.events((events: any) => {
-                                if (events) {
-                                    // Loop through the Vec<EventRecord>
-                                    events.forEach((record: any) => {
-                                        // Extract the phase, event and the event types
-                                        const { event, phase } = record;
-                                        const withdrawSuccessful = `${event.section}:${event.method}` == "imbueProposals:ProjectFundsWithdrawn";
-                                        const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                                        if (dispatchError.isModule) {
-                                            try {
-                                                let errorMessage = getDispatchError(dispatchError);
-                                                this.errorNotification(Error(errorMessage));
+                        api?.query.system.events((events: any) => {
+                            if (events) {
+                                // Loop through the Vec<EventRecord>
+                                events.forEach((record: any) => {
+                                    // Extract the phase, event and the event types
+                                    const {event, phase} = record;
+                                    const withdrawSuccessful = `${event.section}:${event.method}` == "imbueProposals:ProjectFundsWithdrawn";
+                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    if (dispatchError.isModule) {
+                                        try {
+                                            let errorMessage = getDispatchError(dispatchError);
+                                            this.errorNotification(Error(errorMessage));
 
-                                                this.$withdraw.disabled = false;
-                                                this.$withdraw.classList.remove("blob");
-                                                this.$withdraw.innerText = "Withdraw";
-                                            } catch (error) {
-                                                // swallow
-                                            }
+                                            this.$withdraw.disabled = false;
+                                            this.$withdraw.classList.remove("blob");
+                                            this.$withdraw.innerText = "Withdraw";
+                                        } catch (error) {
+                                            // swallow
                                         }
+                                    }
 
-                                        if (withdrawSuccessful) {
-                                            const types = event.typeDef;
-                                            const withdrawalAccountId = event.data[0];
-                                            const withdrawalProjectId = parseInt(event.data[1].toString());
+                                    if (withdrawSuccessful) {
+                                        const types = event.typeDef;
+                                        const withdrawalAccountId = event.data[0];
+                                        const withdrawalProjectId = parseInt(event.data[1].toString());
 
 
-                                            if (withdrawalAccountId == account.address && withdrawalProjectId == this.project?.chain_project_id) {
-                                                this.$withdraw.classList.remove("blob");
-                                                this.$withdraw.disabled = false;
-                                                this.$withdraw.classList.add("finalized");
-                                                this.$withdraw.innerText = "Withdraw Successful";
-                                            }
+                                        if (withdrawalAccountId == account.address && withdrawalProjectId == this.project?.chain_project_id) {
+                                            this.$withdraw.classList.remove("blob");
+                                            this.$withdraw.disabled = false;
+                                            this.$withdraw.classList.add("finalized");
+                                            this.$withdraw.innerText = "Withdraw Successful";
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    ).catch((e: any) => {
-                        this.errorNotification(e);
-                    });
-                    console.log(`Transaction hash: ${txHash}`);
-                } break;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                ).catch((e: any) => {
+                    this.errorNotification(e);
+                });
+                console.log(`Transaction hash: ${txHash}`);
+            }
+                break;
         }
     }
 

@@ -20,7 +20,6 @@ import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
 import * as config from "../config";
 import {getPage} from "../utils";
-import Dashboard from "../dashboard";
 
 
 const template = document.createElement("template");
@@ -68,6 +67,7 @@ export default class Proposals extends HTMLElement {
             case "draft":
                 if (userProject?.chain_project_id) {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
+                    return;
                 }
 
                 await getPage<ProposalsDraft>(this.$pages, "editor").init(request);
@@ -76,6 +76,7 @@ export default class Proposals extends HTMLElement {
             case "preview":
                 if (userProject?.chain_project_id) {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
+                    return;
                 }
 
                 await getPage<ProposalsDraftPreview>(this.$pages, "preview").init(request);

@@ -3,9 +3,9 @@ import css from "./index.css";
 
 import "../../proposals/proposal-item";
 import ProposalItem from "../../proposals/proposal-item";
-import { Proposal, User } from "../../model";
+import {Proposal, User} from "../../model";
 import * as config from "../../config";
-import type { ImbueRequest, polkadotJsApiInfo } from "../../dapp";
+import type {ImbueApiInfo, ImbueRequest} from "../../dapp";
 import NoProposal from "../no-proposal";
 
 const CONTENT = Symbol();
@@ -19,7 +19,7 @@ template.innerHTML = `
 
 export default class MyAccount extends HTMLElement {
     user?: User | null;
-    apiInfo?: polkadotJsApiInfo;
+    apiInfo?: ImbueApiInfo | undefined;
 
     private [CONTENT]: DocumentFragment;
 
@@ -27,7 +27,7 @@ export default class MyAccount extends HTMLElement {
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        this.attachShadow({mode: "open"});
         this[CONTENT] =
             template.content.cloneNode(true) as
                 DocumentFragment;
@@ -52,14 +52,11 @@ export default class MyAccount extends HTMLElement {
             this.wrapAuthentication(() => {
                 location.reload()
             });
-        }
-        else {
+        } else {
             const userProject = await request.userProject;
             if (userProject) {
                 this.renderProjects([userProject]);
-            }
-            else
-            {
+            } else {
                 this.$projects.appendChild(new NoProposal());
             }
         }

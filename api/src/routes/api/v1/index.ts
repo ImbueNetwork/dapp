@@ -1,6 +1,4 @@
 import express from "express";
-import db from "../../../db";
-import * as models from "../../../models";
 import projectsRouter from "./projects";
 import usersRouter from "./users";
 import config from "../../../config";
@@ -17,7 +15,8 @@ router.get("/user", (req, res) => {
 
 router.get("/info", (req, res) => {
     res.send({
-        imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr
+        imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
+        relayChainWebsockAddr: config.relayChainWebsockAddr
     });
 });
 

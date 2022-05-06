@@ -33,8 +33,9 @@ services:
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
-      #IMBUE_NETWORK_WEBSOCK_ADDR: wss://localhost:9942
-      IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
+      IMBUE_NETWORK_WEBSOCK_ADDR: ws://127.0.0.1:9942
+      RELAY_CHAIN_WEBSOCK_ADDR: ws://127.0.0.1:9914
+      #IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
     volumes:
     - "./api/build:/api/build"
     - "./api/node_modules:/api/node_modules"

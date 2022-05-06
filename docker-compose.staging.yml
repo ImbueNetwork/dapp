@@ -24,6 +24,7 @@ services:
       DB_PORT: 5432
       DB_HOST: postgres
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
+      RELAY_CHAIN_WEBSOCK_ADDR: wss://testvalidator.imbue.network
   
   web:
     container_name: web

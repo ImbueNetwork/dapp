@@ -50,7 +50,7 @@ export default class Item extends HTMLElement {
 
         this.$img.src = proposal.logo;
 
-        if (proposal.chain_project_id) {
+        if (proposal.chain_project_id || proposal.chain_project_id == 0) {
             this.$name.innerText = proposal.name;
         }
         else

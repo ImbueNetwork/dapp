@@ -220,8 +220,8 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         });
 
         this.addEventListener(config.event.accountChoice, async e => {
-            const callback = (e as CustomEvent).detail;
-            callback(await this.$accountChoice.accountChoice());
+            const {callback, address} = (e as CustomEvent).detail;
+            callback(await this.$accountChoice.accountChoice(address));
         });
 
         this.$mainMenuButton.addEventListener("click", e => {

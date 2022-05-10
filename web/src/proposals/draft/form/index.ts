@@ -45,10 +45,8 @@ export default class Form extends HTMLElement {
     milestoneIdx: number = 0;
     user?: User | null;
     userProject?: Proposal | null;
-    accounts?: Promise<InjectedAccountWithMeta[]>;
     $submitProposal: HTMLInputElement;
     $categorySelect: HTMLSelectElement;
-    $web3AccountSelect: HTMLSelectElement;
     $web3Address: HTMLInputElement;
     $addMilestone: HTMLInputElement;
     $grantSubmissionForm: HTMLFormElement;
@@ -56,7 +54,6 @@ export default class Form extends HTMLElement {
     $milestones: HTMLOListElement;
     $currencySelect: HTMLSelectElement;
     currency = model.Currency;
-
 
     get $fields(): HTMLInputElement[] {
         return Array.from(
@@ -79,9 +76,6 @@ export default class Form extends HTMLElement {
                 HTMLInputElement;
         this.$categorySelect =
             this[CONTENT].getElementById("category-select") as
-                HTMLSelectElement;
-        this.$web3AccountSelect =
-            this[CONTENT].getElementById("web3-account-select") as
                 HTMLSelectElement;
         this.$addMilestone =
             this[CONTENT].getElementById("add-milestone") as
@@ -107,7 +101,6 @@ export default class Form extends HTMLElement {
         ([
             "$categorySelect",
             "$currencySelect",
-            "$web3AccountSelect",
             "$milestones"
         ] as const).forEach(prop => {
             /**
@@ -136,19 +129,6 @@ export default class Form extends HTMLElement {
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
         this.bind();
-    }
-
-    accountFragment(account: InjectedAccountWithMeta) {
-        return document.createRange().createContextualFragment(`
-            <mwc-list-item
-             twoline
-             value="${account.address}"
-             data-source="${account.meta.source}">
-                <span>${account.meta.name ?? account.address}</span>
-                <span class="select-source" slot="secondary">${account.meta.source
-        }</span>
-            </mwc-list-item>
-        `);
     }
 
     async init(request: ImbueRequest) {
@@ -190,39 +170,6 @@ export default class Form extends HTMLElement {
             ? "Save Draft Proposal"
             : "Preview Draft Proposal";
 
-        this.accounts = request.accounts.then(accounts => {
-            const $select = this.$web3AccountSelect;
-
-            accounts.forEach(account => {
-                $select.appendChild(this.accountFragment(account));
-            });
-
-            $select.appendChild(this.accountFragment({
-                address: "other",
-                meta: {
-                    name: "Other",
-                    source: `(entered manually)`
-                }
-            }));
-            return accounts;
-        });
-
-        this.$web3AccountSelect.addEventListener("change", e => {
-            const address = this.$web3AccountSelect.value;
-            if (address === "other") {
-                this.$web3Address.value = "";
-                this.$web3Address.toggleAttribute("disabled", false);
-            } else {
-                this.$web3Address.toggleAttribute("disabled", true);
-                this.$web3Address.value = address;
-            }
-        });
-
-        this.$web3AccountSelect.addEventListener("closed", e => {
-            if (this.$web3AccountSelect.value === "other")
-                this.$web3Address.focus();
-        });
-
         Object.entries(categories).forEach(([category, subcategies], idx) => {
             this.$categorySelect.appendChild(
                 document.createRange().createContextualFragment(`
@@ -234,7 +181,6 @@ export default class Form extends HTMLElement {
                 `)
             );
         });
-
 
         const currencies = Object.keys(this.currency).filter((v) => !isNaN(Number(v)));
         Object.values(currencies).forEach((currency) => {
@@ -248,6 +194,9 @@ export default class Form extends HTMLElement {
         });
 
         const projectId = this.userProject?.id;
+
+        this.$web3Address.toggleAttribute("disabled", true);
+        this.$web3Address.value = this.user?.web3Accounts.find(_ => true)?.address || "";
 
         try {
             if (projectId) {
@@ -264,8 +213,6 @@ export default class Form extends HTMLElement {
             this.addMilestoneItem();
             setTimeout(() => this.$fields[0].focus(), 0);
         }
-
-
     }
 
     redirectToNewDraft() {
@@ -359,7 +306,7 @@ export default class Form extends HTMLElement {
             ) * 1e12,
             currency_id: parseInt(formData.get("imbu-currency") as string),
             category: formData.get("imbu-category") as string,
-            owner: formData.get("imbu-address") as string,
+            owner: this.user?.web3Accounts.find(_ => true)?.address as string,
         }
     }
 
@@ -369,17 +316,7 @@ export default class Form extends HTMLElement {
                 ...p, [c.getAttribute("name") as string]: c
             }), {});
 
-        this.accounts?.then(accounts => {
-            if (proposal.owner && accounts.some(
-                account => account.address === proposal.owner
-            )) {
-                $inputFields["imbu-account"].value = proposal.owner ?? "";
-            } else {
-                // `owner` exists and is a String
-                $inputFields["imbu-account"].value = "other";
-                $inputFields["imbu-address"].value = proposal.owner ?? "";
-            }
-        });
+        $inputFields["imbu-address"].value = proposal.owner ?? "";
         $inputFields["imbu-name"].value = proposal.name ?? "";
         $inputFields["imbu-logo"].value = proposal.logo ?? "";
         $inputFields["imbu-description"].value = proposal.description ?? "";
@@ -438,20 +375,9 @@ export default class Form extends HTMLElement {
         // Form is valid.
         const formData = new FormData($form);
         this.disabled = true;
+
         const proposal = this.proposalFromForm(formData);
-
-        const account = (await this.accounts)?.filter(
-            account => account.address === proposal.owner
-        )[0];
-
-        // XXX: shouldn't happen because we get the list of accounts to
-        // populate the dropdown in the first place.
-        // if (!account) {
-        //     // FIXME: Need UX here.
-        //     throw new Error("Selected account no longer found.");
-        // }
-
-        return this.submitGrantProposal(proposal, account);
+        return this.submitGrantProposal(proposal);
     }
 
     get milestonePercentFields() {
@@ -516,10 +442,7 @@ export default class Form extends HTMLElement {
         this.toggleInputsAttribute("disabled", force);
     }
 
-    async submitGrantProposal(
-        draft: DraftProposal,
-        account?: InjectedAccountWithMeta,
-    ): Promise<void> {
+    async submitGrantProposal(draft: DraftProposal): Promise<void> {
 
         // if yes, go ahead and post the draft with the `user_id`
         draft.user_id = this.user?.id;

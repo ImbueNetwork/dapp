@@ -60,11 +60,11 @@
     <fieldset class="funding">
         <legend class="label">How much funding will your project need?</legend>
 
-        <mwc-select id="currency-select" class="input-field" label="Currency" name="imbu-currency" helper="" required>
-            <mwc-list-item></mwc-list-item>
-        </mwc-select>
-
         <div class="funding">
+            <mwc-select id="currency-select" class="input-field" label="Currency" name="imbu-currency" helper="" required>
+                <mwc-list-item></mwc-list-item>
+            </mwc-select>
+
             <hq-forms-textfield
              class="input-field"
              name="imbu-funds-required"
@@ -77,15 +77,6 @@
                <span slot="suffix">.00</span>
                <span slot="floating-label">Funds required</span>
            </hq-forms-textfield>
-   
-           <mwc-select
-            id="web3-account-select"
-            class="input-field"
-            label="Web3 Account"
-            name="imbu-account"
-            required>
-               <mwc-list-item></mwc-list-item>
-           </mwc-select>   
         </div>
 
         <hq-forms-textfield
@@ -94,7 +85,7 @@
          name="imbu-address"
          type="text"
          helper="A valid Polkadot wallet address."
-         required>
+         disabled>
             <!-- TODO: add address validation-->
            <span slot="floating-label">Address</span>
        </hq-forms-textfield>

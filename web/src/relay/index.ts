@@ -56,9 +56,6 @@ export default class Relay extends HTMLElement {
 
             const amount = parseInt(this.$transferAmount.value as string) * 1e12;
 
-
-            
-
             if (relayApi && amount > 0) {
 
                 this.$transfer.disabled = true;
@@ -70,67 +67,69 @@ export default class Relay extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: async (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                const dest = { V0: { X1: { Parachain: 2102 } } };
+                        detail: {
+                            callback: async (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    const dest = {V0: {X1: {Parachain: 2102}}};
 
-                                const beneficiary = {
-                                    V1: {
-                                        parents: 0,
-                                        interior: {
-                                            X1: {
-                                                AccountId32: {
-                                                    network: "Any",
-                                                    id: decodeAddress(account.address)
+                                    const beneficiary = {
+                                        V1: {
+                                            parents: 0,
+                                            interior: {
+                                                X1: {
+                                                    AccountId32: {
+                                                        network: "Any",
+                                                        id: decodeAddress(account.address)
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                };
+                                    };
 
-                                const assets = {
-                                    V1: [{
-                                        id: { Concrete: { parents: 0, interior: "Here" } },
-                                        fun: { Fungible: amount }
-                                    }]
-                                };
+                                    const assets = {
+                                        V1: [{
+                                            id: {Concrete: {parents: 0, interior: "Here"}},
+                                            fun: {Fungible: amount}
+                                        }]
+                                    };
 
-                                const feeAssetItem = 0;
+                                    const feeAssetItem = 0;
 
-                                const injector = await web3FromSource(account.meta.source);
-                                const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
+                                    const injector = await web3FromSource(account.meta.source);
+                                    const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
 
-                                try {
-                                const txHash = await extrinsic.signAndSend(
-                                    account.address,
-                                    { signer: injector.signer },
-                                    ({ status }) => {
-                                        imbueApi?.query.system.events((events: any) => {
-                                            if (events) {
-                                                // Loop through the Vec<EventRecord>
-                                                events.forEach((record: any) => {
-                                                    const { event, phase } = record;
-                                                    const currenciesDeposited = `${event.section}:${event.method}` == "currencies:Deposited";
-                                                    if (currenciesDeposited) {
-                                                        const types = event.typeDef;
-                                                        const accountId = event.data[1];
+                                    try {
+                                        const txHash = await extrinsic.signAndSend(
+                                            account.address,
+                                            {signer: injector.signer},
+                                            ({status}) => {
+                                                imbueApi?.query.system.events((events: any) => {
+                                                    if (events) {
+                                                        // Loop through the Vec<EventRecord>
+                                                        events.forEach((record: any) => {
+                                                            const {event, phase} = record;
+                                                            const currenciesDeposited = `${event.section}:${event.method}` == "currencies:Deposited";
+                                                            if (currenciesDeposited) {
+                                                                const types = event.typeDef;
+                                                                const accountId = event.data[1];
 
-                                                        if (accountId == account.address) {
-                                                            this.$transfer.classList.remove("blob");
-                                                            this.$transfer.disabled = false;
-                                                            this.$transfer.classList.add("finalized");
-                                                            this.$transfer.innerText = "Transfer Succeeded";
-                                                        }
+                                                                if (accountId == account.address) {
+                                                                    this.$transfer.classList.remove("blob");
+                                                                    this.$transfer.disabled = false;
+                                                                    this.$transfer.classList.add("finalized");
+                                                                    this.$transfer.innerText = "Transfer Succeeded";
+                                                                }
+                                                            }
+                                                        });
                                                     }
                                                 });
-                                            }
-                                        });
-                                    });
-                                } catch (error:any) {
-                                    this.errorNotification(error);
-                                    this.$transfer.classList.remove("blob");
-                                    this.$transfer.disabled = false;
-                                    this.$transfer.innerText = "Transfer";
+                                            });
+                                    } catch (error: any) {
+                                        this.errorNotification(error);
+                                        this.$transfer.classList.remove("blob");
+                                        this.$transfer.disabled = false;
+                                        this.$transfer.innerText = "Transfer";
+                                    }
                                 }
                             }
                         }

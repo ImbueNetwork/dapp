@@ -32,7 +32,7 @@ export default class Choice extends HTMLElement {
         ));
     }
 
-    accountChoice() {
+    accountChoice(address: string | null) {
         const accountActionEntry = (resolve: CallableFunction) => (
             account: InjectedAccountWithMeta,
         ) => [
@@ -49,8 +49,15 @@ export default class Choice extends HTMLElement {
         ];
 
         return new Promise((resolve, _reject) => {
-            // do we have accounts?
-            if (!this.accounts.length) {
+            // Did we get a specific address passed in?
+            if (address) {
+                const account = this.accounts.find(_ => _.address === address);
+                if (account) {
+                    resolve(account);
+                } else {
+                    resolve(void 0);
+                }
+            } else if (!this.accounts.length) {
                 this.dispatchNotification(
                     "No accounts found",
                     "",

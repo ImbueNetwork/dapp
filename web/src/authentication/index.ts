@@ -129,12 +129,14 @@ export default class Authentication extends HTMLElement {
                 {
                     bubbles: true,
                     composed: true,
-                    detail: (account?: InjectedAccountWithMeta) => {
-                        if (account) {
-                            this.web3AuthWorkflow(
-                                "account-chosen",
-                                {...state, account},
-                            );
+                    detail: {
+                        callback: (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                this.web3AuthWorkflow(
+                                    "account-chosen",
+                                    {...state, account},
+                                );
+                            }
                         }
                     }
                 }

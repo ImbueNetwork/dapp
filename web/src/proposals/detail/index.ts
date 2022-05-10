@@ -305,32 +305,6 @@ export default class Detail extends HTMLElement {
         });
     }
 
-    wrapAuthentication(action: CallableFunction) {
-        const callback = (state: any) => {
-            this.user = state.user;
-            action();
-        }
-
-        this.dispatchEvent(new CustomEvent(
-            config.event.authenticationRequired,
-            {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    callback,
-                    content: authDialogContent,
-                    actions: {
-                        dismiss: {
-                            handler: () => {
-                            },
-                            label: "Continue using local storage"
-                        }
-                    }
-                },
-            }
-        ));
-    }
-
     renderProject(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
@@ -411,12 +385,15 @@ export default class Detail extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.contribute(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                        detail: {
+                            address: this.user?.web3Accounts.find(_ => true)?.address,
+                            callback: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.contribute(
+                                        "account-chosen",
+                                        {...state, account},
+                                    );
+                                }
                             }
                         }
                     }
@@ -519,12 +496,15 @@ export default class Detail extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.vote(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                        detail: {
+                            address: this.user?.web3Accounts.find(_ => true)?.address,
+                            callback: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.vote(
+                                        "account-chosen",
+                                        {...state, account},
+                                    );
+                                }
                             }
                         }
                     }
@@ -623,12 +603,15 @@ export default class Detail extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.submitMilestone(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                        detail: {
+                            address: this.user?.web3Accounts.find(_ => true)?.address,
+                            callback: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.submitMilestone(
+                                        "account-chosen",
+                                        {...state, account},
+                                    );
+                                }
                             }
                         }
                     }
@@ -728,12 +711,15 @@ export default class Detail extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.withdraw(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                        detail: {
+                            address: this.user?.web3Accounts.find(_ => true)?.address,
+                            callback: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.withdraw(
+                                        "account-chosen",
+                                        {...state, account},
+                                    );
+                                }
                             }
                         }
                     }

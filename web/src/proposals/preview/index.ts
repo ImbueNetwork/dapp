@@ -355,12 +355,15 @@ export default class Preview extends HTMLElement {
                     {
                         bubbles: true,
                         composed: true,
-                        detail: (account?: InjectedAccountWithMeta) => {
-                            if (account) {
-                                this.finalizeWorkflow(
-                                    "account-chosen",
-                                    {...state, account},
-                                );
+                        detail: {
+                            address: this.user?.web3Accounts.find(_ => true)?.address,
+                            callback: (account?: InjectedAccountWithMeta) => {
+                                if (account) {
+                                    this.finalizeWorkflow(
+                                        "account-chosen",
+                                        {...state, account},
+                                    );
+                                }
                             }
                         }
                     }

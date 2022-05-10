@@ -98,21 +98,22 @@ exports.polkadotJsAuthRouter.post("/", (req, res, next) => {
         if (!user) {
             next(new Error("No user provided."));
         }
-        try {
-            // create a `challenge` uuid and insert it into the users
-            // table respond with the challenge
-            db_1.default.transaction(async (tx) => {
+        // create a `challenge` uuid and insert it into the users
+        // table respond with the challenge
+        db_1.default.transaction(async (tx) => {
+            try {
                 const challenge = (0, uuid_1.v4)();
                 const [web3Account, isInsert] = await (0, models_1.upsertWeb3Challenge)(user, address, req.body.type, challenge)(tx);
                 if (isInsert) {
                     res.status(201);
                 }
                 res.send({ user, web3Account });
-            });
-        }
-        catch (e) {
-            next(new Error(`Unable to upsert web3 challenge for address: ${address}`, { cause: e }));
-        }
+            }
+            catch (e) {
+                await tx.rollback();
+                next(new Error(`Unable to upsert web3 challenge for address: ${address}`, { cause: e }));
+            }
+        });
     });
 });
 exports.polkadotJsAuthRouter.post("/callback", passport_1.default.authenticate("polkadot-js"), (_req, res) => {

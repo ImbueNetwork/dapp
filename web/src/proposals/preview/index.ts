@@ -389,16 +389,6 @@ export default class Preview extends HTMLElement {
                         }
 
 
-                        // removing to speed up confirmation
-                        // if (status.isInBlock) {
-                        //     this.$finalize.innerText = `Finalising....`;
-                        // }
-
-                        // if (status.isFinalized) {
-                        //     location.reload();
-                        //     return;
-                        // }
-
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
@@ -416,12 +406,25 @@ export default class Preview extends HTMLElement {
                                             this.updateGrantProposal(this.project, this.project.id);
                                         }
 
-                                        location.reload();
-                                        return;
+                                        this.$finalize.disabled = true;
+                                        this.$finalize.classList.add("finalized");
+                                        this.$finalize.innerText = "Proposal Created";
+
                                     }
                                 });
                             }
                         });
+
+
+                        // removing to speed up confirmation
+                        // if (status.isInBlock) {
+                        //     this.$finalize.innerText = `Finalising....`;
+                        // }
+
+                        if (status.isFinalized) {
+                            location.reload();
+                            return;
+                        }
                     }
                 ).catch((e: any) => {
                     this.errorNotification(e);

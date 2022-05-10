@@ -14,6 +14,8 @@ import {ImbueRequest} from "../dapp";
 
 import ".//my-account";
 import MyAccount from ".//my-account";
+import NoProposal from "./no-proposal";
+import * as config from "../config";
 
 
 const template = document.createElement("template");
@@ -48,6 +50,16 @@ export default class Dashboard extends HTMLElement {
     }
 
     async route(path: string | null, request: ImbueRequest) {
+        // Are we logged in?
+        const user = await request.user;
+        if (!user) {
+            this.wrapAuthentication(() => {
+                location.reload()
+            });
+
+            return;
+        }
+
         if (!path) {
             await getPage<MyAccount>(this.$pages, "my-account").init(request);
             this.$pages.select("my-account");
@@ -64,6 +76,25 @@ export default class Dashboard extends HTMLElement {
             default:
                 this.dispatchEvent(utils.badRouteEvent("not-found"));
         }
+    }
+
+    wrapAuthentication(action: CallableFunction) {
+        const callback = (state: any) => {
+            console.log(state);
+            console.log(state.user);
+            action();
+        }
+
+        this.dispatchEvent(new CustomEvent(
+            config.event.authenticationRequired,
+            {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    callback
+                },
+            }
+        ));
     }
 }
 

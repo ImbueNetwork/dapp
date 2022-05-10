@@ -176,9 +176,15 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         );
 
         this.userProject = this.user
-            .then(user => model.fetchUserProject(user?.id))
+            .then(user => {
+                if (user?.id) {
+                    return model.fetchUserProject(user.id);
+                }
+
+                return null
+            })
             .then(resp => {
-                if (resp.ok) {
+                if (resp?.ok) {
                     return resp.json();
                 }
 

@@ -1,9 +1,9 @@
 DBDIR := "./src/db"
 
 
-all: build
+all: clean build
 
-clean: clean_build 
+clean: clean_build clean_deps
 clean_build:
 	rm -rf -- build/*.js build/*/
 clean_deps:

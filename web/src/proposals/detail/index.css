@@ -160,22 +160,13 @@ ul.project-details li {
     color: #fff;
 }
 
-
-
-#finalize.blob {
-	/* background: black; */
-	/* border-radius: 25%; */
-	/* margin: 10px; */
-	/* height: 20px; */
-	width: 32%;
-
+.blob {
 	box-shadow: 0 0 0 0 rgba(178, 255, 11, 1);
 	transform: scale(1);
 	animation: pulse 2s infinite;
 }
 
 #finalize.finalized {
-    width: 32%;
     background-color: var(--theme-primary);
     color: black;
     font-weight: bolder;

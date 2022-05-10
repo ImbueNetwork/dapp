@@ -325,9 +325,7 @@ export default class Preview extends HTMLElement {
                 if (!this.project) {
                     return;
                 }
-                this.$finalize.disabled = true;
-                this.$finalize.classList.add("blob");
-                this.$finalize.innerText = "Saving.....";
+
                 const extrinsic = api?.tx.imbueProposals.createProject(
                     this.project.name,
                     this.project.logo,
@@ -376,10 +374,29 @@ export default class Preview extends HTMLElement {
                 const account = state?.account as
                     InjectedAccountWithMeta;
                 const injector = await web3FromSource(account.meta.source);
+
                 const txHash = await extrinsic.signAndSend(
                     account.address,
                     {signer: injector.signer},
                     ({status}) => {
+                        if (status.isBroadcast) {
+                            this.toggleEdit = false;
+                            this.toggleSave = false;
+
+                            this.$finalize.disabled = true;
+                            this.$finalize.classList.add("blob");
+                            this.$finalize.innerText = `Sending proposal (this may take a minute)...`;
+                        }
+
+                        if (status.isInBlock) {
+                            this.$finalize.innerText = `Finalising....`;
+                        }
+
+                        if (status.isFinalized) {
+                            location.reload();
+                            return;
+                        }
+
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
@@ -395,11 +412,6 @@ export default class Preview extends HTMLElement {
                                         if (createdAccountId == account.address && this.project) {
                                             this.project.chain_project_id = createdProjectId;
                                             this.updateGrantProposal(this.project, this.project.id);
-                                            this.toggleEdit = false;
-                                            this.toggleSave = false;
-                                            // this.$finalize.classList.remove("blob");
-                                            this.$finalize.classList.add("finalized");
-                                            this.$finalize.innerText = "Proposal Created";
                                         }
                                     }
                                 });

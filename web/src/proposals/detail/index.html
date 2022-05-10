@@ -10,6 +10,52 @@
 
 </div>
 
+<div class="action-buttons">
+    <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"
+          autocomplete="off" hidden="true" novalidate>
+        <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number"
+                            helper="The total amount to contribute for the project." step="1" min="1" max="1e127" required>
+            <span slot="prefix" id="project-currency" class="imbu-symbol-prefix">$IMBU</span>
+            <span slot="suffix">.00</span>
+            <span slot="floating-label">Contribution amount</span>
+        </hq-forms-textfield>
+    </form>
+
+    <button href="javascript:void(0)" class="button primary" id="contribute" hidden="true">Contribute</button>
+
+    <form id="vote-submission-form" name="vote-submission-form" method="get" class="form" hidden="true"
+          autocomplete="off" novalidate>
+        <mwc-select id="vote-select" class="input-field" label="Vote" name="vote-select" hidden="true" required>
+            <mwc-list-item twoline value="False">
+                <span>No</span>
+            </mwc-list-item>
+            <mwc-list-item twoline value="True">
+                <span>Yes</span>
+            </mwc-list-item>
+        </mwc-select>
+
+        <mwc-select id="vote-milestone-select" class="input-field" label="Milestone"
+                    name="vote-milestone-select" hidden="true" required>
+        </mwc-select>
+        </hq-forms-textfield>
+    </form>
+
+    <form id="submit-milestone-form" name="submit-milestone-form" method="get" class="form" hidden="true"
+          autocomplete="off" novalidate>
+        <mwc-select id="submit-milestone-select" class="input-field" label="Milestone"
+                    name="submit-milestone-select" hidden="true" required>
+        </mwc-select>
+        </hq-forms-textfield>
+    </form>
+
+    <h3 id="funding-round-not-yet-open" hidden="true"></h3>
+
+    <button href="javascript:void(0)" class="button primary" hidden="true" id="submit-milestone">Submit</button>
+    <button href="javascript:void(0)" class="button primary" hidden="true" id="vote">Vote</button>
+    <button href="javascript:void(0)" class="button primary" hidden="true" id="withdraw">Withdraw</button>
+</div>
+</div>
+
 <div class="tabs-menu w-tab-menu" role="tablist">
     <div class="mdc-tab-bar" role="tablist" id="tab-bar">
         <div class="mdc-tab-scroller">
@@ -66,49 +112,4 @@
     <ol id="milestones" class="tab-content mdc-deprecated-list mdc-deprecated-list--two-line">
     </ol>
 
-</div>
-
-
-<div class="action-buttons">
-    <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"
-          autocomplete="off" hidden="true" novalidate>
-        <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number"
-                            helper="The total amount to contribute for the project." step="1" min="1" max="1e127" required>
-            <span slot="prefix" id="project-currency" class="imbu-symbol-prefix">$IMBU</span>
-            <span slot="suffix">.00</span>
-            <span slot="floating-label">Contribution amount</span>
-        </hq-forms-textfield>
-    </form>
-
-    <button href="javascript:void(0)" class="button primary" id="contribute" hidden="true">Contribute</button>
-
-    <form id="vote-submission-form" name="vote-submission-form" method="get" class="form" hidden="true"
-          autocomplete="off" novalidate>
-        <mwc-select id="vote-select" class="input-field" label="Vote" name="vote-select" hidden="true" required>
-            <mwc-list-item twoline value="False">
-                <span>No</span>
-            </mwc-list-item>
-            <mwc-list-item twoline value="True">
-                <span>Yes</span>
-            </mwc-list-item>
-        </mwc-select>
-
-        <mwc-select id="vote-milestone-select" class="input-field" label="Milestone"
-                    name="vote-milestone-select" hidden="true" required>
-        </mwc-select>
-        </hq-forms-textfield>
-    </form>
-
-    <form id="submit-milestone-form" name="submit-milestone-form" method="get" class="form" hidden="true"
-          autocomplete="off" novalidate>
-        <mwc-select id="submit-milestone-select" class="input-field" label="Milestone"
-                    name="submit-milestone-select" hidden="true" required>
-        </mwc-select>
-        </hq-forms-textfield>
-    </form>
-
-    <button href="javascript:void(0)" class="button primary" hidden="true" id="submit-milestone">Submit</button>
-    <button href="javascript:void(0)" class="button primary" hidden="true" id="vote">Vote</button>
-    <button href="javascript:void(0)" class="button primary" hidden="true" id="withdraw">Withdraw</button>
-</div>
 </div>

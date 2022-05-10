@@ -47,6 +47,7 @@ export default class Detail extends HTMLElement {
     $fundsRequired: HTMLElement;
     $projectCurrency: HTMLElement;
     $projectDetailCurrency: HTMLElement;
+    $fundingRoundNotYetOpenMsg: HTMLElement;
 
     $contributionSubmissionForm: HTMLFormElement;
     $imbuContribution: HTMLElement;
@@ -120,6 +121,10 @@ export default class Detail extends HTMLElement {
 
         this.$projectDetailCurrency =
             this[CONTENT].getElementById("project-detail-currency") as
+                HTMLElement;
+
+        this.$fundingRoundNotYetOpenMsg =
+            this[CONTENT].getElementById("funding-round-not-yet-open") as
                 HTMLElement;
 
         this.$imbuContribution =
@@ -238,6 +243,16 @@ export default class Detail extends HTMLElement {
             } else if (projectOnChain.approvedForFunding && !this.userIsInitiator) {
                 this.$contributionSubmissionForm.hidden = this.openForVoting;
                 this.$contribute.hidden = this.openForVoting;
+            } else {
+                // Project not yet open for funding
+                this.$fundingRoundNotYetOpenMsg.hidden = false;
+
+                if (this.userIsInitiator) {
+                    this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review and to open your funding round."
+                }
+                else {
+                    this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
+                }
             }
 
         }

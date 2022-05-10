@@ -160,6 +160,15 @@ ul.project-details li {
     color: #fff;
 }
 
+#funding-round-not-yet-open {
+    font-weight: normal;
+}
+
+#funding-round-not-yet-open > a {
+    color: var(--theme-primary);
+}
+
+
 .blob {
 	box-shadow: 0 0 0 0 rgba(178, 255, 11, 1);
 	transform: scale(1);

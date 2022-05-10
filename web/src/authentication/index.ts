@@ -49,7 +49,7 @@ export default class Authentication extends HTMLElement {
             }
         ));
     }
-        
+
     async web3AuthWorkflow(
         event: string = "begin",
         state?: Record<string, any>

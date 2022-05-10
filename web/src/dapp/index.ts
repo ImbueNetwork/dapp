@@ -118,6 +118,16 @@ const navigationItems = (isLoggedIn: boolean, hasProposal: boolean): MenuItem[] 
         spa: true,
     });
 
+    if (isLoggedIn) {
+        menuItems.push({
+            name: "log-out",
+            label: "Log out",
+            href: "/dapp/log-out",
+            icon: "logout",
+            spa: true,
+        });
+    }
+
     return menuItems;
 }
 
@@ -376,6 +386,23 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
         this.$pages.select("loading");
 
         switch (route.data?.app) {
+            case "log-out":
+                const resp = await fetch(
+                    `/logout`,
+                    {
+                        headers: config.postAPIHeaders,
+                        method: "get"
+                    }
+                );
+
+                if (resp.ok) {
+                    location.assign("/");
+                }
+                else {
+                    this.$pages.select("server-error");
+                }
+
+                break;
             case "proposals":
                 await getPage<Proposals>(this.$pages, "proposals").route(route.tail, request);
                 this.$pages.select("proposals");

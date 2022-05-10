@@ -65,7 +65,7 @@ export default class Proposals extends HTMLElement {
 
         switch (route.data?.page) {
             case "draft":
-                if (userProject?.chain_project_id) {
+                if (userProject?.chain_project_id || userProject?.chain_project_id === 0) {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
                     return;
                 }
@@ -74,7 +74,7 @@ export default class Proposals extends HTMLElement {
                 this.$pages.select("editor");
                 break;
             case "preview":
-                if (userProject?.chain_project_id) {
+                if (userProject?.chain_project_id || userProject?.chain_project_id === 0) {
                     utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
                     return;
                 }

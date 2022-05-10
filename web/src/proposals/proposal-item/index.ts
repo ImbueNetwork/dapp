@@ -50,7 +50,7 @@ export default class Item extends HTMLElement {
 
         this.$img.src = proposal.logo;
 
-        if (proposal.chain_project_id || proposal.chain_project_id == 0) {
+        if (proposal.chain_project_id || proposal.chain_project_id === 0) {
             this.$name.innerText = proposal.name;
         }
         else
@@ -66,7 +66,7 @@ export default class Item extends HTMLElement {
     }
 
     get href() {
-        if (this.proposal.chain_project_id) {
+        if (this.proposal.chain_project_id || this.proposal.chain_project_id === 0) {
             return `${config.grantProposalsURL}/detail/${this.proposal.id}`;
         }
         else

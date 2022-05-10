@@ -18,7 +18,6 @@ ssh ec2-user@3.144.183.82 -o StrictHostKeyChecking=no "
         sudo rm -rf dapp && git clone https://github.com/ImbueNetwork/dapp/ && cd dapp; git checkout $BRANCH_NAME;
         docker-compose -f docker-compose.staging.yml down;
         docker system prune --volumes -f;
-        docker-compose -f docker-compose.staging.yml build --no-cache; 
         docker-compose -f docker-compose.staging.yml up -d;
         docker exec api make db_up;
 "

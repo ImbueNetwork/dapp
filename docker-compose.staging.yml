@@ -14,7 +14,7 @@ services:
   api:
 
     container_name: api
-    image: samelamin/dapp-api
+    image: samelamin/dapp-api:testnet
     ports:
     - "3000:3000"
     environment:
@@ -28,7 +28,7 @@ services:
   
   web:
     container_name: web
-    image: samelamin/dapp-web
+    image: samelamin/dapp-web:testnet
     ports:
     - "8081:80"
     - "8443:8443"

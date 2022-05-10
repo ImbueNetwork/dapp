@@ -388,14 +388,16 @@ export default class Preview extends HTMLElement {
                             this.$finalize.innerText = `Sending proposal (this may take a minute)...`;
                         }
 
-                        if (status.isInBlock) {
-                            this.$finalize.innerText = `Finalising....`;
-                        }
 
-                        if (status.isFinalized) {
-                            location.reload();
-                            return;
-                        }
+                        // removing to speed up confirmation
+                        // if (status.isInBlock) {
+                        //     this.$finalize.innerText = `Finalising....`;
+                        // }
+
+                        // if (status.isFinalized) {
+                        //     location.reload();
+                        //     return;
+                        // }
 
                         api?.query.system.events((events: any) => {
                             if (events) {
@@ -413,6 +415,9 @@ export default class Preview extends HTMLElement {
                                             this.project.chain_project_id = createdProjectId;
                                             this.updateGrantProposal(this.project, this.project.id);
                                         }
+
+                                        location.reload();
+                                        return;
                                     }
                                 });
                             }

@@ -64,6 +64,8 @@ export type PolkadotJsApiInfo = {
 }
 
 const template = document.createElement("template");
+
+const DEFAULT_TIMEOUT_MS = 5 * 1000;
 template.innerHTML = `
     ${materialIcons}
     <style>${styles}</style>
@@ -322,6 +324,8 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     }
 
     async initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo> {
+
+
         const provider = new WsProvider(webSockAddr);
         provider.on("error", e => {
             this.errorNotification(e);

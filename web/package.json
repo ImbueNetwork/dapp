@@ -32,7 +32,7 @@
     "@material/tab-bar": "^13.0.0",
     "@material/textfield": "^13.0.0",
     "@pojagi/hoquet": "^9.0.0-SNAPSHOT.29",
-    "@polkadot/api": "^7.1.1",
+    "@polkadot/api": "^8.3.1",
     "@polkadot/extension-dapp": "^0.42.4",
     "element-internals-polyfill": "^0.1.51",
     "marked": "^4.0.10"

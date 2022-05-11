@@ -355,7 +355,7 @@ export default class Preview extends HTMLElement {
                         composed: true,
                         detail: {
                             address: this.user?.web3Accounts.find(_ => true)?.address,
-                            callback: (account?: InjectedAccountWithMeta) => {
+                            callback: async (account?: InjectedAccountWithMeta) => {
                                 if (account) {
                                     this.finalizeWorkflow(
                                         "account-chosen",
@@ -374,6 +374,7 @@ export default class Preview extends HTMLElement {
                 const account = state?.account as
                     InjectedAccountWithMeta;
                 const injector = await web3FromSource(account.meta.source);
+                console.log(injector);
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,

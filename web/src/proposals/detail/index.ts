@@ -439,7 +439,7 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            this.errorNotification(Error(errorMessage));
+                                            // this.errorNotification(Error(errorMessage));
 
                                             this.$contribute.disabled = false;
                                             this.$contribute.classList.remove("blob");
@@ -549,7 +549,7 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            this.errorNotification(Error(errorMessage));
+                                            // this.errorNotification(Error(errorMessage));
 
                                             this.$vote.disabled = false;
                                             this.$vote.classList.remove("blob");
@@ -656,7 +656,7 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            this.errorNotification(Error(errorMessage));
+                                            // this.errorNotification(Error(errorMessage));
 
                                             this.$submitMilestone.disabled = false;
                                             this.$submitMilestone.classList.remove("blob");
@@ -764,7 +764,7 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            this.errorNotification(Error(errorMessage));
+                                            // this.errorNotification(Error(errorMessage));
 
                                             this.$withdraw.disabled = false;
                                             this.$withdraw.classList.remove("blob");

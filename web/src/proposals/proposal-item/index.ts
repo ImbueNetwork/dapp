@@ -77,11 +77,6 @@ export default class Item extends HTMLElement {
 
     connectedCallback() {
         this.shadowRoot?.appendChild(this[CONTENT]);
-
-        this.$contribute.addEventListener("click", e => {
-            e.preventDefault();
-            utils.redirect(this.href);
-        });
     }
 }
 

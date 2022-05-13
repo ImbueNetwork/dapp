@@ -370,9 +370,9 @@ export default class Detail extends HTMLElement {
         state?: Record<string, any>
     ): Promise<void> {
         const formData = new FormData(this.$contributionSubmissionForm);
-        const contribution = parseInt(
+        const contribution = BigInt(
             formData.get("imbu-contribution") as string
-        ) * 1e12;
+        ) * BigInt(1e12);
         const api = this.apiInfo?.imbue?.api;
         switch (event) {
             case "begin": {
@@ -439,11 +439,12 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            // this.errorNotification(Error(errorMessage));
+                                            this.errorNotification(Error(errorMessage));
 
                                             this.$contribute.disabled = false;
                                             this.$contribute.classList.remove("blob");
                                             this.$contribute.innerText = "Contribute";
+                                            location.reload();
                                         } catch (error) {
                                             // swallow
                                         }
@@ -549,11 +550,12 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            // this.errorNotification(Error(errorMessage));
+                                            this.errorNotification(Error(errorMessage));
 
                                             this.$vote.disabled = false;
                                             this.$vote.classList.remove("blob");
                                             this.$vote.innerText = "Vote";
+                                            location.reload();
                                         } catch (error) {
                                             // swallow
                                         }
@@ -656,11 +658,12 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            // this.errorNotification(Error(errorMessage));
+                                            this.errorNotification(Error(errorMessage));
 
                                             this.$submitMilestone.disabled = false;
                                             this.$submitMilestone.classList.remove("blob");
                                             this.$submitMilestone.innerText = "Submit";
+                                            location.reload();
                                         } catch (error) {
                                             // swallow
                                         }
@@ -764,11 +767,12 @@ export default class Detail extends HTMLElement {
                                     if (dispatchError.isModule) {
                                         try {
                                             let errorMessage = getDispatchError(dispatchError);
-                                            // this.errorNotification(Error(errorMessage));
+                                            this.errorNotification(Error(errorMessage));
 
                                             this.$withdraw.disabled = false;
                                             this.$withdraw.classList.remove("blob");
                                             this.$withdraw.innerText = "Withdraw";
+                                            location.reload();
                                         } catch (error) {
                                             // swallow
                                         }

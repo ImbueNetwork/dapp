@@ -196,9 +196,19 @@ export default class Preview extends HTMLElement {
             utils.redirect(config.dashboardUrl);
             return;
         }
+        await this.fetchProject(this.project.id.toString());
+        console.log(this.project);
 
         this.toggleSave = false;
         this.renderProject(this.project);
+    }
+
+    async fetchProject(projectId: string) {
+        const resp = await model.fetchProject(projectId);
+        if (resp.ok) {
+            this.project = await resp.json();
+            return this.project;
+        }
     }
 
     errorNotification(e: Error) {

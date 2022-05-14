@@ -326,7 +326,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     async initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo> {
 
 
-        const provider = new WsProvider(webSockAddr);
+        const provider = new WsProvider(webSockAddr,undefined,undefined,60_000);
         provider.on("error", e => {
             this.errorNotification(e);
             console.log(e);

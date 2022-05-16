@@ -291,6 +291,9 @@ export default class Detail extends HTMLElement {
                         this.openForVoting = projectInVotingRound;
                         this.$voteSubmissionForm.hidden = !this.openForVoting
                         this.$vote.hidden = !this.openForVoting;
+                    } else {
+                        this.$fundingRoundNotYetOpenMsg.hidden = false;
+                        this.$fundingRoundNotYetOpenMsg.innerText = "Awaiting milestone submission";
                     }
                 } else if (!this.userIsInitiator && projectInContributionRound) {
                     this.$contributionSubmissionForm.hidden = this.openForVoting;
@@ -298,8 +301,9 @@ export default class Detail extends HTMLElement {
                 } else {
                     // Project not yet open for funding
                     this.$fundingRoundNotYetOpenMsg.hidden = false;
-
-                    if (this.userIsInitiator) {
+                    if (projectOnChain.approvedForFunding && !projectInContributionRound) {
+                        this.$fundingRoundNotYetOpenMsg.innerHTML = "Awaiting funding approval. Funding round not complete or approved. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review."
+                    } else if (this.userIsInitiator) {
                         if (projectInContributionRound) {
                             this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully and added to the funding round. Contributors can now fund your project."
                         } else {

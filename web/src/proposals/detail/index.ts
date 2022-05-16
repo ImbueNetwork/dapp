@@ -197,7 +197,7 @@ export default class Detail extends HTMLElement {
          */
         // await this.fetchProject(projectId);
         await this.fetchProject(projectId).then(project => {
-            if (this.project) {
+            if (project) {
                 this.renderProject(project);
             } else {
                 /**
@@ -212,51 +212,7 @@ export default class Detail extends HTMLElement {
         this.apiInfo = await request.apiInfo;
         this.user = await request.user;
 
-        const projectOnChain: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
-        if (projectOnChain) {
-            if (this.user) {
-                this.user?.web3Accounts.forEach(web3Account => {
-                    if (web3Account.address == projectOnChain.initiator) {
-                        this.userIsInitiator = true;
-                    }
-                });
-            }
-
-            projectOnChain.milestones.forEach((milestone: any) => {
-                this.$voteMilestoneSelect.appendChild(this.milestoneFragment(milestone));
-                this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
-            });
-
-            //TODO Check if project is in the scheduled round for contribution
-            // this.openForContributions = projectIsInFundingRound;
-            if (projectOnChain.fundingThresholdMet) {
-                // Initators cannot contribute to their own project
-                if (this.userIsInitiator) {
-                    this.$submitMilestoneForm.hidden = !this.userIsInitiator
-                    this.$submitMilestone.hidden = !this.userIsInitiator
-                    this.$withdraw.hidden = !this.userIsInitiator
-
-                } else {
-                    this.openForVoting = projectOnChain.approvedForFunding;
-                    this.$voteSubmissionForm.hidden = !this.openForVoting
-                    this.$vote.hidden = !this.openForVoting;
-                }
-            } else if (projectOnChain.approvedForFunding && !this.userIsInitiator) {
-                this.$contributionSubmissionForm.hidden = this.openForVoting;
-                this.$contribute.hidden = this.openForVoting;
-            } else {
-                // Project not yet open for funding
-                this.$fundingRoundNotYetOpenMsg.hidden = false;
-
-                if (this.userIsInitiator) {
-                    this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review and to open your funding round."
-                }
-                else {
-                    this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
-                }
-            }
-
-        }
+        await this.handleButtonStates();
     }
 
     milestoneFragment(milestone: any) {
@@ -271,6 +227,92 @@ export default class Detail extends HTMLElement {
         `);
     }
 
+    async handleButtonStates() {
+
+        if (this.apiInfo) {
+            const projectOnChain: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+
+            if (projectOnChain) {
+
+
+                let projectInContributionRound = false;
+                let projectInVotingRound = false;
+
+
+                const lastHeader = await this.apiInfo?.imbue?.api.rpc.chain.getHeader();
+                const currentBlockNumber = lastHeader.number.toBigInt();
+
+
+                const rounds: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.rounds.entries());
+                const roundsLength = Object.keys(rounds).length;
+
+
+                if (this.user) {
+                    this.user?.web3Accounts.forEach(web3Account => {
+                        if (web3Account.address == projectOnChain.initiator) {
+                            this.userIsInitiator = true;
+                        }
+                    });
+                }
+
+                projectOnChain.milestones.forEach((milestone: any) => {
+                    this.$voteMilestoneSelect.appendChild(this.milestoneFragment(milestone));
+                    this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
+                });
+
+                //TODO Check if project is in the scheduled round for contribution
+                for (var i = roundsLength - 1; i >= 0; i--) {
+                    const [id, round] = rounds[i];
+                    const readableRound = round.toHuman();
+                    const roundStart = BigInt(readableRound.start.replace(",", ""));
+                    const roundEnd = BigInt(readableRound.end.replace(",", ""));
+                    const ProjectExistsInRound = readableRound.projectKeys.includes(projectOnChain.milestones[0].projectKey)
+
+                    if (roundStart < currentBlockNumber && roundEnd > currentBlockNumber && ProjectExistsInRound) {
+                        if (projectOnChain.approvedForFunding && readableRound.roundType == model.RoundType[model.RoundType.ContributionRound]) {
+                            projectInContributionRound = true;
+                            break;
+                        } else if (projectOnChain.fundingThresholdMet && readableRound.roundType == model.RoundType[model.RoundType.VotingRound]) {
+                            projectInVotingRound = true;
+                            break;
+                        }
+                    }
+                }
+
+
+                // this.openForContributions = projectIsInFundingRound;
+                if (projectOnChain.fundingThresholdMet) {
+                    // Initators cannot contribute to their own project
+                    if (this.userIsInitiator) {
+                        this.$submitMilestoneForm.hidden = !this.userIsInitiator
+                        this.$submitMilestone.hidden = !this.userIsInitiator
+                        this.$withdraw.hidden = !this.userIsInitiator
+                    } else if (projectInVotingRound) {
+                        this.openForVoting = projectInVotingRound;
+                        this.$voteSubmissionForm.hidden = !this.openForVoting
+                        this.$vote.hidden = !this.openForVoting;
+                    }
+                } else if (!this.userIsInitiator && projectInContributionRound) {
+                    this.$contributionSubmissionForm.hidden = this.openForVoting;
+                    this.$contribute.hidden = this.openForVoting;
+                } else {
+                    // Project not yet open for funding
+                    this.$fundingRoundNotYetOpenMsg.hidden = false;
+
+                    if (this.userIsInitiator) {
+                        if (projectInContributionRound) {
+                            this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully and added to the funding round. Contributors can now fund your project."
+                        } else {
+                            this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review and to open your funding round."
+                        }
+                    } else {
+                        this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
+                    }
+                }
+            }
+        }
+    }
+
     async fetchProject(projectId: string) {
         if (this.project) {
             return this.project;
@@ -283,6 +325,8 @@ export default class Detail extends HTMLElement {
     }
 
     bind() {
+
+
         this.shadowRoot?.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
             const $container = this.$tabContentContainer;

@@ -1,23 +1,23 @@
-import {marked} from "marked";
+import { marked } from "marked";
 import "@pojagi/hoquet/lib/dialog/dialog";
 import authDialogContent from "../../dapp/auth-dialog-content.html";
-import {MDCTabBar} from "@material/tab-bar";
-import type {SubmittableExtrinsic} from "@polkadot/api/types";
-import type {ISubmittableResult, ITuple,} from "@polkadot/types/types";
-import type {DispatchError} from '@polkadot/types/interfaces';
+import { MDCTabBar } from "@material/tab-bar";
+import type { SubmittableExtrinsic } from "@polkadot/api/types";
+import type { ISubmittableResult, ITuple, } from "@polkadot/types/types";
+import type { DispatchError } from '@polkadot/types/interfaces';
 
-import {web3FromSource} from "@polkadot/extension-dapp";
+import { web3FromSource } from "@polkadot/extension-dapp";
 import materialComponentsLink from "/material-components-link.html";
 import materialIconsLink from "/material-icons-link.html";
 import templateSrc from "./index.html";
 import styles from "./index.css";
 import * as model from "../../model";
-import {DraftProposal, Proposal, User} from "../../model";
-import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
-import {getDispatchError} from "../../utils/polkadot";
+import { DraftProposal, Proposal, User } from "../../model";
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import { getDispatchError } from "../../utils/polkadot";
 import * as config from "../../config";
 import * as utils from "../../utils";
-import type {ImbueApiInfo, ImbueRequest} from "../../dapp";
+import type { ImbueApiInfo, ImbueRequest } from "../../dapp";
 
 const CONTENT = Symbol();
 
@@ -68,100 +68,100 @@ export default class Detail extends HTMLElement {
     constructor() {
         super();
 
-        this.attachShadow({mode: "open"});
+        this.attachShadow({ mode: "open" });
 
         this.openForVoting = false;
         this.userIsInitiator = false;
 
         this[CONTENT] =
             template.content.cloneNode(true) as
-                DocumentFragment;
+            DocumentFragment;
 
         this.$tabContentContainer =
             this[CONTENT].getElementById("tab-content-container") as
-                HTMLElement;
+            HTMLElement;
 
         this.$tabBar =
             this[CONTENT].getElementById("tab-bar") as
-                HTMLElement;
+            HTMLElement;
 
         this.tabBar = new MDCTabBar(this.$tabBar);
 
 
         this.$projectName =
             this[CONTENT].getElementById("project-name") as
-                HTMLElement;
+            HTMLElement;
 
         this.$projectWebsite =
             this[CONTENT].getElementById("project-website") as
-                HTMLElement;
+            HTMLElement;
 
         this.$projectDescription =
             this[CONTENT].getElementById("project-description") as
-                HTMLElement;
+            HTMLElement;
         this.$projectLogo =
             this[CONTENT].getElementById("project-logo") as
-                HTMLImageElement;
+            HTMLImageElement;
 
         this.$milestones =
             this[CONTENT].getElementById("milestones") as
-                HTMLOListElement;
+            HTMLOListElement;
 
         this.$fundsRequired =
             this[CONTENT].getElementById("funds-required") as
-                HTMLElement;
+            HTMLElement;
 
         this.$contributionSubmissionForm =
             this[CONTENT].getElementById("contribution-submission-form") as
-                HTMLFormElement;
+            HTMLFormElement;
 
         this.$projectCurrency =
             this[CONTENT].getElementById("project-currency") as
-                HTMLElement;
+            HTMLElement;
 
         this.$projectDetailCurrency =
             this[CONTENT].getElementById("project-detail-currency") as
-                HTMLElement;
+            HTMLElement;
 
         this.$fundingRoundNotYetOpenMsg =
             this[CONTENT].getElementById("funding-round-not-yet-open") as
-                HTMLElement;
+            HTMLElement;
 
         this.$imbuContribution =
             this[CONTENT].getElementById("imbu-contribution") as
-                HTMLElement;
+            HTMLElement;
 
         this.$contribute =
             this[CONTENT].getElementById("contribute") as
-                HTMLButtonElement;
+            HTMLButtonElement;
 
         this.$voteSubmissionForm =
             this[CONTENT].getElementById("vote-submission-form") as
-                HTMLFormElement;
+            HTMLFormElement;
 
         this.$voteMilestoneSelect =
             this[CONTENT].getElementById("vote-milestone-select") as
-                HTMLSelectElement;
+            HTMLSelectElement;
 
         this.$vote =
             this[CONTENT].getElementById("vote") as
-                HTMLButtonElement;
+            HTMLButtonElement;
 
         this.$submitMilestoneForm =
             this[CONTENT].getElementById("submit-milestone-form") as
-                HTMLFormElement;
+            HTMLFormElement;
 
         this.$submitMilestoneSelect =
             this[CONTENT].getElementById("submit-milestone-select") as
-                HTMLSelectElement;
+            HTMLSelectElement;
 
         this.$submitMilestone =
             this[CONTENT].getElementById("submit-milestone") as
-                HTMLButtonElement;
+            HTMLButtonElement;
 
         this.$withdraw =
             this[CONTENT].getElementById("withdraw") as
-                HTMLButtonElement;
+            HTMLButtonElement;
     }
 
     get projectId(): string | null {
@@ -190,13 +190,12 @@ export default class Detail extends HTMLElement {
             return;
         }
 
-        this.apiInfo = await request.apiInfo;
-        this.user = await request.user;
 
         /**
          * We await this here because if there's no draft, we don't want to
          * bother with any other confusing and/or expensive tasks.
          */
+        // await this.fetchProject(projectId);
         await this.fetchProject(projectId).then(project => {
             if (project) {
                 this.renderProject(project);
@@ -210,52 +209,10 @@ export default class Detail extends HTMLElement {
             }
         });
 
-        const projectOnChain: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+        this.apiInfo = await request.apiInfo;
+        this.user = await request.user;
 
-        if (projectOnChain) {
-            if (this.user) {
-                this.user?.web3Accounts.forEach(web3Account => {
-                    if (web3Account.address == projectOnChain.initiator) {
-                        this.userIsInitiator = true;
-                    }
-                });
-            }
-
-            projectOnChain.milestones.forEach((milestone: any) => {
-                this.$voteMilestoneSelect.appendChild(this.milestoneFragment(milestone));
-                this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
-            });
-
-            //TODO Check if project is in the scheduled round for contribution
-            // this.openForContributions = projectIsInFundingRound;
-            if (projectOnChain.fundingThresholdMet) {
-                // Initators cannot contribute to their own project
-                if (this.userIsInitiator) {
-                    this.$submitMilestoneForm.hidden = !this.userIsInitiator
-                    this.$submitMilestone.hidden = !this.userIsInitiator
-                    this.$withdraw.hidden = !this.userIsInitiator
-
-                } else {
-                    this.openForVoting = projectOnChain.approvedForFunding;
-                    this.$voteSubmissionForm.hidden = !this.openForVoting
-                    this.$vote.hidden = !this.openForVoting;
-                }
-            } else if (projectOnChain.approvedForFunding && !this.userIsInitiator) {
-                this.$contributionSubmissionForm.hidden = this.openForVoting;
-                this.$contribute.hidden = this.openForVoting;
-            } else {
-                // Project not yet open for funding
-                this.$fundingRoundNotYetOpenMsg.hidden = false;
-
-                if (this.userIsInitiator) {
-                    this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review and to open your funding round."
-                }
-                else {
-                    this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
-                }
-            }
-
-        }
+        await this.handleButtonStates();
     }
 
     milestoneFragment(milestone: any) {
@@ -265,9 +222,99 @@ export default class Detail extends HTMLElement {
              value="${milestone.milestoneKey}">
                 <span>${milestone.name}</span>
                 <span class="select-source" slot="secondary">${milestone.percentageToUnlock
-        }%</span>
+            }%</span>
             </mwc-list-item>
         `);
+    }
+
+    async handleButtonStates() {
+
+        if (this.apiInfo) {
+            const projectOnChain: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.projects(this.project?.chain_project_id)).toHuman();
+
+            if (projectOnChain) {
+
+
+                let projectInContributionRound = false;
+                let projectInVotingRound = false;
+
+
+                const lastHeader = await this.apiInfo?.imbue?.api.rpc.chain.getHeader();
+                const currentBlockNumber = lastHeader.number.toBigInt();
+
+
+                const rounds: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.rounds.entries());
+                const roundsLength = Object.keys(rounds).length;
+
+
+                if (this.user) {
+                    this.user?.web3Accounts.forEach(web3Account => {
+                        if (web3Account.address == projectOnChain.initiator) {
+                            this.userIsInitiator = true;
+                        }
+                    });
+                }
+
+                projectOnChain.milestones.forEach((milestone: any) => {
+                    this.$voteMilestoneSelect.appendChild(this.milestoneFragment(milestone));
+                    this.$submitMilestoneSelect.appendChild(this.milestoneFragment(milestone));
+                });
+
+                //TODO Check if project is in the scheduled round for contribution
+                for (var i = roundsLength - 1; i >= 0; i--) {
+                    const [id, round] = rounds[i];
+                    const readableRound = round.toHuman();
+                    const roundStart = BigInt(readableRound.start.replace(",", ""));
+                    const roundEnd = BigInt(readableRound.end.replace(",", ""));
+                    const ProjectExistsInRound = readableRound.projectKeys.includes(projectOnChain.milestones[0].projectKey)
+
+                    if (roundStart < currentBlockNumber && roundEnd > currentBlockNumber && ProjectExistsInRound) {
+                        if (projectOnChain.approvedForFunding && readableRound.roundType == model.RoundType[model.RoundType.ContributionRound]) {
+                            projectInContributionRound = true;
+                            break;
+                        } else if (projectOnChain.fundingThresholdMet && readableRound.roundType == model.RoundType[model.RoundType.VotingRound]) {
+                            projectInVotingRound = true;
+                            break;
+                        }
+                    }
+                }
+
+
+                // this.openForContributions = projectIsInFundingRound;
+                if (projectOnChain.fundingThresholdMet) {
+                    // Initators cannot contribute to their own project
+                    if (this.userIsInitiator) {
+                        this.$submitMilestoneForm.hidden = !this.userIsInitiator
+                        this.$submitMilestone.hidden = !this.userIsInitiator
+                        this.$withdraw.hidden = !this.userIsInitiator
+                    } else if (projectInVotingRound) {
+                        this.openForVoting = projectInVotingRound;
+                        this.$voteSubmissionForm.hidden = !this.openForVoting
+                        this.$vote.hidden = !this.openForVoting;
+                    } else {
+                        this.$fundingRoundNotYetOpenMsg.hidden = false;
+                        this.$fundingRoundNotYetOpenMsg.innerText = "Awaiting milestone submission";
+                    }
+                } else if (!this.userIsInitiator && projectInContributionRound) {
+                    this.$contributionSubmissionForm.hidden = this.openForVoting;
+                    this.$contribute.hidden = this.openForVoting;
+                } else {
+                    // Project not yet open for funding
+                    this.$fundingRoundNotYetOpenMsg.hidden = false;
+                    if (projectOnChain.approvedForFunding && !projectInContributionRound) {
+                        this.$fundingRoundNotYetOpenMsg.innerHTML = "Awaiting funding approval. Funding round not complete or approved. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review."
+                    } else if (this.userIsInitiator) {
+                        if (projectInContributionRound) {
+                            this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully and added to the funding round. Contributors can now fund your project."
+                        } else {
+                            this.$fundingRoundNotYetOpenMsg.innerHTML = "Your proposal has been created successfully. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review and to open your funding round."
+                        }
+                    } else {
+                        this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
+                    }
+                }
+            }
+        }
     }
 
     async fetchProject(projectId: string) {
@@ -282,6 +329,8 @@ export default class Detail extends HTMLElement {
     }
 
     bind() {
+
+
         this.shadowRoot?.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
             const $container = this.$tabContentContainer;
@@ -320,7 +369,7 @@ export default class Detail extends HTMLElement {
         });
     }
 
-    renderProject(draft: DraftProposal | Proposal) {
+    async renderProject(draft: DraftProposal | Proposal) {
         if (!draft) {
             throw new Error(
                 "Attempt to render nonexistent draft."
@@ -336,7 +385,7 @@ export default class Detail extends HTMLElement {
         this.$projectName.innerText = draft.name;
         this.$projectWebsite.innerHTML = `
             <a href="${draft.website}" target="_blank">${draft.website
-        }</a>
+            }</a>
         `;
         this.$projectDescription.innerHTML = marked.parse(draft.description);
         this.$projectLogo.setAttribute("srcset", draft.logo);
@@ -354,7 +403,7 @@ export default class Detail extends HTMLElement {
                         </span>
                         <span class="mdc-deprecated-list-item__text">
                             <span class="mdc-deprecated-list-item__primary-text">${milestone.name
-                }</span>
+                    }</span>
                             <span class="mdc-deprecated-list-item__secondary-text"><!--
                             -->${milestone.percentage_to_unlock}%
                             </span>
@@ -391,7 +440,7 @@ export default class Detail extends HTMLElement {
 
                 return this.contribute(
                     "extrinsic-created",
-                    {...state, extrinsic},
+                    { ...state, extrinsic },
                 );
             }
             case "extrinsic-created": {
@@ -406,7 +455,7 @@ export default class Detail extends HTMLElement {
                                 if (account) {
                                     this.contribute(
                                         "account-chosen",
-                                        {...state, account},
+                                        { ...state, account },
                                     );
                                 }
                             }
@@ -425,15 +474,15 @@ export default class Detail extends HTMLElement {
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,
-                    {signer: injector.signer},
-                    ({status}) => {
+                    { signer: injector.signer },
+                    ({ status }) => {
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
                                 events.forEach((record: any) => {
 
                                     // Extract the phase, event and the event types
-                                    const {event, phase} = record;
+                                    const { event, phase } = record;
                                     const contributionSucceeded = `${event.section}:${event.method}` == "imbueProposals:ContributeSucceeded";
                                     const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
                                     if (dispatchError.isModule) {
@@ -503,7 +552,7 @@ export default class Detail extends HTMLElement {
 
                 return this.vote(
                     "extrinsic-created",
-                    {...state, extrinsic},
+                    { ...state, extrinsic },
                 );
             }
             case "extrinsic-created": {
@@ -518,7 +567,7 @@ export default class Detail extends HTMLElement {
                                 if (account) {
                                     this.vote(
                                         "account-chosen",
-                                        {...state, account},
+                                        { ...state, account },
                                     );
                                 }
                             }
@@ -536,15 +585,15 @@ export default class Detail extends HTMLElement {
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,
-                    {signer: injector.signer},
-                    ({status}) => {
+                    { signer: injector.signer },
+                    ({ status }) => {
 
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
                                 events.forEach((record: any) => {
                                     // Extract the phase, event and the event types
-                                    const {event, phase} = record;
+                                    const { event, phase } = record;
                                     const voteSucceeded = `${event.section}:${event.method}` == "imbueProposals:VoteComplete";
                                     const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
                                     if (dispatchError.isModule) {
@@ -611,7 +660,7 @@ export default class Detail extends HTMLElement {
 
                 return this.submitMilestone(
                     "extrinsic-created",
-                    {...state, extrinsic},
+                    { ...state, extrinsic },
                 );
             }
             case "extrinsic-created": {
@@ -626,7 +675,7 @@ export default class Detail extends HTMLElement {
                                 if (account) {
                                     this.submitMilestone(
                                         "account-chosen",
-                                        {...state, account},
+                                        { ...state, account },
                                     );
                                 }
                             }
@@ -644,15 +693,15 @@ export default class Detail extends HTMLElement {
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,
-                    {signer: injector.signer},
-                    ({status}) => {
+                    { signer: injector.signer },
+                    ({ status }) => {
 
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
                                 events.forEach((record: any) => {
                                     // Extract the phase, event and the event types
-                                    const {event, phase} = record;
+                                    const { event, phase } = record;
                                     const milestoneSubmitted = `${event.section}:${event.method}` == "imbueProposals:MilestoneSubmitted";
                                     const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
                                     if (dispatchError.isModule) {
@@ -720,7 +769,7 @@ export default class Detail extends HTMLElement {
 
                 return this.withdraw(
                     "extrinsic-created",
-                    {...state, extrinsic},
+                    { ...state, extrinsic },
                 );
             }
             case "extrinsic-created": {
@@ -735,7 +784,7 @@ export default class Detail extends HTMLElement {
                                 if (account) {
                                     this.withdraw(
                                         "account-chosen",
-                                        {...state, account},
+                                        { ...state, account },
                                     );
                                 }
                             }
@@ -753,15 +802,15 @@ export default class Detail extends HTMLElement {
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,
-                    {signer: injector.signer},
-                    ({status}) => {
+                    { signer: injector.signer },
+                    ({ status }) => {
 
                         api?.query.system.events((events: any) => {
                             if (events) {
                                 // Loop through the Vec<EventRecord>
                                 events.forEach((record: any) => {
                                     // Extract the phase, event and the event types
-                                    const {event, phase} = record;
+                                    const { event, phase } = record;
                                     const withdrawSuccessful = `${event.section}:${event.method}` == "imbueProposals:ProjectFundsWithdrawn";
                                     const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
                                     if (dispatchError.isModule) {

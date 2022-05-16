@@ -83,8 +83,8 @@ export default class Proposals extends HTMLElement {
                 this.$pages.select("preview");
                 break;
             case "detail":
-                await getPage<Detail>(this.$pages, "detail").init(request);
                 this.$pages.select("detail");
+                (this.$pages.selected as Detail).init(request);
                 break;
             default:
                 this.dispatchEvent(utils.badRouteEvent("not-found"));

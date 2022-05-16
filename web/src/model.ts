@@ -7,6 +7,10 @@ export enum Currency {
     KUSD
 }
 
+export enum RoundType {
+    ContributionRound,
+    VotingRound,
+}
 
 /**
  * Models the milestone data that appears in the /proposals/draft form

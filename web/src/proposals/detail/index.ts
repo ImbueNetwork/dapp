@@ -284,12 +284,12 @@ export default class Detail extends HTMLElement {
                 if (projectOnChain.fundingThresholdMet) {
                     // Initators cannot contribute to their own project
                     if (this.userIsInitiator) {
+                        this.$submitMilestoneForm.hidden = !this.userIsInitiator
                         this.$withdraw.hidden = !this.userIsInitiator
                         if (projectInVotingRound) {
                             this.$fundingRoundNotYetOpenMsg.hidden = false;
                             this.$fundingRoundNotYetOpenMsg.innerHTML = "Awaiting milestone approval. Milestone voting round not complete or approved. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review."
                         } else {
-                            this.$submitMilestoneForm.hidden = !this.userIsInitiator
                             this.$submitMilestone.hidden = !this.userIsInitiator
                         }
                     } else if (projectInVotingRound) {

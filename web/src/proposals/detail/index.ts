@@ -234,18 +234,13 @@ export default class Detail extends HTMLElement {
 
             if (projectOnChain) {
 
-
                 let projectInContributionRound = false;
                 let projectInVotingRound = false;
-
 
                 const lastHeader = await this.apiInfo?.imbue?.api.rpc.chain.getHeader();
                 const currentBlockNumber = lastHeader.number.toBigInt();
 
-
                 const rounds: any = await (await this.apiInfo?.imbue?.api.query.imbueProposals.rounds.entries());
-                const roundsLength = Object.keys(rounds).length;
-
 
                 if (this.user) {
                     this.user?.web3Accounts.forEach(web3Account => {
@@ -261,11 +256,11 @@ export default class Detail extends HTMLElement {
                 });
 
                 //TODO Check if project is in the scheduled round for contribution
-                for (var i = roundsLength - 1; i >= 0; i--) {
+                for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
                     const [id, round] = rounds[i];
                     const readableRound = round.toHuman();
-                    const roundStart = BigInt(readableRound.start.replace(",", ""));
-                    const roundEnd = BigInt(readableRound.end.replace(",", ""));
+                    const roundStart = BigInt(readableRound.start.replaceAll(",", ""));
+                    const roundEnd = BigInt(readableRound.end.replaceAll(",", ""));
                     const ProjectExistsInRound = readableRound.projectKeys.includes(projectOnChain.milestones[0].projectKey)
 
                     if (roundStart < currentBlockNumber && roundEnd > currentBlockNumber && ProjectExistsInRound) {
@@ -318,6 +313,15 @@ export default class Detail extends HTMLElement {
                         this.$fundingRoundNotYetOpenMsg.innerText = "Funding for this project is not yet open. Check back soon for more updates!"
                     }
                 }
+
+                for (var i = Object.keys(projectOnChain.contributions).length - 1; i >= 0; i--) {
+                    this.user?.web3Accounts.forEach(web3Account => {
+                        if (web3Account.address == projectOnChain.contributions[i].accountId && this.project) {
+                            const contributionValue = BigInt(projectOnChain.contributions[i].value.replaceAll(",", "")) / BigInt(1e12);
+                            this.$fundingRoundNotYetOpenMsg.innerText = this.$fundingRoundNotYetOpenMsg.innerText + `\n\n Your Contributions: $${model.Currency[this.project.currency_id]} ${contributionValue}`
+                        }
+                    });
+                };
             }
         }
     }

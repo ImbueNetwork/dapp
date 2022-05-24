@@ -339,7 +339,6 @@ export default class Detail extends HTMLElement {
 
     bind() {
 
-
         this.shadowRoot?.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
             const $container = this.$tabContentContainer;
@@ -402,9 +401,10 @@ export default class Detail extends HTMLElement {
         this.$projectCurrency.innerText = "$" + model.Currency[draft.currency_id as any];
         this.$projectDetailCurrency.innerText = this.$projectCurrency.innerText;
         this.$milestones.querySelectorAll('*').forEach(n => n.remove());
-        draft.milestones.forEach(milestone => {
+        draft.milestones.forEach((milestone,index) => {
             this.$milestones.appendChild(
                 document.createRange().createContextualFragment(`
+                    <h1>Milestone ${index+1} </h1>
                     <li class="mdc-deprecated-list-item" tabindex="0">
                         <span class="mdc-deprecated-list-item__ripple"></span>
                         <span class="mdc-deprecated-list-item__graphic">

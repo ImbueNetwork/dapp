@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const projects_1 = __importDefault(require("./projects"));
+const contributions_1 = __importDefault(require("./contributions"));
 const users_1 = __importDefault(require("./users"));
 const config_1 = __importDefault(require("../../../config"));
 const router = express_1.default.Router();
@@ -24,4 +25,5 @@ router.get("/info", (req, res) => {
 });
 router.use("/projects", projects_1.default);
 router.use("/users", users_1.default);
+router.use("/contributions", contributions_1.default);
 exports.default = router;

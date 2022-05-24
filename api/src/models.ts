@@ -60,6 +60,13 @@ export type Project = {
     user_id?: string | number;
 };
 
+export type Contribution = {
+    id?: number,
+    project_id: string,
+    address: string,
+    amount: number
+};
+
 export type ProjectProperties = {
     id?: string | number;
     faq: string;
@@ -130,6 +137,11 @@ export const insertProject = (project: Project) =>
         await tx<Project>("projects").insert(project).returning("*")
     )[0];
 
+export const insertContribution = (contribution: Contribution) =>
+async (tx: Knex.Transaction) => (
+    await tx<Contribution>("contributions").insert(contribution).returning("*")
+)[0];    
+
 export const updateProject = (id: string | number, project: Project) =>
     async (tx: Knex.Transaction) => (
         await tx<Project>("projects")
@@ -149,6 +161,10 @@ export const updateProjectProperties = (id: string | number, properties: Project
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select().where({ id }).first();
+
+export const fetchContributions = (address: string) =>
+(tx: Knex.Transaction) =>
+    tx<Contribution>("contributions").select().where({ address });        
 
 
 export const fetchProjectWithProperties = (id: string | number) =>

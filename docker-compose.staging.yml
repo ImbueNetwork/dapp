@@ -14,7 +14,7 @@ services:
   api:
 
     container_name: api
-    image: samelamin/dapp-api:testnet
+    image: samelamin/dapp-api:rococo
     ports:
     - "3000:3000"
     environment:
@@ -23,12 +23,12 @@ services:
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
-      IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
-      RELAY_CHAIN_WEBSOCK_ADDR: wss://testvalidator.imbue.network
+      IMBUE_NETWORK_WEBSOCK_ADDR: wss://rococo.imbue.network
+      RELAY_CHAIN_WEBSOCK_ADDR: wss://rococo-rpc.polkadot.io
   
   web:
     container_name: web
-    image: samelamin/dapp-web:testnet
+    image: samelamin/dapp-web:rococo
     ports:
     - "8081:80"
     - "8443:8443"

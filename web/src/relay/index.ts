@@ -70,7 +70,7 @@ export default class Relay extends HTMLElement {
                         detail: {
                             callback: async (account?: InjectedAccountWithMeta) => {
                                 if (account) {
-                                    const dest = {V0: {X1: {Parachain: 2102}}};
+                                    const dest = {V0: {X1: {Parachain: 3017}}};
 
                                     const beneficiary = {
                                         V1: {
@@ -108,7 +108,7 @@ export default class Relay extends HTMLElement {
                                                         // Loop through the Vec<EventRecord>
                                                         events.forEach((record: any) => {
                                                             const {event, phase} = record;
-                                                            const currenciesDeposited = `${event.section}:${event.method}` == "currencies:Deposited";
+                                                            const currenciesDeposited = `${event.section}:${event.method}` == "ormlTokens:Deposited";
                                                             if (currenciesDeposited) {
                                                                 const types = event.typeDef;
                                                                 const accountId = event.data[1];

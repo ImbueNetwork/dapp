@@ -8,6 +8,8 @@ module.exports = {
     entry: {
         "material-components": "./src/material-components.ts",
         "dapp": "./src/dapp/index.ts",
+        "extend-webflow": "./src/extend-webflow/index.ts"
+
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

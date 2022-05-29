@@ -34,6 +34,9 @@ const { hexToU8a, isHex } = require('@polkadot/util');
 const router = express_1.default.Router();
 router.get("/:address", (req, res, next) => {
     const address = req.params.address;
+    if (!isValidAddressAddress(address)) {
+        throw new Error("Please enter valid address");
+    }
     db_1.default.transaction(async (tx) => {
         try {
             const contributions = await models.fetchContributions(address)(tx);
@@ -82,7 +85,7 @@ router.post("/", (req, res, next) => {
 });
 const validateContribution = (contribution) => {
     if (!contribution) {
-        throw new Error("Missing `contribution` entry5.");
+        throw new Error("Missing `contribution` entry.");
     }
     const entries = Object.entries(contribution);
     if (entries.filter(([_, v]) => {
@@ -92,7 +95,7 @@ const validateContribution = (contribution) => {
         throw new Error(`Contribution entries can't have a value of \`undefined\`.`);
     }
 };
-const isValidAddressPolkadotAddress = (address) => {
+const isValidAddressAddress = (address) => {
     try {
         encodeAddress(isHex(address)
             ? hexToU8a(address)
@@ -103,74 +106,4 @@ const isValidAddressPolkadotAddress = (address) => {
         return false;
     }
 };
-// router.put("/:id", (req, res, next) => {
-//     if (!req.isAuthenticated()) {
-//         return res.status(401).end();
-//     }
-//     const id = req.params.id;
-//     try {
-//         validateProposal(req.body.proposal);
-//     } catch (e) {
-//         res.status(400).send(
-//             {message: (e as Error).message}
-//         );
-//     }
-//     const {
-//         name,
-//         logo,
-//         description,
-//         website,
-//         category,
-//         chain_project_id,
-//         required_funds,
-//         currency_id,
-//         owner,
-//         milestones,
-//     } = req.body.proposal as models.GrantProposal;
-//     const user_id = (req.user as any).id;
-//     db.transaction(async tx => {
-//         try {
-//             // ensure the project exists first
-//             const exists = await models.fetchProject(id)(tx);
-//             if (!exists) {
-//                 return res.status(404).end();
-//             }
-//             if (exists.user_id !== user_id) {
-//                 return res.status(403).end();
-//             }
-//             const project = await models.updateProject(id, {
-//                 name,
-//                 logo,
-//                 description,
-//                 website,
-//                 category,
-//                 chain_project_id,
-//                 required_funds,
-//                 currency_id,
-//                 owner,
-//                 // user_id,
-//             })(tx);
-//             if (!project.id) {
-//                 return next(new Error(
-//                     "Cannot update milestones: `project_id` missing."
-//                 ));
-//             }
-//             // drop then recreate
-//             await models.deleteMilestones(id)(tx);
-//             const pkg: ProjectPkg = {
-//                 ...project,
-//                 milestones: await models.insertMilestones(
-//                     milestones,
-//                     project.id,
-//                 )(tx)
-//             }
-//             res.status(200).send(pkg);
-//         } catch (cause) {
-//             next(new Error(
-//                 `Failed to update project.`,
-//                 {cause: cause as Error}
-//             ));
-//         }
-//     });
-// });
 exports.default = router;

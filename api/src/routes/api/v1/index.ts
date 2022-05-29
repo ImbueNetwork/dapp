@@ -21,6 +21,7 @@ router.get("/info", (req, res) => {
     });
 });
 
+router.use(express.json());
 router.use("/projects", projectsRouter);
 router.use("/users", usersRouter);
 router.use("/contributions", contributionsRouter);

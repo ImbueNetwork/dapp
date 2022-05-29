@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -25,6 +29,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = __importDefault(require("../../../db"));
 const models = __importStar(require("../../../models"));
+const { decodeAddress, encodeAddress } = require('@polkadot/keyring');
+const { hexToU8a, isHex } = require('@polkadot/util');
 const router = express_1.default.Router();
 router.get("/:address", (req, res, next) => {
     const address = req.params.address;
@@ -43,7 +49,7 @@ router.post("/", (req, res, next) => {
     //     res.status(401).end();
     // }
     try {
-        validateContribution(req.body.proposal);
+        validateContribution(req.body.contribution);
     }
     catch (e) {
         res.status(400).send({ message: e.message });
@@ -67,7 +73,7 @@ router.post("/", (req, res, next) => {
             //         amount
             //     )(tx)
             // }
-            res.status(201).send("success");
+            res.status(201).send(project);
         }
         catch (cause) {
             next(new Error(`Failed to insert project.`, { cause: cause }));
@@ -76,7 +82,7 @@ router.post("/", (req, res, next) => {
 });
 const validateContribution = (contribution) => {
     if (!contribution) {
-        throw new Error("Missing `contribution` entry.");
+        throw new Error("Missing `contribution` entry5.");
     }
     const entries = Object.entries(contribution);
     if (entries.filter(([_, v]) => {
@@ -84,6 +90,17 @@ const validateContribution = (contribution) => {
         return v === void 0;
     }).length) {
         throw new Error(`Contribution entries can't have a value of \`undefined\`.`);
+    }
+};
+const isValidAddressPolkadotAddress = (address) => {
+    try {
+        encodeAddress(isHex(address)
+            ? hexToU8a(address)
+            : decodeAddress(address));
+        return true;
+    }
+    catch (error) {
+        return false;
     }
 };
 // router.put("/:id", (req, res, next) => {

@@ -23,6 +23,7 @@ router.get("/info", (req, res) => {
         relayChainWebsockAddr: config_1.default.relayChainWebsockAddr
     });
 });
+router.use(express_1.default.json());
 router.use("/projects", projects_1.default);
 router.use("/users", users_1.default);
 router.use("/contributions", contributions_1.default);

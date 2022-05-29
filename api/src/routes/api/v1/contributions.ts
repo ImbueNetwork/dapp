@@ -15,7 +15,7 @@ router.get("/:address", (req, res, next) => {
         } catch (e) {
             next(new Error(
                 `Failed to fetch all contribution for the address: ${address}`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
@@ -28,10 +28,10 @@ router.post("/", (req, res, next) => {
     // }
 
     try {
-        validateContribution(req.body.proposal);
+        validateContribution(req.body.contribution);
     } catch (e) {
         res.status(400).send(
-            {message: (e as Error).message}
+            { message: (e as Error).message }
         );
     }
 
@@ -48,7 +48,7 @@ router.post("/", (req, res, next) => {
                 address,
                 amount
             })(tx);
-    
+
             if (!project.id) {
                 return next(new Error(
                     "Failed to insert contribution: `project_id` missing."
@@ -63,12 +63,12 @@ router.post("/", (req, res, next) => {
             //         amount
             //     )(tx)
             // }
-    
-            res.status(201).send("success");    
+
+            res.status(201).send(project);
         } catch (cause) {
             next(new Error(
                 `Failed to insert project.`,
-                {cause: cause as Error}
+                { cause: cause as Error }
             ));
         }
     });
@@ -77,20 +77,34 @@ router.post("/", (req, res, next) => {
 
 const validateContribution = (contribution: models.Contribution) => {
     if (!contribution) {
-        throw new Error("Missing `contribution` entry.");
+        throw new Error("Missing `contribution` entry5.");
     }
 
     const entries = Object.entries(contribution);
-    if (entries.filter(([_,v]) => {
-            // undefined not allowed
-            return v === void 0;
-        }).length
+    if (entries.filter(([_, v]) => {
+        // undefined not allowed
+        return v === void 0;
+    }).length
     ) {
         throw new Error(
             `Contribution entries can't have a value of \`undefined\`.`
         );
     }
 }
+
+const isValidAddressPolkadotAddress = (address: any) => {
+    try {
+        encodeAddress(
+            isHex(address)
+                ? hexToU8a(address)
+                : decodeAddress(address)
+        );
+
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
 
 
 // router.put("/:id", (req, res, next) => {
@@ -148,13 +162,13 @@ const validateContribution = (contribution: models.Contribution) => {
 //                 owner,
 //                 // user_id,
 //             })(tx);
-    
+
 //             if (!project.id) {
 //                 return next(new Error(
 //                     "Cannot update milestones: `project_id` missing."
 //                 ));
 //             }
-    
+
 //             // drop then recreate
 //             await models.deleteMilestones(id)(tx);
 
@@ -165,7 +179,7 @@ const validateContribution = (contribution: models.Contribution) => {
 //                     project.id,
 //                 )(tx)
 //             }
-    
+
 //             res.status(200).send(pkg);
 //         } catch (cause) {
 //             next(new Error(

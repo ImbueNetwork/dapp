@@ -9,7 +9,7 @@ BRANCH_NAME=$3
 echo 'Starting to Deploy...'
 echo 'BRANCH NAME IS ' $BRANCH_NAME
 
-ssh ec2-user@3.144.183.82 -o StrictHostKeyChecking=no " 
+ssh ec2-user@18.222.97.79 -o StrictHostKeyChecking=no " 
         set -e
         
         export GOOGLE_OAUTH2_CLIENT_ID=$GOOGLE_OAUTH2_CLIENT_ID;

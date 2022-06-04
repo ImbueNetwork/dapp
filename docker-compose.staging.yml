@@ -12,7 +12,6 @@ services:
     - "/var/log/imbue/dapp/postgres-data:/var/lib/postgresql/data"
 
   api:
-
     container_name: api
     image: samelamin/dapp-api:testnet
     ports:

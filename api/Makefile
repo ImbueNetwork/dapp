@@ -42,10 +42,13 @@ db_up: migrate seed
 
 db_down: migrate_reset
 
+cmd: db_up
+	node build/index.js
+
 start: db_up
 	yarn start
 
 .PHONY: all clean clean_build clean_deps build \
 	migrate migrate_latest migrate_up migrate_down migrate_reset \
 	seed db_up db_down \
-	start
+	cmd start

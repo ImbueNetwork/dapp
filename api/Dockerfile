@@ -9,4 +9,4 @@ COPY . .
 
 RUN make
 
-CMD ["node", "build/index.js"]
+CMD ["make", "cmd"]

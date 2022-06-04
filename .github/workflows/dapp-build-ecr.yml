@@ -1,42 +1,33 @@
 # This is a basic workflow to help you get started with Actions
 name: DAPP-BUILD-ECR
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: '?DEV or ?STAGING or ?PROD'
-        required: true
-        default: 'STAGING'
-      deployType:
-        description: 'Type of Deployment - ?BUILD or ?DEPLOY or  ?BUILD+DEPLOY'
-        required: true
-        default: 'BUILD+DEPLOY'
+  push:
+    branches:
+      - main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      majorVersion: 0
     steps:
-      - name: Check out code
+      - name: Checkout
         uses: actions/checkout@v2
-
+    
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Build, tag, and push image to Amazon ECR
-        working-directory: ./web
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: imbue-web
-          IMAGE_TAG: imbue/$RUN_NUMBER
+          ECR_REGISTRY: public.ecr.aws/d7f4c0w8
+          IMAGE_TAG: ${{ env.majorVersion }}.${{ github.run_number }}.${{ github.run_attempt }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/d7f4c0w8
+          docker build -t $ECR_REGISTRY/imbue-web:$IMAGE_TAG ./web
+          docker build -t $ECR_REGISTRY/imbue-api:$IMAGE_TAG ./api
+          docker push $ECR_REGISTRY/imbue-web:$IMAGE_TAG
+          docker push $ECR_REGISTRY/imbue-api:$IMAGE_TAG

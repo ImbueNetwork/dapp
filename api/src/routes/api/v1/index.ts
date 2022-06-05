@@ -1,16 +1,13 @@
 import express from "express";
+import passport from "passport";
 import projectsRouter from "./projects";
 import usersRouter from "./users";
 import config from "../../../config";
 
 const router = express.Router();
 
-router.get("/user", (req, res) => {
-    if (req.isAuthenticated()) {
-        res.send(req.user);
-    } else {
-        res.status(401).end();
-    }
+router.get("/user", passport.authenticate('jwt', { session: false }), (req, res) => {
+    res.send(req.user);
 });
 
 router.get("/info", (req, res) => {

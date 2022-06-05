@@ -1,8 +1,8 @@
 import express from "express";
 import {v4 as uuid} from "uuid";
 import passport from "passport";
-import {signatureVerify} from "@polkadot/util-crypto";
 
+import {signatureVerify} from "@polkadot/util-crypto";
 
 import {decodeAddress, encodeAddress} from "@polkadot/keyring";
 import {hexToU8a, isHex} from '@polkadot/util';
@@ -11,72 +11,34 @@ import {fetchUser, fetchWeb3Account, getOrCreateFederatedUser, upsertWeb3Challen
 import db from "../../../../db";
 
 
+// @ts-ignore
+import * as passportJwt from "passport-jwt"
+// @ts-ignore
+import jwt from 'jsonwebtoken';
+
+const JwtStrategy = passportJwt.Strategy;
+
 type Solution = {
     signature: string;
     address: string;
+    type: string;
 };
 
-export class Web3Strategy extends passport.Strategy {
-    name: string;
+const cookieExtractor = function(req: any) {
+    let token: any | null = null;
+    if (req && req.cookies) token = req.cookies['access_token'];
+    return token;
+};
 
-    constructor(name: string) {
-        super();
-        this.name = name;
-    }
+const jwtOptions = {
+    jwtFromRequest: cookieExtractor,
+    secretOrKey: 'mysecretword'
+};
 
-    authenticate(
-        req: express.Request<Record<string, any>>,
-        _opts?: Record<string, any>
-    ) {
-        db.transaction(async tx => {
-            try {
-                const solution: Solution = req.body;
-                const web3Account = await fetchWeb3Account(
-                    solution.address
-                )(tx);
-
-                if (!web3Account) {
-                    this.fail();
-                } else {
-                    const user = await fetchUser(web3Account.user_id)(tx);
-                    if (user?.id) {
-                        if (
-                            signatureVerify(
-                                web3Account.challenge,
-                                solution.signature,
-                                solution.address
-                            ).isValid
-                        ) {
-                            this.success(user);
-                        } else {
-                            const challenge = uuid();
-                            const [web3Account, _] = await upsertWeb3Challenge(
-                                user,
-                                req.body.address,
-                                req.body.type,
-                                challenge
-                            )(tx);
-
-                            /**
-                             * FIXME: this sets the "WWW-Authenticate" header.
-                             * Should we be running all of the auth calls
-                             * through the same endpoint and responding with
-                             * the "challenge" here, instead? Also, what form
-                             * should this actually take?
-                             */
-                            this.fail(`Imbue ${web3Account.challenge}`);
-                        }
-                    } else {
-                        this.fail();
-                    }
-                }
-            } catch (e) {
-                await tx.rollback();
-                this.error(e);
-            }
-        });
-    }
-}
+// @ts-ignore
+export const polkadotJsStrategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+    next(null, {});
+});
 
 /**
  * FIXME: move this to a more common location to be reused.
@@ -97,8 +59,6 @@ const ensureParams = (
     }
 }
 
-
-export const polkadotJsStrategy = new Web3Strategy("polkadot-js");
 export const polkadotJsAuthRouter = express.Router();
 
 polkadotJsAuthRouter.post("/", (req, res, next) => {
@@ -165,11 +125,55 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
 
 polkadotJsAuthRouter.post(
     "/callback",
-    passport.authenticate("polkadot-js"),
-    (
-        _req: express.Request,
-        res: express.Response,
-    ) => {
-        res.send({success: true});
+    (req, res, next) => {
+        db.transaction(async tx => {
+            try {
+                const solution: Solution = req.body;
+                const web3Account = await fetchWeb3Account(
+                    solution.address
+                )(tx);
+
+                if (!web3Account) {
+                    res.status(404);
+                } else {
+                    const user = await fetchUser(web3Account.user_id)(tx);
+                    if (user?.id) {
+                        if (signatureVerify(web3Account.challenge, solution.signature, solution.address).isValid) {
+                            const payload = {id: user?.id};
+                            const token = jwt.sign(payload, jwtOptions.secretOrKey);
+
+                            console.log(`sent: ${res.headersSent}`);
+                            res.cookie("access_token", token);
+                            res.send({success: true});
+                        } else {
+                            const challenge = uuid();
+                            const [web3Account, _] = await upsertWeb3Challenge(
+                                user,
+                                solution.address,
+                                solution.type,
+                                challenge
+                            )(tx);
+
+                            /**
+                             * FIXME: this sets the "WWW-Authenticate" header.
+                             * Should we be running all of the auth calls
+                             * through the same endpoint and responding with
+                             * the "challenge" here, instead? Also, what form
+                             * should this actually take?
+                             */
+                            next(`Imbue ${web3Account.challenge}`);
+                        }
+                    } else {
+                        res.status(404);
+                    }
+                }
+            } catch (e) {
+                await tx.rollback();
+                next(new Error(
+                    `Unable to finalise login`,
+                    {cause: e as Error}
+                ));
+            }
+        });
     }
 );

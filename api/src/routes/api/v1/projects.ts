@@ -1,6 +1,7 @@
 import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
+import passport from "passport";
 
 
 type ProjectPkg = models.Project & {
@@ -77,11 +78,7 @@ const validateProposal = (proposal: models.GrantProposal) => {
 }
 
 
-router.post("/", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).end();
-    }
-
+router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     try {
         validateProposal(req.body.proposal);
     } catch (e) {
@@ -141,11 +138,7 @@ router.post("/", (req, res, next) => {
 });
 
 
-router.put("/:id", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
-
+router.put("/:id", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -241,11 +234,7 @@ const validateProperties = (properties: models.ProjectProperties) => {
     }
 }
 
-router.get('/:id/properties', (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
-    
+router.get('/:id/properties', passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
 
     db.transaction(async tx => {
@@ -266,11 +255,7 @@ router.get('/:id/properties', (req, res, next) => {
     });
 });
 
-router.put("/:id/properties", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
-
+router.put("/:id/properties", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
 
     try {

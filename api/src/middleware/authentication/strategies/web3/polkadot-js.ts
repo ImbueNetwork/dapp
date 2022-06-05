@@ -1,6 +1,5 @@
 import express from "express";
 import {v4 as uuid} from "uuid";
-import passport from "passport";
 
 import {signatureVerify} from "@polkadot/util-crypto";
 
@@ -22,6 +21,7 @@ import db from "../../../../db";
 import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
+import config from "../../../../config";
 
 const JwtStrategy = passportJwt.Strategy;
 
@@ -164,8 +164,11 @@ polkadotJsAuthRouter.post(
                             const payload = {id: user?.id};
                             const token = jwt.sign(payload, jwtOptions.secretOrKey);
 
-                            console.log(`sent: ${res.headersSent}`);
-                            res.cookie("access_token", token);
+                            res.cookie("access_token", token, {
+                                secure: config.environment !== "development",
+                                httpOnly: true
+                            });
+
                             res.send({success: true});
                         } else {
                             const challenge = uuid();

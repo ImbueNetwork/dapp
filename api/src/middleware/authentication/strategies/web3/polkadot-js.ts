@@ -7,7 +7,14 @@ import {signatureVerify} from "@polkadot/util-crypto";
 import {decodeAddress, encodeAddress} from "@polkadot/keyring";
 import {hexToU8a, isHex} from '@polkadot/util';
 
-import {fetchUser, fetchWeb3Account, getOrCreateFederatedUser, upsertWeb3Challenge, User} from "../../../../models";
+import {
+    fetchUser,
+    fetchWeb3Account,
+    getOrCreateFederatedUser,
+    upsertWeb3Challenge,
+    User,
+    Web3Account
+} from "../../../../models";
 import db from "../../../../db";
 
 
@@ -36,8 +43,23 @@ const jwtOptions = {
 };
 
 // @ts-ignore
-export const polkadotJsStrategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
-    next(null, {});
+export const polkadotJsStrategy = new JwtStrategy(jwtOptions, async function(jwt_payload, next) {
+    const id = jwt_payload.id;
+
+    try {
+        const user = await db.select().from<User>("users").where({"id": Number(id)}).first();
+        if (!user) {
+            next(`No user found with id: ${id}`, false);
+        } else {
+            user.web3Accounts = await db<Web3Account>("web3_accounts").select().where({
+                user_id: user.id
+            });
+
+            return next(null, user);
+        }
+    } catch (e) {
+        return next(`Failed to deserialize user with id ${id}`, false);
+    }
 });
 
 /**

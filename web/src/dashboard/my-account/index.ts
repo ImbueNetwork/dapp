@@ -24,6 +24,7 @@ export default class MyAccount extends HTMLElement {
     private [CONTENT]: DocumentFragment;
 
     $projects: HTMLOListElement;
+    $contributions: HTMLOListElement;
 
     constructor() {
         super();
@@ -35,6 +36,9 @@ export default class MyAccount extends HTMLElement {
         this.$projects =
             this[CONTENT].getElementById("projects-list") as
                 HTMLOListElement;
+        this.$contributions =
+        this[CONTENT].getElementById("contributions-list") as
+            HTMLOListElement;
     }
 
     connectedCallback() {

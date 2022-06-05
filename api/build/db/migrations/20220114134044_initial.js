@@ -62,6 +62,14 @@ async function up(knex) {
      *      create_block_number: BlockNumber,
      *  }
      */
+    const contributionsTableName = "contributions";
+    await knex.schema.createTable(contributionsTableName, builder => {
+        builder.increments("id", { primaryKey: true });
+        builder.text("project_id");
+        builder.text("address");
+        builder.integer("amount");
+        (0, utils_1.auditFields)(knex, builder);
+    }).then((0, utils_1.onUpdateTrigger)(knex, contributionsTableName));
     const projectsTableName = "projects";
     await knex.schema.createTable(projectsTableName, (builder) => {
         builder.increments("id", { primaryKey: true });

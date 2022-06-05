@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOrCreateFederatedUser = exports.insertFederatedCredential = exports.fetchProjectMilestones = exports.deleteMilestones = exports.insertMilestones = exports.fetchUserProject = exports.fetchAllProjects = exports.fetchProjectWithProperties = exports.fetchProject = exports.updateProjectProperties = exports.updateProject = exports.insertProject = exports.insertUserByDisplayName = exports.upsertWeb3Challenge = exports.fetchUser = exports.fetchWeb3Account = void 0;
+exports.getOrCreateFederatedUser = exports.insertFederatedCredential = exports.fetchProjectMilestones = exports.deleteMilestones = exports.insertMilestones = exports.fetchUserProject = exports.fetchAllProjects = exports.fetchProjectWithProperties = exports.fetchContributions = exports.fetchProject = exports.updateProjectProperties = exports.updateProject = exports.insertContribution = exports.insertProject = exports.insertUserByDisplayName = exports.upsertWeb3Challenge = exports.fetchUser = exports.fetchWeb3Account = void 0;
 const index_1 = __importDefault(require("./db/index"));
 const fetchWeb3Account = (address) => (tx) => tx("web3_accounts")
     .select()
@@ -42,6 +42,8 @@ const insertUserByDisplayName = (displayName) => async (tx) => (await tx("users"
 exports.insertUserByDisplayName = insertUserByDisplayName;
 const insertProject = (project) => async (tx) => (await tx("projects").insert(project).returning("*"))[0];
 exports.insertProject = insertProject;
+const insertContribution = (contribution) => async (tx) => (await tx("contributions").insert(contribution).returning("*"))[0];
+exports.insertContribution = insertContribution;
 const updateProject = (id, project) => async (tx) => (await tx("projects")
     .update(project)
     .where({ id })
@@ -54,6 +56,8 @@ const updateProjectProperties = (id, properties) => async (tx) => (await tx("pro
 exports.updateProjectProperties = updateProjectProperties;
 const fetchProject = (id) => (tx) => tx("projects").select().where({ id }).first();
 exports.fetchProject = fetchProject;
+const fetchContributions = (address) => (tx) => tx("contributions").select().where({ address });
+exports.fetchContributions = fetchContributions;
 const fetchProjectWithProperties = (id) => (tx) => tx("projects").join("project_properties", "projects.id", "=", "project_properties.project_id").select().where({ "project_id": id }).first();
 exports.fetchProjectWithProperties = fetchProjectWithProperties;
 const fetchAllProjects = () => (tx) => tx("projects").whereNotNull('chain_project_id').select();

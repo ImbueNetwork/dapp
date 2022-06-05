@@ -1,5 +1,6 @@
 import express from "express";
 import projectsRouter from "./projects";
+import contributionsRouter from "./contributions";
 import usersRouter from "./users";
 import config from "../../../config";
 
@@ -20,7 +21,9 @@ router.get("/info", (req, res) => {
     });
 });
 
+router.use(express.json());
 router.use("/projects", projectsRouter);
 router.use("/users", usersRouter);
+router.use("/contributions", contributionsRouter);
 
 export default router;

@@ -25,6 +25,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = __importDefault(require("../../../db"));
 const models = __importStar(require("../../../models"));
+const passport_1 = __importDefault(require("passport"));
 /**
  * FIXME: all of this is terriblme
  */
@@ -74,10 +75,7 @@ const validateProposal = (proposal) => {
         throw new Error(`Proposal entries can't have a value of \`undefined\`.`);
     }
 };
-router.post("/", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).end();
-    }
+router.post("/", passport_1.default.authenticate('jwt', { session: false }), (req, res, next) => {
     try {
         validateProposal(req.body.proposal);
     }
@@ -112,10 +110,7 @@ router.post("/", (req, res, next) => {
         }
     });
 });
-router.put("/:id", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
+router.put("/:id", passport_1.default.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
     try {
         validateProposal(req.body.proposal);
@@ -175,10 +170,7 @@ const validateProperties = (properties) => {
         throw new Error(`Project property entries can't have a value of \`undefined\`.`);
     }
 };
-router.get('/:id/properties', (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
+router.get('/:id/properties', passport_1.default.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
     db_1.default.transaction(async (tx) => {
         try {
@@ -193,10 +185,7 @@ router.get('/:id/properties', (req, res, next) => {
         }
     });
 });
-router.put("/:id/properties", (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).end();
-    }
+router.put("/:id/properties", passport_1.default.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
     try {
         validateProperties({ ...req.body.properties, project_id: id });

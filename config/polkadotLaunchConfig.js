@@ -1,7 +1,7 @@
 const basePathBase = process.env.POLKADOT_LAUNCH_BASE_PATH_BASE || void 0;
 const relaychainExecutable = process.env.RELAYCHAIN_EXECUTABLE || "/polkadot";
 const collatorExecutable = process.env.COLLATOR_EXECUTABLE || "/imbue-collator";
-const collatorParachainId = process.env.COLLATOR_PARACHAIN_ID || "2102";
+const collatorParachainId = process.env.COLLATOR_PARACHAIN_ID || "2121";
 
 let relaychainBasePort = 30300;
 let relaychainBaseRPCPort = 9900;

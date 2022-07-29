@@ -68,7 +68,7 @@ services:
   #   environment:
   #   - RELAYCHAIN_EXECUTABLE=/polkadot
   #   - COLLATOR_EXECUTABLE=/imbue-collator
-  #   - COLLATOR_PARACHAIN_ID=2102
+  #   - COLLATOR_PARACHAIN_ID=2121
   #     #- POLKADOT_LAUNCH_BASE_PATH_BASE=/var/log/polkadot-launch-imbue
   #   volumes:
   #   # Allows you to see/control the lifespan of the logs polkadot-launch

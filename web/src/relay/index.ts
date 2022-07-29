@@ -70,7 +70,7 @@ export default class Relay extends HTMLElement {
                         detail: {
                             callback: async (account?: InjectedAccountWithMeta) => {
                                 if (account) {
-                                    const dest = {V0: {X1: {Parachain: 2102}}};
+                                    const dest = {V0: {X1: {Parachain: 2121}}};
 
                                     const beneficiary = {
                                         V1: {

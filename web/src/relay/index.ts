@@ -108,7 +108,7 @@ export default class Relay extends HTMLElement {
                                                         // Loop through the Vec<EventRecord>
                                                         events.forEach((record: any) => {
                                                             const {event, phase} = record;
-                                                            const currenciesDeposited = `${event.section}:${event.method}` == "currencies:Deposited";
+                                                            const currenciesDeposited = `${event.section}:${event.method}` == "ormlTokens:Deposited";
                                                             if (currenciesDeposited) {
                                                                 const types = event.typeDef;
                                                                 const accountId = event.data[1];

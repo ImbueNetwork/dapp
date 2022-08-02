@@ -9,32 +9,32 @@
     "start": "NODE_ENV=development webpack watch --mode development"
   },
   "devDependencies": {
-    "@types/marked": "^4.0.1",
-    "css-loader": "^6.5.1",
-    "html-loader": "^3.0.1",
-    "serve": "^13.0.2",
+    "@types/marked": "^4.0.3",
+    "css-loader": "^6.7.1",
+    "html-loader": "^4.1.0",
+    "serve": "^14.0.1",
     "style-loader": "^3.3.1",
-    "ts-loader": "^9.2.6",
+    "ts-loader": "^9.3.1",
     "tslint": "^6.1.3",
-    "typescript": "^4.6.0-dev.20220211",
-    "webpack": "^5.65.0",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
     "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@material/dialog": "^13.0.0",
-    "@material/list": "^13.0.0",
-    "@material/mwc-dialog": "^0.25.3",
-    "@material/mwc-icon": "^0.25.3",
-    "@material/mwc-select": "^0.25.3",
-    "@material/mwc-textarea": "^0.25.3",
-    "@material/mwc-textfield": "^0.25.3",
-    "@material/tab-bar": "^13.0.0",
-    "@material/textfield": "^13.0.0",
+    "@material/dialog": "^14.0.0",
+    "@material/list": "^14.0.0",
+    "@material/mwc-dialog": "^0.26.1",
+    "@material/mwc-icon": "^0.26.1",
+    "@material/mwc-select": "^0.26.1",
+    "@material/mwc-textarea": "^0.26.1",
+    "@material/mwc-textfield": "^0.26.1",
+    "@material/tab-bar": "^14.0.0",
+    "@material/textfield": "^14.0.0",
     "@pojagi/hoquet": "^9.0.0-SNAPSHOT.29",
-    "@polkadot/api": "^8.3.1",
-    "@polkadot/extension-dapp": "^0.42.4",
-    "element-internals-polyfill": "^0.1.51",
-    "marked": "^4.0.10"
+    "@polkadot/api": "^9.0.1",
+    "@polkadot/extension-dapp": "^0.44.3",
+    "element-internals-polyfill": "^1.1.6",
+    "marked": "^4.0.18"
   }
 }

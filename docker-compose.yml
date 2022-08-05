@@ -33,8 +33,8 @@ services:
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
-      IMBUE_NETWORK_WEBSOCK_ADDR: ws://127.0.0.1:9942
-      RELAY_CHAIN_WEBSOCK_ADDR: ws://127.0.0.1:9914
+      IMBUE_NETWORK_WEBSOCK_ADDR: wss://collator.staging.imbue.network
+      RELAY_CHAIN_WEBSOCK_ADDR: wss://rococo-rpc.polkadot.io
       #IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
     volumes:
     - "./api/build:/api/build"

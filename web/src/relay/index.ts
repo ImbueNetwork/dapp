@@ -51,95 +51,101 @@ export default class Relay extends HTMLElement {
 
     bind() {
         this.$transfer.addEventListener("click", e => {
-            const relayApi = this.apiInfo?.relayChain?.api;
-            const imbueApi = this.apiInfo?.imbue?.api;
+            this.transferFromRelayChain();
+        });
+    }
 
-            const amount = parseInt(this.$transferAmount.value as string) * 1e12;
+    async transferFromRelayChain(
+        event: string = "begin",
+        state?: Record<string, any>
+    ): Promise<void> {
+        const relayApi = this.apiInfo?.relayChain?.api;
+        const imbueApi = this.apiInfo?.imbue?.api;
 
-            if (relayApi && amount > 0) {
+        const amount = parseInt(this.$transferAmount.value as string) * 1e12;
 
-                this.$transfer.disabled = true;
-                this.$transfer.classList.add("blob");
-                this.$transfer.innerText = "Transfering.....";
+        if (relayApi && amount > 0) {
 
-                this.dispatchEvent(new CustomEvent(
-                    config.event.accountChoice,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: {
-                            callback: async (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    const dest = {V0: {X1: {Parachain: 2121}}};
+            this.$transfer.disabled = true;
+            this.$transfer.classList.add("blob");
+            this.$transfer.innerText = "Transfering.....";
 
-                                    const beneficiary = {
-                                        V1: {
-                                            parents: 0,
-                                            interior: {
-                                                X1: {
-                                                    AccountId32: {
-                                                        network: "Any",
-                                                        id: decodeAddress(account.address)
-                                                    }
+            this.dispatchEvent(new CustomEvent(
+                config.event.accountChoice,
+                {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        callback: async (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                const dest = {V0: {X1: {Parachain: 2121}}};
+
+                                const beneficiary = {
+                                    V1: {
+                                        parents: 0,
+                                        interior: {
+                                            X1: {
+                                                AccountId32: {
+                                                    network: "Any",
+                                                    id: decodeAddress(account.address)
                                                 }
                                             }
                                         }
-                                    };
-
-                                    const assets = {
-                                        V1: [{
-                                            id: {Concrete: {parents: 0, interior: "Here"}},
-                                            fun: {Fungible: amount}
-                                        }]
-                                    };
-
-                                    const feeAssetItem = 0;
-
-                                    const injector = await web3FromSource(account.meta.source);
-                                    const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
-
-                                    try {
-                                        const txHash = await extrinsic.signAndSend(
-                                            account.address,
-                                            {signer: injector.signer},
-                                            ({status}) => {
-                                                imbueApi?.query.system.events((events: any) => {
-                                                    if (events) {
-                                                        // Loop through the Vec<EventRecord>
-                                                        events.forEach((record: any) => {
-                                                            const {event, phase} = record;
-                                                            const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
-                                                            if (currenciesDeposited) {
-                                                                const types = event.typeDef;
-                                                                const accountId = event.data[1];
-
-                                                                if (accountId == account.address) {
-                                                                    this.$transfer.classList.remove("blob");
-                                                                    this.$transfer.disabled = false;
-                                                                    this.$transfer.classList.add("finalized");
-                                                                    this.$transfer.innerText = "Transfer Succeeded";
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            });
-                                    } catch (error: any) {
-                                        this.errorNotification(error);
-                                        this.$transfer.classList.remove("blob");
-                                        this.$transfer.disabled = false;
-                                        this.$transfer.innerText = "Transfer";
                                     }
+                                };
+
+                                const assets = {
+                                    V1: [{
+                                        id: {Concrete: {parents: 0, interior: "Here"}},
+                                        fun: {Fungible: amount}
+                                    }]
+                                };
+
+                                const feeAssetItem = 0;
+
+                                const injector = await web3FromSource(account.meta.source);
+                                const extrinsic = relayApi?.tx.xcmPallet.reserveTransferAssets(dest, beneficiary, assets, feeAssetItem);
+
+                                try {
+                                    const txHash = await extrinsic.signAndSend(
+                                        account.address,
+                                        {signer: injector.signer},
+                                        ({status}) => {
+                                            imbueApi?.query.system.events((events: any) => {
+                                                if (events) {
+                                                    // Loop through the Vec<EventRecord>
+                                                    events.forEach((record: any) => {
+                                                        const {event, phase} = record;
+                                                        const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
+                                                        if (currenciesDeposited) {
+                                                            const types = event.typeDef;
+                                                            const accountId = event.data[1];
+
+                                                            if (accountId == account.address) {
+                                                                this.$transfer.classList.remove("blob");
+                                                                this.$transfer.disabled = false;
+                                                                this.$transfer.classList.add("finalized");
+                                                                this.$transfer.innerText = "Transfer Succeeded";
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        });
+                                } catch (error: any) {
+                                    this.errorNotification(error);
+                                    this.$transfer.classList.remove("blob");
+                                    this.$transfer.disabled = false;
+                                    this.$transfer.innerText = "Transfer";
                                 }
                             }
                         }
                     }
-                ));
-            }
-        });
+                }
+            ));
+        }
+
     }
-
-
     async init(request: ImbueRequest) {
         this.apiInfo = await request.apiInfo;
         return;

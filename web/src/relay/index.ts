@@ -1,5 +1,6 @@
 import html from "./index.html";
 import css from "./index.css";
+import '@polkadot/api-augment';
 import { ImbueApiInfo, ImbueRequest } from "../dapp";
 import * as config from "../config";
 import { getDispatchError } from "../utils/polkadot";
@@ -140,7 +141,8 @@ export default class Relay extends HTMLElement {
                                         this.$transfer.innerText = "Transfer";
                                     }
                                 } else {
-                                    const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${(freeBalance / 1e12).toFixed(2)}`
+                                    const avilableBalance = Number(freeBalance.toBigInt() / BigInt(1e12))
+                                    const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${avilableBalance.toFixed(2)}`
                                     this.errorNotification(Error(errorMessage));
 
                                     this.$transfer.disabled = false;

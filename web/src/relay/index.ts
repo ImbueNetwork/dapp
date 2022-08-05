@@ -51,27 +51,36 @@ export default class Relay extends HTMLElement {
 
     bind() {
         this.$transfer.addEventListener("click", e => {
-            const relayApi = this.apiInfo?.relayChain?.api;
-            const imbueApi = this.apiInfo?.imbue?.api;
+            this.transferFromRelayChain();
+        });
+    }
 
-            const amount = parseInt(this.$transferAmount.value as string) * 1e12;
+    async transferFromRelayChain(
+        event: string = "begin",
+        state?: Record<string, any>
+    ): Promise<void> {
+        const relayApi = this.apiInfo?.relayChain?.api;
+        const imbueApi = this.apiInfo?.imbue?.api;
+        const transferAmount = BigInt(parseFloat(this.$transferAmount.value as string) * 1e12);
 
-            if (relayApi && amount > 0) {
+        if (relayApi && transferAmount > 0) {
 
-                this.$transfer.disabled = true;
-                this.$transfer.classList.add("blob");
-                this.$transfer.innerText = "Transfering.....";
+            this.$transfer.disabled = true;
+            this.$transfer.classList.add("blob");
+            this.$transfer.innerText = "Transfering.....";
 
-                this.dispatchEvent(new CustomEvent(
-                    config.event.accountChoice,
-                    {
-                        bubbles: true,
-                        composed: true,
-                        detail: {
-                            callback: async (account?: InjectedAccountWithMeta) => {
-                                if (account) {
-                                    const dest = {V0: {X1: {Parachain: 2121}}};
-
+            this.dispatchEvent(new CustomEvent(
+                config.event.accountChoice,
+                {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        callback: async (account?: InjectedAccountWithMeta) => {
+                            if (account) {
+                                const { data: { free: freeBalance } } = await relayApi.query.system.account(account.address);
+                                const userHasEnoughBalance = freeBalance.toBigInt() >= transferAmount
+                                if (userHasEnoughBalance) {
+                                    const dest = { V0: { X1: { Parachain: 2121 } } };
                                     const beneficiary = {
                                         V1: {
                                             parents: 0,
@@ -88,8 +97,8 @@ export default class Relay extends HTMLElement {
 
                                     const assets = {
                                         V1: [{
-                                            id: {Concrete: {parents: 0, interior: "Here"}},
-                                            fun: {Fungible: amount}
+                                            id: { Concrete: { parents: 0, interior: "Here" } },
+                                            fun: { Fungible: transferAmount }
                                         }]
                                     };
 
@@ -101,13 +110,13 @@ export default class Relay extends HTMLElement {
                                     try {
                                         const txHash = await extrinsic.signAndSend(
                                             account.address,
-                                            {signer: injector.signer},
-                                            ({status}) => {
+                                            { signer: injector.signer },
+                                            ({ status }) => {
                                                 imbueApi?.query.system.events((events: any) => {
                                                     if (events) {
                                                         // Loop through the Vec<EventRecord>
                                                         events.forEach((record: any) => {
-                                                            const {event, phase} = record;
+                                                            const { event, phase } = record;
                                                             const currenciesDeposited = `${event.section}.${event.method}` == "ormlTokens.Deposited";
                                                             if (currenciesDeposited) {
                                                                 const types = event.typeDef;
@@ -130,21 +139,27 @@ export default class Relay extends HTMLElement {
                                         this.$transfer.disabled = false;
                                         this.$transfer.innerText = "Transfer";
                                     }
+                                } else {
+                                    const errorMessage = `Error: Insuffient balance to complete transfer. Available balance is ${(freeBalance / 1e12).toFixed(2)}`
+                                    this.errorNotification(Error(errorMessage));
+
+                                    this.$transfer.disabled = false;
+                                    this.$transfer.classList.remove("blob");
+                                    this.$transfer.innerText = "Transfer";
                                 }
                             }
                         }
                     }
-                ));
-            }
-        });
+                }
+            ));
+        }
+
     }
-
-
     async init(request: ImbueRequest) {
         this.apiInfo = await request.apiInfo;
         return;
     }
-    
+
     errorNotification(e: Error) {
         console.log(e);
         this.dispatchEvent(new CustomEvent(

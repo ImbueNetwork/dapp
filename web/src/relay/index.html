@@ -5,9 +5,8 @@
     <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"
           autocomplete="off" novalidate>
         <hq-forms-textfield class="input-field" id="imbu-transfer" name="imbu-transfer" type="number"
-                            helper="The total amount to trasfer." step="1" min="1" max="1e127" required>
+                            helper="The total amount to trasfer." step="any" max="1e127" required>
             <span slot="prefix" id="project-currency" class="imbu-symbol-prefix">$KSM</span>
-            <span slot="suffix">.00</span>
             <span slot="floating-label">Amount to transfer</span>
         </hq-forms-textfield>
     </form>

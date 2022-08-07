@@ -428,9 +428,7 @@ export default class Detail extends HTMLElement {
         state?: Record<string, any>
     ): Promise<void> {
         const formData = new FormData(this.$contributionSubmissionForm);
-        const contribution = BigInt(
-            formData.get("imbu-contribution") as string
-        ) * BigInt(1e12);
+        const contribution =  BigInt(parseFloat(formData.get("imbu-contribution") as string) * 1e12);
         const api = this.apiInfo?.imbue?.api;
         switch (event) {
             case "begin": {

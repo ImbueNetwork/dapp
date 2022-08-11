@@ -1,14 +1,5 @@
 version: '3.8'
 services:
-  #dynamodb-local:
-  #  command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-  #  image: "amazon/dynamodb-local:latest"
-  #  container_name: dynamodb-local
-  #  ports:
-  #  - "8000:8000"
-  #  volumes:
-  #  - "./docker/dynamodb:/home/dynamodblocal/data"
-  #  working_dir: /home/dynamodblocal
 
   postgres:
     container_name: postgres
@@ -28,63 +19,11 @@ services:
     ports:
     - "3000:3000"
     environment:
-      GOOGLE_OAUTH2_CLIENT_ID: $GOOGLE_OAUTH2_CLIENT_ID
-      GOOGLE_OAUTH2_CLIENT_SECRET: $GOOGLE_OAUTH2_CLIENT_SECRET
       WEB_HOST: "https://localhost:8443"
       DB_PORT: 5432
       DB_HOST: postgres
       IMBUE_NETWORK_WEBSOCK_ADDR: wss://collator.staging.imbue.network
       RELAY_CHAIN_WEBSOCK_ADDR: wss://rococo-rpc.polkadot.io
-      #IMBUE_NETWORK_WEBSOCK_ADDR: wss://testnet.imbue.network
     volumes:
     - "./api/build:/api/build"
     - "./api/node_modules:/api/node_modules"
-    - "./api/views:/api/views"
-
-  web:
-    build: ./web
-    container_name: web
-    ports:
-    - "8081:80"
-    - "8443:8443"
-    environment:
-    - HTTP_PORT=80
-    - HTTPS_PORT=8443
-    - SSL_DHPARAM=/etc/nginx/conf.d/includes/dhparam.pem
-    - SSL_CERTS_CONF=conf.d/includes/self-signed.conf
-    - WEBFLOW_URL=https://imbue-e67fe2-46873a03f61498e3c4ae7180df.webflow.io
-    - API_LOCAL=http://api:3000
-    volumes:
-    - "./web/dist:/usr/share/nginx/html/dist"
-    - "./web/nginx/templates:/etc/nginx/templates"
-
-  # # XXX: commenting this out for now, because we have a testnet to work with instead.
-  # # but if you wanted to work with a local network, this is one possibility.
-  # imbue:
-  #   container_name: imbue
-  #   command: >
-  #     /bin/bash -c "
-  #       cd /var/log/polkadot-launch-imbue;
-  #       polkadot-launch /polkadot-launch/polkadotLaunchConfig.js;
-  #     "
-  #   #image: imbue-collator:latest
-  #   #build: http://github.com/ImbueNetwork/imbue.git#589ce100c1f8e76e3336920a7ce73653ae96d884
-  #   image: samelamin/imbue:0.9.13
-  #   ports:
-  #   # prometheus
-  #   - "9610:9610"
-  #   # WS and RPC
-  #   - "9900-9999:9900-9999"
-  #   # P2P
-  #   - "30000-31000:30000-31000"
-  #   environment:
-  #   - RELAYCHAIN_EXECUTABLE=/polkadot
-  #   - COLLATOR_EXECUTABLE=/imbue-collator
-  #   - COLLATOR_PARACHAIN_ID=2121
-  #     #- POLKADOT_LAUNCH_BASE_PATH_BASE=/var/log/polkadot-launch-imbue
-  #   volumes:
-  #   # Allows you to see/control the lifespan of the logs polkadot-launch
-  #   # creates.
-  #   - "/tmp/polkadot-launch-imbue:/var/log/polkadot-launch-imbue"
-  #   # Allows you to provide your own launchConfig via `command` above.
-  #   - "./config:/polkadot-launch"

@@ -55,8 +55,7 @@ export default class Proposals extends HTMLElement {
 
     async route(path: string | null, request: ImbueRequest) {
         if (!path) {
-            this.$pages.select("listing");
-            (this.$pages.selected as List).init();
+            location.assign("/dapp/proposals");
             return;
         }
 

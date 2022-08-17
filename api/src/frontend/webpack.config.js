@@ -2,7 +2,8 @@ const path = require("path");
 
 module.exports = {
     entry: {
-        "login": path.resolve(__dirname, "login.tsx")
+        "login": path.resolve(__dirname, "login.tsx"),
+        "proposals": path.resolve(__dirname, "proposals.tsx")
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

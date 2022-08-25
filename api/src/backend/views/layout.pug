@@ -61,16 +61,14 @@ html
 
 
         script(type='text/javascript').
+            const drawer =  document.getElementById("right-drawer")
+            const modal =  document.getElementById("modal")
             function openDrawer() {
-                const drawer =  document.getElementById("right-drawer")
-                const modal =  document.getElementById("modal")
                 drawer.classList.add("open")
                 modal.classList.add("show")
             }
 
             function closeDrawer() {
-                const drawer =  document.getElementById("right-drawer")
-                const modal =  document.getElementById("modal")
                 drawer.classList.remove("open")
                 modal.classList.remove("show")
             }

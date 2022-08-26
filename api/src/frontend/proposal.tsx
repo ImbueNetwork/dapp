@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
+import { marked } from "marked";
 import * as config from "../legacy/config";
 import { Project, User } from "../backend/models";
 import * as model from "../backend/models";
@@ -35,6 +36,14 @@ export type DraftProposal = {
 };
 
 
+
+export enum Currency {
+    IMBU = 0,
+    KSM = 1,
+    KUSD = 2
+}
+
+
 type ProposalProps = {}
 type ProposalState = {
     project: Project[]
@@ -44,7 +53,7 @@ type ProposalState = {
 const fetchProject = async (projectId: string) => {
     const resp = await fetch(
         `${config.apiBase}/projects/${projectId}`,
-        {headers: config.getAPIHeaders}
+        { headers: config.getAPIHeaders }
     );
 
     if (resp.ok) {
@@ -68,28 +77,22 @@ class Proposal extends React.Component {
                 project: project
             })
         });
+        const test = Currency.IMBU;
+
 
     }
-
-
-    // get projectId(): string | null {
-    //     const candidate = window.location.pathname.split("/").pop();
-
-    //     if (utils.validProjectId(candidate)) {
-    //         return candidate as string;
-    //     }
-
-    //     return null;
-    // }
 
     render() {
-        return <div>
-            <h1>{this.state.project.name}</h1>
-            </div>
+        const project = this.state.project;
+        console.log(project);
+        document.getElementById('project-name').innerText = project.name;
+        document.getElementById('project-website').innerHTML = `<a href=${project.website} target="_blank">${project.website}</a>`;
+        document.getElementById('project-logo').setAttribute("srcset", project.logo);
+        document.getElementById('project-description').innerHTML = marked.parse(`${project.description}`);
+        document.getElementById('funds-required').innerHTML = String(project.required_funds / 1e12);
+        document.getElementById('project-detail-currency').innerHTML = "$" + Currency[project.currency_id as any];
     }
 }
-
-
 type ProposalItemProps = {
     projectId: number,
     imageSrc: string,
@@ -105,7 +108,7 @@ class ProposalItem extends React.Component<ProposalItemProps, ProposalItemState>
         return <li>
             <a id="contribute" href={`/dapp/proposals/detail/${this.props.projectId}`}>
                 <img id="img"
-                     src={this.props.imageSrc}/>
+                    src={this.props.imageSrc} />
                 <div id="name">{this.props.name}</div>
             </a>
         </li>
@@ -113,6 +116,6 @@ class ProposalItem extends React.Component<ProposalItemProps, ProposalItemState>
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-    ReactDOMClient.createRoot(document.getElementById('content-root')!)
-        .render(<Proposal/>);
+    ReactDOMClient.createRoot(document.getElementById('project-body')!)
+        .render(<Proposal />);
 });

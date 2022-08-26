@@ -2,6 +2,8 @@ import type { Knex } from "knex";
 import db from "./db/index";
 
 
+
+
 export type FederatedCredential = {
     id: number,
     issuer: string,

@@ -92,7 +92,6 @@ button {
     color: var(--hq-secondary-button-color);
     border: var(--hq-secondary-button-border);
     transition: var(--hq-base-transition);
-    width: 100%;
     padding: var(--hq-button-padding, 10px);
     font-size: var(--hq-button-font-size);
     cursor: pointer;

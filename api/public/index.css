@@ -172,7 +172,7 @@ button.primary:hover {
 }
 
 div#layout {
-    display: flex;
+    /* display: flex; */
     flex-direction: row;
     align-content: baseline;
     height: 100%;

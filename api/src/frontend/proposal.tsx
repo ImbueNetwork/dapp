@@ -4,6 +4,7 @@ import { marked } from "marked";
 import * as config from "../legacy/config";
 import { Project, User } from "../backend/models";
 import * as model from "../backend/models";
+import { MDCTabBar } from "@material/tab-bar";
 /**
  * Models the milestone data that appears in the /proposals/draft form
  */
@@ -78,19 +79,50 @@ class Proposal extends React.Component {
             })
         });
         const test = Currency.IMBU;
+        new MDCTabBar(document.getElementById("tab-bar"));
 
+        
+        document.addEventListener("MDCTabBar:activated", e => {
+            const detail = (e as CustomEvent).detail;
+            const container = document.getElementById('tab-content-container');
+            Array.from(container.children).forEach(
+                child => child.classList.remove("active")
+            );
+            container.children[detail.index].classList.add("active");
+        });
 
     }
 
     render() {
-        const project = this.state.project;
-        console.log(project);
+        const project: DraftProposal = this.state.project;
         document.getElementById('project-name').innerText = project.name;
         document.getElementById('project-website').innerHTML = `<a href=${project.website} target="_blank">${project.website}</a>`;
         document.getElementById('project-logo').setAttribute("srcset", project.logo);
         document.getElementById('project-description').innerHTML = marked.parse(`${project.description}`);
         document.getElementById('funds-required').innerHTML = String(project.required_funds / 1e12);
         document.getElementById('project-detail-currency').innerHTML = "$" + Currency[project.currency_id as any];
+
+        const milestones = document.getElementById('milestones');
+        milestones.querySelectorAll('*').forEach(n => n.remove());
+        project.milestones?.forEach(milestone => {
+            milestones.appendChild(
+                document.createRange().createContextualFragment(`
+                    <li class="mdc-deprecated-list-item" tabindex="0">
+                        <span class="mdc-deprecated-list-item__ripple"></span>
+                        <span class="mdc-deprecated-list-item__graphic">
+                            <i class="material-icons">pending_actions</i>
+                        </span>
+                        <span class="mdc-deprecated-list-item__text">
+                            <span class="mdc-deprecated-list-item__primary-text">${milestone.name}</span>
+                            <span class="mdc-deprecated-list-item__secondary-text">${milestone.percentage_to_unlock}%
+                            </span>
+                        </span>
+                    </li>
+                `)
+            );
+        });
+
+
     }
 }
 type ProposalItemProps = {

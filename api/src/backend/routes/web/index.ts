@@ -16,6 +16,10 @@ router.get("/proposals", (req, res) => {
     res.render("proposals")
 });
 
+router.get("/proposal", (req, res) => {
+    res.render("proposal")
+});
+
 router.use((_req, res, next) => {
     res.render("legacy")
 });

@@ -177,10 +177,11 @@ div#layout {
     align-content: baseline;
     height: 100%;
     /* width: 100vw; */
-    max-width: 100%;
+    max-width: 1366px;
     color: var(--theme-ink-color);
     flex-wrap: wrap;
     --hq-layout-header-height: 2.5rem;
+    /* max-width: 1366px; */
     /* box-shadow: 0 0 20px #aaa; */
     margin: auto;
     min-height: 100vh;

@@ -24,42 +24,42 @@ html
 
                     div(class="spacer")
 
-                    div(class="context-menu")
+                    div(id ="context-menu" class="context-menu")
                         div(class="context-menu-item")
                             a(id="main-menu" class="material-icons" tabindex="0" onclick=`openDrawer()`) &#xe5d2;
-                            div(class="modal" id="modal" onclick=`closeDrawer()`)
-                            div(class="drawer" id="right-drawer")
-                                nav(id="nav")
-                                    ul(id="menu")
-                                        li(class="menu-item" id="menu-item__account-dashboard")
-                                            a(href="/dapp/dashboard" title="Dashboard")
-                                                i(class="material-icons" aria-hidden="true") face
-                                                span() Dashboard
 
-                                        li(class="menu-item" id="menu-item__account-dashboard")
-                                            a(href="/dapp/proposals/draft" title="Create a Proposal")
-                                                i(class="material-icons" aria-hidden="true") library_add
-                                                span() Create A Proposal
+            div(class="modal" id="modal" onclick=`closeDrawer()`)
 
-                                        li(class="menu-item" id="menu-item__account-dashboard")
-                                            a(href="/dapp/proposals" title="Discover")
-                                                i(class="material-icons" aria-hidden="true") search
-                                                span() Discover
+            div(class="drawer" id="right-drawer")
+                nav(id="nav")
+                    ul(id="menu")
+                        li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/dashboard" title="Dashboard")
+                                i(class="material-icons" aria-hidden="true") face
+                                span() Dashboard
 
-                                        li(class="menu-item" id="menu-item__account-dashboard")
-                                            a(href="/dapp/relay" title="Transfer Funds")
-                                                i(class="material-icons" aria-hidden="true") money
-                                                span() Transfer Funds
+                        li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/proposals/draft" title="Create a Proposal")
+                                i(class="material-icons" aria-hidden="true") library_add
+                                span() Create A Proposal
 
-                                        li(class="menu-item" id="menu-item__account-dashboard")
-                                            a(href="/dapp/logout" title="Log out")
-                                                i(class="material-icons" aria-hidden="true") logout
-                                                span() Log out
+                        li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/proposals" title="Discover")
+                                i(class="material-icons" aria-hidden="true") search
+                                span() Discover
+
+                        li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/relay" title="Transfer Funds")
+                                i(class="material-icons" aria-hidden="true") money
+                                span() Transfer Funds
+
+                        li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/logout" title="Log out")
+                                i(class="material-icons" aria-hidden="true") logout
+                                span() Log out
 
             main(id="content-root" class="padded")
                 block content
-
-
         script(type='text/javascript').
             const drawer =  document.getElementById("right-drawer")
             const modal =  document.getElementById("modal")

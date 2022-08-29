@@ -5,17 +5,15 @@ extends layout.pug
 
 block content
     link(rel='stylesheet' href='/public/proposal.css')
-    <div class="top-wrapper">
-        <header class="project-name-header">
-            <h1 class="heading-8 project-name-heading"><span id="project-name">test</span></h1>
-        </header>
-        <img id="project-logo" loading="lazy">
+    div(id='project-body')
+    div(class="top-wrapper")
+        header(class="project-name-header")
+            h1(class="heading-8 project-name-heading")
+                <span id="project-name"></span></h1>
 
-    </div>
-
-    <div>
-        <h3 id="funding-round-not-yet-open">Your proposal has been created successfully. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review and to open your funding round.</h3>
-        <div class="action-buttons">
+        img(id="project-logo" loading="lazy")
+        h3(id="funding-round-not-yet-open") Your proposal has been created successfully. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review and to open your funding round.
+        div(class="action-buttons")
             <form id="contribution-submission-form" name="contribution-submission-form" method="get" class="form"  autocomplete="off" hidden="true" novalidate>
                 <hq-forms-textfield class="input-field" id="imbu-contribution" name="imbu-contribution" type="number" helper="The total amount to contribute for the project." step="any" max="1e127" required>
                     <span slot="prefix" id="project-currency" class="imbu-symbol-prefix">$IMBU</span>
@@ -46,13 +44,10 @@ block content
                 </hq-forms-textfield>
             </form>
 
-
-
             <button href="javascript:void(0)" class="button primary" hidden="true" id="submit-milestone">Submit</button>
             <button href="javascript:void(0)" class="button primary" hidden="true" id="vote">Vote</button>
             <button href="javascript:void(0)" class="button primary" hidden="true" id="withdraw">Withdraw</button>
-        </div>
-    </div>
+
     <div class="tabs-menu w-tab-menu" role="tablist">
         <div class="mdc-tab-bar" role="tablist" id="tab-bar">
             <div class="mdc-tab-scroller">
@@ -83,6 +78,7 @@ block content
             </div>
         </div>
     </div>
+    
     <div id="tab-content-container">
         <div class="about active tab-content">
             <div id="project-description"></div>
@@ -105,5 +101,6 @@ block content
         <ol id="milestones" class="tab-content mdc-deprecated-list mdc-deprecated-list--two-line">
         </ol>
     </div>
-    div(id='project-body')
+
+
     script(src="/public/lib/proposal.js" type="text/javascript")

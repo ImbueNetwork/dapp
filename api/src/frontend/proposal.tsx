@@ -5,6 +5,7 @@ import * as config from "../legacy/config";
 import { Project, User } from "../backend/models";
 import * as model from "../backend/models";
 import { MDCTabBar } from "@material/tab-bar";
+import * as utils from "./utils";
 /**
  * Models the milestone data that appears in the /proposals/draft form
  */
@@ -36,8 +37,6 @@ export type DraftProposal = {
     category?: string | number;
 };
 
-
-
 export enum Currency {
     IMBU = 0,
     KSM = 1,
@@ -48,6 +47,7 @@ export enum Currency {
 type ProposalProps = {}
 type ProposalState = {
     project: Project[]
+    projectId: 0
 }
 
 
@@ -63,6 +63,20 @@ const fetchProject = async (projectId: string) => {
     }
 }
 
+
+function getProjectId(): string | null {
+    const candidate = window.location.pathname.split("/").pop();
+
+    if (utils.validProjectId(candidate)) {
+        return candidate as string;
+    }
+
+    return null;
+}
+
+
+
+
 class Proposal extends React.Component {
 
     state = {
@@ -70,18 +84,28 @@ class Proposal extends React.Component {
     }
 
     constructor(props: ProposalProps) {
+
         super(props);
-        const projectId = "1";
+        const projectId = getProjectId();
+        if (!projectId) {
+            document.dispatchEvent(utils.badRouteEvent("bad-route"));
+            return;
+        }
 
         fetchProject(projectId).then((project) => {
-            this.setState({
-                project: project
-            })
+            if (project) {
+                this.setState({
+                    project: project
+                })
+            } else {
+                utils.redirect("/not-found");
+                location.reload();
+                return;
+            }
         });
-        const test = Currency.IMBU;
+
         new MDCTabBar(document.getElementById("tab-bar"));
 
-        
         document.addEventListener("MDCTabBar:activated", e => {
             const detail = (e as CustomEvent).detail;
             const container = document.getElementById('tab-content-container');
@@ -121,7 +145,6 @@ class Proposal extends React.Component {
                 `)
             );
         });
-
 
     }
 }

@@ -16,7 +16,7 @@ router.get("/proposals", (req, res) => {
     res.render("proposals")
 });
 
-router.get("/proposal", (req, res) => {
+router.get("/proposals/:projectId", (req, res) => {
     res.render("proposal")
 });
 

@@ -172,12 +172,12 @@ button.primary:hover {
 }
 
 div#layout {
-    /* display: flex; */
+    display: flex;
     flex-direction: row;
     align-content: baseline;
     height: 100%;
     /* width: 100vw; */
-    /* max-width: 100%; */
+    max-width: 100%;
     color: var(--theme-ink-color);
     flex-wrap: wrap;
     --hq-layout-header-height: 2.5rem;

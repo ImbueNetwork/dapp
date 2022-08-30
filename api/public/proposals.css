@@ -1,0 +1,56 @@
+#imbu-proposals {
+    font-family: var(--theme-font-family);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    --hq-layout-max-screen:1366px;
+}
+
+h1 {
+    font-size: var(--theme-h1-size);
+    font-weight: var(--theme-h1-weight);
+}
+
+ol {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 23%);
+    /* grid-gap: 1%; */
+    justify-content: space-between;
+}
+
+li {
+    display: block;
+    margin: 0 0 30px 0;
+    border: 1px solid #007;
+    box-shadow: 0 0 5px #333,
+                0 0 15px #333;
+    max-width:500px;
+}
+.hidden {
+    display: none;
+}
+
+@media screen and (max-width: 1100px) {
+    ol {
+        grid-template-columns: repeat(auto-fill, 31%);
+    }
+}
+
+@media screen and (max-width: 750px) {
+    ol {
+        grid-template-columns: repeat(auto-fill, 48%);
+    }
+}
+
+@media screen and (max-width: 500px) {
+    ol {
+        display: flex;
+        flex-flow: row wrap;
+        grid-template-columns: none;
+    }
+    li {
+        width: 100%;
+    }
+}

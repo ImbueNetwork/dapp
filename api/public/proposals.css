@@ -1,56 +1,128 @@
-#imbu-proposals {
-    font-family: var(--theme-font-family);
+
+
+#list {
     display: flex;
+    width: 100%;
     flex-wrap: wrap;
-    flex-direction: row;
-    --hq-layout-max-screen:1366px;
-}
-
-h1 {
-    font-size: var(--theme-h1-size);
-    font-weight: var(--theme-h1-weight);
-}
-
-ol {
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 23%);
-    /* grid-gap: 1%; */
-    justify-content: space-between;
 }
 
 li {
+    list-style: none;
+}
+
+img {
+    object-fit: cover;
+    height: 200px;
+    width: 100%;
+}
+
+#name {
+    font-family: var(--theme-font-family);
+    font-size: 22px;
+    padding: 20px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    background: transparent;
+    transition: var(--base-transition);
+    padding: 20px 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+a:hover {
+    background: var(--theme-primary);
+    color: #000;
+}
+
+.imbu-proposal-item {
     display: block;
     margin: 0 0 30px 0;
     border: 1px solid #007;
     box-shadow: 0 0 5px #333,
-                0 0 15px #333;
-    max-width:500px;
+    0 0 15px #333;
 }
-.hidden {
-    display: none;
+
+
+
+
+ol.proposals-list {
+    margin: 0;
+    padding: 30;
+    grid-template-columns: repeat(auto-fill, 23%);
+    grid-gap: 2%;
+}
+
+ol.proposals-list li {
+    display: block;
+    border: 1px solid #007;
+    box-shadow: 0 0 5px #333,
+    0 0 15px #333;
+    width: 100%;
 }
 
 @media screen and (max-width: 1100px) {
-    ol {
+    ol.proposals-list {
         grid-template-columns: repeat(auto-fill, 31%);
     }
 }
 
 @media screen and (max-width: 750px) {
-    ol {
+    ol.proposals-list {
         grid-template-columns: repeat(auto-fill, 48%);
     }
 }
 
 @media screen and (max-width: 500px) {
-    ol {
+    ol.proposals-list {
         display: flex;
         flex-flow: row wrap;
         grid-template-columns: none;
     }
-    li {
+    ol.proposals-list li {
         width: 100%;
     }
+}
+
+/*:host {*/
+/*    display: block;*/
+/*}*/
+
+ol.proposals-list li {
+    list-style: none;
+}
+
+ol.proposals-list li img {
+    object-fit: cover;
+    height: 200px;
+    width: 100%;
+}
+
+ol.proposals-list li #name {
+    font-family: var(--theme-font-family);
+    font-size: 22px;
+    padding: 20px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+ol.proposals-list li a {
+    display: block;
+    text-decoration: none;
+    background: transparent;
+    transition: var(--base-transition);
+    padding: 20px 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+ol.proposals-list li a:hover {
+    background: var(--theme-primary);
+    color: #000;
 }

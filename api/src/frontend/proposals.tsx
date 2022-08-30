@@ -102,13 +102,15 @@ class ProposalItem extends React.Component<ProposalItemProps, ProposalItemState>
     state: ProposalItemState = {}
 
     render() {
-        return <li>
-            <a id="contribute" href={`/dapp/proposals/detail/${this.props.projectId}`}>
-                <img id="img"
-                     src={this.props.imageSrc}/>
-                <div id="name">{this.props.name}</div>
-            </a>
-        </li>
+        return <div className="imbu-proposal-item">
+                    <li>
+                        <a id="contribute" href={`/dapp/proposals/detail/${this.props.projectId}`}>
+                            <img id="img"
+                                src={this.props.imageSrc}/>
+                            <div id="name">{this.props.name}</div>
+                        </a>
+                    </li>
+                </div>
     }
 }
 

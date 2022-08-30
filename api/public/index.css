@@ -110,13 +110,7 @@ button.primary:hover {
     background-color: var(--hq-primary-button-background-hover-color);
 }
 
-.imbu-proposal-item {
-    display: block;
-    margin: 0 0 30px 0;
-    border: 1px solid #007;
-    box-shadow: 0 0 5px #333,
-    0 0 15px #333;
-}
+
 
 .w-button {
     display: inline-block;
@@ -568,85 +562,6 @@ and (min-width: 500px) {
     to {
         transform: rotate(359deg);
     }
-}
-
-ol.proposals-list {
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 23%);
-    /* grid-gap: 1%; */
-    justify-content: space-between;
-}
-
-ol.proposals-list li {
-    display: block;
-    margin: 0 0 30px 0;
-    border: 1px solid #007;
-    box-shadow: 0 0 5px #333,
-    0 0 15px #333;
-    width: 100%;
-}
-
-@media screen and (max-width: 1100px) {
-    ol.proposals-list {
-        grid-template-columns: repeat(auto-fill, 31%);
-    }
-}
-
-@media screen and (max-width: 750px) {
-    ol.proposals-list {
-        grid-template-columns: repeat(auto-fill, 48%);
-    }
-}
-
-@media screen and (max-width: 500px) {
-    ol.proposals-list {
-        display: flex;
-        flex-flow: row wrap;
-        grid-template-columns: none;
-    }
-    ol.proposals-list li {
-        width: 100%;
-    }
-}
-
-/*:host {*/
-/*    display: block;*/
-/*}*/
-
-ol.proposals-list li {
-    list-style: none;
-}
-
-ol.proposals-list li img {
-    object-fit: cover;
-    height: 200px;
-    width: 100%;
-}
-
-ol.proposals-list li #name {
-    font-family: var(--theme-font-family);
-    font-size: 22px;
-    padding: 20px;
-    font-weight: 400;
-    line-height: 1.2;
-}
-
-ol.proposals-list li a {
-    display: block;
-    text-decoration: none;
-    background: transparent;
-    transition: var(--base-transition);
-    padding: 20px 10px;
-    color: white;
-    font-size: 16px;
-    font-weight: 400;
-}
-
-ol.proposals-list li a:hover {
-    background: var(--theme-primary);
-    color: #000;
 }
 
 

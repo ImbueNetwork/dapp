@@ -6,14 +6,16 @@ import {List, SimpleListItem} from "@rmwc/list";
 
 type DetailsProps = {}
 type DetailsState = {
-    activeTabIndex: number
+    activeTabIndex: number,
+    projectState: string
 }
 
 import '@rmwc/list/styles';
 
 class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
-        activeTabIndex: 0
+        activeTabIndex: 0,
+        projectState: "awaiting_approval"
     }
 
     constructor(props: DetailsProps) {
@@ -32,8 +34,12 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                 <img id="project-logo" loading="lazy"
                      srcSet="https://uploads-ssl.webflow.com/6269d876b0577cd24ebce942/626f2cc6ce0d710373645931_6269d876b0577c5f59bceab2_imbue-web-image%5B1%5D-p-800.jpeg"/>
             </div>
-            <h3 id="funding-round-not-yet-open">Awaiting funding approval. Funding round not complete or approved.
-                Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>
+
+            { this.state.projectState === "awaiting_approval" ?
+                <h3 id="funding-round-not-yet-open">Awaiting funding approval. Funding round not complete or approved.
+                    Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>
+                 : null
+            }
 
             <TabBar activeTabIndex={this.state.activeTabIndex}
                     onActivate={(evt) => this.setActiveTab(evt.detail.index)} >

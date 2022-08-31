@@ -84,6 +84,16 @@ ol {
     color: var(--theme-primary);
 }
 
+#milestones li {
+    color: var(--mdc-theme-text-primary-on-background);
+    background-color: var(--mdc-theme-background);
+    margin: 5px 0;
+}
+
+#milestones .mdc-list-item__secondary-text {
+    color: var(--theme-primary);
+}
+
 #funding-round-not-yet-open {
     font-weight: normal;
 }

@@ -2,12 +2,14 @@ import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
 
 import {Tab, TabBar} from "@rmwc/tabs";
+import {List, SimpleListItem} from "@rmwc/list";
 
 type DetailsProps = {}
 type DetailsState = {
     activeTabIndex: number
 }
 
+import '@rmwc/list/styles';
 
 class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
@@ -62,31 +64,45 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                         </li>
                     </ul>
                 </div>
-                <ol id="milestones" className={`tab-content mdc-deprecated-list mdc-deprecated-list--two-line ${ this.state.activeTabIndex === 1 ? "active" : "" }`}>
-                    <li className="mdc-deprecated-list-item" tabIndex={0}>
-                        <span className="mdc-deprecated-list-item__ripple"></span>
-                        <span className="mdc-deprecated-list-item__graphic">
-                            <i className="material-icons">pending_actions</i>
-                        </span>
-                        <span className="mdc-deprecated-list-item__text">
-                            <span className="mdc-deprecated-list-item__primary-text">Launch on Kusama</span>
-                            <span className="mdc-deprecated-list-item__secondary-text">50%
-                            </span>
-                        </span>
-                    </li>
 
-                    <li className="mdc-deprecated-list-item" tabIndex={0}>
-                        <span className="mdc-deprecated-list-item__ripple"></span>
-                        <span className="mdc-deprecated-list-item__graphic">
-                            <i className="material-icons">pending_actions</i>
-                        </span>
-                        <span className="mdc-deprecated-list-item__text">
-                            <span className="mdc-deprecated-list-item__primary-text">Imbue Enterprise</span>
-                            <span className="mdc-deprecated-list-item__secondary-text">50%
-                            </span>
-                        </span>
-                    </li>
-                </ol>
+                <List twoLine id="milestones" className={`tab-content ${ this.state.activeTabIndex === 1 ? "active" : "" }`}>
+                    <SimpleListItem
+                        graphic="pending_actions"
+                        text="Launch on Kusama"
+                        secondaryText="50%"
+                    />
+                    <SimpleListItem
+                        graphic="pending_actions"
+                        text="Imbue Enterprise"
+                        secondaryText="50%"
+                    />
+                </List>
+
+                {/*<ol id="milestones" className={`tab-content mdc-deprecated-list mdc-deprecated-list--two-line ${ this.state.activeTabIndex === 1 ? "active" : "" }`}>*/}
+                {/*    <li className="mdc-deprecated-list-item" tabIndex={0}>*/}
+                {/*        <span className="mdc-deprecated-list-item__ripple"></span>*/}
+                {/*        <span className="mdc-deprecated-list-item__graphic">*/}
+                {/*            <i className="material-icons">pending_actions</i>*/}
+                {/*        </span>*/}
+                {/*        <span className="mdc-deprecated-list-item__text">*/}
+                {/*            <span className="mdc-deprecated-list-item__primary-text">Launch on Kusama</span>*/}
+                {/*            <span className="mdc-deprecated-list-item__secondary-text">50%*/}
+                {/*            </span>*/}
+                {/*        </span>*/}
+                {/*    </li>*/}
+
+                {/*    <li className="mdc-deprecated-list-item" tabIndex={0}>*/}
+                {/*        <span className="mdc-deprecated-list-item__ripple"></span>*/}
+                {/*        <span className="mdc-deprecated-list-item__graphic">*/}
+                {/*            <i className="material-icons">pending_actions</i>*/}
+                {/*        </span>*/}
+                {/*        <span className="mdc-deprecated-list-item__text">*/}
+                {/*            <span className="mdc-deprecated-list-item__primary-text">Imbue Enterprise</span>*/}
+                {/*            <span className="mdc-deprecated-list-item__secondary-text">50%*/}
+                {/*            </span>*/}
+                {/*        </span>*/}
+                {/*    </li>*/}
+                {/*</ol>*/}
             </div>
         </div>
     }

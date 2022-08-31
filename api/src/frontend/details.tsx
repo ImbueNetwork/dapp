@@ -4,16 +4,22 @@ import * as ReactDOMClient from "react-dom/client";
 import {Tab, TabBar} from "@rmwc/tabs";
 
 type DetailsProps = {}
-type DetailsState = {}
+type DetailsState = {
+    activeTabIndex: number
+}
 
 
 class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
-        projectsList: []
+        activeTabIndex: 0
     }
 
     constructor(props: DetailsProps) {
         super(props);
+    }
+
+    setActiveTab(tabIndex: number) {
+        this.setState({activeTabIndex: tabIndex});
     }
 
     render() {
@@ -27,13 +33,14 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             <h3 id="funding-round-not-yet-open">Awaiting funding approval. Funding round not complete or approved.
                 Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>
 
-            <TabBar>
+            <TabBar activeTabIndex={this.state.activeTabIndex}
+                    onActivate={(evt) => this.setActiveTab(evt.detail.index)} >
                 <Tab icon="description" label="About"/>
                 <Tab icon="list" label="Milestones"/>
             </TabBar>
 
             <div id="tab-content-container">
-                <div className="about tab-content active">
+                <div className={`about tab-content ${ this.state.activeTabIndex === 0 ? "active" : "" }`}>
                     <div id="project-description"><p>Imbue Network is a decentralised crowdfunding DAO built on top of
                         the Polkadot blockchain platform. It is an idea incubator open to the entire world that allows
                         anyone, from any walk of life and for any kind of endeavour, to submit and vote on Ideas worth
@@ -55,7 +62,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                         </li>
                     </ul>
                 </div>
-                <ol id="milestones" className="tab-content mdc-deprecated-list mdc-deprecated-list--two-line">
+                <ol id="milestones" className={`tab-content mdc-deprecated-list mdc-deprecated-list--two-line ${ this.state.activeTabIndex === 1 ? "active" : "" }`}>
                     <li className="mdc-deprecated-list-item" tabIndex={0}>
                         <span className="mdc-deprecated-list-item__ripple"></span>
                         <span className="mdc-deprecated-list-item__graphic">

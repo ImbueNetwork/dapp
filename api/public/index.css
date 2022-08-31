@@ -4,14 +4,14 @@ body {
     font-family: var(--theme-font-family);
 }
 
-a {
-    background-color: var(--theme-secondary-dark);
-    text-decoration: none;
-    transition: all 150ms ease-in-out;
-}
-a:hover {
-    background-color: var(--theme-secondary-dark-hover);
-}
+/*a {*/
+/*    background-color: var(--theme-secondary-dark);*/
+/*    text-decoration: none;*/
+/*    transition: all 150ms ease-in-out;*/
+/*}*/
+/*a:hover {*/
+/*    background-color: var(--theme-secondary-dark-hover);*/
+/*}*/
 
 .hidden {
     display: none !important;
@@ -67,6 +67,31 @@ ol {
     z-index: var(--hq-dialog-z-index, 1001);
 }
 
+.mdc-tab .mdc-tab__text-label, .mdc-tab .mdc-tab__icon {
+    color: #fff;
+}
+
+.tab-content {
+    margin: 20px 0;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content a {
+    color: var(--theme-primary);
+}
+
+#funding-round-not-yet-open {
+    font-weight: normal;
+}
+
+#funding-round-not-yet-open > a {
+    color: var(--theme-primary);
+}
+
 ul#action-list {
     list-style: none outside none;
     margin: 0;
@@ -85,7 +110,7 @@ ul li {
     display: flex;
 }
 
-button {
+.button-container button {
     border-radius: var(--hq-button-border-radius, 3px);
     background-color: var(--hq-secondary-button-background-color, inherit);
     color: var(--hq-secondary-button-color);
@@ -97,16 +122,16 @@ button {
     cursor: pointer;
 }
 
-button.primary {
+.button-container button.primary {
     background-color: var(--hq-primary-button-background-color);
     font-weight: bold;
 }
 
-button:hover {
+.button-container button:hover {
     background-color: var(--hq-secondary-button-background-hover-color);
 }
 
-button.primary:hover {
+.button-container button.primary:hover {
     background-color: var(--hq-primary-button-background-hover-color);
 }
 

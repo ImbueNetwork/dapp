@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
-import * as config from "../legacy/config";
 
 /**
  * Models the milestone data that appears in the /proposals/draft form
@@ -51,10 +50,14 @@ type ProposalsState = {
     projectsList: Proposal[]
 }
 
+const getAPIHeaders = {
+    "accept": "application/json",
+};
+
 const fetchProjects = async () => {
     const resp = await fetch(
-        `${config.apiBase}/projects/`,
-        {headers: config.getAPIHeaders});
+        `$/api/v1/projects/`,
+        {headers: getAPIHeaders});
 
     if (resp.ok) {
         return await resp.json();

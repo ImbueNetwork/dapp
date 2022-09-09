@@ -17,7 +17,7 @@ type EventDetails = {
 }
 
 const eventMapping: Record<string, EventDetails> = {
-    "contribute": { accountIdKey: 0,eventName: "ContributeSucceeded"},
+    "contribute": { accountIdKey: 0, eventName: "ContributeSucceeded" },
 }
 
 class ChainService {
@@ -38,7 +38,7 @@ class ChainService {
 
     async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
-        const txState: BasicTxResponse = {};
+        const transactionState: BasicTxResponse = {};
         try {
             // Make a transfer from Alice to BOB, waiting for inclusion
             const unsubscribe = await extrinsic
@@ -51,40 +51,45 @@ class ChainService {
                             }
 
                             events
-                                .filter(({ event, phase }) => event.section === 'imbueProposals')
-                                .forEach(({ event, phase }): BasicTxResponse => {
-                                    const currentEvent = `${event.section}:${event.method}`;
-                                    console.log(currentEvent);
-                                    txState.transactionHash = extrinsic.hash.toHex();
+                                .filter(({ event }) =>  event.section === 'imbueProposals' || event.section === 'system' )
+                                .forEach(({ event }): BasicTxResponse => {
+                                    transactionState.transactionHash = extrinsic.hash.toHex();
+
+                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    if (dispatchError.isModule) {
+                                       return this.handleError(transactionState, dispatchError);
+                                    }
+
                                     if (eventName && event.method === eventName && event.data[eventKey].toHuman() === account.address) {
-                                        txState.status = true;
-                                        return txState;
+                                        transactionState.status = true;
+                                        return transactionState;
                                     }
                                     else if (event.method === 'ExtrinsicFailed') {
-                                        txState.status = false;
-                                        return txState;
+                                        transactionState.status = false;
+                                        transactionState.txError = true;
+                                        return transactionState;
                                     }
-                                    return txState;
+                                    return transactionState;
                                 });
 
 
                             if (result.isError) {
-                                txState.txError = true;
-                                return txState;
+                                transactionState.txError = true;
+                                return transactionState;
                             }
 
                             if (result.isCompleted) {
                                 unsubscribe();
-                                return txState;
+                                return transactionState;
                             }
                         });
                     });
-        } catch (e) {
-            console.error('error withdrawing', e);
-            txState.txError = true;
-            return txState;
+        } catch (error) {
+            transactionState.txError = true;
+            transactionState.errorMessage = error.message;
+            return transactionState;
         }
-        return txState;
+        return transactionState;
     }
 
     async submitExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>): Promise<BasicTxResponse> {
@@ -135,60 +140,24 @@ class ChainService {
         return txState;
     }
 
+     handleError(transactionState: BasicTxResponse,  dispatchError: DispatchError): BasicTxResponse {
+        try {
+            
+            let errorMessage = polkadot.getDispatchError(dispatchError);
+            transactionState.errorMessage = errorMessage;
+            transactionState.status = false;
+            transactionState.txError = true;
+            return transactionState;
+        } catch (error) {
+            transactionState.errorMessage = error.message;
 
-
-    public async contributeTest(account: InjectedAccountWithMeta, projectOnChain: any, contribution: bigint): Promise<boolean> {
-        const projectId = projectOnChain.milestones[0].projectKey;
-        const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.contribute(
-            projectId,
-            contribution
-        );
-        const injector = await web3FromSource(account.meta.source);
-        const txHash = await extrinsic.signAndSend(
-            account.address,
-            { signer: injector.signer },
-            ({ status }) => {
-                this.imbueApi.imbue.api.query.system.events((events: any) => {
-                    if (events) {
-                        // Loop through the Vec<EventRecord>
-                        events.forEach((record: any) => {
-
-                            // Extract the phase, event and the event types
-                            const { event, phase } = record;
-                            const contributionSucceeded = `${event.section}.${event.method}` == "imbueProposals.ContributeSucceeded";
-                            const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                            if (dispatchError.isModule) {
-                                try {
-                                    let errorMessage = polkadot.getDispatchError(dispatchError);
-                                    console.log(errorMessage);
-                                    polkadot.errorNotification(Error(errorMessage));
-                                    return false;
-                                    // location.reload();
-                                } catch (error) {
-                                    console.log("***** error is ", error)
-                                    // swallow
-                                }
-                            }
-                            if (contributionSucceeded) {
-                                const types = event.typeDef;
-                                const contributionAccountId = event.data[0];
-                                const contributionProjectId = parseInt(event.data[1].toString());
-
-                                if (contributionAccountId == account.address && contributionProjectId == projectId) {
-                                    return true;
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        ).catch((e: any) => {
-            polkadot.errorNotification(e);
-            return false;
-        });
-        console.log(`Transaction hash: ${txHash}`);
-        console.log(`extrinsic: ${extrinsic}`);
+            // swallow
+            return transactionState;
+        }
     }
+
+
+
 };
 
 export default ChainService;

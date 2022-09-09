@@ -124,3 +124,7 @@ body {
     font-family: "Aeonik";
     src: url("AeonikTRIAL-Regular.otf") format("opentype");
 }
+
+.mdc-dialog .mdc-dialog__title, .mdc-dialog__content {
+    color: var(--mdc-text-field-ink-color) !important;
+}

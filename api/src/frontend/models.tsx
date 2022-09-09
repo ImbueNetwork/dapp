@@ -38,7 +38,7 @@ export type User = {
 };
 
 export interface BasicTxResponse {
-    passwordError?: string | null,
+    errorMessage: string | null,
     callHash?: string,
     status?: boolean,
     transactionHash?: string,

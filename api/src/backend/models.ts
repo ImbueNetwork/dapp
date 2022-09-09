@@ -239,8 +239,7 @@ export const getOrCreateFederatedUser = (
             done(null, user);
         } catch (err) {
             done(new Error(
-                "Failed to upsert federated authentication.",
-                { cause: err as Error }
+                "Failed to upsert federated authentication." 
             ));
         }
     });

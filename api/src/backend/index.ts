@@ -49,11 +49,6 @@ app.get("/redirect", (req, res) => {
 });
 
 
-// not found
-app.use((_req, _res, next) => {
-    next(createError(404));
-});
-
 // uncaught error
 app.use(errorHandler(environment));
 

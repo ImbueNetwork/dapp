@@ -3,7 +3,8 @@ const path = require("path");
 module.exports = {
     entry: {
         "login": path.resolve(__dirname, "login.tsx"),
-        "proposals": path.resolve(__dirname, "proposals.tsx")
+        "proposals": path.resolve(__dirname, "proposals.tsx"),
+        "details": path.resolve(__dirname, "details.tsx")
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"
@@ -30,7 +31,10 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: "css-loader",
+                use: [
+                  'style-loader',
+                  'css-loader',
+                ]
             },
         ]
     },

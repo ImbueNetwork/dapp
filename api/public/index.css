@@ -1,18 +1,17 @@
-
 body {
     color: var(--main-text-color);
     width: 100%;
     font-family: var(--theme-font-family);
 }
 
-/* a {
-    background-color: var(--theme-secondary-dark);
-    text-decoration: none;
-    transition: all 150ms ease-in-out;
-}
-a:hover {
-    background-color: var(--theme-secondary-dark-hover);
-} */
+/*a {*/
+/*    background-color: var(--theme-secondary-dark);*/
+/*    text-decoration: none;*/
+/*    transition: all 150ms ease-in-out;*/
+/*}*/
+/*a:hover {*/
+/*    background-color: var(--theme-secondary-dark-hover);*/
+/*}*/
 
 .hidden {
     display: none !important;
@@ -68,6 +67,32 @@ ol {
     z-index: var(--hq-dialog-z-index, 1001);
 }
 
+.mdc-tab .mdc-tab__text-label, .mdc-tab .mdc-tab__icon {
+    color: #fff;
+}
+
+.tab-content a {
+    color: var(--theme-primary);
+}
+
+#milestones li {
+    color: var(--mdc-theme-text-primary-on-background);
+    background-color: var(--mdc-theme-background);
+    margin: 5px 0;
+}
+
+#milestones .mdc-list-item__secondary-text {
+    color: var(--theme-primary);
+}
+
+#details > h3 {
+    font-weight: normal;
+}
+
+#details > h3 > a {
+    color: var(--theme-primary);
+}
+
 ul#action-list {
     list-style: none outside none;
     margin: 0;
@@ -86,7 +111,7 @@ ul li {
     display: flex;
 }
 
-button {
+.button-container button {
     border-radius: var(--hq-button-border-radius, 3px);
     background-color: var(--hq-secondary-button-background-color, inherit);
     color: var(--hq-secondary-button-color);
@@ -98,25 +123,17 @@ button {
     cursor: pointer;
 }
 
-button.primary {
+.button-container button.primary {
     background-color: var(--hq-primary-button-background-color);
     font-weight: bold;
 }
 
-button:hover {
+.button-container button:hover {
     background-color: var(--hq-secondary-button-background-hover-color);
 }
 
-button.primary:hover {
+.button-container button.primary:hover {
     background-color: var(--hq-primary-button-background-hover-color);
-}
-
-.imbu-proposal-item {
-    display: block;
-    margin: 0 0 30px 0;
-    border: 1px solid #007;
-    box-shadow: 0 0 5px #333,
-    0 0 15px #333;
 }
 
 .w-button {
@@ -173,26 +190,23 @@ button.primary:hover {
 }
 
 div#layout {
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
     align-content: baseline;
     height: 100%;
-    /* width: 100vw; */
-    /* max-width: 100%; */
+    width: 100vw;
+    max-width: 100%;
     color: var(--theme-ink-color);
     flex-wrap: wrap;
     --hq-layout-header-height: 2.5rem;
-    /* box-shadow: 0 0 20px #aaa; */
     margin: auto;
     min-height: 100vh;
-    /* why 55px? */
     min-height: calc(100vh - 55px);
     --hq-layout-padding: 30px;
     padding: 0;
-
     width: 100%;
+    max-width: var(--hq-layout-max-screen);
     /* overflow: hidden; */
-
     --hq-layout-max-screen: 1366px;
 }
 
@@ -570,83 +584,6 @@ and (min-width: 500px) {
     }
 }
 
-ol.proposals-list {
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 23%);
-    /* grid-gap: 1%; */
-    justify-content: space-between;
-}
-
-ol.proposals-list li {
-    display: block;
-    margin: 0 0 30px 0;
-    border: 1px solid #007;
-    box-shadow: 0 0 5px #333,
-    0 0 15px #333;
-}
-
-@media screen and (max-width: 1100px) {
-    ol.proposals-list {
-        grid-template-columns: repeat(auto-fill, 31%);
-    }
-}
-
-@media screen and (max-width: 750px) {
-    ol.proposals-list {
-        grid-template-columns: repeat(auto-fill, 48%);
-    }
-}
-
-@media screen and (max-width: 500px) {
-    ol.proposals-list {
-        display: flex;
-        flex-flow: row wrap;
-        grid-template-columns: none;
-    }
-    ol.proposals-list li {
-        width: 100%;
-    }
-}
-
-/*:host {*/
-/*    display: block;*/
-/*}*/
-
-ol.proposals-list li {
-    list-style: none;
-}
-
-ol.proposals-list li img {
-    object-fit: cover;
-    height: 200px;
-    width: 100%;
-}
-
-ol.proposals-list li #name {
-    font-family: var(--theme-font-family);
-    font-size: 22px;
-    padding: 20px;
-    font-weight: 400;
-    line-height: 1.2;
-}
-
-ol.proposals-list li a {
-    display: block;
-    text-decoration: none;
-    background: transparent;
-    transition: var(--base-transition);
-    padding: 20px 10px;
-    color: white;
-    font-size: 16px;
-    font-weight: 400;
-}
-
-ol.proposals-list li a:hover {
-    background: var(--theme-primary);
-    color: #000;
-}
 
 
 
@@ -687,10 +624,12 @@ nav a {
     text-decoration: none;
     padding: 12px 20px;
 }
-nav i.material-icons {
-    font-size: var(--icon-size);
-    padding-top: 2px;
-}
-nav span {
+
+.drawer span {
     margin-left: 10px;
+}
+
+nav i.material-icons {
+    font-size: 24px;
+    padding-top: 2px;
 }

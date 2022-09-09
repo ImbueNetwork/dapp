@@ -10,11 +10,13 @@ import '@rmwc/list/styles';
 import { marked } from "marked";
 
 import { Contribute } from './components/contribute';
+import ChainService from "./services/chain-service";
 
 type DetailsProps = {
     imbueApi: polkadot.ImbueApiInfo,
     projectId: string | number | null,
     user: User,
+    chainService: ChainService
 }
 
 type DetailsState = {
@@ -210,14 +212,12 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             {this.showProjectStateHeading()}
 
             <div className="action-buttons">
-                {this.state.showContributeComponent ?
                     <Contribute
-                        projectOnChain={this.state.projectOnChain}
-                        user={this.props.user}
-                        imbueApi={this.props.imbueApi}
+                        projectOnChain = { this.state.projectOnChain }
+                        user = { this.props.user }
+                        imbueApi = { this.props.imbueApi }
+                        chainService = { this.props.chainService }
                     ></Contribute>
-                    : null
-                }
             </div>
 
             <TabBar activeTabIndex={this.state.activeTabIndex}
@@ -264,6 +264,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     const imbueApi = await polkadot.initImbueAPIInfo();
     const projectId = await utils.getProjectId();
     const user = await utils.getCurrentUser();
+    const chainService = new ChainService(imbueApi);
     ReactDOMClient.createRoot(document.getElementById('project-body')!)
-        .render(<Details imbueApi={imbueApi} projectId={projectId} user={user} />);
+        .render(<Details imbueApi={imbueApi} projectId={projectId} user={user} chainService = { chainService } />);
 });

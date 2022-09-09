@@ -2,17 +2,19 @@ import * as React from 'react';
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
 import * as polkadot from "../utils/polkadot";
-import { Currency, User } from "../models";
+import { BasicTxResponse, Currency, User } from "../models";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import { AccountChoice } from './accountChoice';
 import type { ITuple, } from "@polkadot/types/types";
+import ChainService from '../services/chain-service';
 
 export type ContributeProps = {
     imbueApi: polkadot.ImbueApiInfo,
     user: User,
     projectOnChain: any,
+    chainService: ChainService
 }
 
 enum ButtonState {
@@ -35,67 +37,26 @@ export class Contribute extends React.Component<ContributeProps> {
         buttonState: ButtonState.Default
     }
 
-    constructor(props: ContributeProps) {
-        super(props);
-    }
-
     async contribute(account: InjectedAccountWithMeta): Promise<void> {
         await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving});
+        const result: BasicTxResponse = await this.props.chainService.contribute(account,
+            this.props.projectOnChain,
+            BigInt(this.state.contribution * 1e12));
 
-        if (!this.props.projectOnChain) {
-            return
-        }
+        while(true) {
 
-        const projectId = this.props.projectOnChain.milestones[0].projectKey;
+            if(result.transactionHash) {
 
-        const extrinsic = await this.props.imbueApi.imbue.api.tx.imbueProposals.contribute(
-            projectId,
-            this.state.contribution * 1e12
-        );
+                if (result.status) {
+                    await this.setState({ buttonState: ButtonState.Done});
 
-        const injector = await web3FromSource(account.meta.source);
-
-        const txHash = await extrinsic.signAndSend(
-            account.address,
-            { signer: injector.signer },
-            ({ status }) => {
-                this.props.imbueApi.imbue.api.query.system.events((events: any) => {
-                    if (events) {
-                        // Loop through the Vec<EventRecord>
-                        events.forEach((record: any) => {
-
-                            // Extract the phase, event and the event types
-                            const { event, phase } = record;
-                            const contributionSucceeded = `${event.section}.${event.method}` == "imbueProposals.ContributeSucceeded";
-                            const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
-                            if (dispatchError.isModule) {
-                                try {
-                                    let errorMessage = polkadot.getDispatchError(dispatchError);
-                                    polkadot.errorNotification(Error(errorMessage));
-                                    this.setState({ buttonState: ButtonState.Default});
-                                    // location.reload();
-                                } catch (error) {
-                                    // swallow
-                                }
-                            }
-                            if (contributionSucceeded) {
-                                const types = event.typeDef;
-                                const contributionAccountId = event.data[0];
-                                const contributionProjectId = parseInt(event.data[1].toString());
-
-                                if (contributionAccountId == account.address && contributionProjectId == projectId) {
-                                    this.setState({ buttonState: ButtonState.Done});
-                                }
-                            }
-                        });
-                    }
-                });
+                } else {
+                    await this.setState({ buttonState: ButtonState.Default});
+                }
+                break;
             }
-        ).catch((e: any) => {
-            polkadot.errorNotification(e);
-        });
-        console.log(`Transaction hash: ${txHash}`);
-
+            await new Promise(f => setTimeout(f, 1000));
+        }
     }
 
     updateContributionValue(newContribution: number) {

@@ -36,3 +36,11 @@ export type User = {
     display_name: string;
     web3Accounts: Web3Account[];
 };
+
+export interface BasicTxResponse {
+    passwordError?: string | null,
+    callHash?: string,
+    status?: boolean,
+    transactionHash?: string,
+    txError?: boolean,
+  }

@@ -2,7 +2,9 @@ import * as React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 
 import {Dialogue} from './components/dialogue';
-import {getWeb3Accounts, signWeb3Challenge} from "./utils/polkadot";
+import {AccountChoice} from './components/accountChoice';
+
+import {signWeb3Challenge} from "./utils/polkadot";
 import {InjectedAccountWithMeta} from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 
@@ -17,8 +19,7 @@ const postAPIHeaders = {
 
 type LoginProps = {}
 type LoginState = {
-    showPolkadotAccounts: Boolean,
-    accounts: InjectedAccountWithMeta[]
+    showPolkadotAccounts: boolean
 }
 
 async function getAccountAndSign (account: InjectedAccountWithMeta) {
@@ -75,13 +76,11 @@ async function authorise(signature: SignerResult, account: InjectedAccountWithMe
 
 class Login extends React.Component<LoginProps, LoginState> {
     state: LoginState = {
-        showPolkadotAccounts: false,
-        accounts: []
+        showPolkadotAccounts: false
     }
 
     async clicked() {
-        const accounts = await getWeb3Accounts();
-        this.setState({showPolkadotAccounts: true, accounts});
+        this.setState({showPolkadotAccounts: true});
     }
 
     async accountSelected(account: InjectedAccountWithMeta) {
@@ -92,19 +91,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     render() {
         if (this.state.showPolkadotAccounts) {
             return (
-                <Dialogue title="Choose the account you would like to use"
-                          actionList={
-                              <>
-                                  {this.state.accounts.map((account, index) => {
-                                      const {address, meta: {name, source}} = account;
-                                      return <li className="button-container" key={index}>
-                                          <button className="primary" onClick={() => this.accountSelected(account)}>
-                                              {`${name} (${source})`}
-                                          </button>
-                                      </li>
-                                  })}
-                              </>
-                          }/>
+                <AccountChoice accountSelected={(account: InjectedAccountWithMeta) => this.accountSelected(account)} />
             );
         } else {
             return (

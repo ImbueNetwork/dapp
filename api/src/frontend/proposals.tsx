@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
-import * as config from "../legacy/config";
+import * as config from "./config";
 
 /**
  * Models the milestone data that appears in the /proposals/draft form
@@ -79,7 +79,6 @@ class Proposals extends React.Component<ProposalsProps, ProposalsState> {
 
     render() {
         return <div>
-            <h1>Discover Proposals</h1>
             <ol id="list" className="proposals-list">
                 {this.state.projectsList.map(p =>
                     <ProposalItem key={p.id} projectId={p.id} imageSrc={p.logo}
@@ -103,17 +102,19 @@ class ProposalItem extends React.Component<ProposalItemProps, ProposalItemState>
     state: ProposalItemState = {}
 
     render() {
-        return <li>
-            <a id="contribute" href={`/dapp/proposals/detail/${this.props.projectId}`}>
-                <img id="img"
-                     src={this.props.imageSrc}/>
-                <div id="name">{this.props.name}</div>
-            </a>
-        </li>
+        return <div className="imbu-proposal-item">
+                    <li>
+                        <a id="contribute" href={`/dapp/proposals/detail/${this.props.projectId}`}>
+                            <img id="img"
+                                src={this.props.imageSrc}/>
+                            <div id="name">{this.props.name}</div>
+                        </a>
+                    </li>
+                </div>
     }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-    ReactDOMClient.createRoot(document.getElementById('content-root')!)
+    ReactDOMClient.createRoot(document.getElementById('imbu-proposals')!)
         .render(<Proposals/>);
 });

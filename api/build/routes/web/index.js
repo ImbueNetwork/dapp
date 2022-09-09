@@ -12,6 +12,15 @@ router.get("/dashboard", passport_1.default.authenticate('jwt', { session: false
 router.get("/login", (req, res) => {
     res.render("login");
 });
+router.get("/proposals", (req, res) => {
+    res.render("proposals");
+});
+router.get("/proposals/new-details", (req, res) => {
+    res.render("details");
+});
+router.get("/projects/:projectId", (req, res) => {
+    res.render("details");
+});
 router.use((_req, res, next) => {
     res.render("legacy");
 });

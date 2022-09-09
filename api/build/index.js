@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const http_1 = __importDefault(require("http"));
-const http_errors_1 = __importDefault(require("http-errors"));
 const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const morgan_1 = __importDefault(require("morgan"));
@@ -36,10 +35,10 @@ app.get("/redirect", (req, res) => {
     }
     res.redirect("/");
 });
-// not found
-app.use((_req, _res, next) => {
-    next((0, http_errors_1.default)(404));
-});
+// // not found
+// app.use((_req, _res, next) => {
+//     next(createError(404));
+// });
 // uncaught error
 app.use((0, errors_1.errorHandler)(environment));
 const server = http_1.default.createServer(app);

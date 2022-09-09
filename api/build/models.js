@@ -109,7 +109,7 @@ const getOrCreateFederatedUser = (issuer, subject, displayName, done) => {
             done(null, user);
         }
         catch (err) {
-            done(new Error("Failed to upsert federated authentication.", { cause: err }));
+            done(new Error("Failed to upsert federated authentication."));
         }
     });
 };

@@ -15,18 +15,24 @@ export type ContributeProps = {
     projectOnChain: any,
 }
 
+enum ButtonState {
+    Default,
+    Saving,
+    Done
+}
 
 type ContributeState = {
     showPolkadotAccounts: Boolean,
     contribution: number,
+    buttonState: ButtonState
 }
-
 
 export class Contribute extends React.Component<ContributeProps> {
 
     state: ContributeState = {
         showPolkadotAccounts: false,
         contribution: 0,
+        buttonState: ButtonState.Default
     }
 
     constructor(props: ContributeProps) {
@@ -34,17 +40,13 @@ export class Contribute extends React.Component<ContributeProps> {
     }
 
     async contribute(account: InjectedAccountWithMeta): Promise<void> {
-        this.setState({ showPolkadotAccounts: false });
+        await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving});
+
         if (!this.props.projectOnChain) {
             return
         }
 
         const projectId = this.props.projectOnChain.milestones[0].projectKey;
-        let contributeButton = document.getElementById('contribute-button') as HTMLButtonElement;
-
-        contributeButton.disabled = true;
-        contributeButton.classList.add("blob");
-        contributeButton.innerText = "Saving.....";
 
         const extrinsic = await this.props.imbueApi.imbue.api.tx.imbueProposals.contribute(
             projectId,
@@ -70,10 +72,7 @@ export class Contribute extends React.Component<ContributeProps> {
                                 try {
                                     let errorMessage = polkadot.getDispatchError(dispatchError);
                                     polkadot.errorNotification(Error(errorMessage));
-
-                                    contributeButton.disabled = false;
-                                    contributeButton.classList.remove("blob");
-                                    contributeButton.innerText = "Contribute";
+                                    this.setState({ buttonState: ButtonState.Default});
                                     // location.reload();
                                 } catch (error) {
                                     // swallow
@@ -85,10 +84,7 @@ export class Contribute extends React.Component<ContributeProps> {
                                 const contributionProjectId = parseInt(event.data[1].toString());
 
                                 if (contributionAccountId == account.address && contributionProjectId == projectId) {
-                                    contributeButton.classList.remove("blob");
-                                    contributeButton.disabled = false;
-                                    contributeButton.classList.add("finalized");
-                                    contributeButton.innerText = "Contribution Succeeded";
+                                    this.setState({ buttonState: ButtonState.Done});
                                 }
                             }
                         });
@@ -107,7 +103,7 @@ export class Contribute extends React.Component<ContributeProps> {
     }
 
     async beginContribution(): Promise<void> {
-        this.setState({ showPolkadotAccounts: true });
+        this.setState({ showPolkadotAccounts: true, buttonState: ButtonState.Done });
     }
 
     handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -118,7 +114,6 @@ export class Contribute extends React.Component<ContributeProps> {
     render() {
         return (
             <div>
-
                 {this.state.showPolkadotAccounts ?
                     <h3 id="project-state-headline">
                         <AccountChoice accountSelected={ (account) => this.contribute(account)} />
@@ -129,10 +124,19 @@ export class Contribute extends React.Component<ContributeProps> {
                     <TextField
                         type="number"
                         step="any"
-                        onChange = {(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))} 
+                        onChange = {(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
                         outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
                         label="Contribution Amount..." required />
-                    <button type="submit" className="button primary" id="contribute-button" >Contribute</button>
+                    <button
+                    type="submit"
+                    disabled = {this.state.buttonState == ButtonState.Saving}
+                    className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized": "button primary"}
+                    id="contribute-button">
+                        {
+                        this.state.buttonState == ButtonState.Saving ? "Saving....."
+                        : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
+                        : "Contribute"}
+                    </button>
                 </form>
             </div>
         );

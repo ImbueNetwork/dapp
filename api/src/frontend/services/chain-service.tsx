@@ -9,7 +9,7 @@ import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import type { ITuple, } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-
+import type { EventRecord } from '@polkadot/types/interfaces';
 
 type EventDetails = {
     accountIdKey: number,
@@ -35,36 +35,34 @@ class ChainService {
         return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["contribute"].accountIdKey, eventMapping["contribute"].eventName);
     }
 
-
     async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
-        const transactionState: BasicTxResponse = {};
+        const transactionState: BasicTxResponse = {} as BasicTxResponse;
         try {
-            // Make a transfer from Alice to BOB, waiting for inclusion
             const unsubscribe = await extrinsic
                 .signAndSend(
                     account.address,
                     { signer: injector.signer }, (result) => {
-                        this.imbueApi.imbue.api.query.system.events((events: any) => {
+                        this.imbueApi.imbue.api.query.system.events((events: EventRecord[]) => {
                             if (!result || !result.status || !events) {
                                 return;
                             }
 
                             events
-                                .filter(({ event }) =>  event.section === 'imbueProposals' || event.section === 'system' )
-                                .forEach(({ event }): BasicTxResponse => {
+                                .filter(({ event: { data, method, section }, phase }: EventRecord) => section === 'imbueProposals' || section === 'system')
+                                .forEach(({ event: { data, method, section }, phase }: EventRecord): BasicTxResponse => {
                                     transactionState.transactionHash = extrinsic.hash.toHex();
 
-                                    const [dispatchError] = event.data as unknown as ITuple<[DispatchError]>;
+                                    const [dispatchError] = data as unknown as ITuple<[DispatchError]>;
                                     if (dispatchError.isModule) {
-                                       return this.handleError(transactionState, dispatchError);
+                                        return this.handleError(transactionState, dispatchError);
                                     }
 
-                                    if (eventName && event.method === eventName && event.data[eventKey].toHuman() === account.address) {
+                                    if (eventName && method === eventName && data[eventKey].toHuman() === account.address) {
                                         transactionState.status = true;
                                         return transactionState;
                                     }
-                                    else if (event.method === 'ExtrinsicFailed') {
+                                    else if (method === 'ExtrinsicFailed') {
                                         transactionState.status = false;
                                         transactionState.txError = true;
                                         return transactionState;
@@ -85,79 +83,78 @@ class ChainService {
                         });
                     });
         } catch (error) {
+            if (error instanceof Error) {
+                transactionState.errorMessage = error.message;
+            }
             transactionState.txError = true;
-            transactionState.errorMessage = error.message;
+        } finally {
+            return transactionState;
+        }
+    }
+
+    async submitExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>): Promise<BasicTxResponse> {
+        const injector = await web3FromSource(account.meta.source);
+        const transactionState: BasicTxResponse = {} as BasicTxResponse;
+        try {
+            const unsubscribe = await extrinsic
+                .signAndSend(
+                    account.address,
+                    { signer: injector.signer }, (result) => {
+                        (async () => {
+                            if (!result || !result.status) {
+                                return;
+                            }
+                            result.events
+                                .filter(({ event: { data, method, section }, phase }: EventRecord) => section === 'system' || section === 'imbueProposals')
+                                .forEach(({ event: { data, method, section }, phase }: EventRecord): BasicTxResponse => {
+                                    transactionState.transactionHash = extrinsic.hash.toHex();
+
+                                    if (method === 'ExtrinsicSuccess') {
+                                        transactionState.status = true;
+                                        return transactionState;
+                                    } else if (method === 'ExtrinsicFailed') {
+                                        transactionState.status = false;
+                                        return transactionState;
+                                    }
+                                    return transactionState;
+                                });
+
+                            if (result.isError) {
+                                transactionState.txError = true;
+                                return transactionState;
+                            }
+
+                            if (result.isCompleted) {
+                                unsubscribe();
+                                return transactionState;
+                            }
+                            return transactionState;
+                        });
+                    });
+        } catch (error) {
+            if (error instanceof Error) {
+                transactionState.errorMessage = error.message;
+            }
+            transactionState.txError = true;
             return transactionState;
         }
         return transactionState;
     }
 
-    async submitExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>): Promise<BasicTxResponse> {
-
-        const injector = await web3FromSource(account.meta.source);
-        const txState: BasicTxResponse = {};
-
+    handleError(transactionState: BasicTxResponse, dispatchError: DispatchError): BasicTxResponse {
         try {
-            // Make a transfer from Alice to BOB, waiting for inclusion
-            const unsubscribe = await extrinsic
-                .signAndSend(
-                    account.address,
-                    { signer: injector.signer }, (result) => {
-                        if (!result || !result.status) {
-                            return;
-                        }
-
-                        result.events
-                            .filter(({ event }) => event.section === 'system' || event.section === 'imbueProposals')
-                            .forEach(({ event }): BasicTxResponse => {
-                                txState.transactionHash = extrinsic.hash.toHex();
-
-                                if (event.method === 'ExtrinsicSuccess') {
-                                    txState.status = true;
-                                    return txState;
-                                } else if (event.method === 'ExtrinsicFailed') {
-                                    txState.status = false;
-                                    return txState;
-                                }
-                                return txState;
-                            });
-
-                        if (result.isError) {
-                            txState.txError = true;
-                            return txState;
-                        }
-
-                        if (result.isCompleted) {
-                            unsubscribe();
-                            return txState;
-                        }
-                    });
-        } catch (e) {
-            console.error('error withdrawing', e);
-            txState.txError = true;
-            return txState;
-        }
-        return txState;
-    }
-
-     handleError(transactionState: BasicTxResponse,  dispatchError: DispatchError): BasicTxResponse {
-        try {
-            
             let errorMessage = polkadot.getDispatchError(dispatchError);
             transactionState.errorMessage = errorMessage;
-            transactionState.status = false;
             transactionState.txError = true;
-            return transactionState;
         } catch (error) {
-            transactionState.errorMessage = error.message;
-
-            // swallow
+            if (error instanceof Error) {
+                transactionState.errorMessage = error.message;
+            }
+            transactionState.txError = true;
+        } finally {
             return transactionState;
         }
     }
-
-
-
 };
 
 export default ChainService;

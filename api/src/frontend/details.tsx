@@ -4,7 +4,7 @@ import { Tab, TabBar } from "@rmwc/tabs";
 import { List, SimpleListItem } from "@rmwc/list";
 import * as utils from "./utils";
 import * as polkadot from "./utils/polkadot";
-import { Currency, RoundType, Project,ProjectOnChain, User } from "./models";
+import { Currency, RoundType, Project,ProjectOnChain, User, ProjectState } from "./models";
 import "../../public/proposal.css"
 import '@rmwc/list/styles';
 import { marked } from "marked";
@@ -22,7 +22,7 @@ type DetailsProps = {
 type DetailsState = {
     activeTabIndex: number,
     projectOnChain: ProjectOnChain,
-    projectState: string,
+    projectState: ProjectState,
     userIsInitiator: boolean,
     showContributeComponent: boolean,
     showSubmitMilestoneComponent: boolean,
@@ -30,46 +30,59 @@ type DetailsState = {
     showWithdrawComponent: boolean
 }
 
-const initiatorHeadingMapping: Record<string, JSX.Element> = {
+const initiatorHeadingMapping: Record<ProjectState, JSX.Element> = {
     /* PROJECT HAS BEEN CREATED SUCCESSFULLY AND pending ADDITION TO FUNDING ROUND */
-    "pending_project_approval": <h3>Funding for this project is not yet open. Check back soon for more updates!</h3>,
+    [ProjectState.PendingProjectApproval] : <h3>Funding for this project is not yet open. Check back soon for more updates!</h3>,
 
     /* PROJECT IS PENDING FUNDING APPROVAL ROUND */
-    "pending_funding_approval": <h3>Pending funding approval. Funding round not complete or approved. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>,
+    [ProjectState.PendingFundingApproval] : <h3>Pending funding approval. Funding round not complete or approved. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>,
 
     /* PROJECT IS IN THE CONTRIBUTION ROUND */
-    "pending_contributions": <h3>Your proposal has been created successfully and added to the funding round. Contributors can now fund your project</h3>,
+    [ProjectState.OpenForContribution]: <h3>Your proposal has been created successfully and added to the funding round. Contributors can now fund your project</h3>,
 
     /* PROJECT IS IN THE VOTING ROUND */
-    "open_for_voting": <h3>Pending milestone approval. Milestone voting round not complete or approved. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review.</h3>,
+
+    [ProjectState.OpenForVoting] : <></>,
+
+    [ProjectState.PendingMilestoneApproval] : <h3>Pending milestone approval. Milestone voting round not complete or approved. Please <a href='https://discord.gg/jyWc6k8a'>contact the team</a> for review.</h3>,
 
     /* PROJECT IS pending MILESTONE SUBMISSION */
-    "pending_milestone_submission": <h3>Pending milestone submission</h3>
+    [ProjectState.PendingMilestoneSubmission]: <h3>Pending milestone submission</h3>,
+
+    [ProjectState.OpenForWithdraw]: <></>
+
+
 }
 
-const contributorHeadingMapping: Record<string, JSX.Element> = {
+const contributorHeadingMapping: Record<ProjectState, JSX.Element> = {
     /* PROJECT HAS BEEN CREATED SUCCESSFULLY AND pending ADDITION TO FUNDING ROUND */
-    "pending_project_approval": <h3>Funding for this project is not yet open. Check back soon for more updates!</h3>,
+    [ProjectState.PendingProjectApproval] : <h3>Funding for this project is not yet open. Check back soon for more updates!</h3>,
 
     /* PROJECT IS PENDING FUNDING APPROVAL ROUND */
-    "pending_funding_approval": <h3>Pending funding approval. Funding round not complete or approved. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>,
+    [ProjectState.PendingFundingApproval] : <h3>Pending funding approval. Funding round not complete or approved. Please <a href="https://discord.gg/jyWc6k8a">contact the team</a> for review.</h3>,
 
     /* PROJECT IS IN THE CONTRIBUTION ROUND */
-    "pending_contributions": <h3>This project is open for contributions!</h3>,
+    [ProjectState.OpenForContribution] : <h3>This project is open for contributions!</h3>,
+
+    [ProjectState.PendingMilestoneSubmission] : <></>,
 
     /* PROJECT IS IN THE VOTING ROUND */
-    "open_for_voting": <h3>Project contributors can now vote on milestones</h3>,
+    [ProjectState.OpenForVoting] : <h3>Project contributors can now vote on milestones</h3>,
 
+    /* PROJECT IS IN THE VOTING ROUND */
+    [ProjectState.PendingMilestoneApproval] : <></>,
 
     /* PROJECT IS pending MILESTONE SUBMISSION */
-    "pending_milestone_submission": <h3>Pending milestone submission</h3>,
+    [ProjectState.PendingMilestoneSubmission]: <h3>Pending milestone submission</h3>,
+
+    [ProjectState.OpenForWithdraw]: <></>
 }
 
 class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
         activeTabIndex: 0,
         projectOnChain: {} as ProjectOnChain,
-        projectState: "",
+        projectState: ProjectState.PendingProjectApproval,
         userIsInitiator: false,
         showContributeComponent: false,
         showSubmitMilestoneComponent: false,
@@ -86,91 +99,36 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     }
 
     async setProjectState(projectOnChain: ProjectOnChain): Promise<void> {
-        let userIsInitiator = false;
-        let projectInContributionRound = false;
-        let projectInVotingRound = false;
-        let finalState = ""
-        let showContributeComponent = false
+        let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain);        let showContributeComponent = false
         let showSubmitMilestoneComponent = false;
         let showVoteComponent = false;
         let showWithdrawComponent = false;
-
-
-
 
         if (!projectOnChain.milestones) {
             return;
         }
 
-        const lastHeader = await this.props.imbueApi.imbue.api.rpc.chain.getHeader();
-        const currentBlockNumber = lastHeader.number.toBigInt();
-        const rounds: any = await (await this.props.imbueApi.imbue.api.query.imbueProposals.rounds.entries());
-        const isLoggedIn = (this.props.user && this.props.user.web3Accounts != null)
-        if (isLoggedIn) {
-            this.props.user.web3Accounts.forEach(web3Account => {
-                if (web3Account.address == projectOnChain.initiator) {
-                    userIsInitiator = true;
-                }
-            });
-        }
+        const projectState = await this.props.chainService.getProjectState(projectOnChain, this.props.user);
 
-        for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
-            const [id, round] = rounds[i];
-            const readableRound = round.toHuman();
-            const roundStart = BigInt(readableRound.start.replaceAll(",", ""));
-            const roundEnd = BigInt(readableRound.end.replaceAll(",", ""));
-            const ProjectExistsInRound = readableRound.projectKeys.includes(projectOnChain.milestones[0].projectKey)
-
-            if (roundStart < currentBlockNumber && roundEnd > currentBlockNumber && ProjectExistsInRound) {
-                if (projectOnChain.approvedForFunding && readableRound.roundType == RoundType[RoundType.ContributionRound]) {
-                    projectInContributionRound = true;
-                    break;
-                } else if (projectOnChain.fundingThresholdMet && readableRound.roundType == RoundType[RoundType.VotingRound]) {
-                    projectInVotingRound = true;
-                    break;
-                }
+        if(userIsInitiator) {
+            // SHOW WITHDRAW AND MILESTONE SUBMISSION components
+            switch(projectState) {
+                case ProjectState.PendingMilestoneSubmission: showSubmitMilestoneComponent = true;
+                case ProjectState.OpenForWithdraw: showWithdrawComponent = true;
             }
-        }
 
-        if (projectOnChain.fundingThresholdMet) {
-            // Initators cannot contribute to their own project
-            if (userIsInitiator) {
-                showSubmitMilestoneComponent = userIsInitiator;
-                if (projectInVotingRound) {
-                    showWithdrawComponent = userIsInitiator;
-                    finalState = "pending_milestone_approval";
-                } else if (projectInContributionRound) {
-                    finalState = "pending_contributions"
-                }
-            } else if (projectInVotingRound) {
-                showVoteComponent = projectInVotingRound;
-                finalState = "open_for_voting";
-            } else {
-                finalState = "pending_milestone_submission";
-            }
-        } else if (!userIsInitiator && projectInContributionRound) {
-            showContributeComponent = projectInContributionRound;
-            finalState = "pending_contributions";
         } else {
-            // Project not yet open for funding
-            if (projectOnChain.approvedForFunding && !projectInContributionRound) {
-                finalState = "pending_funding_approval";
-            } else if (userIsInitiator) {
-                if (projectInContributionRound) {
-                    finalState = "pending_contributions"
-                } else {
-                    finalState = "pending_project_approval";
-                }
-            } else {
-                finalState = "pending_project_approval";
+            switch(projectState) {
+                case ProjectState.OpenForContribution: showContributeComponent = true;
+                case ProjectState.OpenForVoting: showVoteComponent = true;
             }
         }
 
-        if (this.state.projectState !== finalState) {
+        if (this.state.projectState !== projectState) {
             this.setState({
                 projectOnChain: projectOnChain,
                 userIsInitiator: userIsInitiator,
-                projectState: finalState,
+                projectState: projectState,
                 showContributeComponent: showContributeComponent,
                 showVoteComponent: showVoteComponent,
                 showWithdrawComponent: showWithdrawComponent,

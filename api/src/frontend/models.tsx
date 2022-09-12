@@ -23,6 +23,16 @@ export type Project = {
     user_id?: string | number;
 };
 
+export enum ProjectState {
+    PendingProjectApproval,
+    PendingFundingApproval,
+    OpenForContribution,
+    PendingMilestoneSubmission,
+    PendingMilestoneApproval,
+    OpenForVoting,
+    OpenForWithdraw,
+}
+
 export type ProjectOnChain = {
     id?: string | number;
     name: string;

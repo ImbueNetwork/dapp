@@ -3,7 +3,7 @@ import * as React from 'react';
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
 import * as polkadot from "../utils/polkadot";
-import { BasicTxResponse, Currency, Contribution, Milestone, Project, ProjectOnChain, User } from "../models";
+import { BasicTxResponse, Currency, Contribution, Milestone, Project, ProjectOnChain, ProjectState, RoundType, User } from "../models";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
@@ -185,9 +185,81 @@ class ChainService {
             fundingThresholdMet: projectOnChain.fundingThresholdMet,
             cancelled: projectOnChain.cancelled,
         };
-
-
         return convertedProject;
+    }
+
+    public async getProjectState(projectOnChain: ProjectOnChain, user: User):Promise<ProjectState> {
+
+        let projectState = ProjectState.PendingProjectApproval;
+        let userIsInitiator = await this.isUserInitiator(user, projectOnChain);
+        let projectInContributionRound = false;
+        let projectInVotingRound = false;
+        const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
+        const currentBlockNumber = lastHeader.number.toBigInt();
+        const rounds: any = await (await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries());
+     
+
+        for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
+            const [id, round] = rounds[i];
+            const readableRound = round.toHuman();
+            const roundStart = BigInt(readableRound.start.replaceAll(",", ""));
+            const roundEnd = BigInt(readableRound.end.replaceAll(",", ""));
+            const ProjectExistsInRound = readableRound.projectKeys.includes(projectOnChain.milestones[0].projectKey)
+
+            if (roundStart < currentBlockNumber && roundEnd > currentBlockNumber && ProjectExistsInRound) {
+                if (projectOnChain.approvedForFunding && readableRound.roundType == RoundType[RoundType.ContributionRound]) {
+                    projectInContributionRound = true;
+                    break;
+                } else if (projectOnChain.fundingThresholdMet && readableRound.roundType == RoundType[RoundType.VotingRound]) {
+                    projectInVotingRound = true;
+                    break;
+                }
+            }
+        }
+
+        if (projectOnChain.fundingThresholdMet) {
+            // Initators cannot contribute to their own project
+            if (userIsInitiator) {
+                if (projectInVotingRound) {
+                    projectState = ProjectState.PendingMilestoneApproval;
+                } else if (projectInContributionRound) {
+                    projectState = ProjectState.OpenForContribution;
+                }
+            } else if (projectInVotingRound) {
+                projectState = ProjectState.OpenForVoting;
+            } else {
+                projectState = ProjectState.PendingMilestoneSubmission;
+            }
+        } else if (!userIsInitiator && projectInContributionRound) {
+            projectState = ProjectState.OpenForContribution;
+        } else {
+            // Project not yet open for funding
+            if (projectOnChain.approvedForFunding && !projectInContributionRound) {
+                projectState = ProjectState.PendingFundingApproval;
+            } else if (userIsInitiator) {
+                if (projectInContributionRound) {
+                    projectState = ProjectState.OpenForContribution;
+                } else {
+                    projectState = ProjectState.PendingProjectApproval;
+                }
+            } else {
+                projectState = ProjectState.PendingProjectApproval;
+            }
+        }
+        return projectState;
+    }
+
+    public async isUserInitiator(user:User, projectOnChain: project): Promise<boolean> {
+        let userIsInitiator = false;
+        const isLoggedIn = (user && user.web3Accounts != null)
+        if (isLoggedIn) {
+            user.web3Accounts.forEach(web3Account => {
+                if (web3Account.address == projectOnChain.initiator) {
+                    userIsInitiator = true;
+                }
+            });
+        }
+        return userIsInitiator;
     }
 };
 

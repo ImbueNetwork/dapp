@@ -4,7 +4,7 @@ import { Tab, TabBar } from "@rmwc/tabs";
 import { List, SimpleListItem } from "@rmwc/list";
 import * as utils from "./utils";
 import * as polkadot from "./utils/polkadot";
-import { Currency, RoundType, Project, User } from "./models";
+import { Currency, RoundType, Project,ProjectOnChain, User } from "./models";
 import "../../public/proposal.css"
 import '@rmwc/list/styles';
 import { marked } from "marked";
@@ -21,8 +21,7 @@ type DetailsProps = {
 
 type DetailsState = {
     activeTabIndex: number,
-    project: Project,
-    projectOnChain: any,
+    projectOnChain: ProjectOnChain,
     projectState: string,
     userIsInitiator: boolean,
     showContributeComponent: boolean,
@@ -48,7 +47,6 @@ const initiatorHeadingMapping: Record<string, JSX.Element> = {
     "pending_milestone_submission": <h3>Pending milestone submission</h3>
 }
 
-
 const contributorHeadingMapping: Record<string, JSX.Element> = {
     /* PROJECT HAS BEEN CREATED SUCCESSFULLY AND pending ADDITION TO FUNDING ROUND */
     "pending_project_approval": <h3>Funding for this project is not yet open. Check back soon for more updates!</h3>,
@@ -70,8 +68,7 @@ const contributorHeadingMapping: Record<string, JSX.Element> = {
 class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
         activeTabIndex: 0,
-        project: {} as Project,
-        projectOnChain: {} as any,
+        projectOnChain: {} as ProjectOnChain,
         projectState: "",
         userIsInitiator: false,
         showContributeComponent: false,
@@ -88,7 +85,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         this.setState({ activeTabIndex: tabIndex });
     }
 
-    async setProjectState(project: Project): Promise<void> {
+    async setProjectState(projectOnChain: ProjectOnChain): Promise<void> {
         let userIsInitiator = false;
         let projectInContributionRound = false;
         let projectInVotingRound = false;
@@ -98,7 +95,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         let showVoteComponent = false;
         let showWithdrawComponent = false;
 
-        const projectOnChain: any = (await this.props.imbueApi.imbue?.api.query.imbueProposals.projects(project.chain_project_id)).toHuman();
+
+
 
         if (!projectOnChain.milestones) {
             return;
@@ -170,7 +168,6 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
         if (this.state.projectState !== finalState) {
             this.setState({
-                project: project,
                 projectOnChain: projectOnChain,
                 userIsInitiator: userIsInitiator,
                 projectState: finalState,
@@ -182,15 +179,18 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     }
 
     async componentDidMount() {
-        const project = await utils.fetchProject(this.props.projectId);
-        if (!project) {
-            utils.redirect("/not-found");
-            location.reload();
-            return;
-        }
-        this.setProjectState(project);
-    }
 
+        if (this.props.projectId) {
+            const project = await this.props.chainService.getProject(this.props.projectId);
+
+            if (!project) {
+                utils.redirect("/not-found");
+                location.reload();
+                return;
+            }
+            this.setProjectState(project);
+        }
+    }
 
     showProjectStateHeading(): JSX.Element {
         if (this.state.userIsInitiator) {
@@ -204,7 +204,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         return <div id="details">
             <div className="top-wrapper">
                 <header className="project-name-header"><h1 className="heading-8 project-name-heading"><span
-                    id="project-name">{this.state.project.name}</span></h1></header>
+                    id="project-name">{this.state.projectOnChain.name}</span></h1></header>
                 <img id="project-logo" loading="lazy"
                     srcSet="https://uploads-ssl.webflow.com/6269d876b0577cd24ebce942/626f2cc6ce0d710373645931_6269d876b0577c5f59bceab2_imbue-web-image%5B1%5D-p-800.jpeg" />
             </div>
@@ -212,12 +212,12 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             {this.showProjectStateHeading()}
 
             <div className="action-buttons">
-                    <Contribute
-                        projectOnChain = { this.state.projectOnChain }
-                        user = { this.props.user }
-                        imbueApi = { this.props.imbueApi }
-                        chainService = { this.props.chainService }
-                    ></Contribute>
+                <Contribute
+                    projectOnChain={this.state.projectOnChain}
+                    user={this.props.user}
+                    imbueApi={this.props.imbueApi}
+                    chainService={this.props.chainService}
+                ></Contribute>
             </div>
 
             <TabBar activeTabIndex={this.state.activeTabIndex}
@@ -229,7 +229,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             <div id="tab-content-container">
                 <div className={`tab-content ${this.state.activeTabIndex === 0 ? "active" : ""}`}>
                     <div id="project-description"
-                        dangerouslySetInnerHTML={{ __html: marked.parse(`${this.state.project.description}`) }}>
+                        dangerouslySetInnerHTML={{ __html: marked.parse(`${this.state.projectOnChain.description}`) }}>
                     </div>
                     <ul className="project-details">
                         <li className="project-detail"><span className="detail-value hidden" id="in-block"></span></li>
@@ -237,13 +237,13 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                             <span className="detail-label"></span>
                             <span id="project-detail-currency"
                                 className="imbu-currency-label">${this.state.projectOnChain.currencyId as Currency}</span>{' '}
-                            <span id="funds-required">{String(this.state.project.required_funds / 1e12)}</span>
+                            <span id="funds-required">{String(this.state.projectOnChain.requiredFundsFormatted)}</span>
                             <span className="imbu-currency-label fraction">.00</span>{' '}
                             <span className="detail-label">required</span>
                         </li>
                         <li className="project-detail">
                             <span className="detail-value" id="project-website">
-                                <a href={this.state.project.website} target="_blank">{this.state.project.website}</a>
+                                <a href={this.state.projectOnChain.website} target="_blank">{this.state.projectOnChain.website}</a>
                             </span>
                         </li>
                     </ul>
@@ -266,5 +266,5 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     const user = await utils.getCurrentUser();
     const chainService = new ChainService(imbueApi);
     ReactDOMClient.createRoot(document.getElementById('project-body')!)
-        .render(<Details imbueApi={imbueApi} projectId={projectId} user={user} chainService = { chainService } />);
+        .render(<Details imbueApi={imbueApi} projectId={projectId} user={user} chainService={chainService} />);
 });

@@ -3,13 +3,17 @@ import * as React from 'react';
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
 import * as polkadot from "../utils/polkadot";
-import { BasicTxResponse, Currency, User } from "../models";
+import { BasicTxResponse, Currency, Contribution, Milestone, Project, ProjectOnChain, User } from "../models";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { DispatchError } from '@polkadot/types/interfaces';
 import type { ITuple, } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from '@polkadot/types/interfaces';
+import * as utils from "../utils";
+import type { AnyJson } from '@polkadot/types/types';
+import { stringify } from "querystring";
+
 
 type EventDetails = {
     accountIdKey: number,
@@ -155,6 +159,37 @@ class ChainService {
             return transactionState;
         }
     }
+
+    public async getProject(projectId: string | number) {
+        const project: Project = await utils.fetchProject(projectId);
+        return await this.convertToOnChainProject(project);
+    }
+
+    async convertToOnChainProject(project: Project) {
+        const projectOnChain: any = (await this.imbueApi.imbue?.api.query.imbueProposals.projects(project.chain_project_id)).toHuman();
+        const convertedProject: ProjectOnChain = {
+            id: projectOnChain.milestones[0].projectKey,
+            name: projectOnChain.name,
+            logo: projectOnChain.logo,
+            website: projectOnChain.website,
+            description: project.description,
+            requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",","")),
+            requiredFundsFormatted: (projectOnChain.requiredFunds.replaceAll(",","") / 1e12),
+            withdrawnFunds: BigInt(projectOnChain.withdrawnFunds.replaceAll(",","")),
+            currencyId: projectOnChain.currencyId as Currency,
+            milestones: projectOnChain.milestones as Milestone[],
+            contributions: projectOnChain.contributions as Contribution[],
+            initiator: projectOnChain.initiator,
+            createBlockNumber:  BigInt(projectOnChain.createBlockNumber.replaceAll(",","")),
+            approvedForFunding: projectOnChain.approvedForFunding,
+            fundingThresholdMet: projectOnChain.fundingThresholdMet,
+            cancelled: projectOnChain.cancelled,
+        };
+
+
+        return convertedProject;
+    }
 };
 
 export default ChainService;
+

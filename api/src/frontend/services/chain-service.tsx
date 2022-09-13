@@ -249,7 +249,7 @@ class ChainService {
         return projectState;
     }
 
-    public async isUserInitiator(user:User, projectOnChain: project): Promise<boolean> {
+    public async isUserInitiator(user:User, projectOnChain: ProjectOnChain): Promise<boolean> {
         let userIsInitiator = false;
         const isLoggedIn = (user && user.web3Accounts != null)
         if (isLoggedIn) {

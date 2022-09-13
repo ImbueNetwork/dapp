@@ -23,6 +23,47 @@ export type Project = {
     user_id?: string | number;
 };
 
+export enum ProjectState {
+    PendingProjectApproval,
+    PendingFundingApproval,
+    OpenForContribution,
+    PendingMilestoneSubmission,
+    PendingMilestoneApproval,
+    OpenForVoting,
+    OpenForWithdraw,
+}
+
+export type ProjectOnChain = {
+    id?: string | number;
+    name: string;
+    logo: string;
+    description: string;
+    website: string;
+    requiredFunds: bigint;
+    requiredFundsFormatted: number;
+    withdrawnFunds: bigint;
+    currencyId: Currency;
+    milestones: Milestone[];
+    contributions: Contribution[];
+    initiator: string;
+    createBlockNumber: bigint;
+    approvedForFunding: boolean;
+    fundingThresholdMet: boolean;
+    cancelled: boolean;
+}
+
+export type Milestone = {
+    projectKey: number;
+    milestoneKey: number;
+    name: string;
+    percentageToUnlock: number;
+    isApproved: boolean;
+}
+
+export type Contribution = {
+    accountId: string;
+    value: bigint;
+}
 
 export type Web3Account = {
     address: string,

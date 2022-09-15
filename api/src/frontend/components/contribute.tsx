@@ -6,7 +6,6 @@ import * as polkadot from "../utils/polkadot";
 import { BasicTxResponse, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { AccountChoice } from './accountChoice';
-import { FundingInfo } from './fundingInfo';
 import { ErrorDialog } from './errorDialog';
 import ChainService from '../services/chainService';
 
@@ -84,7 +83,6 @@ export class Contribute extends React.Component<ContributeProps> {
             return (
                 <div>
                     <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
-                    <FundingInfo projectOnChain={this.props.projectOnChain}></FundingInfo>
 
                      {this.state.showPolkadotAccounts ?
                         <h3 id="project-state-headline">

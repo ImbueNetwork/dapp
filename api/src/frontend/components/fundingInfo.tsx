@@ -6,24 +6,23 @@ import { ProgressBar, Step } from "react-step-progress-bar";
 
 import "react-step-progress-bar/styles.css";
 import '@rmwc/linear-progress/styles';
-import {  Currency, ProjectOnChain, ProjectState, User } from "../models";
+import { Currency, ProjectOnChain, ProjectState, User } from "../models";
 
 export type FundingInfoProps = {
     projectOnChain: ProjectOnChain,
+    lastApprovedMilestoneIndex: number,
 }
 
 type FundingInfoState = {
-    lastApprovedMilestoneIndex: number,
     percentageFunded: number,
 }
 
 export class FundingInfo extends React.Component<FundingInfoProps> {
     state: FundingInfoState = {
-        lastApprovedMilestoneIndex: 0,
         percentageFunded: 0,
     }
 
-    async componentDidMount() {
+    async componentDidUpdate() {
         if (this.props.projectOnChain.milestones) {
             this.setProjectState();
         }
@@ -32,28 +31,21 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
     async setProjectState() {
         const totalContributions = this.props.projectOnChain.contributions.reduce((sum: bigint, contribution) => sum + contribution.value, BigInt(0))
         const percentageFunded = Number(totalContributions / BigInt(1e12)) / Number((this.props.projectOnChain.requiredFunds / BigInt(1e12))) * 100;
-        let lastApprovedMilestoneIndex = 0;
-
-        if (this.props.projectOnChain.milestones.filter(milestone => milestone.isApproved).length > 0) {
-            lastApprovedMilestoneIndex = this.props.projectOnChain.milestones
-                .filter(milestone => milestone.isApproved)
-                .reduce(function (prev, current) {
-                    return (prev.milestoneKey > current.milestoneKey) ? prev : current
-                }).milestoneKey + 1;
+        if (Number(percentageFunded.toFixed(2)) != this.state.percentageFunded) {
+            this.setState({
+                percentageFunded: percentageFunded.toFixed(2),
+            })
         }
-        this.setState({
-            lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
-            percentageFunded: percentageFunded.toFixed(2),
-        })
     }
 
     render() {
         if (this.props.projectOnChain.milestones) {
+
             return (
                 <div>
                     <div id="funding-info">
                         <div className="progress-info">
-                            <LinearProgress progress={0.6} buffer={this.props.projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} ></LinearProgress>
+                            <LinearProgress progress={this.state.percentageFunded/100} buffer={this.props.projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} ></LinearProgress>
                             <span>{this.state.percentageFunded}% Funded</span>
                             <div className="funding-goal">
                                 <span className="detail-label">Funding Goal</span>
@@ -64,14 +56,14 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
                         </div>
 
                         <div className="progress-info">
-                            <ProgressBar percent={100 * ((this.state.lastApprovedMilestoneIndex) / this.props.projectOnChain.milestones.length)}>
+                            <ProgressBar percent={100 * ((this.props.lastApprovedMilestoneIndex + 1) / this.props.projectOnChain.milestones.length)}>
                                 {this.props.projectOnChain.milestones.map((milestone, index, arr) => {
                                     return (
                                         <Step
                                             position={100 * (index / arr.length)}
                                             transition="scale"
                                             key={milestone.milestoneKey}
-                                            children={({  }) => (
+                                            children={({ }) => (
                                                 <div className={milestone.isApproved ? "progress-dot completed" : "progress-dot"} title={milestone.name}>
                                                 </div>
                                             )}

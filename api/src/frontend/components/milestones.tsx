@@ -4,6 +4,7 @@ import MilestoneItem from './milestoneItem';
 
 export type MilestonesProps = {
     projectOnChain: ProjectOnChain,
+    lastPendingMilestoneIndex: number
 }
 
 type MilestonesState = {
@@ -22,21 +23,6 @@ export class Milestones extends React.Component<MilestonesProps, MilestonesState
         })
     };
 
-    isMilestoneInVotingRound(milestone: Milestone) {
-        if (this.props.projectOnChain.projectState == ProjectState.OpenForVoting) {
-            const votingMilestoneKey = this.findVotingRoundMilestone();
-            return milestone.milestoneKey == votingMilestoneKey;
-        }
-        return false;
-    }
-
-    findVotingRoundMilestone(): number {
-        const firstmilestone = this.props.projectOnChain.milestones.find(milestone => !milestone.isApproved);
-        if (firstmilestone) {
-            return firstmilestone.milestoneKey;
-        }
-        return -1;
-    }
 
     render() {
         if (this.props.projectOnChain.milestones) {
@@ -47,7 +33,7 @@ export class Milestones extends React.Component<MilestonesProps, MilestonesState
                             key={milestone.milestoneKey}
                             projectOnChain={this.props.projectOnChain}
                             milestone={milestone}
-                            isInVotingRound={this.isMilestoneInVotingRound(milestone)}
+                            isInVotingRound={milestone.milestoneKey === this.props.lastPendingMilestoneIndex && this.props.projectOnChain.projectState === ProjectState.OpenForVoting}
                             toggleActive={this.state.activeMilestone === (milestone.milestoneKey)}
                             toggleMilestone={this.toggleMilestone}
                         />

@@ -11,6 +11,8 @@ import { marked } from "marked";
 
 import { Contribute } from './components/contribute';
 import { Milestones } from './components/milestones';
+import { FundingInfo } from './components/fundingInfo';
+
 import ChainService from "./services/chainService";
 
 type DetailsProps = {
@@ -23,6 +25,8 @@ type DetailsProps = {
 type DetailsState = {
     activeTabIndex: number,
     projectOnChain: ProjectOnChain,
+    lastApprovedMilestoneIndex: number,
+    lastPendingMilestoneIndex: number,
     userIsInitiator: boolean,
     showContributeComponent: boolean,
     showSubmitMilestoneComponent: boolean,
@@ -82,6 +86,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     state: DetailsState = {
         activeTabIndex: 0,
         projectOnChain: {} as ProjectOnChain,
+        lastApprovedMilestoneIndex: -1,
+        lastPendingMilestoneIndex: -1,
         userIsInitiator: false,
         showContributeComponent: false,
         showSubmitMilestoneComponent: false,
@@ -123,8 +129,21 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             }
         }
 
+        let lastApprovedMilestoneIndex = this.props.chainService.findLastMilestone(projectOnChain, true);
+        let lastPendingMilestoneIndex = this.props.chainService.findLastMilestone(projectOnChain, false);
+        
+        // USE THIS FOR DEMO
+        // projectOnChain.milestones[0].isApproved = true;
+        // projectOnChain.milestones[1].isApproved = true;
+        // lastApprovedMilestoneIndex = 1;
+        // lastPendingMilestoneIndex = 2;
+        // projectOnChain.projectState = ProjectState.OpenForVoting;
+
+        console.log("**** last pending milestone is ", lastPendingMilestoneIndex);
         this.setState({
             projectOnChain: projectOnChain,
+            lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
+            lastPendingMilestoneIndex: lastPendingMilestoneIndex,
             userIsInitiator: userIsInitiator,
             showContributeComponent: showContributeComponent,
             showVoteComponent: showVoteComponent,
@@ -163,7 +182,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             </div>
 
             {this.showProjectStateHeading()}
-
+            <FundingInfo projectOnChain={this.state.projectOnChain} lastApprovedMilestoneIndex={this.state.lastApprovedMilestoneIndex}></FundingInfo>
             <div className="action-buttons">
                 {this.state.showContributeComponent ?
                     <Contribute
@@ -211,7 +230,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
 
                 <div className={`tab-content ${this.state.activeTabIndex === 1 ? "active" : ""}`}>
-                    <Milestones projectOnChain={this.state.projectOnChain}></Milestones>
+                    <Milestones projectOnChain={this.state.projectOnChain} lastPendingMilestoneIndex={this.state.lastPendingMilestoneIndex}></Milestones>
                 </div>
 
                 <div className={`tab-content ${this.state.activeTabIndex === 2 ? "active" : ""}`}>

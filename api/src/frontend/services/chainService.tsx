@@ -258,6 +258,14 @@ class ChainService {
         }
         return userIsInitiator;
     }
+
+    public findLastMilestone(projectOnChain: ProjectOnChain, isApproved: boolean): number {
+        const firstmilestone = projectOnChain.milestones.find(milestone => milestone.isApproved == isApproved);
+        if (firstmilestone) {
+            return firstmilestone.milestoneKey;
+        }
+        return -1;
+    }
 };
 
 export default ChainService;

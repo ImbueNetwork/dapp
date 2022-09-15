@@ -1,7 +1,4 @@
-import { ImbueApiInfo, initImbueAPIInfo } from "../utils/polkadot";
-import * as React from 'react';
-import { TextField } from "@rmwc/textfield";
-import '@rmwc/textfield/styles';
+import { ImbueApiInfo } from "../utils/polkadot";
 import * as polkadot from "../utils/polkadot";
 import { BasicTxResponse, Currency, Contribution, Milestone, Project, ProjectOnChain, ProjectState, RoundType, User } from "../models";
 import { web3FromSource } from "@polkadot/extension-dapp";
@@ -11,8 +8,6 @@ import type { ITuple, } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from '@polkadot/types/interfaces';
 import * as utils from "../utils";
-import type { AnyJson } from '@polkadot/types/types';
-import { stringify } from "querystring";
 
 
 type EventDetails = {
@@ -26,8 +21,10 @@ const eventMapping: Record<string, EventDetails> = {
 
 class ChainService {
     imbueApi: ImbueApiInfo;
-    constructor(imbueApi: ImbueApiInfo) {
+    user: User;
+    constructor(imbueApi: ImbueApiInfo, user: User) {
         this.imbueApi = imbueApi;
+        this.user = user
     }
 
     public async contribute(account: InjectedAccountWithMeta, projectOnChain: any, contribution: bigint): Promise<BasicTxResponse> {
@@ -176,28 +173,28 @@ class ChainService {
             requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",","")),
             requiredFundsFormatted: (projectOnChain.requiredFunds.replaceAll(",","") / 1e12),
             withdrawnFunds: BigInt(projectOnChain.withdrawnFunds.replaceAll(",","")),
-            currencyId: projectOnChain.currencyId as Currency,
-            milestones: projectOnChain.milestones as Milestone[],
-            contributions: projectOnChain.contributions as Contribution[],
+            currencyId: projectOnChain.currencyId == "Native" ? "IMBU" as Currency : projectOnChain.currencyId as Currency,
+            milestones: projectOnChain.milestones.map((milestone: any) => ({ projectKey: Number(milestone.projectKey), milestoneKey: Number(milestone.milestoneKey), name: milestone.name, percentageToUnlock: Number(milestone.percentageToUnlock), isApproved: milestone.isApproved } as Milestone)),
+            contributions: projectOnChain.contributions.map((contribution: any) => ({  value: BigInt(contribution.value.replaceAll(",","")), accountId: contribution.accountId } as Contribution)),
             initiator: projectOnChain.initiator,
             createBlockNumber:  BigInt(projectOnChain.createBlockNumber.replaceAll(",","")),
             approvedForFunding: projectOnChain.approvedForFunding,
             fundingThresholdMet: projectOnChain.fundingThresholdMet,
             cancelled: projectOnChain.cancelled,
+            projectState: await this.getProjectState(projectOnChain)
         };
         return convertedProject;
     }
 
-    public async getProjectState(projectOnChain: ProjectOnChain, user: User):Promise<ProjectState> {
+    async getProjectState(projectOnChain: ProjectOnChain):Promise<ProjectState> {
 
         let projectState = ProjectState.PendingProjectApproval;
-        let userIsInitiator = await this.isUserInitiator(user, projectOnChain);
+        let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
         let projectInContributionRound = false;
         let projectInVotingRound = false;
         const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
         const currentBlockNumber = lastHeader.number.toBigInt();
         const rounds: any = await (await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries());
-     
 
         for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
             const [id, round] = rounds[i];
@@ -260,6 +257,14 @@ class ChainService {
             });
         }
         return userIsInitiator;
+    }
+
+    public findLastMilestone(projectOnChain: ProjectOnChain, isApproved: boolean): number {
+        const firstmilestone = projectOnChain.milestones.find(milestone => milestone.isApproved == isApproved);
+        if (firstmilestone) {
+            return firstmilestone.milestoneKey;
+        }
+        return -1;
     }
 };
 

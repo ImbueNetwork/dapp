@@ -92,7 +92,6 @@ async function initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo
 }
 
 export function errorNotification(e: Error) {
-    console.log(e);
     dispatchEvent(new CustomEvent(
         config.event.notification,
         {

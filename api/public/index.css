@@ -22,6 +22,12 @@ h1 {
     font-weight: var(--theme-h1-weight);
 }
 
+h2 {
+    font-size: var(--theme-h2-size);
+    font-weight: var(--theme-h2-weight);
+}
+
+
 li {
     list-style: none;
 }

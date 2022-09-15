@@ -1,7 +1,7 @@
 export enum Currency {
-    IMBU = 0,
-    KSM = 1,
-    KUSD = 2
+    IMBU = "IMBU",
+    KSM = "KSM",
+    KUSD = "KUSD"
 }
 
 export enum RoundType {
@@ -50,6 +50,7 @@ export type ProjectOnChain = {
     approvedForFunding: boolean;
     fundingThresholdMet: boolean;
     cancelled: boolean;
+    projectState: ProjectState;
 }
 
 export type Milestone = {

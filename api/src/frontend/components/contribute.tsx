@@ -1,22 +1,19 @@
 import * as React from 'react';
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
-import '@rmwc/dialog/styles';
-import '@rmwc/button/styles';
+
 import * as polkadot from "../utils/polkadot";
-import { BasicTxResponse, Currency, User } from "../models";
-import { web3FromSource } from "@polkadot/extension-dapp";
+import { BasicTxResponse, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import type { DispatchError } from '@polkadot/types/interfaces';
 import { AccountChoice } from './accountChoice';
-import { ErrorDialog } from './error-dialog';
-import type { ITuple, } from "@polkadot/types/types";
-import ChainService from '../services/chain-service';
+import { FundingInfo } from './fundingInfo';
+import { ErrorDialog } from './errorDialog';
+import ChainService from '../services/chainService';
 
 export type ContributeProps = {
     imbueApi: polkadot.ImbueApiInfo,
     user: User,
-    projectOnChain: any,
+    projectOnChain: ProjectOnChain,
     chainService: ChainService
 }
 
@@ -31,6 +28,7 @@ type ContributeState = {
     showErrorDialog: boolean,
     errorMessage: String | null,
     contribution: number,
+    status: string,
     buttonState: ButtonState
 }
 
@@ -40,6 +38,7 @@ export class Contribute extends React.Component<ContributeProps> {
         showErrorDialog: false,
         errorMessage: null,
         contribution: 0,
+        status: "pendingApproval",
         buttonState: ButtonState.Default
     }
 
@@ -77,40 +76,42 @@ export class Contribute extends React.Component<ContributeProps> {
     }
 
     closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false});
+        this.setState({ showErrorDialog: false });
     }
 
     render() {
-        return (
-            <div>
+        if (this.props.projectOnChain.milestones) {
+            return (
+                <div>
+                    <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
+                    <FundingInfo projectOnChain={this.props.projectOnChain}></FundingInfo>
 
-                <ErrorDialog errorMessage= {this.state.errorMessage} showDialog={ this.state.showErrorDialog } closeDialog={this.closeErrorDialog}></ErrorDialog>
-
-                {this.state.showPolkadotAccounts ?
-                    <h3 id="project-state-headline">
-                        <AccountChoice accountSelected={(account) => this.contribute(account)} />
-                    </h3>
-                    : null
-                }
-                <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                    <TextField
-                        type="number"
-                        step="any"
-                        onChange={(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
-                        outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
-                        label="Contribution Amount..." required />
-                    <button
-                        type="submit"
-                        disabled={this.state.buttonState == ButtonState.Saving}
-                        className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                        id="contribute-button">
-                        {
-                            this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
-                                    : "Contribute"}
-                    </button>
-                </form>
-            </div>
-        );
+                     {this.state.showPolkadotAccounts ?
+                        <h3 id="project-state-headline">
+                            <AccountChoice accountSelected={(account) => this.contribute(account)} />
+                        </h3>
+                        : null
+                    }
+                    <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
+                        <TextField
+                            type="number"
+                            step="any"
+                            onChange={(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
+                            outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
+                            label="Contribution Amount..." required />
+                        <button
+                            type="submit"
+                            disabled={this.state.buttonState == ButtonState.Saving}
+                            className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
+                            id="contribute-button">
+                            {
+                                this.state.buttonState == ButtonState.Saving ? "Saving....."
+                                    : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
+                                        : "Contribute"}
+                        </button>
+                    </form>
+                </div>
+            );
+        }
     }
 }

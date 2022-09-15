@@ -139,7 +139,6 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         // lastPendingMilestoneIndex = 2;
         // projectOnChain.projectState = ProjectState.OpenForVoting;
 
-        console.log("**** last pending milestone is ", lastPendingMilestoneIndex);
         this.setState({
             projectOnChain: projectOnChain,
             lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,

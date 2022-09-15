@@ -4,7 +4,7 @@ import MilestoneItem from './milestoneItem';
 
 export type MilestonesProps = {
     projectOnChain: ProjectOnChain,
-    lastPendingMilestoneIndex: number
+    firstPendingMilestoneIndex: number
 }
 
 type MilestonesState = {
@@ -33,7 +33,7 @@ export class Milestones extends React.Component<MilestonesProps, MilestonesState
                             key={milestone.milestoneKey}
                             projectOnChain={this.props.projectOnChain}
                             milestone={milestone}
-                            isInVotingRound={milestone.milestoneKey === this.props.lastPendingMilestoneIndex && this.props.projectOnChain.projectState === ProjectState.OpenForVoting}
+                            isInVotingRound={milestone.milestoneKey === this.props.firstPendingMilestoneIndex && this.props.projectOnChain.projectState === ProjectState.OpenForVoting}
                             toggleActive={this.state.activeMilestone === (milestone.milestoneKey)}
                             toggleMilestone={this.toggleMilestone}
                         />

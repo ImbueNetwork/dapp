@@ -26,7 +26,7 @@ type DetailsState = {
     activeTabIndex: number,
     projectOnChain: ProjectOnChain,
     lastApprovedMilestoneIndex: number,
-    lastPendingMilestoneIndex: number,
+    firstPendingMilestoneIndex: number,
     userIsInitiator: boolean,
     showContributeComponent: boolean,
     showSubmitMilestoneComponent: boolean,
@@ -87,7 +87,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         activeTabIndex: 0,
         projectOnChain: {} as ProjectOnChain,
         lastApprovedMilestoneIndex: -1,
-        lastPendingMilestoneIndex: -1,
+        firstPendingMilestoneIndex: -1,
         userIsInitiator: false,
         showContributeComponent: false,
         showSubmitMilestoneComponent: false,
@@ -129,8 +129,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             }
         }
 
-        let lastApprovedMilestoneIndex = this.props.chainService.findLastMilestone(projectOnChain, true);
-        let lastPendingMilestoneIndex = this.props.chainService.findLastMilestone(projectOnChain, false);
+        let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
+        let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
         
         // USE THIS FOR DEMO
         // projectOnChain.milestones[0].isApproved = true;
@@ -142,7 +142,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         this.setState({
             projectOnChain: projectOnChain,
             lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
-            lastPendingMilestoneIndex: lastPendingMilestoneIndex,
+            firstPendingMilestoneIndex: firstPendingMilestoneIndex,
             userIsInitiator: userIsInitiator,
             showContributeComponent: showContributeComponent,
             showVoteComponent: showVoteComponent,
@@ -229,7 +229,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
 
                 <div className={`tab-content ${this.state.activeTabIndex === 1 ? "active" : ""}`}>
-                    <Milestones projectOnChain={this.state.projectOnChain} lastPendingMilestoneIndex={this.state.lastPendingMilestoneIndex}></Milestones>
+                    <Milestones projectOnChain={this.state.projectOnChain} lastPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}></Milestones>
                 </div>
 
                 <div className={`tab-content ${this.state.activeTabIndex === 2 ? "active" : ""}`}>

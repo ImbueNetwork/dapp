@@ -33,14 +33,13 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
         const percentageFunded = Number(totalContributions / BigInt(1e12)) / Number((this.props.projectOnChain.requiredFunds / BigInt(1e12))) * 100;
         if (Number(percentageFunded.toFixed(2)) != this.state.percentageFunded) {
             this.setState({
-                percentageFunded: percentageFunded.toFixed(2),
+                percentageFunded: percentageFunded.toFixed(1),
             })
         }
     }
 
     render() {
         if (this.props.projectOnChain.milestones) {
-
             return (
                 <div>
                     <div id="funding-info">

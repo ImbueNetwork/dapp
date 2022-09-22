@@ -1,51 +1,58 @@
 import * as React from 'react';
-import { TextField } from "@rmwc/textfield";
-import '@rmwc/textfield/styles';
+import { Select } from "@rmwc/Select";
+import '@rmwc/select/styles';
 
 import * as polkadot from "../utils/polkadot";
-import { BasicTxResponse, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
+import { BasicTxResponse, ButtonState, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { AccountChoice } from './accountChoice';
 import { ErrorDialog } from './errorDialog';
 import ChainService from '../services/chainService';
 
-export type ContributeProps = {
+export type SubmitMilestoneProps = {
     imbueApi: polkadot.ImbueApiInfo,
     user: User,
     projectOnChain: ProjectOnChain,
     chainService: ChainService
 }
 
-enum ButtonState {
-    Default,
-    Saving,
-    Done
-}
-
-type ContributeState = {
+type SubmitMilestoneState = {
     showPolkadotAccounts: boolean,
     showErrorDialog: boolean,
     errorMessage: String | null,
-    contribution: number,
+    milestoneKey: number,
     status: string,
     buttonState: ButtonState
 }
 
-export class Contribute extends React.Component<ContributeProps> {
-    state: ContributeState = {
+export class SubmitMilestone extends React.Component<SubmitMilestoneProps> {
+    state: SubmitMilestoneState = {
         showPolkadotAccounts: false,
         showErrorDialog: false,
         errorMessage: null,
-        contribution: 0,
+        milestoneKey: 0,
         status: "pendingApproval",
         buttonState: ButtonState.Default
     }
 
-    async contribute(account: InjectedAccountWithMeta): Promise<void> {
+    updateMilestoneValue(milestoneKey: number) {
+        this.setState({ milestoneKey: milestoneKey });
+    }
+
+    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        this.setState({ showPolkadotAccounts: true });
+    }
+
+    closeErrorDialog = () => {
+        this.setState({ showErrorDialog: false });
+    }
+
+    async submitMilestone(account: InjectedAccountWithMeta): Promise<void> {
         await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.contribute(account,
+        const result: BasicTxResponse = await this.props.chainService.submitMilestone(account,
             this.props.projectOnChain,
-            BigInt(this.state.contribution * 1e12));
+            this.state.milestoneKey);
 
         // TODO timeout the while loop
         while (true) {
@@ -61,47 +68,38 @@ export class Contribute extends React.Component<ContributeProps> {
         }
     }
 
-    updateContributionValue(newContribution: number) {
-        this.setState({ contribution: newContribution });
-    }
-
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
-    }
-
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
-    }
-
     render() {
         if (this.props.projectOnChain.milestones) {
             return (
                 <div>
                     <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
 
-                     {this.state.showPolkadotAccounts ?
+                    {this.state.showPolkadotAccounts ?
                         <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.contribute(account)} />
+                            <AccountChoice accountSelected={(account) => this.submitMilestone(account)} />
                         </h3>
                         : null
                     }
-                    <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <TextField
-                            type="number"
-                            step="any"
-                            onChange={(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
-                            outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
-                            label="Contribution Amount..." required />
+                    <form id="milestone-submission-form" name="milestone-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
+                        <Select
+                            label="Submit Milestone"
+                            required
+                            onChange={(event: React.FormEvent) => this.updateMilestoneValue(parseInt((event.target as HTMLInputElement).value))}
+                            icon="how_to_vote"
+                        >
+                            {this.props.projectOnChain.milestones.map(milestone =>
+                                <option key={milestone.milestoneKey} value={milestone.milestoneKey}>{milestone.name}</option>
+                            )}
+                        </Select>
                         <button
                             type="submit"
                             disabled={this.state.buttonState == ButtonState.Saving}
                             className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="contribute">
+                            id="submit-milestone">
                             {
                                 this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
-                                        : "Contribute"}
+                                    : this.state.buttonState == ButtonState.Done ? "Submit Succeeded"
+                                        : "Submit"}
                         </button>
                     </form>
                 </div>

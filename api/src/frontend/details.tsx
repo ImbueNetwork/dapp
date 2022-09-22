@@ -12,6 +12,8 @@ import { marked } from "marked";
 import { Contribute } from './components/contribute';
 import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
+import { SubmitMilestone } from './components/submitMilestone';
+import { VoteOnMilestone } from './components/voteOnMilestone';
 
 import ChainService from "./services/chainService";
 
@@ -104,7 +106,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     }
 
     async setProjectState(projectOnChain: ProjectOnChain): Promise<void> {
-        let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain); let showContributeComponent = false
+        let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain);
+        let showContributeComponent = false
         let showSubmitMilestoneComponent = false;
         let showVoteComponent = false;
         let showWithdrawComponent = false;
@@ -114,14 +117,13 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         }
 
         const projectState = projectOnChain.projectState
+        console.log("****** user is initiator is ", userIsInitiator);
+        console.log("****** project state is ", projectState);
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
-            switch (projectState) {
-                case ProjectState.PendingMilestoneSubmission: showSubmitMilestoneComponent = true;
-                case ProjectState.OpenForWithdraw: showWithdrawComponent = true;
-            }
-
+            showSubmitMilestoneComponent = true;
+            showWithdrawComponent = true;
         } else {
             switch (projectState) {
                 case ProjectState.OpenForContribution: showContributeComponent = true;
@@ -131,7 +133,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
         let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
         let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
-        
+
         // USE THIS FOR DEMO
         // projectOnChain.milestones[0].isApproved = true;
         // projectOnChain.milestones[1].isApproved = true;
@@ -139,12 +141,14 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         // lastPendingMilestoneIndex = 2;
         // projectOnChain.projectState = ProjectState.OpenForVoting;
 
+
         this.setState({
             projectOnChain: projectOnChain,
             lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
             firstPendingMilestoneIndex: firstPendingMilestoneIndex,
             userIsInitiator: userIsInitiator,
             showContributeComponent: showContributeComponent,
+            showSubmitMilestoneComponent: showSubmitMilestoneComponent,
             showVoteComponent: showVoteComponent,
             showWithdrawComponent: showWithdrawComponent,
         })
@@ -192,8 +196,26 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                     ></Contribute>
                     : null
                 }
+                {this.state.showSubmitMilestoneComponent ?
+                    <SubmitMilestone
+                        projectOnChain={this.state.projectOnChain}
+                        user={this.props.user}
+                        imbueApi={this.props.imbueApi}
+                        chainService={this.props.chainService}
+                    ></SubmitMilestone>
+                    : null
+                }
+                {this.state.showVoteComponent ?
+                    <VoteOnMilestone
+                        projectOnChain={this.state.projectOnChain}
+                        user={this.props.user}
+                        imbueApi={this.props.imbueApi}
+                        firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
+                        chainService={this.props.chainService}
+                    ></VoteOnMilestone>
+                    : null
+                }
             </div>
-
             <TabBar activeTabIndex={this.state.activeTabIndex}
                 onActivate={(evt) => this.setActiveTab(evt.detail.index)}>
                 <Tab icon="description" label="About" />

@@ -14,16 +14,16 @@ export type FundingInfoProps = {
 }
 
 type FundingInfoState = {
-    percentageFunded: number,
+    percentageFunded: number | undefined,
 }
 
 export class FundingInfo extends React.Component<FundingInfoProps> {
     state: FundingInfoState = {
-        percentageFunded: 0,
+        percentageFunded: undefined,
     }
 
     async componentDidUpdate() {
-        if (this.props.projectOnChain.milestones) {
+        if (this.props.projectOnChain.milestones && !this.state.percentageFunded) {
             this.setProjectState();
         }
     }

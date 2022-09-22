@@ -1,51 +1,60 @@
 import * as React from 'react';
-import { TextField } from "@rmwc/textfield";
-import '@rmwc/textfield/styles';
+import { Select } from "@rmwc/Select";
+import '@rmwc/select/styles';
 
 import * as polkadot from "../utils/polkadot";
-import { BasicTxResponse, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
+import { BasicTxResponse, ButtonState, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { AccountChoice } from './accountChoice';
 import { ErrorDialog } from './errorDialog';
 import ChainService from '../services/chainService';
 
-export type ContributeProps = {
+export type VoteOnMilestoneProps = {
     imbueApi: polkadot.ImbueApiInfo,
     user: User,
     projectOnChain: ProjectOnChain,
+    firstPendingMilestoneIndex: number,
     chainService: ChainService
 }
 
-enum ButtonState {
-    Default,
-    Saving,
-    Done
-}
-
-type ContributeState = {
+type VoteOnMilestoneState = {
     showPolkadotAccounts: boolean,
     showErrorDialog: boolean,
     errorMessage: String | null,
-    contribution: number,
+    vote: boolean,
     status: string,
     buttonState: ButtonState
 }
 
-export class Contribute extends React.Component<ContributeProps> {
-    state: ContributeState = {
+export class VoteOnMilestone extends React.Component<VoteOnMilestoneProps> {
+    state: VoteOnMilestoneState = {
         showPolkadotAccounts: false,
         showErrorDialog: false,
         errorMessage: null,
-        contribution: 0,
+        vote: false,
         status: "pendingApproval",
         buttonState: ButtonState.Default
     }
 
-    async contribute(account: InjectedAccountWithMeta): Promise<void> {
+    updateVoteValue(vote: boolean) {
+        this.setState({ vote: vote });
+    }
+
+    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        this.setState({ showPolkadotAccounts: true });
+    }
+
+    closeErrorDialog = () => {
+        this.setState({ showErrorDialog: false });
+    }
+
+    async submitVote(account: InjectedAccountWithMeta): Promise<void> {
         await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.contribute(account,
+        const result: BasicTxResponse = await this.props.chainService.voteOnMilestone(account,
             this.props.projectOnChain,
-            BigInt(this.state.contribution * 1e12));
+            this.props.firstPendingMilestoneIndex,
+            this.state.vote);
 
         // TODO timeout the while loop
         while (true) {
@@ -61,47 +70,37 @@ export class Contribute extends React.Component<ContributeProps> {
         }
     }
 
-    updateContributionValue(newContribution: number) {
-        this.setState({ contribution: newContribution });
-    }
-
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
-    }
-
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
-    }
-
     render() {
         if (this.props.projectOnChain.milestones) {
             return (
                 <div>
                     <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
 
-                     {this.state.showPolkadotAccounts ?
+                    {this.state.showPolkadotAccounts ?
                         <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.contribute(account)} />
+                            <AccountChoice accountSelected={(account) => this.submitVote(account)} />
                         </h3>
                         : null
                     }
-                    <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <TextField
-                            type="number"
-                            step="any"
-                            onChange={(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
-                            outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
-                            label="Contribution Amount..." required />
+                    <form id="vote-submission-form" name="vote-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
+                        <Select
+                            label="Vote On Milestone"
+                            required
+                            onChange={(event: React.FormEvent) => this.updateVoteValue(Boolean(parseInt((event.target as HTMLInputElement).value)))}
+                            icon="how_to_vote"
+                        >
+                            <option key="false" value={0} >No</option>
+                            <option key="true" value={1}>Yes</option>
+                        </Select>
                         <button
                             type="submit"
                             disabled={this.state.buttonState == ButtonState.Saving}
                             className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="contribute">
+                            id="vote">
                             {
                                 this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
-                                        : "Contribute"}
+                                    : this.state.buttonState == ButtonState.Done ? "Vote Registered"
+                                        : "Vote"}
                         </button>
                     </form>
                 </div>

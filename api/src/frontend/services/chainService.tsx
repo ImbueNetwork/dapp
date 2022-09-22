@@ -18,6 +18,7 @@ type EventDetails = {
 const eventMapping: Record<string, EventDetails> = {
     "contribute": { accountIdKey: 0, eventName: "ContributeSucceeded" },
     "submitMilestone": { accountIdKey: 0, eventName: "MilestoneSubmitted" },
+    "voteOnMilestone": { accountIdKey: 0, eventName: "VoteComplete" },
 }
 
 class ChainService {
@@ -37,7 +38,6 @@ class ChainService {
         return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["contribute"].accountIdKey, eventMapping["contribute"].eventName);
     }
 
-
     public async submitMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number): Promise<BasicTxResponse> {
         const projectId = projectOnChain.milestones[0].projectKey;
         const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
@@ -45,6 +45,16 @@ class ChainService {
             milestoneKey
         );
         return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["submitMilestone"].accountIdKey, eventMapping["submitMilestone"].eventName);
+    }
+
+    public async voteOnMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number, userVote: boolean): Promise<BasicTxResponse> {
+        const projectId = projectOnChain.milestones[0].projectKey;
+        const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.voteOnMilestone(
+            projectId,
+            milestoneKey,
+            userVote
+        );
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["voteOnMilestone"].accountIdKey, eventMapping["voteOnMilestone"].eventName);
     }
 
     async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {
@@ -203,6 +213,7 @@ class ChainService {
         let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
         let projectInContributionRound = false;
         let projectInVotingRound = false;
+        const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(projectOnChain);
         const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
         const currentBlockNumber = lastHeader.number.toBigInt();
         const rounds: any = await (await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries());
@@ -232,6 +243,10 @@ class ChainService {
                     projectState = ProjectState.PendingMilestoneApproval;
                 } else if (projectInContributionRound) {
                     projectState = ProjectState.OpenForContribution;
+                } else if (lastApprovedMilestoneKey >= 0) {
+                    projectState = ProjectState.OpenForWithdraw;
+                } else {
+                    projectState = ProjectState.PendingMilestoneSubmission;
                 }
             } else if (projectInVotingRound) {
                 projectState = ProjectState.OpenForVoting;

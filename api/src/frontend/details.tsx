@@ -13,6 +13,7 @@ import { Contribute } from './components/contribute';
 import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
 import { SubmitMilestone } from './components/submitMilestone';
+import { VoteOnMilestone } from './components/voteOnMilestone';
 
 import ChainService from "./services/chainService";
 
@@ -105,7 +106,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     }
 
     async setProjectState(projectOnChain: ProjectOnChain): Promise<void> {
-        let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain); let showContributeComponent = false
+        let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain);
+        let showContributeComponent = false
         let showSubmitMilestoneComponent = false;
         let showVoteComponent = false;
         let showWithdrawComponent = false;
@@ -115,14 +117,13 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         }
 
         const projectState = projectOnChain.projectState
+        console.log("****** user is initiator is ", userIsInitiator);
+        console.log("****** project state is ", projectState);
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
-            switch (projectState) {
-                case ProjectState.PendingMilestoneSubmission: showSubmitMilestoneComponent = true;
-                case ProjectState.OpenForWithdraw: showWithdrawComponent = true;
-            }
-
+            showSubmitMilestoneComponent = true;
+            showWithdrawComponent = true;
         } else {
             switch (projectState) {
                 case ProjectState.OpenForContribution: showContributeComponent = true;
@@ -147,6 +148,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             firstPendingMilestoneIndex: firstPendingMilestoneIndex,
             userIsInitiator: userIsInitiator,
             showContributeComponent: showContributeComponent,
+            showSubmitMilestoneComponent: showSubmitMilestoneComponent,
             showVoteComponent: showVoteComponent,
             showWithdrawComponent: showWithdrawComponent,
         })
@@ -195,7 +197,6 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                     : null
                 }
                 {this.state.showSubmitMilestoneComponent ?
-
                     <SubmitMilestone
                         projectOnChain={this.state.projectOnChain}
                         user={this.props.user}
@@ -204,10 +205,17 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                     ></SubmitMilestone>
                     : null
                 }
-
-
+                {this.state.showVoteComponent ?
+                    <VoteOnMilestone
+                        projectOnChain={this.state.projectOnChain}
+                        user={this.props.user}
+                        imbueApi={this.props.imbueApi}
+                        firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
+                        chainService={this.props.chainService}
+                    ></VoteOnMilestone>
+                    : null
+                }
             </div>
-
             <TabBar activeTabIndex={this.state.activeTabIndex}
                 onActivate={(evt) => this.setActiveTab(evt.detail.index)}>
                 <Tab icon="description" label="About" />

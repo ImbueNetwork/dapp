@@ -17,6 +17,7 @@ type EventDetails = {
 
 const eventMapping: Record<string, EventDetails> = {
     "contribute": { accountIdKey: 0, eventName: "ContributeSucceeded" },
+    "submitMilestone": { accountIdKey: 0, eventName: "MilestoneSubmitted" },
 }
 
 class ChainService {
@@ -34,6 +35,16 @@ class ChainService {
             contribution
         );
         return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["contribute"].accountIdKey, eventMapping["contribute"].eventName);
+    }
+
+
+    public async submitMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number): Promise<BasicTxResponse> {
+        const projectId = projectOnChain.milestones[0].projectKey;
+        const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.submitMilestone(
+            projectId,
+            milestoneKey
+        );
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["submitMilestone"].accountIdKey, eventMapping["submitMilestone"].eventName);
     }
 
     async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {

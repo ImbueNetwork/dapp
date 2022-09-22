@@ -183,7 +183,7 @@ ul.project-details li {
     font-weight: bolder;
 }
 
-#contribute-button.finalized {
+#contribute.finalized {
     background-color: var(--theme-primary);
     color: black;
     font-weight: bolder;
@@ -432,5 +432,18 @@ ul.project-details li {
 }
 
 .active {
+    color: var(--theme-ink-color) !important;
+}
+
+.mdc-select {
+    width: 35%;
+    padding-top: 15px;
+}
+
+.mdc-select__anchor {
+    background-color: #1a1a19 !important;
+}
+
+.mdc-select__selected-text, .mdc-select__anchor > span, .rmwc-icon {
     color: var(--theme-ink-color) !important;
 }

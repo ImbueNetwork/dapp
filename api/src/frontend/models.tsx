@@ -9,6 +9,12 @@ export enum RoundType {
     VotingRound,
 }
 
+export enum ButtonState {
+    Default,
+    Saving,
+    Done
+}
+
 export type Project = {
     id?: string | number;
     name: string;

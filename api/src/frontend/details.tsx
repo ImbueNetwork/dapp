@@ -12,6 +12,7 @@ import { marked } from "marked";
 import { Contribute } from './components/contribute';
 import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
+import { SubmitMilestone } from './components/submitMilestone';
 
 import ChainService from "./services/chainService";
 
@@ -131,7 +132,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
         let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
         let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
-        
+
         // USE THIS FOR DEMO
         // projectOnChain.milestones[0].isApproved = true;
         // projectOnChain.milestones[1].isApproved = true;
@@ -139,6 +140,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         // lastPendingMilestoneIndex = 2;
         // projectOnChain.projectState = ProjectState.OpenForVoting;
 
+        
         this.setState({
             projectOnChain: projectOnChain,
             lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
@@ -192,6 +194,15 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                     ></Contribute>
                     : null
                 }
+
+                <SubmitMilestone
+                    projectOnChain={this.state.projectOnChain}
+                    user={this.props.user}
+                    imbueApi={this.props.imbueApi}
+                    chainService={this.props.chainService}
+                ></SubmitMilestone>
+
+
             </div>
 
             <TabBar activeTabIndex={this.state.activeTabIndex}

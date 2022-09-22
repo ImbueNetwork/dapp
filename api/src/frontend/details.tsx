@@ -118,8 +118,6 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         }
 
         const projectState = projectOnChain.projectState
-        console.log("****** user is initiator is ", userIsInitiator);
-        console.log("****** project state is ", projectState);
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components

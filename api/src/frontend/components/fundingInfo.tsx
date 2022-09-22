@@ -44,7 +44,7 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
                 <div>
                     <div id="funding-info">
                         <div className="progress-info">
-                            <LinearProgress progress={this.state.percentageFunded/100} buffer={this.props.projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} ></LinearProgress>
+                            <LinearProgress progress={(this.state.percentageFunded ?? 0)/100} buffer={this.props.projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} ></LinearProgress>
                             <span>{this.state.percentageFunded}% Funded</span>
                             <div className="funding-goal">
                                 <span className="detail-label">Funding Goal</span>

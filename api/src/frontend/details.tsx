@@ -14,6 +14,7 @@ import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
 import { SubmitMilestone } from './components/submitMilestone';
 import { VoteOnMilestone } from './components/voteOnMilestone';
+import { Withdraw } from './components/withdraw';
 
 import ChainService from "./services/chainService";
 
@@ -213,6 +214,15 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                         firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
                         chainService={this.props.chainService}
                     ></VoteOnMilestone>
+                    : null
+                }
+                {this.state.showWithdrawComponent ?
+                    <Withdraw
+                        projectOnChain={this.state.projectOnChain}
+                        user={this.props.user}
+                        imbueApi={this.props.imbueApi}
+                        chainService={this.props.chainService}
+                    ></Withdraw>
                     : null
                 }
             </div>

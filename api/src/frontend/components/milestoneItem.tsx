@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+  import React, { Component } from "react";
 import { AiFillPlusCircle, AiFillMinusCircle } from "react-icons/ai";
 import {  BsCircleFill } from "react-icons/bs";
 import { Currency, Milestone, ProjectOnChain, ProjectState } from "../models";

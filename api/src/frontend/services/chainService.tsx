@@ -8,6 +8,7 @@ import type { ITuple, } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from '@polkadot/types/interfaces';
 import * as utils from "../utils";
+import { Withdraw } from "../components/withdraw";
 
 
 type EventDetails = {
@@ -19,6 +20,8 @@ const eventMapping: Record<string, EventDetails> = {
     "contribute": { accountIdKey: 0, eventName: "ContributeSucceeded" },
     "submitMilestone": { accountIdKey: 0, eventName: "MilestoneSubmitted" },
     "voteOnMilestone": { accountIdKey: 0, eventName: "VoteComplete" },
+    "withraw": { accountIdKey: 0, eventName: "ProjectFundsWithdrawn" }
+
 }
 
 class ChainService {
@@ -55,6 +58,14 @@ class ChainService {
             userVote
         );
         return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["voteOnMilestone"].accountIdKey, eventMapping["voteOnMilestone"].eventName);
+    }
+
+    public async withdraw(account: InjectedAccountWithMeta, projectOnChain: any): Promise<BasicTxResponse> {
+        const projectId = projectOnChain.milestones[0].projectKey;
+        const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.withdraw(
+            projectId
+        );
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["withraw"].accountIdKey, eventMapping["withraw"].eventName);
     }
 
     async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {

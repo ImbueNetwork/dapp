@@ -48,7 +48,7 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
                             <span>{this.state.percentageFunded}% Funded</span>
                             <div className="funding-goal">
                                 <span className="detail-label">Funding Goal</span>
-                                <span className="funds-required">{String(this.props.projectOnChain.requiredFundsFormatted)}</span>
+                                <span className="funds-required">{this.props.projectOnChain.requiredFundsFormatted.toLocaleString()}</span>
                                 <span id="project-detail-currency"
                                     className="funds-required">${this.props.projectOnChain.currencyId as Currency}</span>{' '}
                             </div>

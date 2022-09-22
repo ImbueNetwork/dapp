@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Select } from "@rmwc/Select";
+import { Select } from "@rmwc/select";
 import '@rmwc/select/styles';
 
 import * as polkadot from "../utils/polkadot";

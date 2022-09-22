@@ -140,7 +140,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         // lastPendingMilestoneIndex = 2;
         // projectOnChain.projectState = ProjectState.OpenForVoting;
 
-        
+
         this.setState({
             projectOnChain: projectOnChain,
             lastApprovedMilestoneIndex: lastApprovedMilestoneIndex,
@@ -194,13 +194,16 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                     ></Contribute>
                     : null
                 }
+                {this.state.showSubmitMilestoneComponent ?
 
-                <SubmitMilestone
-                    projectOnChain={this.state.projectOnChain}
-                    user={this.props.user}
-                    imbueApi={this.props.imbueApi}
-                    chainService={this.props.chainService}
-                ></SubmitMilestone>
+                    <SubmitMilestone
+                        projectOnChain={this.state.projectOnChain}
+                        user={this.props.user}
+                        imbueApi={this.props.imbueApi}
+                        chainService={this.props.chainService}
+                    ></SubmitMilestone>
+                    : null
+                }
 
 
             </div>

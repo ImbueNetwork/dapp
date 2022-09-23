@@ -177,31 +177,8 @@ ul.project-details li {
     animation: pulse 2s infinite;
 }
 
-#finalize.finalized {
-    background-color: var(--theme-primary);
-    color: black;
-    font-weight: bolder;
-}
 
-#contribute.finalized {
-    background-color: var(--theme-primary);
-    color: black;
-    font-weight: bolder;
-}
-
-#vote.finalized {
-    background-color: var(--theme-primary);
-    color: black;
-    font-weight: bolder;
-}
-
-#submit-milestone.finalized {
-    background-color: var(--theme-primary);
-    color: black;
-    font-weight: bolder;
-}
-
-#withdraw.finalized {
+#finalize.finalized, #contribute.finalized, #submit-milestone.finalized, #vote.finalized , #approve-milestone.finalized, #withdraw.finalized {
     background-color: var(--theme-primary);
     color: black;
     font-weight: bolder;
@@ -436,7 +413,7 @@ ul.project-details li {
 }
 
 .mdc-select {
-    width: 35%;
+    width: 50%;
     padding-top: 15px;
 }
 
@@ -447,3 +424,13 @@ ul.project-details li {
 .mdc-select__selected-text, .mdc-select__anchor > span, .rmwc-icon {
     color: var(--theme-ink-color) !important;
 }
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-buttons > div {
+    width: 80%;
+}
+

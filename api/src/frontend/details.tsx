@@ -14,6 +14,7 @@ import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
 import { SubmitMilestone } from './components/submitMilestone';
 import { VoteOnMilestone } from './components/voteOnMilestone';
+import { ApproveMilestone } from './components/approveMilestone';
 
 import ChainService from "./services/chainService";
 
@@ -33,6 +34,7 @@ type DetailsState = {
     showContributeComponent: boolean,
     showSubmitMilestoneComponent: boolean,
     showVoteComponent: boolean,
+    showApproveMilestoneComponent: boolean,
     showWithdrawComponent: boolean
 }
 
@@ -94,6 +96,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         showContributeComponent: false,
         showSubmitMilestoneComponent: false,
         showVoteComponent: false,
+        showApproveMilestoneComponent: false,
         showWithdrawComponent: false
     }
 
@@ -107,31 +110,43 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
     async setProjectState(projectOnChain: ProjectOnChain): Promise<void> {
         let userIsInitiator = await this.props.chainService.isUserInitiator(this.props.user, projectOnChain);
+
         let showContributeComponent = false
         let showSubmitMilestoneComponent = false;
         let showVoteComponent = false;
+        let showApproveMilestoneComponent = false;
         let showWithdrawComponent = false;
 
         if (!projectOnChain.milestones) {
             return;
         }
 
+    
+
+        let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
+        let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
+
+
         const projectState = projectOnChain.projectState
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
             showSubmitMilestoneComponent = projectOnChain.fundingThresholdMet;
-            console.log("****** approved for funding is ", projectOnChain.fundingThresholdMet);
-            showWithdrawComponent = true;
+            showWithdrawComponent = lastApprovedMilestoneIndex >= 0;
+            showApproveMilestoneComponent = projectOnChain.fundingThresholdMet;
         } else {
             switch (projectState) {
-                case ProjectState.OpenForContribution: showContributeComponent = true;
-                case ProjectState.OpenForVoting: showVoteComponent = true;
+                case ProjectState.OpenForContribution: {
+                    showContributeComponent = true;
+                    break
+                }
+                case ProjectState.OpenForVoting: {
+                    showVoteComponent = true;
+                    break;
+                }
             }
         }
 
-        let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
-        let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
 
         // USE THIS FOR DEMO
         // projectOnChain.milestones[0].isApproved = true;
@@ -149,6 +164,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             showContributeComponent: showContributeComponent,
             showSubmitMilestoneComponent: showSubmitMilestoneComponent,
             showVoteComponent: showVoteComponent,
+            showApproveMilestoneComponent: showApproveMilestoneComponent,
             showWithdrawComponent: showWithdrawComponent,
         })
     }
@@ -213,6 +229,16 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                             firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
                             chainService={this.props.chainService}
                         ></VoteOnMilestone>
+                        : null
+                    }
+                    { this.state.showApproveMilestoneComponent ?
+                        <ApproveMilestone
+                            projectOnChain={this.state.projectOnChain}
+                            user={this.props.user}
+                            imbueApi={this.props.imbueApi}
+                            firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
+                            chainService={this.props.chainService}
+                        ></ApproveMilestone>
                         : null
                     }
                 </div>

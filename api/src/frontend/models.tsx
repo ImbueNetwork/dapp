@@ -47,6 +47,8 @@ export type ProjectOnChain = {
     website: string;
     requiredFunds: bigint;
     requiredFundsFormatted: number;
+    raisedFunds: bigint;
+    raisedFundsFormatted: number;
     withdrawnFunds: bigint;
     currencyId: Currency;
     milestones: Milestone[];
@@ -55,6 +57,7 @@ export type ProjectOnChain = {
     createBlockNumber: bigint;
     approvedForFunding: boolean;
     fundingThresholdMet: boolean;
+
     cancelled: boolean;
     projectState: ProjectState;
 }

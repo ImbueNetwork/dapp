@@ -29,9 +29,8 @@ export class FundingInfo extends React.Component<FundingInfoProps> {
     }
 
     async setProjectState() {
-        const totalContributions = this.props.projectOnChain.contributions.reduce((sum: bigint, contribution) => sum + contribution.value, BigInt(0))
-        const percentageFunded = Number(totalContributions / BigInt(1e12)) / Number((this.props.projectOnChain.requiredFunds / BigInt(1e12))) * 100;
-        if (Number(percentageFunded.toFixed(2)) != this.state.percentageFunded) {
+        const percentageFunded = (this.props.projectOnChain.raisedFundsFormatted / this.props.projectOnChain.requiredFundsFormatted) * 100;
+        if (Number(percentageFunded.toFixed(1)) != this.state.percentageFunded) {
             this.setState({
                 percentageFunded: percentageFunded.toFixed(1),
             })

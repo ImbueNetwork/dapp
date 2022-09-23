@@ -10,15 +10,15 @@ import type { EventRecord } from '@polkadot/types/interfaces';
 import * as utils from "../utils";
 
 type EventDetails = {
-    accountIdKey: number,
     eventName: string
 }
 
 const eventMapping: Record<string, EventDetails> = {
-    "contribute": { accountIdKey: 0, eventName: "ContributeSucceeded" },
-    "submitMilestone": { accountIdKey: 0, eventName: "MilestoneSubmitted" },
-    "voteOnMilestone": { accountIdKey: 0, eventName: "VoteComplete" },
-    "withraw": { accountIdKey: 0, eventName: "ProjectFundsWithdrawn" }
+    "contribute": { eventName: "ContributeSucceeded" },
+    "submitMilestone": { eventName: "MilestoneSubmitted" },
+    "voteOnMilestone": { eventName: "VoteComplete" },
+    "approveMilestone": { eventName: "MilestoneApproved" },
+    "withraw": { eventName: "ProjectFundsWithdrawn" }
 }
 
 class ChainService {
@@ -35,7 +35,7 @@ class ChainService {
             projectId,
             contribution
         );
-        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["contribute"].accountIdKey, eventMapping["contribute"].eventName);
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["contribute"].eventName);
     }
 
     public async submitMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number): Promise<BasicTxResponse> {
@@ -44,7 +44,7 @@ class ChainService {
             projectId,
             milestoneKey
         );
-        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["submitMilestone"].accountIdKey, eventMapping["submitMilestone"].eventName);
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["submitMilestone"].eventName);
     }
 
     public async voteOnMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number, userVote: boolean): Promise<BasicTxResponse> {
@@ -54,7 +54,16 @@ class ChainService {
             milestoneKey,
             userVote
         );
-        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["voteOnMilestone"].accountIdKey, eventMapping["voteOnMilestone"].eventName);
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["voteOnMilestone"].eventName);
+    }
+
+    public async approveMilestone(account: InjectedAccountWithMeta, projectOnChain: any, milestoneKey: number): Promise<BasicTxResponse> {
+        const projectId = projectOnChain.milestones[0].projectKey;
+        const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.finaliseMilestoneVoting(
+            projectId,
+            [milestoneKey]
+        );
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["approveMilestone"].eventName);
     }
 
     public async withdraw(account: InjectedAccountWithMeta, projectOnChain: any): Promise<BasicTxResponse> {
@@ -62,10 +71,10 @@ class ChainService {
         const extrinsic = await this.imbueApi.imbue.api.tx.imbueProposals.withdraw(
             projectId
         );
-        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["withraw"].accountIdKey, eventMapping["withraw"].eventName);
+        return await this.submitImbueExtrinsic(account, extrinsic, eventMapping["withraw"].eventName);
     }
 
-    async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventKey: number, eventName: String): Promise<BasicTxResponse> {
+    async submitImbueExtrinsic(account: InjectedAccountWithMeta, extrinsic: SubmittableExtrinsic<'promise'>, eventName: String): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
         const transactionState: BasicTxResponse = {} as BasicTxResponse;
         try {
@@ -88,7 +97,7 @@ class ChainService {
                                         return this.handleError(transactionState, dispatchError);
                                     }
 
-                                    if (eventName && method === eventName && data[eventKey].toHuman() === account.address) {
+                                    if (eventName && method === eventName && data[0].toHuman() === account.address) {
                                         transactionState.status = true;
                                         return transactionState;
                                     }
@@ -193,6 +202,7 @@ class ChainService {
 
     async convertToOnChainProject(project: Project) {
         const projectOnChain: any = (await this.imbueApi.imbue?.api.query.imbueProposals.projects(project.chain_project_id)).toHuman();
+        const totalContributions = projectOnChain.contributions.reduce((sum: bigint, contribution: any) => sum + BigInt(contribution.value.replaceAll(",","")), BigInt(0))
         const convertedProject: ProjectOnChain = {
             id: projectOnChain.milestones[0].projectKey,
             name: projectOnChain.name,
@@ -201,6 +211,8 @@ class ChainService {
             description: project.description,
             requiredFunds: BigInt(projectOnChain.requiredFunds.replaceAll(",","")),
             requiredFundsFormatted: (projectOnChain.requiredFunds.replaceAll(",","") / 1e12),
+            raisedFunds: totalContributions,
+            raisedFundsFormatted: Number(totalContributions / BigInt(1e12)),
             withdrawnFunds: BigInt(projectOnChain.withdrawnFunds.replaceAll(",","")),
             currencyId: projectOnChain.currencyId == "Native" ? "IMBU" as Currency : projectOnChain.currencyId as Currency,
             milestones: projectOnChain.milestones.map((milestone: any) => ({ projectKey: Number(milestone.projectKey), milestoneKey: Number(milestone.milestoneKey), name: milestone.name, percentageToUnlock: Number(milestone.percentageToUnlock), isApproved: milestone.isApproved } as Milestone)),
@@ -212,11 +224,11 @@ class ChainService {
             cancelled: projectOnChain.cancelled,
             projectState: await this.getProjectState(projectOnChain)
         };
+
         return convertedProject;
     }
 
     async getProjectState(projectOnChain: ProjectOnChain):Promise<ProjectState> {
-
         let projectState = ProjectState.PendingProjectApproval;
         let userIsInitiator = await this.isUserInitiator(this.user, projectOnChain);
         let projectInContributionRound = false;

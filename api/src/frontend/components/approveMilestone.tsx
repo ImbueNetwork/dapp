@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Tooltip } from "@rmwc/tooltip";
-import '@rmwc/tooltip/styles';
+import { CircularProgress } from "@rmwc/circular-progress";
+import { Chip } from "@rmwc/chip";
+import '@rmwc/circular-progress/styles';
 
 import * as polkadot from "../utils/polkadot";
 import { BasicTxResponse, ButtonState, Currency, Milestone, ProjectOnChain, ProjectState, User } from "../models";
@@ -22,6 +23,8 @@ type ApproveMilestoneState = {
     showErrorDialog: boolean,
     errorMessage: String | null,
     enableApproveButton: boolean,
+    displayVotingProgress: boolean,
+    percentageOfContributorsVoted: number,
     status: string,
     buttonState: ButtonState
 }
@@ -32,7 +35,9 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
         showErrorDialog: false,
         errorMessage: null,
         status: "pendingApproval",
+        percentageOfContributorsVoted: -1,
         enableApproveButton: false,
+        displayVotingProgress: false,
         buttonState: ButtonState.Default
     }
 
@@ -46,21 +51,29 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
     }
 
     async componentDidMount() {
-        const enableApproveButton = await this.haveAllUsersVotedOnMilestone();
-        if (this.state.enableApproveButton != enableApproveButton) {
-            this.setState({
-                enableApproveButton: enableApproveButton,
-            })
-        }
-        console.log("**** button is enabled ",this.state.enableApproveButton);
+        await this.haveAllUsersVotedOnMilestone();
     }
 
     async haveAllUsersVotedOnMilestone(): Promise<boolean> {
         const totalContributions = this.props.projectOnChain.raisedFundsFormatted;
-        const milestoneVotes: any = (await (await this.props.imbueApi.imbue?.api.query.imbueProposals.milestoneVotes([this.props.projectOnChain.id, this.props.firstPendingMilestoneIndex])).toHuman();
+        const milestoneVotes: any = ((await this.props.imbueApi.imbue?.api.query.imbueProposals.milestoneVotes([this.props.projectOnChain.id, this.props.firstPendingMilestoneIndex]))).toHuman();
+        if (!milestoneVotes) {
+            return false;
+        }
+
         const yayVotes = BigInt(milestoneVotes.yay.replaceAll(",", ""));
         const nayVotes = BigInt(milestoneVotes.nay.replaceAll(",", ""));
         const totalVotes = Number((yayVotes + nayVotes) / BigInt(1e12));
+        const percentageOfContributorsVoted = (totalVotes / totalContributions) * 100;
+        const enableApproveButton = totalVotes == totalContributions;
+        const displayVotingProgress = (this.props.projectOnChain.projectState == ProjectState.OpenForVoting || !this.state.enableApproveButton);
+        if (this.state.percentageOfContributorsVoted != percentageOfContributorsVoted) {
+            this.setState({
+                enableApproveButton: enableApproveButton,
+                percentageOfContributorsVoted: percentageOfContributorsVoted,
+                displayVotingProgress: displayVotingProgress,
+            })
+        }
         return totalVotes == totalContributions;
     }
 
@@ -85,6 +98,7 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
     }
 
     render() {
+
         if (this.props.projectOnChain.milestones) {
             return (
                 <div>
@@ -108,6 +122,14 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
                                         : "Approve Milestone"
                             }
                         </button>
+
+                        {  this.state.displayVotingProgress ?
+                            <div id="vote-progress">
+                                <Chip icon={<CircularProgress />} label={`${this.state.percentageOfContributorsVoted}% Contributors Voted`} />
+                            </div>
+                            : null
+                        }
+
                     </form>
                 </div>
             );

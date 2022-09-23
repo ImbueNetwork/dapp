@@ -23,7 +23,7 @@
 
 .form {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     margin: 15px 0;
     width: 100%;
     height: fit-content;
@@ -434,3 +434,14 @@ ul.project-details li {
     width: 80%;
 }
 
+#vote-progress {
+    padding-top: 30px;
+}
+
+#vote-progress > div {
+    background-color: #000;
+    color: var(--theme-ink-color);
+    font-family: var(--theme-font-family);
+    font-size: 15px;
+    font-weight: bold;
+}

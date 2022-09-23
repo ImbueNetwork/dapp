@@ -121,19 +121,16 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             return;
         }
 
-    
-
         let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
         let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
-
 
         const projectState = projectOnChain.projectState
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
-            showSubmitMilestoneComponent = projectOnChain.fundingThresholdMet;
+            showSubmitMilestoneComponent = projectOnChain.fundingThresholdMet && firstPendingMilestoneIndex >= 0;
             showWithdrawComponent = lastApprovedMilestoneIndex >= 0;
-            showApproveMilestoneComponent = projectOnChain.fundingThresholdMet;
+            showApproveMilestoneComponent = projectOnChain.fundingThresholdMet && firstPendingMilestoneIndex >= 0;
         } else {
             switch (projectState) {
                 case ProjectState.OpenForContribution: {

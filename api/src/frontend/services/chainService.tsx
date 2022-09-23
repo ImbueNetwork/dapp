@@ -260,7 +260,7 @@ class ChainService {
             // Initators cannot contribute to their own project
             if (userIsInitiator) {
                 if (projectInVotingRound) {
-                    projectState = ProjectState.PendingMilestoneApproval;
+                    projectState = ProjectState.OpenForVoting;
                 } else if (projectInContributionRound) {
                     projectState = ProjectState.OpenForContribution;
                 } else if (lastApprovedMilestoneKey >= 0) {

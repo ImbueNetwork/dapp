@@ -14,7 +14,6 @@ import { Milestones } from './components/milestones';
 import { FundingInfo } from './components/fundingInfo';
 import { SubmitMilestone } from './components/submitMilestone';
 import { VoteOnMilestone } from './components/voteOnMilestone';
-import { Withdraw } from './components/withdraw';
 
 import ChainService from "./services/chainService";
 
@@ -121,7 +120,8 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
-            showSubmitMilestoneComponent = true;
+            showSubmitMilestoneComponent = projectOnChain.fundingThresholdMet;
+            console.log("****** approved for funding is ", projectOnChain.fundingThresholdMet);
             showWithdrawComponent = true;
         } else {
             switch (projectState) {
@@ -175,112 +175,105 @@ class Details extends React.Component<DetailsProps, DetailsState> {
     }
 
     render() {
-        return <div id="details">
-            <div className="top-wrapper">
-                <header className="project-name-header"><h1 className="heading-8 project-name-heading"><span
-                    id="project-name">{this.state.projectOnChain.name}</span></h1></header>
-                <img id="project-logo" loading="lazy"
-                    srcSet={this.state.projectOnChain.logo} />
-            </div>
+        if (this.state.projectOnChain.milestones) {
+            return <div id="details">
+                <div className="top-wrapper">
+                    <header className="project-name-header"><h1 className="heading-8 project-name-heading"><span
+                        id="project-name">{this.state.projectOnChain.name}</span></h1></header>
+                    <img id="project-logo" loading="lazy"
+                        srcSet={this.state.projectOnChain.logo} />
+                </div>
 
-            {this.showProjectStateHeading()}
-            <FundingInfo projectOnChain={this.state.projectOnChain} lastApprovedMilestoneIndex={this.state.lastApprovedMilestoneIndex}></FundingInfo>
-            <div className="action-buttons">
-                {this.state.showContributeComponent ?
-                    <Contribute
-                        projectOnChain={this.state.projectOnChain}
-                        user={this.props.user}
-                        imbueApi={this.props.imbueApi}
-                        chainService={this.props.chainService}
-                    ></Contribute>
-                    : null
-                }
-                {this.state.showSubmitMilestoneComponent ?
-                    <SubmitMilestone
-                        projectOnChain={this.state.projectOnChain}
-                        user={this.props.user}
-                        imbueApi={this.props.imbueApi}
-                        chainService={this.props.chainService}
-                    ></SubmitMilestone>
-                    : null
-                }
-                {this.state.showVoteComponent ?
-                    <VoteOnMilestone
-                        projectOnChain={this.state.projectOnChain}
-                        user={this.props.user}
-                        imbueApi={this.props.imbueApi}
-                        firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
-                        chainService={this.props.chainService}
-                    ></VoteOnMilestone>
-                    : null
-                }
-                {this.state.showWithdrawComponent ?
-                    <Withdraw
-                        projectOnChain={this.state.projectOnChain}
-                        user={this.props.user}
-                        imbueApi={this.props.imbueApi}
-                        chainService={this.props.chainService}
-                    ></Withdraw>
-                    : null
-                }
-            </div>
-            <TabBar activeTabIndex={this.state.activeTabIndex}
-                onActivate={(evt) => this.setActiveTab(evt.detail.index)}>
-                <Tab icon="description" label="About" />
-                <Tab icon="list" label="Milestones" />
-                <Tab icon="quiz" label="FAQ" />
-                <Tab icon="groups2" label="team" />
-                <Tab icon="update" label="Updates" />
-            </TabBar>
+                {this.showProjectStateHeading()}
+                <FundingInfo projectOnChain={this.state.projectOnChain} lastApprovedMilestoneIndex={this.state.lastApprovedMilestoneIndex}></FundingInfo>
+                <div className="action-buttons">
+                    {this.state.showContributeComponent ?
+                        <Contribute
+                            projectOnChain={this.state.projectOnChain}
+                            user={this.props.user}
+                            imbueApi={this.props.imbueApi}
+                            chainService={this.props.chainService}
+                        ></Contribute>
+                        : null
+                    }
+                    {this.state.showSubmitMilestoneComponent ?
+                        <SubmitMilestone
+                            projectOnChain={this.state.projectOnChain}
+                            user={this.props.user}
+                            imbueApi={this.props.imbueApi}
+                            chainService={this.props.chainService}
+                        ></SubmitMilestone>
+                        : null
+                    }
+                    {this.state.showVoteComponent ?
+                        <VoteOnMilestone
+                            projectOnChain={this.state.projectOnChain}
+                            user={this.props.user}
+                            imbueApi={this.props.imbueApi}
+                            firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
+                            chainService={this.props.chainService}
+                        ></VoteOnMilestone>
+                        : null
+                    }
+                </div>
+                <TabBar activeTabIndex={this.state.activeTabIndex}
+                    onActivate={(evt) => this.setActiveTab(evt.detail.index)}>
+                    <Tab icon="description" label="About" />
+                    <Tab icon="list" label="Milestones" />
+                    <Tab icon="quiz" label="FAQ" />
+                    <Tab icon="groups2" label="team" />
+                    <Tab icon="update" label="Updates" />
+                </TabBar>
 
-            <div id="tab-content-container">
-                <div className={`tab-content ${this.state.activeTabIndex === 0 ? "active" : ""}`}>
-                    <h2>{this.state.projectOnChain.name}</h2>
-                    <div id="project-description"
-                        dangerouslySetInnerHTML={{ __html: marked.parse(`${this.state.projectOnChain.description}`) }}>
+                <div id="tab-content-container">
+                    <div className={`tab-content ${this.state.activeTabIndex === 0 ? "active" : ""}`}>
+                        <h2>{this.state.projectOnChain.name}</h2>
+                        <div id="project-description"
+                            dangerouslySetInnerHTML={{ __html: marked.parse(`${this.state.projectOnChain.description}`) }}>
+                        </div>
+                        <ul className="project-details">
+                            <li className="project-detail"><span className="detail-value hidden" id="in-block"></span></li>
+                            <li className="project-detail">
+                                <span className="detail-label"></span>
+                                <span id="project-detail-currency"
+                                    className="imbu-currency-label">${this.state.projectOnChain.currencyId as Currency}</span>{' '}
+                                <span id="funds-required">{this.state.projectOnChain.requiredFundsFormatted.toLocaleString()}</span>
+                                <span className="imbu-currency-label fraction">.00</span>{' '}
+                                <span className="detail-label">required</span>
+                            </li>
+                            <li className="project-detail">
+                                <span className="detail-value" id="project-website">
+                                    <a href={this.state.projectOnChain.website} target="_blank">{this.state.projectOnChain.website}</a>
+                                </span>
+                            </li>
+                        </ul>
                     </div>
-                    <ul className="project-details">
-                        <li className="project-detail"><span className="detail-value hidden" id="in-block"></span></li>
-                        <li className="project-detail">
-                            <span className="detail-label"></span>
-                            <span id="project-detail-currency"
-                                className="imbu-currency-label">${this.state.projectOnChain.currencyId as Currency}</span>{' '}
-                            <span id="funds-required">{String(this.state.projectOnChain.requiredFundsFormatted)}</span>
-                            <span className="imbu-currency-label fraction">.00</span>{' '}
-                            <span className="detail-label">required</span>
-                        </li>
-                        <li className="project-detail">
-                            <span className="detail-value" id="project-website">
-                                <a href={this.state.projectOnChain.website} target="_blank">{this.state.projectOnChain.website}</a>
-                            </span>
-                        </li>
-                    </ul>
-                </div>
 
 
-                <div className={`tab-content ${this.state.activeTabIndex === 1 ? "active" : ""}`}>
-                    <Milestones projectOnChain={this.state.projectOnChain} firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}></Milestones>
-                </div>
+                    <div className={`tab-content ${this.state.activeTabIndex === 1 ? "active" : ""}`}>
+                        <Milestones projectOnChain={this.state.projectOnChain} firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}></Milestones>
+                    </div>
 
-                <div className={`tab-content ${this.state.activeTabIndex === 2 ? "active" : ""}`}>
-                    <List twoLine id="FAQ">
-                        <h2>Coming soon.....</h2>
-                    </List>
-                </div>
+                    <div className={`tab-content ${this.state.activeTabIndex === 2 ? "active" : ""}`}>
+                        <List twoLine id="FAQ">
+                            <h2>Coming soon.....</h2>
+                        </List>
+                    </div>
 
-                <div className={`tab-content ${this.state.activeTabIndex === 3 ? "active" : ""}`}>
-                    <List twoLine id="Team">
-                        <h2>Coming soon.....</h2>
-                    </List>
-                </div>
+                    <div className={`tab-content ${this.state.activeTabIndex === 3 ? "active" : ""}`}>
+                        <List twoLine id="Team">
+                            <h2>Coming soon.....</h2>
+                        </List>
+                    </div>
 
-                <div className={`tab-content ${this.state.activeTabIndex === 4 ? "active" : ""}`}>
-                    <List twoLine id="Updates">
-                        <h2>Coming soon.....</h2>
-                    </List>
+                    <div className={`tab-content ${this.state.activeTabIndex === 4 ? "active" : ""}`}>
+                        <List twoLine id="Updates">
+                            <h2>Coming soon.....</h2>
+                        </List>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     }
 }
 

@@ -8,8 +8,6 @@ import type { ITuple, } from "@polkadot/types/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { EventRecord } from '@polkadot/types/interfaces';
 import * as utils from "../utils";
-import { Withdraw } from "../components/withdraw";
-
 
 type EventDetails = {
     accountIdKey: number,
@@ -21,7 +19,6 @@ const eventMapping: Record<string, EventDetails> = {
     "submitMilestone": { accountIdKey: 0, eventName: "MilestoneSubmitted" },
     "voteOnMilestone": { accountIdKey: 0, eventName: "VoteComplete" },
     "withraw": { accountIdKey: 0, eventName: "ProjectFundsWithdrawn" }
-
 }
 
 class ChainService {

@@ -87,7 +87,7 @@ export class SubmitMilestone extends React.Component<SubmitMilestoneProps> {
                             onChange={(event: React.FormEvent) => this.updateMilestoneValue(parseInt((event.target as HTMLInputElement).value))}
                             icon="how_to_vote"
                         >
-                            {this.props.projectOnChain.milestones.map(milestone =>
+                            {this.props.projectOnChain.milestones.filter(milestone => !milestone.isApproved).map(milestone =>
                                 <option key={milestone.milestoneKey} value={milestone.milestoneKey}>{milestone.name}</option>
                             )}
                         </Select>

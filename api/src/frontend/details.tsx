@@ -17,6 +17,7 @@ import { VoteOnMilestone } from './components/voteOnMilestone';
 import { ApproveMilestone } from './components/approveMilestone';
 
 import ChainService from "./services/chainService";
+import { Withdraw } from "./components/withdraw";
 
 type DetailsProps = {
     imbueApi: polkadot.ImbueApiInfo,
@@ -129,7 +130,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         if (userIsInitiator) {
             // SHOW WITHDRAW AND MILESTONE SUBMISSION components
             showSubmitMilestoneComponent = projectOnChain.fundingThresholdMet && firstPendingMilestoneIndex >= 0;
-            showWithdrawComponent = lastApprovedMilestoneIndex >= 0;
+            showWithdrawComponent = lastApprovedMilestoneIndex >= 0 && projectOnChain.raisedFunds > projectOnChain.withdrawnFunds;
             showApproveMilestoneComponent = projectOnChain.fundingThresholdMet && firstPendingMilestoneIndex >= 0;
         } else {
             switch (projectState) {
@@ -228,7 +229,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                         ></VoteOnMilestone>
                         : null
                     }
-                    { this.state.showApproveMilestoneComponent ?
+                    {this.state.showApproveMilestoneComponent ?
                         <ApproveMilestone
                             projectOnChain={this.state.projectOnChain}
                             user={this.props.user}
@@ -236,6 +237,16 @@ class Details extends React.Component<DetailsProps, DetailsState> {
                             firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}
                             chainService={this.props.chainService}
                         ></ApproveMilestone>
+                        : null
+                    }
+
+                    {this.state.showWithdrawComponent ?
+                        <Withdraw
+                            projectOnChain={this.state.projectOnChain}
+                            user={this.props.user}
+                            imbueApi={this.props.imbueApi}
+                            chainService={this.props.chainService}
+                        ></Withdraw>
                         : null
                     }
                 </div>

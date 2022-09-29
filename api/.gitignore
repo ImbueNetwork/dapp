@@ -1,3 +1,4 @@
 src/**/*.js$
 !build/
 .env
+public/lib

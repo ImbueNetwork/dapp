@@ -1,4 +1,4 @@
-DBDIR := "./src/db"
+DBDIR := "./src/backend/db"
 
 
 all: clean build
@@ -12,9 +12,14 @@ clean_deps:
 node_modules:
 	yarn install
 
-build: build/index.js
-build/index.js: node_modules
-	yarn run tsc
+build: node_modules
+	yarn build/frontend
+	yarn build/backend
+	yarn build/legacy
+	mkdir -p ./build/views
+	mkdir -p ./build/public
+	cp ./src/backend/views/* ./build/views/
+	cp -r ./public/* ./build/public/
 
 migrate: migrate_latest
 

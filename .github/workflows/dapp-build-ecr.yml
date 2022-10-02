@@ -27,7 +27,5 @@ jobs:
           IMAGE_TAG: ${{ env.majorVersion }}.${{ github.run_number }}.${{ github.run_attempt }}
         run: |
           aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/d7f4c0w8
-          docker build -t $ECR_REGISTRY/imbue-web:$IMAGE_TAG ./web
           docker build -t $ECR_REGISTRY/imbue-api:$IMAGE_TAG ./api
-          docker push $ECR_REGISTRY/imbue-web:$IMAGE_TAG
           docker push $ECR_REGISTRY/imbue-api:$IMAGE_TAG

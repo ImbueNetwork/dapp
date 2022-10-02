@@ -4,7 +4,9 @@ import * as config from "./config";
 export enum Currency {
     IMBU,
     KSM,
-    KUSD
+    AUSD,
+    KAR,
+    MGX
 }
 
 export enum RoundType {

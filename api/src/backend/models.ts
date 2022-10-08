@@ -72,6 +72,19 @@ export type ProjectProperties = {
     project_id?: string | number;
 };
 
+export type Brief = {
+    id?: string | number;
+    headline: string;
+    industries: string;
+    description: string;
+    skills: string;
+    scope: string;
+    duration: string;
+    budget: number;
+    owner?: string;
+    user_id?: string | number;
+};
+
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
@@ -206,6 +219,11 @@ export const fetchAllMilestone = (id: string | number) =>
 export const fetchMilestoneByIndex = (projectId: string | number,milestoneId: string | number) =>
     (tx: Knex.Transaction) =>
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId}).where('index', '=', milestoneId);
+
+export const insertBrief = (brief: Brief) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Brief>("briefs").insert(brief).returning("*")
+    )[0];
 
 export const insertFederatedCredential = (
     id: number,

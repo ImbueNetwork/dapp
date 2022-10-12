@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
         //builder.integer("project_id").notNullable();
         //builder.foreign("project_id")
          //   .references("projects.id");
-
+        builder.string("user_id"); 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, tableName));
 }

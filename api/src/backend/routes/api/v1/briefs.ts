@@ -87,7 +87,7 @@ router.post("/", (req, res, next) => {
                 duration,
                 budget,
                 owner,
-                user_id: (req.user as any).id,
+                user_id,
             })(tx);
     
             if (!brief.id) {
@@ -96,10 +96,10 @@ router.post("/", (req, res, next) => {
                 ));
             }
     
-            res.status(201).send(brief);    
+            res.status(201);    
         } catch (cause) {
             next(new Error(
-                `Failed to insert brief.`,
+                `Failed to insert brief .`,
                 {cause: cause as Error}
             ));
         }

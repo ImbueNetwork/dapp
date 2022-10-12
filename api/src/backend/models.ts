@@ -220,6 +220,10 @@ export const fetchMilestoneByIndex = (projectId: string | number,milestoneId: st
     (tx: Knex.Transaction) =>
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId}).where('index', '=', milestoneId);
 
+export const fetchAllBriefs = () =>
+(tx: Knex.Transaction) =>
+    tx<Brief>("briefs").whereNotNull('id').select();
+
 export const insertBrief = (brief: Brief) =>
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").insert(brief).returning("*")

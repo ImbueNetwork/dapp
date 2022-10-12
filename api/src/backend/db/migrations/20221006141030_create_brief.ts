@@ -10,9 +10,11 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("industries"); 
         builder.text("description");   
         builder.text("skills");  
-        builder.enu("scope",["Complex","Large","Medium","Small"]); 
-        builder.enu("duration",["OneToThreeMonths","ThreeToSixMonths","MoreThan6Months","MoreThan1Year"]);  
-        builder.integer("budget");
+        builder.text("scope");  
+        builder.text("duration");  
+        //builder.enu("scope",["Complex","Large","Medium","Small"]); 
+        //builder.enu("duration",["OneToThreeMonths","ThreeToSixMonths","MoreThan6Months","MoreThan1Year"]);  
+        builder.integer("budget");          
 
         //builder.integer("project_id").notNullable();
         //builder.foreign("project_id")
@@ -24,6 +26,6 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.schema.dropTableIfExists("project_properties");
+    await knex.schema.dropTableIfExists("briefs");
 }
 

@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: imbue
+      POSTGRES_PASSWORD: imbue
+    ports:
+    - 5433:5432
+    volumes:
+    - "/var/log/imbue/dapp/postgres-data:/var/lib/postgresql/data"
+
+  api:
+    container_name: api
+    image: samelamin/dapp-api:testnet
+    depends_on:
+      - postgres
+    ports:
+    - "3000:3000"
+    environment:
+      GOOGLE_OAUTH2_CLIENT_ID: client_id
+      GOOGLE_OAUTH2_CLIENT_SECRET: client_secret
+      WEB_HOST: "https://localhost:8443"
+      DB_PORT: 5432
+      DB_HOST: postgres
+      IMBUE_NETWORK_WEBSOCK_ADDR: wss://collator.production.imbue.network
+      RELAY_CHAIN_WEBSOCK_ADDR: wss://kusama-rpc.polkadot.io

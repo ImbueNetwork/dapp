@@ -48,6 +48,10 @@ app.get("/redirect", (req, res) => {
     res.redirect("/");
 });
 
+app.get("/", (req, res) => {
+    res.redirect("/dapp");
+});
+
 
 // uncaught error
 app.use(errorHandler(environment));

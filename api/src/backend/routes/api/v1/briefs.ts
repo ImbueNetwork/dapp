@@ -71,7 +71,6 @@ router.post("/", (req, res, next) => {
         scope,
         duration,
         budget,
-        owner,
         user_id
 
     } = req.body.brief as models.Brief;
@@ -86,7 +85,6 @@ router.post("/", (req, res, next) => {
                 scope,
                 duration,
                 budget,
-                owner,
                 user_id,
             })(tx);
     
@@ -96,7 +94,12 @@ router.post("/", (req, res, next) => {
                 ));
             }
     
-            res.status(201);    
+            res.status(201).send(
+                {
+                    status: "Successful",
+                    brief_id: brief.id
+                }
+            );    
         } catch (cause) {
             next(new Error(
                 `Failed to insert brief .`,

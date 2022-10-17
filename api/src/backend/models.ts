@@ -81,7 +81,6 @@ export type Brief = {
     scope: string;
     duration: string;
     budget: number;
-    owner?: string;
     user_id?: string | number;
 };
 

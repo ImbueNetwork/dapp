@@ -91,7 +91,7 @@ export const timeData = [
   },
 ];
 
-export const industryData = [
+export const suggestedIndustries = [
   "Web3",
   "DeFi",
   "Education",
@@ -109,4 +109,4 @@ export const industryData = [
 ];
 
 
-export const skillData = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];
+export const suggestedSkills = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];

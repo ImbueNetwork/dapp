@@ -28,8 +28,8 @@ router.get("/projects/:projectId", (req, res) => {
     res.render("details")
 });
 
-router.get("/project-details", (req, res) => {
-    res.render("projectDetails");
+router.get("/briefs", (req, res) => {
+    res.render("briefs");
 });
 
 router.use((_req, res, next) => {

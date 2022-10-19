@@ -23,7 +23,7 @@ p {
   line-height: 1.5;
 }
 
-.project-details-container {
+.brief-details-container {
   display: flex;
   flex-direction: row;
   width: 90vw;

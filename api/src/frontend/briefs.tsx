@@ -10,44 +10,44 @@ import {
   scopeData,
   timeData,
   nameExamples,
-  industryData,
-  skillData,
+  suggestedIndustries,
+  suggestedSkills,
 } from "./config/details-data";
 
-export type ProjectDetailsProps = {};
+export type BriefProps = {};
 
-export type ProjectDetailsState = {
+export type BriefState = {
   step: number;
-  info: ProjectInfo;
+  info: BriefInfo;
 };
 
-export type ProjectInfo = {
+export type BriefInfo = {
   name: string;
-  industry: string[];
+  industries: string[];
   description: string;
   scope: string;
   time: string;
-  skill: string[];
+  skills: string[];
   budget: number | undefined;
 };
 
-export class ProjectDetails extends React.Component<
-  ProjectDetailsProps,
-  ProjectDetailsState
+export class Briefs extends React.Component<
+  BriefProps,
+  BriefState
 > {
   state = {
     step: 0,
     info: {
       name: "",
-      industry: [],
+      industries: [],
       description: "",
       scope: "",
       time: "",
-      skill: [],
+      skills: [],
       budget: undefined,
     },
   };
-  constructor(props: ProjectDetailsProps) {
+  constructor(props: BriefProps) {
     super(props);
   }
 
@@ -60,6 +60,16 @@ export class ProjectDetails extends React.Component<
     const { step } = this.state;
     step < stepData.length - 1 &&
       this.setState({ ...this.state, step: step + 1 });
+    if(step == stepData.length-1) {
+      console.log("***** final step");
+      console.log(this.state.info.name);
+      console.log(this.state.info.industries);
+      console.log(this.state.info.description);
+      console.log(this.state.info.scope);
+      console.log(this.state.info.time);
+      console.log(this.state.info.skills);
+      console.log(this.state.info.budget);
+    }
   };
 
   updateFormData = (name: string, value: string | number | string[]) => {
@@ -97,14 +107,14 @@ export class ProjectDetails extends React.Component<
       </>
     );
 
-    const IndustryPanel = (
+    const IndustriesPanel = (
       <>
         <p className="field-name">Search industries or add your own</p>
         <div className="industry-container">
           <TagsInput
-            suggestData={industryData}
-            tags={this.state.info.industry}
-            onChange={(tags: string[]) => this.updateFormData("industry", tags)}
+            suggestData={suggestedIndustries}
+            tags={this.state.info.industries}
+            onChange={(tags: string[]) => this.updateFormData("industries", tags)}
           />
         </div>
       </>
@@ -124,14 +134,14 @@ export class ProjectDetails extends React.Component<
       </div>
     );
 
-    const SkillPanel = (
+    const SkillsPanel = (
       <>
         <p className="field-name">Search the skills</p>
         <div className="skills-container">
           <TagsInput
-            suggestData={skillData}
-            tags={this.state.info.skill}
-            onChange={(tags: string[]) => this.updateFormData("skill", tags)}
+            suggestData={suggestedSkills}
+            tags={this.state.info.skills}
+            onChange={(tags: string[]) => this.updateFormData("skills", tags)}
           />
         </div>
       </>
@@ -193,16 +203,16 @@ export class ProjectDetails extends React.Component<
 
     const panels = [
       NamePanel,
-      IndustryPanel,
+      IndustriesPanel,
       DescriptionPanel,
-      SkillPanel,
+      SkillsPanel,
       ScopePanel,
       TimePanel,
       BudgetPanel,
     ];
 
     return (
-      <div className="project-details-container">
+      <div className="brief-details-container">
         <div className="left-panel">
           <ProgressBar
             titleArray={["Description", "Skills", "Scope", "Budget"]}
@@ -245,7 +255,7 @@ export class ProjectDetails extends React.Component<
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  ReactDOMClient.createRoot(document.getElementById("project-details")!).render(
-    <ProjectDetails />
+  ReactDOMClient.createRoot(document.getElementById("brief-details")!).render(
+    <Briefs />
   );
 });

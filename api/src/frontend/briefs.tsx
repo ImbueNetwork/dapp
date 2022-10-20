@@ -12,7 +12,7 @@ import {
   nameExamples,
   suggestedIndustries,
   suggestedSkills,
-} from "./config/details-data";
+} from "./config/briefs-data";
 
 export type BriefProps = {};
 

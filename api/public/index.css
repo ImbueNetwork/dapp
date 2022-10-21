@@ -639,3 +639,12 @@ nav i.material-icons {
     font-size: 24px;
     padding-top: 2px;
 }
+
+.mdc-data-table__cell {
+  color: #fff;
+}
+
+.mdc-data-table__header-cell {
+  color: #fff;
+  font-weight: 600;
+}

@@ -75,7 +75,7 @@ export async function up(knex: Knex): Promise<void> {
      *      create_block_number: BlockNumber,
      *  }
      */
-    
+
     const projectsTableName = "projects";
     await knex.schema.createTable(projectsTableName, (builder: Knex.CreateTableBuilder) => {
         builder.increments("id", { primaryKey: true });
@@ -94,7 +94,7 @@ export async function up(knex: Knex): Promise<void> {
             .onUpdate("CASCADE");
 
         // milestones[]: `milstone` has a foreign key back to project.
-        
+
         // TODO: contributions[] will probably have a foreign key back to
         // project.
 
@@ -102,14 +102,14 @@ export async function up(knex: Knex): Promise<void> {
         // scale). The emphasis is on precision, while arithmetical efficiency
         // takes a hit.
         builder.decimal("required_funds", null).notNullable();
-        
+
         // FIXME: this will need to be ACID, hence we will
         // need to update it from the blockchain.
         // builder.decimal("withdrawn_funds").defaultTo(0);
 
         /**
          * owner -- `AccountId` is a 32 byte array, stored as base64 encoded
-         * 
+         *
          * This shouldn't be null because we have to offer users the ability to
          * submit the form without having an account, to protect their privacy.
          */
@@ -119,9 +119,9 @@ export async function up(knex: Knex): Promise<void> {
          * This is nullable because we offer web3 account holders the ability to
          * do all of their dealings wihout an account. This means that if they
          * opt-out, they can't edit, etc., before finalization.
-         * 
+         *
          * This is nullable because editing is "opt-in" and we don't need an
-         * account, per se, to store projects. But if/when a user wants to 
+         * account, per se, to store projects. But if/when a user wants to
          * create an account and associate it with a web3 address, we can update
          * all of the projects whose "owner" is a `web3_account` associated with
          * the `usr` account. Likewise, when a user decides to delete their
@@ -142,10 +142,10 @@ export async function up(knex: Knex): Promise<void> {
          * integer in terms of its use, so whatever we get we're going
          * to want to store it as an int, so we're going with bigint here
          * because postgres only has signed ints (`unsigned` is ignored).
-         * 
+         *
          * Once this is set, the project is regarded as "committed", but the
          * real source of truth for this value is the chain itself.
-         * 
+         *
          * If you can't find this on the chain and this value is null, then
          * the project should be considered in a "draft" state.
          */
@@ -182,11 +182,11 @@ export async function up(knex: Knex): Promise<void> {
 
     /**
      * TODO: ? votes and contributions
-     * 
+     *
      * It's not clear that this will ever be anything that needs to be
      * stored in the database, which for now is being thought of as a kind of
      * index or cache.
-     * 
+     *
      *  pub struct Vote<Balance> {
      *      yay: Balance,
      *      nay: Balance,

@@ -31,7 +31,7 @@ router.put("/:id/milestone/:milestoneId", passport.authenticate('jwt', { session
                  );
              } catch (cause) {
                  next(new Error(
-                     `Failed to update project properties.`,
+                     `Failed to update milestones`,
                      {cause: cause as Error}
                  ));
              }
@@ -54,7 +54,24 @@ router.get("/:id/milestones", (req, res, next) => {
             res.send(projects);
         } catch (e) {
             next(new Error(
-                `Failed to fetch all projects`,
+                `Failed to fetch all milestones`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
+
+
+router.get("/:id/milestone/:milestoneId", (req, res, next) => {
+    const id = req.params.id;
+    const milestoneId = req.params.milestoneId;
+    db.transaction(async tx => {
+        try {
+            const milestone = await models.fetchMilestoneByIndex(id,milestoneId)(tx);
+            res.send(milestone);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch the milestone`,
                 {cause: e as Error}
             ));
         }
@@ -80,7 +97,7 @@ router.post("/", passport.authenticate('jwt', { session: false }),(req, res, nex
             res.status(201).send(project);
         } catch (cause) {
             next(new Error(
-                `Failed to insert project.`,
+                `Failed to insert milestone.`,
                 {cause: cause as Error}
             ));
         }

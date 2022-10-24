@@ -7,9 +7,9 @@ import {updateMilestoneDetails} from "../../../models";
 const router = express.Router();
 
 
-router.put("/:id/milestone/:mid", passport.authenticate('jwt', { session: false }),(req, res, next) => {
+router.put("/:id/milestone/:milestoneId", passport.authenticate('jwt', { session: false }),(req, res, next) => {
     const id = req.params.id;
-    const mid = req.params.mid;
+    const milestoneId = req.params.milestoneId;
     const details = req.body.details;
 
 
@@ -24,7 +24,7 @@ router.put("/:id/milestone/:mid", passport.authenticate('jwt', { session: false 
                      return res.status(404).end();
                  }
 
-                 const updated = await models.updateMilestoneDetails(id,mid,details)(tx);
+                 const updated = await models.updateMilestoneDetails(id,milestoneId,details)(tx);
 
                  res.status(200).send(
                      updated

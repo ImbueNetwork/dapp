@@ -193,8 +193,8 @@ export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Milestone>("milestones").select().where({ project_id: id });
 
-export const updateMilestoneDetails = (id: string | number, mid: string | number, details: string) => (tx: Knex.Transaction) =>
-        tx<MilestoneDetails>("milestone_details").where({ project_id: id}).where('index', '=', mid).update('details',details).returning("*");
+export const updateMilestoneDetails = (id: string | number, milestoneId: string | number, details: string) => (tx: Knex.Transaction) =>
+        tx<MilestoneDetails>("milestone_details").where({ project_id: id}).where('index', '=', milestoneId).update('details',details).returning("*");
 
 
 export const insertMilestoneDetails = (value:MilestoneDetails) => async (tx: Knex.Transaction) => (await

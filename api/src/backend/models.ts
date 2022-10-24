@@ -46,6 +46,12 @@ export type Milestone = ProposedMilestone & {
     is_approved: boolean;
 };
 
+export type MilestoneDetails = {
+    index: number | string;
+    project_id: number | string;
+    details: string;
+}
+
 export type Project = {
     id?: string | number;
     name: string;
@@ -179,7 +185,6 @@ export const insertMilestones = (
         tx<Milestone>("milestones").insert(values).returning("*");
 };
 
-
 export const deleteMilestones = (project_id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Milestone>("milestones").delete().where({ project_id });
@@ -187,6 +192,17 @@ export const deleteMilestones = (project_id: string | number) =>
 export const fetchProjectMilestones = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Milestone>("milestones").select().where({ project_id: id });
+
+export const updateMilestoneDetails = (id: string | number, mid: string | number, details: string) => (tx: Knex.Transaction) =>
+        tx<MilestoneDetails>("milestone_details").where({ project_id: id}).where('index', '=', mid).update('details',details).returning("*");
+
+
+export const insertMilestoneDetails = (value:MilestoneDetails) => async (tx: Knex.Transaction) => (await
+    tx<MilestoneDetails>("milestone_details").insert(value).returning("*"))[0];
+
+export const fetchAllMilestone = (id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx<MilestoneDetails>("milestone_details").where('project_id','=',id);
 
 export const insertFederatedCredential = (
     id: number,

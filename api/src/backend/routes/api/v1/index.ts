@@ -3,6 +3,7 @@ import passport from "passport";
 import projectsRouter from "./projects";
 import usersRouter from "./users";
 import config from "../../../config";
+import milestonesRouter from "./milestones"
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.get("/info", (req, res) => {
 
 router.use("/projects", projectsRouter);
 router.use("/users", usersRouter);
+router.use("/milestones",milestonesRouter)
 
 export default router;

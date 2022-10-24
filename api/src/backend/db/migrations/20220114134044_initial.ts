@@ -181,6 +181,23 @@ export async function up(knex: Knex): Promise<void> {
     }).then(onUpdateTrigger(knex, milestonesTableName));
 
     /**
+     ** New table to store the milestone details
+     */
+    const milestoneDetailsTableName = "milestone_details";
+    await knex.schema.createTable(milestoneDetailsTableName, (builder) => {
+        builder.integer("index").notNullable();
+        builder.integer("project_id").notNullable();
+        builder.string("details").nullable();
+        builder.primary(["project_id","index"]);
+        builder.foreign("project_id")
+            .references("projects.id")
+            .onDelete("CASCADE")
+            .onUpdate("CASCADE");
+        auditFields(knex, builder);
+    }).then(onUpdateTrigger(knex, milestoneDetailsTableName));
+
+
+    /**
      * TODO: ? votes and contributions
      * 
      * It's not clear that this will ever be anything that needs to be
@@ -233,6 +250,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("milestones");
+    await knex.schema.dropTableIfExists("milestone_details");
     await knex.schema.dropTableIfExists("projects");
     await knex.schema.dropTableIfExists("project_status");
     await knex.schema.dropTableIfExists("federated_credentials");

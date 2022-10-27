@@ -13,6 +13,16 @@ import {
   suggestedIndustries,
   suggestedSkills,
 } from "./config/briefs-data";
+import * as config from "./config";
+
+const getAPIHeaders = {
+  accept: "application/json",
+};
+
+const postAPIHeaders = {
+  ...getAPIHeaders,
+  "content-type": "application/json",
+};
 
 export type BriefProps = {};
 
@@ -30,6 +40,20 @@ export type BriefInfo = {
   skills: string[];
   budget: number | undefined;
 };
+
+async function invokeBriefAPI(brief: BriefInfo) {
+  const resp = await fetch(`${config.apiBase}/briefs/`, {
+    headers: postAPIHeaders,
+    method: "post",
+    body: JSON.stringify(brief),
+  });
+
+  if (resp.ok) {
+    // could be 200 or 201
+    // Brief API successfully invoked
+    console.log("Brief created successfully via Brief REST API");
+  }
+}
 
 export class Briefs extends React.Component<
   BriefProps,
@@ -51,6 +75,7 @@ export class Briefs extends React.Component<
     super(props);
   }
 
+
   onBack = () => {
     const { step } = this.state;
     step >= 1 && this.setState({ ...this.state, step: step - 1 });
@@ -71,6 +96,13 @@ export class Briefs extends React.Component<
       console.log(this.state.info.budget);
     }
   };
+
+  onReviewPost = (brief: BriefInfo) =>{
+    const { step } = this.state;
+    step < stepData.length - 1 &&
+      this.setState({ ...this.state, step: step + 1 });
+    invokeBriefAPI(brief);
+  }
 
   updateFormData = (name: string, value: string | number | string[]) => {
     this.setState({
@@ -237,16 +269,33 @@ export class Briefs extends React.Component<
                 Back
               </button>
             )}
-            <button
-              className="primary-btn in-dark w-button"
-              onClick={this.onNext}
-            >
-              {step === stepData.length - 1
-                ? "Review your post"
-                : stepData[step].next
-                ? `Next: ${stepData[step].next}`
-                : "Next"}
-            </button>
+
+            {
+              step === stepData.length - 1
+              ? 
+              (
+                <button
+                  className="primary-btn in-dark w-button"
+                  onClick={this.onReviewPost(this.state.info)}
+                >
+                  Review your post
+                </button>
+                
+              )
+              : stepData[step].next
+              ? `Next: ${stepData[step].next}`
+              : 
+              (
+                <button
+                  className="primary-btn in-dark w-button"
+                  onClick={this.onNext}
+                >
+                  Next 
+                </button>
+                
+              )
+              
+            }   
           </div>
         </div>
       </div>

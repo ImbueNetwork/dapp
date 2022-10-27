@@ -45,7 +45,7 @@ async function invokeBriefAPI(brief: BriefInfo) {
   const resp = await fetch(`${config.apiBase}/briefs/`, {
     headers: postAPIHeaders,
     method: "post",
-    body: JSON.stringify(brief),
+    body: JSON.stringify({ brief }),
   });
 
   if (resp.ok) {
@@ -55,10 +55,7 @@ async function invokeBriefAPI(brief: BriefInfo) {
   }
 }
 
-export class Briefs extends React.Component<
-  BriefProps,
-  BriefState
-> {
+export class Briefs extends React.Component<BriefProps, BriefState> {
   state = {
     step: 0,
     info: {
@@ -75,7 +72,6 @@ export class Briefs extends React.Component<
     super(props);
   }
 
-
   onBack = () => {
     const { step } = this.state;
     step >= 1 && this.setState({ ...this.state, step: step - 1 });
@@ -85,7 +81,7 @@ export class Briefs extends React.Component<
     const { step } = this.state;
     step < stepData.length - 1 &&
       this.setState({ ...this.state, step: step + 1 });
-    if(step == stepData.length-1) {
+    if (step == stepData.length - 1) {
       console.log("***** final step");
       console.log(this.state.info.name);
       console.log(this.state.info.industries);
@@ -97,12 +93,12 @@ export class Briefs extends React.Component<
     }
   };
 
-  onReviewPost = (brief: BriefInfo) =>{
+  onReviewPost = (brief: BriefInfo) => {
     const { step } = this.state;
     step < stepData.length - 1 &&
       this.setState({ ...this.state, step: step + 1 });
     invokeBriefAPI(brief);
-  }
+  };
 
   updateFormData = (name: string, value: string | number | string[]) => {
     this.setState({
@@ -146,7 +142,9 @@ export class Briefs extends React.Component<
           <TagsInput
             suggestData={suggestedIndustries}
             tags={this.state.info.industries}
-            onChange={(tags: string[]) => this.updateFormData("industries", tags)}
+            onChange={(tags: string[]) =>
+              this.updateFormData("industries", tags)
+            }
           />
         </div>
       </>
@@ -221,7 +219,7 @@ export class Briefs extends React.Component<
             className="field-input"
             style={{ paddingLeft: "24px" }}
             type="number"
-            value={this.state.info.budget}
+            value={this.state.info.budget || ""}
             onChange={(e) => this.updateFormData("budget", e.target.value)}
           />
           <div className="budget-currency-container">$</div>
@@ -270,32 +268,21 @@ export class Briefs extends React.Component<
               </button>
             )}
 
-            {
-              step === stepData.length - 1
-              ? 
-              (
-                <button
-                  className="primary-btn in-dark w-button"
-                  onClick={this.onReviewPost(this.state.info)}
-                >
-                  Review your post
-                </button>
-                
-              )
-              : stepData[step].next
-              ? `Next: ${stepData[step].next}`
-              : 
-              (
-                <button
-                  className="primary-btn in-dark w-button"
-                  onClick={this.onNext}
-                >
-                  Next 
-                </button>
-                
-              )
-              
-            }   
+            {step === stepData.length - 1 ? (
+              <button
+                className="primary-btn in-dark w-button"
+                onClick={() => this.onReviewPost(this.state.info)}
+              >
+                Review your post
+              </button>
+            ) : (
+              <button
+                className="primary-btn in-dark w-button"
+                onClick={this.onNext}
+              >
+                {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
+              </button>
+            )}
           </div>
         </div>
       </div>

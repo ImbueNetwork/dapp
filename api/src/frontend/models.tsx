@@ -75,6 +75,7 @@ export type Milestone = {
 export type Contribution = {
     accountId: string;
     value: bigint;
+    timestamp: bigint;
 };
 
 export type Web3Account = {

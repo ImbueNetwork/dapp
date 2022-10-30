@@ -180,7 +180,7 @@ class ChainService {
                                             eventName &&
                                             method === eventName &&
                                             data[0].toHuman() ===
-                                                account.address
+                                            account.address
                                         ) {
                                             transactionState.status = true;
                                             return transactionState;
@@ -314,11 +314,8 @@ class ChainService {
             )
         ).toHuman();
 
-        const totalContributions = projectOnChain.contributions.reduce(
-            (sum: bigint, contribution: any) =>
-                sum + BigInt(contribution.value.replaceAll(",", "")),
-            BigInt(0)
-        );
+        const raisedFunds = BigInt(projectOnChain.raisedFunds.replaceAll(",", ""));
+        const milestones = await this.getProjectMilestones(projectOnChain);
 
         // get project state
         let projectState = ProjectState.PendingProjectApproval;
@@ -328,9 +325,7 @@ class ChainService {
         );
         let projectInContributionRound = false;
         let projectInVotingRound = false;
-        const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(
-            projectOnChain
-        );
+        const lastApprovedMilestoneKey = await this.findLastApprovedMilestone(milestones);
         const lastHeader = await this.imbueApi.imbue.api.rpc.chain.getHeader();
         const currentBlockNumber = lastHeader.number.toBigInt();
         const rounds: any =
@@ -338,7 +333,7 @@ class ChainService {
 
         let roundKey = undefined;
         for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
-            const [[id], round] = rounds[i];
+            const [id, round] = rounds[i];
             const readableRound = round.toHuman();
             const roundStart = BigInt(readableRound.start.replaceAll(",", ""));
             const roundEnd = BigInt(readableRound.end.replaceAll(",", ""));
@@ -354,17 +349,18 @@ class ChainService {
                 if (
                     projectOnChain.approvedForFunding &&
                     readableRound.roundType ==
-                        RoundType[RoundType.ContributionRound]
+                    RoundType[RoundType.ContributionRound]
                 ) {
+
                     projectInContributionRound = true;
-                    roundKey = id;
+                    roundKey = Number(id.args.map((key: any) => key.toHuman()));
                     break;
                 } else if (
                     projectOnChain.fundingThresholdMet &&
                     readableRound.roundType == RoundType[RoundType.VotingRound]
                 ) {
                     projectInVotingRound = true;
-                    roundKey = id;
+                    roundKey = Number(id.args.map((key: any) => key.toHuman()));
                     break;
                 }
             }
@@ -417,8 +413,8 @@ class ChainService {
             ),
             requiredFundsFormatted:
                 projectOnChain.requiredFunds.replaceAll(",", "") / 1e12,
-            raisedFunds: totalContributions,
-            raisedFundsFormatted: Number(totalContributions / BigInt(1e12)),
+            raisedFunds: raisedFunds,
+            raisedFundsFormatted: Number(raisedFunds / BigInt(1e12)),
             withdrawnFunds: BigInt(
                 projectOnChain.withdrawnFunds.replaceAll(",", "")
             ),
@@ -426,25 +422,14 @@ class ChainService {
                 projectOnChain.currencyId == "Native"
                     ? ("IMBU" as Currency)
                     : (projectOnChain.currencyId as Currency),
-            milestones: projectOnChain.milestones.map(
-                (milestone: any) =>
-                    ({
-                        projectKey: Number(milestone.projectKey),
-                        milestoneKey: Number(milestone.milestoneKey),
-                        name: milestone.name,
-                        percentageToUnlock: Number(
-                            milestone.percentageToUnlock
-                        ),
-                        isApproved: milestone.isApproved,
-                    } as Milestone)
-            ),
-            contributions: projectOnChain.contributions.map(
-                (contribution: any) =>
-                    ({
-                        value: BigInt(contribution.value.replaceAll(",", "")),
-                        accountId: contribution.accountId,
-                    } as Contribution)
-            ),
+            milestones: milestones,
+            contributions: Object.keys(projectOnChain.contributions).map(
+                (accountId: string) =>
+                ({
+                    value: BigInt(projectOnChain.contributions[accountId].value.replaceAll(",", "")),
+                    accountId: accountId,
+                    timestamp: BigInt(projectOnChain.contributions[accountId].timestamp.replaceAll(",", ""))
+                } as Contribution)),
             initiator: projectOnChain.initiator,
             createBlockNumber: BigInt(
                 projectOnChain.createBlockNumber.replaceAll(",", "")
@@ -457,6 +442,23 @@ class ChainService {
         };
 
         return convertedProject;
+    }
+
+    public async getProjectMilestones(projectOnChain: ProjectOnChain): Promise<Milestone[]> {
+        let milestones: Milestone[] = Object.keys(projectOnChain.milestones).map((milestoneItem: any) => projectOnChain.milestones[milestoneItem]).map(
+            (milestone: any) =>
+            ({
+                projectKey: Number(milestone.projectKey),
+                milestoneKey: Number(milestone.milestoneKey),
+                name: milestone.name,
+                percentageToUnlock: Number(
+                    milestone.percentageToUnlock
+                ),
+                isApproved: milestone.isApproved,
+            } as Milestone)
+        );
+
+        return milestones;
     }
 
     public async isUserInitiator(
@@ -475,8 +477,8 @@ class ChainService {
         return userIsInitiator;
     }
 
-    public findFirstPendingMilestone(projectOnChain: ProjectOnChain): number {
-        const firstmilestone = projectOnChain.milestones.find(
+    public async findFirstPendingMilestone(milestones: Milestone[]): Promise<number> {
+        const firstmilestone = milestones.find(
             (milestone) => !milestone.isApproved
         );
         if (firstmilestone) {
@@ -485,8 +487,8 @@ class ChainService {
         return -1;
     }
 
-    public findLastApprovedMilestone(projectOnChain: ProjectOnChain): number {
-        const firstmilestone = projectOnChain.milestones
+    public async findLastApprovedMilestone(milestones: Milestone[]): Promise<number> {
+        const firstmilestone = milestones
             .slice()
             .reverse()
             .find((milestone) => milestone.isApproved);

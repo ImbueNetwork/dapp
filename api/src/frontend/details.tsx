@@ -122,8 +122,10 @@ class Details extends React.Component<DetailsProps, DetailsState> {
             return;
         }
 
-        let lastApprovedMilestoneIndex = this.props.chainService.findLastApprovedMilestone(projectOnChain);
-        let firstPendingMilestoneIndex = this.props.chainService.findFirstPendingMilestone(projectOnChain);
+        const projectMilestones = await this.props.chainService.getProjectMilestones(projectOnChain);
+
+        let lastApprovedMilestoneIndex = await this.props.chainService.findLastApprovedMilestone(projectMilestones);
+        let firstPendingMilestoneIndex = await this.props.chainService.findFirstPendingMilestone(projectMilestones);
 
         const projectState = projectOnChain.projectState
 

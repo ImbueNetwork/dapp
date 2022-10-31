@@ -43,6 +43,12 @@ export const stepData = [
       "This will help people submit proposals that are within your range.",
     progress: 3.0,
   },
+  {
+    heading: "That's It. All done!",
+    content:
+      "Your brief will be listed shortly after submission and people will be able to submit proposals for you to review.",
+    progress: 3.0,
+  },
 ];
 
 export const nameExamples = ["Build a dapp", "Write a smart contract", "Generate Content, e.g. blog, videos"];

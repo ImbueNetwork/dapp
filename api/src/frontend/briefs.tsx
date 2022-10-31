@@ -57,7 +57,7 @@ async function invokeBriefAPI(brief: BriefInfo) {
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
   state = {
-    step: 0,
+    step: 7,
     info: {
       name: "",
       industries: [],
@@ -81,16 +81,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     const { step } = this.state;
     step < stepData.length - 1 &&
       this.setState({ ...this.state, step: step + 1 });
-    if (step == stepData.length - 1) {
-      console.log("***** final step");
-      console.log(this.state.info.name);
-      console.log(this.state.info.industries);
-      console.log(this.state.info.description);
-      console.log(this.state.info.scope);
-      console.log(this.state.info.time);
-      console.log(this.state.info.skills);
-      console.log(this.state.info.budget);
-    }
   };
 
   onReviewPost = (brief: BriefInfo) => {
@@ -99,6 +89,12 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
       this.setState({ ...this.state, step: step + 1 });
     invokeBriefAPI(brief);
   };
+
+
+  onReviewPost = (brief: BriefInfo) => {
+    // redirect to discover briefs page
+  };
+
 
   updateFormData = (name: string, value: string | number | string[]) => {
     this.setState({
@@ -231,6 +227,15 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
       </div>
     );
 
+    const ConfirmPanel = (
+
+      <div className="description-panel">
+        <p className="field-name">Thank you for your submission!</p>
+      </div>
+
+
+    );
+
     const panels = [
       NamePanel,
       IndustriesPanel,
@@ -239,6 +244,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
       ScopePanel,
       TimePanel,
       BudgetPanel,
+      ConfirmPanel,
     ];
 
     return (
@@ -271,9 +277,16 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             {step === stepData.length - 1 ? (
               <button
                 className="primary-btn in-dark w-button"
+                onClick={() => this.discoverBriefs(this.state.info)}
+              >
+                Discover Briefs
+              </button>
+            ) :  step === stepData.length - 2 ? (
+              <button
+                className="primary-btn in-dark w-button"
                 onClick={() => this.onReviewPost(this.state.info)}
               >
-                Review your post
+                Submit
               </button>
             ) : (
               <button

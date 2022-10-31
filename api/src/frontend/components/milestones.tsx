@@ -1,10 +1,13 @@
 import React from 'react';
-import { Milestone, ProjectOnChain, ProjectState } from "../models";
+import {Milestone, ProjectOnChain, ProjectState, User} from "../models";
 import MilestoneItem from './milestoneItem';
+import ChainService from "../services/chainService";
 
 export type MilestonesProps = {
     projectOnChain: ProjectOnChain,
-    firstPendingMilestoneIndex: number
+    firstPendingMilestoneIndex: number,
+    user: User
+    chainService: ChainService
 }
 
 type MilestonesState = {
@@ -36,6 +39,8 @@ export class Milestones extends React.Component<MilestonesProps, MilestonesState
                             isInVotingRound={milestone.milestoneKey === this.props.firstPendingMilestoneIndex && this.props.projectOnChain.projectState === ProjectState.OpenForVoting}
                             toggleActive={this.state.activeMilestone === (milestone.milestoneKey)}
                             toggleMilestone={this.toggleMilestone}
+                            user={this.props.user}
+                            chainService={this.props.chainService}
                         />
                     ))}
                 </div>

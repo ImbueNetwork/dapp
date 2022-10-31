@@ -7,10 +7,10 @@ import { auditFields, onUpdateTrigger } from "../utils";
 export async function up(knex: Knex): Promise<void> {
     const milestoneDetailsTableName = "milestone_details";
     await knex.schema.createTable(milestoneDetailsTableName, (builder) => {
-        builder.integer("index").notNullable();
+        builder.integer("milestone_id").notNullable();
         builder.integer("project_id").notNullable();
         builder.string("details").nullable();
-        builder.primary(["project_id", "index"]);
+        builder.primary(["project_id", "milestone_id"]);
         builder.foreign("project_id")
             .references("projects.id")
             .onDelete("CASCADE")

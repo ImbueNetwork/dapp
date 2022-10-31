@@ -45,7 +45,7 @@ export const stepData = [
   },
 ];
 
-export const nameExamples = ["Lorem Ipsum", "Lorem Ipsum", "Lorem Ipsum"];
+export const nameExamples = ["Build a dapp", "Write a smart contract", "Generate Content, e.g. blog, videos"];
 
 export const scopeData = [
   {

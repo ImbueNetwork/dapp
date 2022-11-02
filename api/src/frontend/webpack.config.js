@@ -4,7 +4,8 @@ module.exports = {
     entry: {
         "login": path.resolve(__dirname, "login.tsx"),
         "proposals": path.resolve(__dirname, "proposals.tsx"),
-        "details": path.resolve(__dirname, "details.tsx")
+        "details": path.resolve(__dirname, "details.tsx"),
+        "briefs": path.resolve(__dirname, "briefs.tsx")
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

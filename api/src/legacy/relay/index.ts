@@ -158,6 +158,12 @@ export default class Relay extends HTMLElement {
 
     }
     async init(request: ImbueRequest) {
+        request.user.then(user=>{
+            if(user===null)
+            {
+                this.$transfer.disabled = true;
+            }
+        })
         this.apiInfo = await request.apiInfo;
         return;
     }

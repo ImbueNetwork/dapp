@@ -287,7 +287,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
 
 
                     <div className={`tab-content ${this.state.activeTabIndex === 1 ? "active" : ""}`}>
-                        <Milestones projectOnChain={this.state.projectOnChain} firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex}></Milestones>
+                        <Milestones projectOnChain={this.state.projectOnChain} firstPendingMilestoneIndex={this.state.firstPendingMilestoneIndex} user={this.props.user} chainService={this.props.chainService}></Milestones>
                     </div>
 
                     <div className={`tab-content ${this.state.activeTabIndex === 2 ? "active" : ""}`}>

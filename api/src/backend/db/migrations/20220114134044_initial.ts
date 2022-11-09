@@ -155,32 +155,6 @@ export async function up(knex: Knex): Promise<void> {
     }).then(onUpdateTrigger(knex, projectsTableName));
 
     /**
-     *  pub struct Milestone {
-     *      project_key: ProjectIndex,
-     *      milestone_index: MilestoneIndex,
-     *      name: Vec<u8>,
-     *      percentage_to_unlock: u32,
-     *      is_approved: bool
-     *  }
-     */
-    const milestonesTableName = "milestones";
-    await knex.schema.createTable(milestonesTableName, (builder) => {
-        builder.integer("milestone_index");
-        builder.integer("project_id").notNullable();
-        builder.primary(["project_id","milestone_index"]);
-        builder.foreign("project_id")
-            .references("projects.id")
-            .onDelete("CASCADE")
-            .onUpdate("CASCADE");
-
-        builder.text("name");
-        builder.integer("percentage_to_unlock");
-        builder.boolean("is_approved").defaultTo(false);
-
-        auditFields(knex, builder);
-    }).then(onUpdateTrigger(knex, milestonesTableName));
-
-    /**
      * TODO: ? votes and contributions
      *
      * It's not clear that this will ever be anything that needs to be

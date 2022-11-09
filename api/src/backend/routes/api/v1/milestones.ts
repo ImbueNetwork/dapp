@@ -90,14 +90,14 @@ router.post("/", passport.authenticate('jwt', { session: false }),(req, res, nex
 
     db.transaction(async tx => {
         try {
-            const project = await models.insertMilestoneDetails(
-                req.body.milestoneDetails
+            const project = await models.updateMilestoneDetails(
+                req.body.milestoneDetails.project_id,req.body.milestoneDetails.milestone_id,req.body.milestoneDetails.milestone_details
             )(tx);
 
             res.status(201).send(project);
         } catch (cause) {
             next(new Error(
-                `Failed to insert milestone.`,
+                `Failed to add milestone details`,
                 {cause: cause as Error}
             ));
         }

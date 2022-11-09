@@ -43,7 +43,7 @@ class MilestoneItem extends React.Component<MilestonesItemProps, MilestonesState
         const jsonData = {
             "milestoneDetails": {
                 "project_id": projectId,
-                "details": details,
+                "milestone_details": details,
                 "milestone_id": milestoneId
             }
         }
@@ -54,7 +54,7 @@ class MilestoneItem extends React.Component<MilestonesItemProps, MilestonesState
             mode: 'cors',
             body: JSON.stringify(jsonData)
         })
-        console.log("The details have been successfully added to milsetone_details");
+        console.log("The details have been successfully added to milestone_details");
 
         this.setState({valueExist: true});
     }
@@ -74,30 +74,31 @@ class MilestoneItem extends React.Component<MilestonesItemProps, MilestonesState
         })
 
         fetch(
-            `${config.apiBase}/milestones/1/milestone/${this.props.milestone.milestoneKey}`)
+            `${config.apiBase}/milestones/${this.props.milestone.projectKey}/milestone/${this.props.milestone.milestoneKey}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log("This is the json", data)
-                if (data.length > 0 && data !== undefined) {
+                console.log("This is the json", data[0].milestone_details)
+                if (data.length > 0 && data[0].milestone_details !== null) {
                     this.setState({
-                        detailsValue: data[0].details
+                        detailsValue: data[0].milestone_details
                     });
                     this.setState({valueExist: true});
                 }
             })
 
-        fetch(`${config.apiBase}/users/${this.props.user.id}/project`)
-            .then((res) => {
-                if (res.ok) return res.json();
-                else if (res.status === 404) {
-                    throw new Error('Project not found for the user')
-                }
-                else throw new Error("Status code error :" + res.status)
-            })
-            .then((data) => {
-                if (data !== null && data.id !== null) this.setState({dbProjectId: data.id});
-            })
-            .catch(error => console.log(error));
+        if(this.props.user!==null) {
+            fetch(`${config.apiBase}/users/${this.props.user.id}/project`)
+                .then((res) => {
+                    if (res.ok) return res.json();
+                    else if (res.status === 404) {
+                        throw new Error('Project not found for the user')
+                    } else throw new Error("Status code error :" + res.status)
+                })
+                .then((data) => {
+                    if (data !== null && data.id !== null) this.setState({dbProjectId: data.id});
+                })
+                .catch(error => console.log(error));
+        }
     }
 
 

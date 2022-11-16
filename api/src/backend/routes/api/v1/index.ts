@@ -2,7 +2,9 @@ import express from "express";
 import passport from "passport";
 import projectsRouter from "./projects";
 import usersRouter from "./users";
+import briefsRouter from "./briefs";
 import config from "../../../config";
+import milestonesRouter from "./milestones"
 
 const router = express.Router();
 
@@ -19,5 +21,6 @@ router.get("/info", (req, res) => {
 
 router.use("/projects", projectsRouter);
 router.use("/users", usersRouter);
-
+router.use("/milestones",milestonesRouter)
+router.use("/briefs", briefsRouter);
 export default router;

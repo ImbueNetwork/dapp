@@ -57,7 +57,7 @@ async function invokeBriefAPI(brief: BriefInfo) {
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
   state = {
-    step: 7,
+    step: 0,
     info: {
       name: "",
       industries: [],

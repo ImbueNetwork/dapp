@@ -3,7 +3,7 @@ export enum Currency {
     KSM = "KSM",
     AUSD = "AUSD",
     KAR = "KAR",
-    MGX = "MGX"
+    MGX = "MGX",
 }
 
 export enum RoundType {
@@ -14,7 +14,7 @@ export enum RoundType {
 export enum ButtonState {
     Default,
     Saving,
-    Done
+    Done,
 }
 
 export type Project = {
@@ -59,10 +59,10 @@ export type ProjectOnChain = {
     createBlockNumber: bigint;
     approvedForFunding: boolean;
     fundingThresholdMet: boolean;
-
+    roundKey: number | undefined;
     cancelled: boolean;
     projectState: ProjectState;
-}
+};
 
 export type Milestone = {
     projectKey: number;
@@ -70,15 +70,16 @@ export type Milestone = {
     name: string;
     percentageToUnlock: number;
     isApproved: boolean;
-}
+};
 
 export type Contribution = {
     accountId: string;
     value: bigint;
-}
+    timestamp: bigint;
+};
 
 export type Web3Account = {
-    address: string,
+    address: string;
     user_id: number;
     type: string;
     challenge: string;
@@ -91,9 +92,9 @@ export type User = {
 };
 
 export interface BasicTxResponse {
-    errorMessage: string | null,
-    callHash?: string,
-    status?: boolean,
-    transactionHash?: string,
-    txError?: boolean,
-  }
+    errorMessage: string | null;
+    callHash?: string;
+    status?: boolean;
+    transactionHash?: string;
+    txError?: boolean;
+}

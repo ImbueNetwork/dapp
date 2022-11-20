@@ -32,11 +32,11 @@ export type BriefState = {
 };
 
 export type BriefInfo = {
-  name: string;
+  headline: string;
   industries: string[];
   description: string;
   scope: string;
-  time: string;
+  duration: string;
   skills: string[];
   budget: number | undefined;
 };
@@ -59,11 +59,11 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
   state = {
     step: 0,
     info: {
-      name: "",
+      headline: "",
       industries: [],
       description: "",
       scope: "",
-      time: "",
+      duration: "",
       skills: [],
       budget: undefined,
     },
@@ -115,9 +115,9 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
           <input
             className="field-input"
             placeholder="Enter the name of your project"
-            name="name"
-            value={this.state.info.name}
-            onChange={(e) => this.updateFormData("name", e.target.value)}
+            name="headline"
+            value={this.state.info.headline}
+            onChange={(e) => this.updateFormData("headline", e.target.value)}
           />
         </div>
         <p className="field-name">Examples</p>
@@ -200,8 +200,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             label={label}
             value={value}
             key={index}
-            checked={this.state.info.time === value}
-            onSelect={() => this.updateFormData("time", value)}
+            checked={this.state.info.duration === value}
+            onSelect={() => this.updateFormData("duration", value)}
           />
         ))}
       </div>

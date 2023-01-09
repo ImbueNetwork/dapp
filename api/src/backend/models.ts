@@ -84,6 +84,20 @@ export type Brief = {
     user_id?: string | number;
 };
 
+export type Freelancer = {
+    id?: string | number;
+    education: string;
+    experience: string;
+    freelanced_before: boolean;
+    work_type: string;
+    skills: string;
+    title: string;
+    languages: string;
+    services_offer: string;
+    bio: string;
+    user_id?: string | number;
+};
+
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
@@ -284,4 +298,23 @@ export const getOrCreateFederatedUser = (
         }
     });
 };
+
+// freelancer crud interaction
+export const fetchFreelancerDetailsByUserID = (userId: string) =>
+    (tx: Knex.Transaction) =>
+        tx<Freelancer>("freelancers").whereNotNull('id').select().where({ user_id: userId}).first();
+
+export const fetchAllFreelancers = () =>
+    (tx: Knex.Transaction) =>
+        tx<Freelancer>("freelancers").whereNotNull('id').select();
+
+export const insertFreelancerDetails = (freelancer: Freelancer) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Freelancer>("freelancers").insert(freelancer).returning("*")
+    )[0];
+
+export const updateFreelancerDetails = (userId: string,freelancer: Freelancer) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Freelancer>("freelancers").where({user_id:userId}).update(freelancer).returning("*")
+    )[0];
 

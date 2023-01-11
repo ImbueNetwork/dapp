@@ -8,5 +8,5 @@ api/build/*
 
 .DS_Store
 
-.vscode/
+./.vscode
 .idea/

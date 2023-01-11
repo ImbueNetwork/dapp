@@ -14,6 +14,8 @@ import {
     suggestedSkills,
 } from "./config/freelancer-data";
 import * as config from "./config";
+import { Freelancer, User } from "./models";
+import { web3Accounts } from "@polkadot/extension-dapp";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -24,51 +26,47 @@ const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-export type BriefProps = {};
+export type FreelancerProps = {
+    username: string;
+};
 
-export type BriefState = {
+export type FreelancerState = {
     step: number;
-    info: BriefInfo;
+    info: Freelancer;
 };
 
-export type BriefInfo = {
-    name: string;
-    industries: string[];
-    description: string;
-    scope: string;
-    time: string;
-    skills: string[];
-    budget: number | undefined;
-};
-
-async function invokeBriefAPI(brief: BriefInfo) {
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
+async function invokeFreelancerAPI(Freelancer: Freelancer) {
+    const resp = await fetch(`${config.apiBase}/Freelancers/`, {
         headers: postAPIHeaders,
         method: "post",
-        body: JSON.stringify({ brief }),
+        body: JSON.stringify({ Freelancer }),
     });
 
     if (resp.ok) {
         // could be 200 or 201
-        // Brief API successfully invoked
-        console.log("Brief created successfully via Brief REST API");
+        // Freelancer API successfully invoked
+        console.log("Freelancer created successfully via Freelancer REST API");
     }
 }
 
-export class Briefs extends React.Component<BriefProps, BriefState> {
+export class Freelancers extends React.Component<FreelancerProps, FreelancerState> {
     state = {
-        step: 0,
         info: {
-            name: "",
-            industries: [],
-            description: "",
-            scope: "",
-            time: "",
-            skills: [],
-            budget: undefined,
+            id: "",
+            education: "",
+            experience: "",
+            freelanced_before: false,
+            work_type: "",
+            skills: "",
+            title: "",
+            languages: "",
+            services_offer: "",
+            bio: "",
+            user_id: "",
         },
+        step: 0
     };
-    constructor(props: BriefProps) {
+    constructor(props: FreelancerProps) {
         super(props);
     }
 
@@ -83,16 +81,16 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         this.setState({ ...this.state, step: step + 1 });
     };
 
-    onReviewPost = (brief: BriefInfo) => {
+    onReviewPost = (Freelancer: Freelancer) => {
         const { step } = this.state;
         step < stepData.length - 1 &&
         this.setState({ ...this.state, step: step + 1 });
-        invokeBriefAPI(brief);
+        invokeFreelancerAPI(Freelancer);
     };
 
 
-    onDiscoverBriefs = (brief: BriefInfo) => {
-        // redirect to discover briefs page
+    onDiscoverFreelancers = (Freelancer: Freelancer) => {
+        // redirect to discover Freelancers page
     };
 
 
@@ -110,121 +108,11 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         const { step } = this.state;
         const NamePanel = (
             <>
-                <p className="field-name">Write a headline for your brief</p>
+                <h1 className="field-name">Hello {this.props.username}, ready to find an oppertunity? </h1>
                 <div className="name-panel-input-wrapper">
-                    <input
-                        className="field-input"
-                        placeholder="Enter the name of your project"
-                        name="name"
-                        value={this.state.info.name}
-                        onChange={(e) => this.updateFormData("name", e.target.value)}
-                    />
                 </div>
                 <p className="field-name">Examples</p>
-                <div className="name-panel-name-examples">
-                    {nameExamples.map((name, index) => (
-                        <p className="name-panel-name-example" key={index}>
-                            {name}
-                        </p>
-                    ))}
-                </div>
             </>
-        );
-
-        const IndustriesPanel = (
-            <>
-                <p className="field-name">Search industries or add your own</p>
-                <div className="industry-container">
-                    <TagsInput
-                        suggestData={suggestedIndustries}
-                        tags={this.state.info.industries}
-                        onChange={(tags: string[]) =>
-                            this.updateFormData("industries", tags)
-                        }
-                    />
-                </div>
-            </>
-        );
-
-        const DescriptionPanel = (
-            <div className="description-panel">
-                <p className="field-name">Describe your project in a few sentences</p>
-                <div className="description-container">
-                    <TextInput
-                        value={this.state.info.description}
-                        name="description"
-                        maxLength={5000}
-                        onChange={(e) => this.updateFormData("description", e.target.value)}
-                    />
-                </div>
-            </div>
-        );
-
-        const SkillsPanel = (
-            <>
-                <p className="field-name">Search the skills</p>
-                <div className="skills-container">
-                    <TagsInput
-                        suggestData={suggestedSkills}
-                        tags={this.state.info.skills}
-                        onChange={(tags: string[]) => this.updateFormData("skills", tags)}
-                    />
-                </div>
-            </>
-        );
-
-        const ScopePanel = (
-            <div className="scope-container">
-                {scopeData.map(({ label, value, description }, index) => (
-                    <Option
-                        label={label}
-                        value={value}
-                        key={index}
-                        checked={this.state.info.scope === value}
-                        onSelect={() => this.updateFormData("scope", value)}
-                    >
-                        {description ? (
-                            <div className="scope-item-description">{description}</div>
-                        ) : (
-                            <></>
-                        )}
-                    </Option>
-                ))}
-            </div>
-        );
-
-        const TimePanel = (
-            <div className="time-container">
-                {timeData.map(({ label, value }, index) => (
-                    <Option
-                        label={label}
-                        value={value}
-                        key={index}
-                        checked={this.state.info.time === value}
-                        onSelect={() => this.updateFormData("time", value)}
-                    />
-                ))}
-            </div>
-        );
-
-        const BudgetPanel = (
-            <div>
-                <p className="field-name">Maximum project budget (USD)</p>
-                <div className="budget-input-container">
-                    <input
-                        className="field-input"
-                        style={{ paddingLeft: "24px" }}
-                        type="number"
-                        value={this.state.info.budget || ""}
-                        onChange={(e) => this.updateFormData("budget", e.target.value)}
-                    />
-                    <div className="budget-currency-container">$</div>
-                </div>
-                <div className="budget-description">
-                    You will be able to set milestones which divide your project into
-                    manageable phases.
-                </div>
-            </div>
         );
 
         const ConfirmPanel = (
@@ -238,12 +126,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
         const panels = [
             NamePanel,
-            IndustriesPanel,
-            DescriptionPanel,
-            SkillsPanel,
-            ScopePanel,
-            TimePanel,
-            BudgetPanel,
             ConfirmPanel,
         ];
 
@@ -266,9 +148,9 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         {step === stepData.length - 1 ? (
                             <button
                                 className="primary-btn in-dark w-button"
-                                onClick={() => this.onDiscoverBriefs(this.state.info)}
+                                onClick={() => this.onDiscoverFreelancers(this.state.info)}
                             >
-                                Discover Briefs
+                                Discover Freelancers
                             </button>
                         ) :  step === stepData.length - 2 ? (
                             <button
@@ -294,6 +176,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
 document.addEventListener("DOMContentLoaded", (event) => {
     ReactDOMClient.createRoot(document.getElementById("freelancer-details")!).render(
-        <Briefs />
-    );
-});
+        <Freelancers username={"STATIC ANN"}
+     /> )}
+);

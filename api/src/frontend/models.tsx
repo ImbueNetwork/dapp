@@ -98,3 +98,17 @@ export interface BasicTxResponse {
     transactionHash?: string;
     txError?: boolean;
 }
+
+export type Freelancer = {
+    id?: string | number;
+    education: string;
+    experience: string;
+    freelanced_before: boolean;
+    work_type: string;
+    skills: string;
+    title: string;
+    languages: string;
+    services_offer: string;
+    bio: string;
+    user_id?: string | number;
+};

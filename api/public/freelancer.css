@@ -49,11 +49,6 @@ p {
     width: 100%;
 }
 
-.heading {
-    padding: 112px 32px 64px 0px;
-    color: blue;
-}
-
 .help {
     color: var(--theme-ink-color);
     padding-right: 48px;
@@ -61,49 +56,20 @@ p {
 }
 
 .contents {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: flex-end;
-    padding-bottom: 16px;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    height: 100%;
 }
 
 .buttons {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .name-panel-input-wrapper {
     margin-top: 24px;
     margin-bottom: 40px;
-}
-
-.name-panel-name-examples {
-    display: flex;
-    flex-direction: column;
-    margin-top: 16px;
-    padding-bottom: 128px;
-}
-
-.name-panel-name-example {
-    font-size: 20px;
-    color: black;
-    line-height: 1.5;
-    margin: 0px;
-}
-
-.description-panel {
-    display: flex;
-    flex-direction: column;
-    height: 90%;
-}
-
-.description-container {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    margin-top: 24px;
 }
 
 .scope-container {
@@ -126,35 +92,37 @@ p {
     margin-bottom: 120px;
 }
 
-.budget-input-container {
-    position: relative;
-    margin-top: 24px;
-    margin-bottom: 32px;
+.name-title {
+    color: var(--theme-secondary);
+    width: 60%;
 }
 
-.budget-currency-container {
-    position: absolute;
-    top: 0px;
-    left: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.content-text-small {
+    position: static;
+    color: #2c2c2c;
+    width: 60%;
+    font-size: 23px;
+    text-align: center;
+    padding-top: 5%
+}
+
+.right-panel-details {
+    position: static;
+    float: right;
+    width: 20%;
     height: 100%;
-    color: var(--theme-black-text);
+    background-color: white;
+
 }
 
-.budget-description {
-    margin-bottom: 160px;
-    padding-right: 112px;
+.inner-right-panel-details {
+    padding: 4%;
+
+    width: fit-content;
+    height: fit-content;
 }
 
-.industry-container {
-    padding-top: 24px;
-    padding-bottom: 80px;
-}
-
-.skills-container {
-    padding-top: 24px;
-    padding-bottom: 80px;
+.hello-panel {
+    height: 100%;
+    width: 100%;
 }

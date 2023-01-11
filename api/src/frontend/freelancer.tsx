@@ -1,17 +1,8 @@
 import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import { Option } from "./components/option";
-import { ProgressBar } from "./components/progressBar";
-import { TagsInput } from "./components/tagsInput";
-import { TextInput } from "./components/textInput";
 import {
     stepData,
-    scopeData,
-    timeData,
-    nameExamples,
-    suggestedIndustries,
-    suggestedSkills,
 } from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
@@ -106,26 +97,29 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
 
     render() {
         const { step } = this.state;
-        const NamePanel = (
-            <>
-                <h1 className="field-name">Hello {this.props.username}, ready to find an oppertunity? </h1>
-                <div className="name-panel-input-wrapper">
+
+        const HelloPanel = (
+            <div className="hello-panel">
+                <div className="content-text-small">
+                    <p>{stepData[step].content} </p>
                 </div>
-                <p className="field-name">Examples</p>
-            </>
+                <div className="right-panel-details">
+                    <div>
+
+                    </div>
+                </div>
+            </div>
+
         );
 
         const ConfirmPanel = (
-
             <div className="description-panel">
-                <p className="field-name">Thank you for your submission!</p>
+                <p className="content-text">Thank you for your submission!</p>
             </div>
-
-
         );
 
         const panels = [
-            NamePanel,
+            HelloPanel,
             ConfirmPanel,
         ];
 
@@ -133,8 +127,14 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
             <div className="freelancer-details-container">
                 <div className="main-panel">
                     {/*<h1 className="heading">{stepData[0].heading}</h1>*/}
-                    <div className="contents">{panels[step] ?? <></>}</div>
+                    <div className="contents">
+                        <div>
+                            <h2 className="name-title"> {stepData[step].heading} </h2>
+                        </div>
+                        {panels[step] ?? <></>}
+                    </div>
                     <div className="buttons">
+                        
                         {step >= 1 && (
                             <button
                                 disabled={step < 1}
@@ -145,19 +145,12 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                             </button>
                         )}
 
-                        {step === stepData.length - 1 ? (
+                        {step === 0 ? (
                             <button
                                 className="primary-btn in-dark w-button"
-                                onClick={() => this.onDiscoverFreelancers(this.state.info)}
+                                onClick={this.onNext}
                             >
-                                Discover Freelancers
-                            </button>
-                        ) :  step === stepData.length - 2 ? (
-                            <button
-                                className="primary-btn in-dark w-button"
-                                onClick={() => this.onReviewPost(this.state.info)}
-                            >
-                                Submit
+                                Get Started!
                             </button>
                         ) : (
                             <button

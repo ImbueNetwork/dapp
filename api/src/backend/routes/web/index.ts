@@ -36,6 +36,10 @@ router.get("/googlelogin", (req, res) => {
     res.render("googlelogin");
 });
 
+router.get("/freelancers/new", (req, res) => {
+    res.render("freelancer");
+});
+
 router.use((_req, res, next) => {
     res.render("legacy")
 });

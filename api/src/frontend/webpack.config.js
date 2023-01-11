@@ -6,7 +6,10 @@ module.exports = {
         "proposals": path.resolve(__dirname, "proposals.tsx"),
         "details": path.resolve(__dirname, "details.tsx"),
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
-        "googlelogin": path.resolve(__dirname, "googlelogin.tsx")
+        "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
+        "new-brief": path.resolve(__dirname, "new-brief.tsx"),
+        "new-brief": path.resolve(__dirname, "new-brief.tsx"),
+        "freelancer": path.resolve(__dirname, "freelancer.tsx")
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

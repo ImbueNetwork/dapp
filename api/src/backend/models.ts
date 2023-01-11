@@ -315,6 +315,6 @@ export const insertFreelancerDetails = (freelancer: Freelancer) =>
 
 export const updateFreelancerDetails = (userId: string,freelancer: Freelancer) =>
     async (tx: Knex.Transaction) => (
-        await tx<Freelancer>("freelancers").where({user_id:userId}).update(freelancer).returning("*")
+        await tx<Freelancer>("freelancers").where({user_id: userId}).update(freelancer).returning("*")
     )[0];
 

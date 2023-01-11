@@ -20,8 +20,8 @@ From the top-level of the repo.
 
 1. Add some env variables to your bash profile.
 ```bash
-echo 'IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> ~/.bashrc;
-echo 'RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> ~/.bashrc;
+echo 'IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> $HOME/.bashrc;
+echo 'RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> $HOME/.bashrc;
 ```
 
 2. Then build the associated images 
@@ -29,7 +29,7 @@ echo 'RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> ~/.bashrc;
 docker-compose up -d;
 ```
 
-3. Setup DB.
+3. Setup DB and install.
 ```bash
 cd api;
 make db_up;
@@ -37,7 +37,6 @@ make db_up;
 
 4. Finally to start the project, simply
 ```bash
-yarn install;
 yarn start;
 ```
 

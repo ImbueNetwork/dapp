@@ -18,10 +18,11 @@ To go through this guide you will need:
 
 From the top-level of the repo.
 
-1. Add some env variables to your bash profile.
+1. Add some env variables to your bash profile and source.
 ```bash
 echo 'IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> $HOME/.bashrc;
 echo 'RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> $HOME/.bashrc;
+source $HOME/.bashrc;
 ```
 
 2. Then build the associated images 

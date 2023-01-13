@@ -3,10 +3,12 @@ import React from "react";
 import ReactDOMClient from "react-dom/client";
 import {
     stepData,
+    freelancedBeforeStatic,
 } from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
 import { web3Accounts } from "@polkadot/extension-dapp";
+import { listItemFreelance } from "./components/listItemFreelancer";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -104,13 +106,28 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                     <p>{stepData[step].content} </p>
                 </div>
                 <div>
-                <div className="bar-panel">
+                    <div className="bar-panel">
                 </div>
-                <div className="chess-panel">
+                    <div className="chess-panel">
                 </div>
                 </div>
             </div>
 
+        );
+
+        const FreelancedBefore = (
+            <div className="freelanced-before"> 
+                <div className="content-text-small-flex">
+                    <p>{stepData[step].content} </p>
+                </div>
+                <div className="choices">
+                    <ul>
+                        {freelancedBeforeStatic.map((item) => (
+                            <listItemFreelance></listItemFreelance>
+                        ))}
+                    </ul>
+                </div>
+            </div>
         );
 
         const ConfirmPanel = (
@@ -121,6 +138,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
 
         const panels = [
             HelloPanel,
+            FreelancedBefore,
             ConfirmPanel,
         ];
 
@@ -134,7 +152,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                         </div>
                         {panels[step] ?? <></>}
                     </div>
-                    <div className="buttons">
+                    <div className={step === 0 ? "button-left" : "button-right"}>
 
                         {step >= 1 && (
                             <button

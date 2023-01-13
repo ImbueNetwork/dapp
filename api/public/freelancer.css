@@ -61,10 +61,15 @@ p {
     height: 100%;
 }
 
-.buttons {
+.button-left {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+}
+.button-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
 .name-panel-input-wrapper {
@@ -149,5 +154,28 @@ p {
 
     background: url(https://w7.pngwing.com/pngs/606/180/png-transparent-english-draughts-checkerboard-checkerboard-angle-white-text-thumbnail.png);
     border-radius: 23px;
+}
 
+.freelanced-before {
+    display: flex;
+}
+
+.content-text-small-flex {
+    justify-content: center;
+    align-items:flex-start;
+    color:#2c2c2c;
+}
+
+.choices {
+    display: flex;
+    flex-direction: column;
+}
+
+.freelancer-li {
+    display: flex;
+    align-items: flex-start;
+    background-color: #FFF;
+    width: 60%;
+    text-align: left;
+    border-radius: 2%;
 }

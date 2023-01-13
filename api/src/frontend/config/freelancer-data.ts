@@ -87,3 +87,9 @@ export const suggestedIndustries = [
 
 
 export const suggestedSkills = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];
+
+export const freelancedBeforeStatic = [
+    {
+        
+    }
+]

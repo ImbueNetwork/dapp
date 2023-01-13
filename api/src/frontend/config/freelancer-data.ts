@@ -89,7 +89,7 @@ export const suggestedIndustries = [
 export const suggestedSkills = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];
 
 export const freelancedBeforeStatic = [
-    {
-        
-    }
+    "No this is new to me.",
+    "I've freelanced before however, i may need some extra help.",
+    "Yes I'm a pro, I've been doing it for years"
 ]

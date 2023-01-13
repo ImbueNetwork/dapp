@@ -123,7 +123,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                 <div className="choices">
                     <ul>
                         {freelancedBeforeStatic.map((item) => (
-                            <listItemFreelance></listItemFreelance>
+                            <listItemFreelance content={item}></listItemFreelance>
                         ))}
                     </ul>
                 </div>

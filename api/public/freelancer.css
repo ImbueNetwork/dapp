@@ -126,3 +126,28 @@ p {
     height: 100%;
     width: 100%;
 }
+
+/* Rectangle 42 */
+
+.bar-panel{
+    position: absolute;
+    width: 19vw;
+    height: 31vw;
+    left: 63vw;
+    top: 13.5vw;
+    background: #FFFFFF;
+    border-radius: 25px;
+}
+
+.chess-panel{
+
+    position: absolute;
+    width: 16vw;
+    height: 15vw;
+    left: 64.5vw;
+    top: 15vw;
+
+    background: url(https://w7.pngwing.com/pngs/606/180/png-transparent-english-draughts-checkerboard-checkerboard-angle-white-text-thumbnail.png);
+    border-radius: 23px;
+
+}

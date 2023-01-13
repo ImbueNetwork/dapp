@@ -103,10 +103,11 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                 <div className="content-text-small">
                     <p>{stepData[step].content} </p>
                 </div>
-                <div className="right-panel-details">
-                    <div>
-
-                    </div>
+                <div>
+                <div className="bar-panel">
+                </div>
+                <div className="chess-panel">
+                </div>
                 </div>
             </div>
 
@@ -134,7 +135,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                         {panels[step] ?? <></>}
                     </div>
                     <div className="buttons">
-                        
+
                         {step >= 1 && (
                             <button
                                 disabled={step < 1}

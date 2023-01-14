@@ -109,14 +109,8 @@ input::placeholder {
     flex-direction: column;
     gap: 16px;
     border-top: 1px solid var(--theme-light-grey);
+    user-select: none;
     padding: 32px;
-}
-
-.brief-item:hover {
-    background: var(--theme-purple-dark);
-    border: none;
-    border-radius: 10px;
-    opacity: 0.86;
 }
 
 .brief-title {

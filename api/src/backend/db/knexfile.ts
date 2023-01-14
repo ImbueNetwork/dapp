@@ -5,10 +5,10 @@ export default {
     client: "postgresql",
     connection: {
       host: process.env.DB_HOST || "127.0.0.1",
-      port: Number(process.env.DB_PORT) || 5433,
+      port: Number(process.env.DB_PORT) || 5432,
       database: process.env.DB_NAME || "imbue",
-      user: process.env.DB_USER || "imbue",
-      password: process.env.DB_PASSWORD || "imbue"
+      user: process.env.DB_USER || "postgres",
+      password: process.env.DB_PASSWORD || "postgres"
     },
     pool: {
       min: 2,

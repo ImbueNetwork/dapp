@@ -6,305 +6,267 @@ import { ProgressBar } from "./components/progressBar";
 import { TagsInput } from "./components/tagsInput";
 import { TextInput } from "./components/textInput";
 import {
-  stepData,
-  scopeData,
-  timeData,
-  nameExamples,
-  suggestedIndustries,
-  suggestedSkills,
+    stepData,
+    scopeData,
+    timeData,
+    nameExamples,
+    suggestedIndustries,
+    suggestedSkills,
 } from "./config/briefs-data";
 import * as config from "./config";
 
 const getAPIHeaders = {
-  accept: "application/json",
+    accept: "application/json",
 };
 
 const postAPIHeaders = {
-  ...getAPIHeaders,
-  "content-type": "application/json",
+    ...getAPIHeaders,
+    "content-type": "application/json",
+};
+
+type FilterOption = {
+    key: string;
+    value: string;
+};
+
+type Filter = {
+    experience: string;
+    proposals: string;
+    length: string;
+    hours: string;
+};
+
+type BriefItem = {
+    title: string;
+    xpLevel: string;
+    length: string;
+    posted: string;
+    description: string;
+    tags: string[];
+    proposals: string;
 };
 
 export type BriefProps = {};
 
 export type BriefState = {
-  step: number;
-  info: BriefInfo;
+    briefs: Array<BriefItem>;
 };
-
-export type BriefInfo = {
-  name: string;
-  industries: string[];
-  description: string;
-  scope: string;
-  time: string;
-  skills: string[];
-  budget: number | undefined;
-};
-
-async function invokeBriefAPI(brief: BriefInfo) {
-  const resp = await fetch(`${config.apiBase}/briefs/`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify({ brief }),
-  });
-
-  if (resp.ok) {
-    // could be 200 or 201
-    // Brief API successfully invoked
-    console.log("Brief created successfully via Brief REST API");
-  }
-}
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
-  state = {
-    step: 7,
-    info: {
-      name: "",
-      industries: [],
-      description: "",
-      scope: "",
-      time: "",
-      skills: [],
-      budget: undefined,
-    },
-  };
-  constructor(props: BriefProps) {
-    super(props);
-  }
-
-  onBack = () => {
-    const { step } = this.state;
-    step >= 1 && this.setState({ ...this.state, step: step - 1 });
-  };
-
-  onNext = () => {
-    const { step } = this.state;
-    step < stepData.length - 1 &&
-      this.setState({ ...this.state, step: step + 1 });
-  };
-
-  onReviewPost = (brief: BriefInfo) => {
-    const { step } = this.state;
-    step < stepData.length - 1 &&
-      this.setState({ ...this.state, step: step + 1 });
-    invokeBriefAPI(brief);
-  };
-
-
-  onDiscoverBriefs = (brief: BriefInfo) => {
-    // redirect to discover briefs page
-  };
-
-
-  updateFormData = (name: string, value: string | number | string[]) => {
-    this.setState({
-      ...this.state,
-      info: {
-        ...this.state.info,
-        [name]: value,
-      },
-    });
-  };
-
-  render() {
-    const { step } = this.state;
-    const NamePanel = (
-      <>
-        <p className="field-name">Write a headline for your brief</p>
-        <div className="name-panel-input-wrapper">
-          <input
-            className="field-input"
-            placeholder="Enter the name of your project"
-            name="name"
-            value={this.state.info.name}
-            onChange={(e) => this.updateFormData("name", e.target.value)}
-          />
-        </div>
-        <p className="field-name">Examples</p>
-        <div className="name-panel-name-examples">
-          {nameExamples.map((name, index) => (
-            <p className="name-panel-name-example" key={index}>
-              {name}
-            </p>
-          ))}
-        </div>
-      </>
-    );
-
-    const IndustriesPanel = (
-      <>
-        <p className="field-name">Search industries or add your own</p>
-        <div className="industry-container">
-          <TagsInput
-            suggestData={suggestedIndustries}
-            tags={this.state.info.industries}
-            onChange={(tags: string[]) =>
-              this.updateFormData("industries", tags)
-            }
-          />
-        </div>
-      </>
-    );
-
-    const DescriptionPanel = (
-      <div className="description-panel">
-        <p className="field-name">Describe your project in a few sentences</p>
-        <div className="description-container">
-          <TextInput
-            value={this.state.info.description}
-            name="description"
-            maxLength={5000}
-            onChange={(e) => this.updateFormData("description", e.target.value)}
-          />
-        </div>
-      </div>
-    );
-
-    const SkillsPanel = (
-      <>
-        <p className="field-name">Search the skills</p>
-        <div className="skills-container">
-          <TagsInput
-            suggestData={suggestedSkills}
-            tags={this.state.info.skills}
-            onChange={(tags: string[]) => this.updateFormData("skills", tags)}
-          />
-        </div>
-      </>
-    );
-
-    const ScopePanel = (
-      <div className="scope-container">
-        {scopeData.map(({ label, value, description }, index) => (
-          <Option
-            label={label}
-            value={value}
-            key={index}
-            checked={this.state.info.scope === value}
-            onSelect={() => this.updateFormData("scope", value)}
-          >
-            {description ? (
-              <div className="scope-item-description">{description}</div>
-            ) : (
-              <></>
-            )}
-          </Option>
-        ))}
-      </div>
-    );
-
-    const TimePanel = (
-      <div className="time-container">
-        {timeData.map(({ label, value }, index) => (
-          <Option
-            label={label}
-            value={value}
-            key={index}
-            checked={this.state.info.time === value}
-            onSelect={() => this.updateFormData("time", value)}
-          />
-        ))}
-      </div>
-    );
-
-    const BudgetPanel = (
-      <div>
-        <p className="field-name">Maximum project budget (USD)</p>
-        <div className="budget-input-container">
-          <input
-            className="field-input"
-            style={{ paddingLeft: "24px" }}
-            type="number"
-            value={this.state.info.budget || ""}
-            onChange={(e) => this.updateFormData("budget", e.target.value)}
-          />
-          <div className="budget-currency-container">$</div>
-        </div>
-        <div className="budget-description">
-          You will be able to set milestones which divide your project into
-          manageable phases.
-        </div>
-      </div>
-    );
-
-    const ConfirmPanel = (
-
-      <div className="description-panel">
-        <p className="field-name">Thank you for your submission!</p>
-      </div>
-
-
-    );
-
-    const panels = [
-      NamePanel,
-      IndustriesPanel,
-      DescriptionPanel,
-      SkillsPanel,
-      ScopePanel,
-      TimePanel,
-      BudgetPanel,
-      ConfirmPanel,
+    filters = [
+        {
+            label: "Experience Level",
+            options: [
+                {
+                    key: "entry",
+                    value: "Entry Level",
+                },
+                {
+                    key: "intermediate",
+                    value: "Intermediate",
+                },
+                {
+                    key: "expert",
+                    value: "Expert",
+                },
+                {
+                    key: "specialist",
+                    value: "Specialist",
+                },
+            ],
+        },
+        {
+            label: "Proposals submitted",
+            options: [
+                {
+                    key: "<5",
+                    value: "Less than 5",
+                },
+                {
+                    key: "5-10",
+                    value: "5 to 10",
+                },
+                {
+                    key: "10-15",
+                    value: "10 to 15",
+                },
+                {
+                    key: "15+",
+                    value: "15+",
+                },
+            ],
+        },
+        {
+            label: "Project Length",
+            options: [
+                {
+                    key: "1m",
+                    value: "One month",
+                },
+                {
+                    key: "1-3m",
+                    value: "1-3 months",
+                },
+                {
+                    key: "6-12m",
+                    value: "6-12 months",
+                },
+                {
+                    key: "1y+",
+                    value: "1 year +",
+                },
+                {
+                    key: "5y+",
+                    value: "5 years +",
+                },
+            ],
+        },
+        {
+            label: "Hours per week",
+            options: [
+                {
+                    key: "30hrs",
+                    value: "30hrs/week",
+                },
+                {
+                    key: "50hrs",
+                    value: "50hrs/week",
+                },
+            ],
+        },
     ];
+    state: BriefState = {
+        briefs: [
+            {
+                title: "Product Development Engineer",
+                xpLevel: "Intermediate",
+                length: "More than 6 months",
+                posted: "5 days ago",
+                description:
+                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
+                tags: ["Product Development", "Health", "Wellness"],
+                proposals: "Less than 5",
+            },
+            {
+                title: "Product Development Engineer",
+                xpLevel: "Intermediate",
+                length: "More than 6 months",
+                posted: "5 days ago",
+                description:
+                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
+                tags: ["Product Development", "Health", "Wellness"],
+                proposals: "Less than 5",
+            },
+            {
+                title: "Product Development Engineer",
+                xpLevel: "Intermediate",
+                length: "More than 6 months",
+                posted: "5 days ago",
+                description:
+                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
+                tags: ["Product Development", "Health", "Wellness"],
+                proposals: "Less than 5",
+            },
+            {
+                title: "Product Development Engineer",
+                xpLevel: "Intermediate",
+                length: "More than 6 months",
+                posted: "5 days ago",
+                description:
+                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
+                tags: ["Product Development", "Health", "Wellness"],
+                proposals: "Less than 5",
+            },
+        ],
+    };
+    constructor(props: BriefProps) {
+        super(props);
+    }
 
-    return (
-      <div className="brief-details-container">
-        <div className="left-panel">
-          <ProgressBar
-            titleArray={["Description", "Skills", "Scope", "Budget"]}
-            currentValue={stepData[step].progress}
-          />
-          <h1 className="heading">{stepData[step].heading}</h1>
-          {stepData[step].content.split("\n").map((content, index) => (
-            <p className="help" key={index}>
-              {content}
-            </p>
-          ))}
-        </div>
-        <div className="right-panel">
-          <div className="contents">{panels[step] ?? <></>}</div>
-          <div className="buttons">
-            {step >= 1 && (
-              <button
-                disabled={step < 1}
-                className="secondary-btn"
-                onClick={this.onBack}
-              >
-                Back
-              </button>
-            )}
+    onSearch = () => {};
 
-            {step === stepData.length - 1 ? (
-              <button
-                className="primary-btn in-dark w-button"
-                onClick={() => this.onDiscoverBriefs(this.state.info)}
-              >
-                Discover Briefs
-              </button>
-            ) :  step === stepData.length - 2 ? (
-              <button
-                className="primary-btn in-dark w-button"
-                onClick={() => this.onReviewPost(this.state.info)}
-              >
-                Submit
-              </button>
-            ) : (
-              <button
-                className="primary-btn in-dark w-button"
-                onClick={this.onNext}
-              >
-                {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
+    onSavedBriefs = () => {};
+
+    render() {
+        return (
+            <div className="search-briefs-container">
+                <div className="filter-panel">
+                    <div className="filter-heading">Filter By</div>
+                    {this.filters.map(({ label, options }, filterIndex) => (
+                        <div className="filter-section" key={filterIndex}>
+                            <div className="filter-label">{label}</div>
+                            <div className="filter-option-list">
+                                {options.map(({ key, value }, optionIndex) => (
+                                    <div
+                                        className="filter-option"
+                                        key={optionIndex}
+                                    >
+                                        <input type="checkbox" />
+                                        <label>{value}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="briefs-section">
+                    <div className="briefs-heading">
+                        <div className="tab-section">
+                            <div className="tab-item" onClick={this.onSearch}>
+                                Search
+                            </div>
+                            <div
+                                className="tab-item"
+                                onClick={this.onSavedBriefs}
+                            >
+                                Saved Briefs
+                            </div>
+                        </div>
+                        <input className="search-input" placeholder="Search" />
+                        <div className="search-result">
+                            <span className="result-count">34,643</span>
+                            <span> briefs found</span>
+                        </div>
+                    </div>
+                    <div className="briefs-list">
+                        {this.state.briefs.map((item, itemIndex) => (
+                            <div className="brief-item" key={itemIndex}>
+                                <div className="brief-title">{item.title}</div>
+                                <div className="brief-time-info">
+                                    {`${item.xpLevel}, Est. Time: ${item.length}. Posted ${item.posted}`}
+                                </div>
+                                <div className="brief-description">
+                                    {item.description}
+                                </div>
+                                <div className="brief-tags">
+                                    {item.tags.map((tag, tagIndex) => (
+                                        <div
+                                            className="tag-item"
+                                            key={tagIndex}
+                                        >
+                                            {tag}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="brief-proposals">
+                                    <span className="proposals-heading">
+                                        Proposals Submitted:{" "}
+                                    </span>
+                                    <span className="proposals-count">
+                                        {item.proposals}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  ReactDOMClient.createRoot(document.getElementById("brief-details")!).render(
-    <Briefs />
-  );
+    ReactDOMClient.createRoot(document.getElementById("briefs")!).render(
+        <Briefs />
+    );
 });

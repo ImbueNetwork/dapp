@@ -49,7 +49,7 @@ app.get("/redirect", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.redirect("https://imbue.network");
+    res.redirect("/dapp");
 });
 
 

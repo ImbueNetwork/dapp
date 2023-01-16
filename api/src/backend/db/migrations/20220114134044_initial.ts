@@ -15,6 +15,8 @@ export async function up(knex: Knex): Promise<void> {
          */
         builder.increments("id", { primaryKey: true });
         builder.text("display_name");
+        builder.foreign("experience_id").references("experience.id");
+
 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, usersTableName));

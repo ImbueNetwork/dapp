@@ -14,6 +14,7 @@ import {
     suggestedSkills,
 } from "./config/briefs-data";
 import * as config from "./config";
+import { lchown } from "fs";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -46,90 +47,138 @@ type BriefItem = {
     proposals: string;
 };
 
+enum BriefFilterOption {
+    ExpLevel = 0,
+    AmountSubmitted = 1,
+    Length = 2,
+    HoursPerWeek = 3,
+
+};
+
+
 export type BriefProps = {};
 
 export type BriefState = {
     briefs: Array<BriefItem>;
 };
 
+
 export class Briefs extends React.Component<BriefProps, BriefState> {
+    
     filters = [
         {
+            // Keys should never be strings, strings are slow. 
+            // I can read and match agains enums, much easier.
+            // This is a table named "experience"
+            // If you change this you must remigrate the tables.
+            // Should be put in models for sure.
+            object: BriefFilterOption.ExpLevel,
             label: "Experience Level",
             options: [
                 {
-                    key: "entry",
+                    interiorIndex: 0,
                     value: "Entry Level",
                 },
                 {
-                    key: "intermediate",
+                    interiorIndex: 1,
                     value: "Intermediate",
                 },
                 {
-                    key: "expert",
+                    interiorIndex: 2,
                     value: "Expert",
                 },
                 {
-                    key: "specialist",
+                    interiorIndex: 3,
                     value: "Specialist",
                 },
             ],
         },
         {
-            label: "Proposals submitted",
+            // This is a field associated with the User.
+            // since its a range i need the 
+            object: BriefFilterOption.AmountSubmitted,
+            label: "Briefs Submitted",
             options: [
                 {
-                    key: "<5",
-                    value: "Less than 5",
+                    interiorIndex: 0,
+                    low: 0,
+                    high: 4,
+                    value: "0-4",
                 },
                 {
-                    key: "5-10",
-                    value: "5 to 10",
+                    interiorIndex: 1,
+                    low: 5,
+                    high: 9,
+                    value: "5-9",
                 },
                 {
-                    key: "10-15",
-                    value: "10 to 15",
+                    interiorIndex: 2,
+                    low: 10,
+                    high: 14,
+                    value: "10-14",
                 },
                 {
-                    key: "15+",
+                    interiorIndex: 3,
+                    low: 15,
+                    high: 100000,
                     value: "15+",
                 },
             ],
         },
         {
-            label: "Project Length",
+            // Should be a field in the database, WILL BE IN DAYS.
+            // Again i need the high and low values.
+            object: BriefFilterOption.Length,
+            label: BriefFilterOption.Length,
             options: [
                 {
-                    key: "1m",
-                    value: "One month",
+                    interiorIndex: 0,
+                    low: 0,
+                    high: 28,
+                    value: "1 month"
                 },
                 {
-                    key: "1-3m",
+                    interiorIndex: 1,
+                    low: 29,
+                    high: 28 * 3,
                     value: "1-3 months",
                 },
                 {
-                    key: "6-12m",
+                    interiorIndex: 2,
+                    low: (3 * 28) + 1,
+                    high: 28 * 6,
+                    value: "3-6 months",
+                },
+                {
+                    interiorIndex: 3,
+                    low: (6 * 28) + 1,
+                    high: 12 * 28,
                     value: "6-12 months",
                 },
                 {
-                    key: "1y+",
+                    interiorIndex: 4,
+                    low: (12 * 28) + 1,
+                    high: 10_000_000,
                     value: "1 year +",
                 },
                 {
-                    key: "5y+",
+                    // years * months * days
+                    interiorIndex: 5,
+                    low: (5 * 12 * 28),
+                    high: 10_000_000,
                     value: "5 years +",
                 },
             ],
         },
         {
-            label: "Hours per week",
+            label: BriefFilterOption.HoursPerWeek,
             options: [
                 {
-                    key: "30hrs",
+                    interiorIndex: 0,
                     value: "30hrs/week",
                 },
                 {
-                    key: "50hrs",
+                    interiorIndex: 1,
                     value: "50hrs/week",
                 },
             ],
@@ -183,9 +232,14 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         super(props);
     }
 
-    onSearch = () => {};
+    onSearch = () => {
+        // get all the checked boxes
+        
+    };
 
-    onSavedBriefs = () => {};
+    onSavedBriefs = () => {
+
+    };
 
     render() {
         return (
@@ -196,10 +250,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         <div className="filter-section" key={filterIndex}>
                             <div className="filter-label">{label}</div>
                             <div className="filter-option-list">
-                                {options.map(({ key, value }, optionIndex) => (
+                                {options.map(({value, interiorIndex}) => (
                                     <div
                                         className="filter-option"
-                                        key={optionIndex}
+                                        key={interiorIndex}
                                     >
                                         <input type="checkbox" />
                                         <label>{value}</label>

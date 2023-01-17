@@ -47,7 +47,7 @@ type BriefItem = {
     proposals: string;
 };
 
-enum BriefFilterOption {
+export enum BriefFilterOption {
     ExpLevel = 0,
     AmountSubmitted = 1,
     Length = 2,
@@ -70,8 +70,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             // Keys should never be strings, strings are slow. 
             // I can read and match agains enums, much easier.
             // This is a table named "experience"
-            // If you change this you must remigrate the tables.
-            // Should be put in models for sure.
+            // If you change this you must remigrate the experience table.
             object: BriefFilterOption.ExpLevel,
             label: "Experience Level",
             options: [

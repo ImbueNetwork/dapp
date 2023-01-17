@@ -245,9 +245,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 let id = elements[i].getAttribute("id");
                 if (id != null) {
                     let [filterType, interiorIndex] = id.split("-");
+                    // Here we are trying to build teh paramaters required to buidl the
+                    // model searchBriefs
                     switch(parseInt(filterType)) {
                         case BriefFilterOption.ExpLevel:
-
                         
                         case BriefFilterOption.AmountSubmitted:
                         
@@ -260,7 +261,9 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     }
                 }
             }
-          }
+        }
+        // Search briefs
+        //update state with new list.
     };
 
     onSavedBriefs = () => {

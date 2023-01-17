@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
     }
     )
 
-    await knex.schema.alterTable("users", (builder) => {
+    await knex.schema.alterTable("briefs", (builder) => {
         builder.foreign("experience_id").references("experience.id");
     })
 };

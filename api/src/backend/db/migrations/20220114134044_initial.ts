@@ -15,15 +15,10 @@ export async function up(knex: Knex): Promise<void> {
          */
         builder.increments("id", { primaryKey: true });
         builder.text("display_name");
-<<<<<<< HEAD
         builder.text("first_name");
         builder.text("last_name");
         builder.text("email");
         builder.text("password");
-=======
-        builder.foreign("experience_id").references("experience.id");
-
->>>>>>> new exp migration, updated options for sql
 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, usersTableName));

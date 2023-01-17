@@ -17,8 +17,12 @@ export async function up(knex: Knex): Promise<void> {
         ])
     }
     )
+
+    await knex.schema.alterTable("users", (builder) => {
+        builder.foreign("experience_id").references("experience.id");
+    })
 };
 
 export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTableIfExists("experience");
-};
+}; 

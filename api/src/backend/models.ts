@@ -295,23 +295,15 @@ export const searchBriefs = (
             };
 
             const briefWhereCond = {
+                // need the where conditioss
                 'todo': 'todo'
             };
 
+            // what do i select?
             knex.select(["find out what to select"])
                 .from("users")
                 .join("experience", briefJoinCond)
                 .where(briefWhereCond)    
-
-
-          
-            const whereConditions = {
-              'customers.is_active': true,
-              'products.price': { '>': 20 }
-            };
-
-
-
     }        
 };
 

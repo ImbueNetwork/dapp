@@ -32,6 +32,10 @@ router.get("/briefs/new", (req, res) => {
     res.render("new-brief");
 });
 
+router.get("/googlelogin", (req, res) => {
+    res.render("googlelogin");
+});
+
 router.use((_req, res, next) => {
     res.render("legacy")
 });

@@ -54,6 +54,7 @@
     "pug": "^3.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-login": "^5.2.2",
     "react-icons": "^4.4.0",
     "react-step-progress-bar": "^1.0.3",
     "rmwc": "^8.0.1",

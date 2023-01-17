@@ -8,7 +8,7 @@ import {
 import * as config from "./config";
 import { Freelancer, User } from "./models";
 import { web3Accounts } from "@polkadot/extension-dapp";
-import { listItemFreelance } from "./components/listItemFreelancer";
+import {ListItemFreelancer } from "./components/listItemFreelancer";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -116,14 +116,14 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
         );
 
         const FreelancedBefore = (
-            <div className="freelanced-before"> 
+            <div className="freelanced-before">
                 <div className="content-text-small-flex">
                     <p>{stepData[step].content} </p>
                 </div>
                 <div className="choices">
                     <ul>
                         {freelancedBeforeStatic.map((item) => (
-                            <listItemFreelance content={item}></listItemFreelance>
+                            <ListItemFreelancer content={item}></ListItemFreelancer>
                         ))}
                     </ul>
                 </div>

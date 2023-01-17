@@ -19,6 +19,9 @@ export type User = {
     id: number;
     display_name: string;
     web3Accounts: Web3Account[];
+    username: string;
+    email: string;
+    password: string;
 };
 
 export type ProposedMilestone = {
@@ -140,6 +143,17 @@ export const insertUserByDisplayName = (displayName: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
             display_name: displayName
+        }).returning("*")
+    )[0];
+
+export const updateFederatedLoginUser = (user: User, username: string, email: string, password: string) =>
+    async (tx: Knex.Transaction) => (
+        await tx<User>("users").update({
+            username: username,
+            email: email,
+            password: password
+        }).where({
+            id: user.id
         }).returning("*")
     )[0];
 

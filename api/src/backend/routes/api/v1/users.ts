@@ -8,6 +8,8 @@ type ProjectPkg = models.Project & {
     milestones: models.Milestone[]
 }
 
+type UserPkg = models.User;
+
 router.get("/:id/project", (req, res, next) => {
     const id = req.params.id;
 
@@ -28,6 +30,46 @@ router.get("/:id/project", (req, res, next) => {
             next(new Error(
                 `Failed to fetch projects for user id: ${id}`,
                 { cause: e as Error }
+            ));
+        }
+    });
+});
+
+
+router.post("/", (req, res, next) => {
+
+    const {
+        username,
+        email,
+        password
+
+    } = req.body.user as models.User;
+
+    db.transaction(async tx => {
+        try {
+            const federatedUser = models.getOrCreateFederatedUser({
+                password,
+                email,
+                username,
+                updateFederatedLoginUser(user, username, email, password)
+            });
+    
+            if (!federatedUser.id) {
+                return next(new Error(
+                    "Failed to create user."
+                ));
+            }
+    
+            res.status(201).send(
+                {
+                    status: "Successful",
+                    federatedUserId: federatedUser.id
+                }
+            );    
+        } catch (cause) {
+            next(new Error(
+                `Failed to create user.`,
+                {cause: cause as Error}
             ));
         }
     });

@@ -340,22 +340,16 @@ export const updateFreelancerDetails = (userId: string,freelancer: Freelancer) =
  export const searchBriefs = (
     experience_id: number, submitted_low: number, submitted_high: number,
     length_low: number, length_high: number, max_hours_pw: number) => {
-        (knex : Knex.Transaction) => {
+        async (knex : Knex.Transaction) => {
 
-            const briefJoinCond = {
-                'users.experience_id': 'experience.id'
-            };
-
-            const briefWhereCond = {
-                // need the where conditioss
-                'todo': 'todo'
-            };
-
-            // what do i select?
-            knex.select(["find out what to select"])
-                .from("users")
-                .join("experience", briefJoinCond)
-                .where(briefWhereCond)    
+            await knex.select()
+                .from("briefs")
+                .join("experience", {'briefs.experience_id': "experience.id"})
+                .join("users", {"briefs.user_id": "users.id"})
+                .whereBetween("briefs_submitted", [submitted_low, submitted_high])
+                .whereBetween("duration", [length_low, length_high])
+                .whereBetween("hpw", [0, max_hours_pw])
+                .where("experience_id", experience_id)
     }        
 };
 

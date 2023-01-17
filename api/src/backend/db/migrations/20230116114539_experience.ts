@@ -2,10 +2,9 @@ import { Knex } from "knex";
 import { auditFields, onUpdateTrigger } from "../utils";
 
 export async function up(knex: Knex): Promise<void> {
-    await knex.schema.createTableIfNotExists("experience", (builder) => {
+    await knex.schema.createTable("experience", (builder) => {
         builder.increments("id", { primaryKey: true });
         builder.string("level");
-
         auditFields(knex, builder);
 
     }).then(function() {
@@ -15,11 +14,10 @@ export async function up(knex: Knex): Promise<void> {
             {id: 2, level: "Expert"},
             {id: 3, level: "Specialist"},
         ])
-    }
-    )
-
-    await knex.schema.alterTable("briefs", (builder) => {
-        builder.foreign("experience_id").references("experience.id");
+    }).then(function() {
+        return knex.schema.alterTable("briefs", (table) => {
+            table.foreign("experience_id").references("experience.id");
+        })
     })
 };
 

@@ -1,4 +1,4 @@
-import type { Knex } from "knex";
+import { knex, Knex } from "knex";
 import db from "./db/index";
 
 
@@ -283,5 +283,35 @@ export const getOrCreateFederatedUser = (
             ));
         }
     });
+};
+
+export const searchBriefs = (
+    experience_id: number, submitted_low: number, submitted_high: number,
+    length_low: number, length_high: number, max_hours_pw: number) => {
+        (knex : Knex.Transaction) => {
+
+            const briefJoinCond = {
+                'users.experience_id': 'experience.id'
+            };
+
+            const briefWhereCond = {
+                'todo': 'todo'
+            };
+
+            knex.select(["find out what to select"])
+                .from("users")
+                .join("experience", briefJoinCond)
+                .where(briefWhereCond)    
+
+
+          
+            const whereConditions = {
+              'customers.is_active': true,
+              'products.price': { '>': 20 }
+            };
+
+
+
+    }        
 };
 

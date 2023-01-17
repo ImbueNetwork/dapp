@@ -8,13 +8,13 @@ h1 {
 
 .registration-container {
     display: flex;
-    flex-direction: row;
+    /* flex-direction: row; */
     width: 90vw;
     min-height: 650px;
     max-height: 650px;
-    max-width: 1250px;
-    margin-right: auto;
-    border-radius: 20px;
+    /* max-width: 1250px; */
+    /* margin-right: auto; */
+    /* border-radius: 20px; */
 }
 
 .contents {
@@ -27,6 +27,7 @@ h1 {
 
 .contents > div {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
 }
@@ -40,6 +41,11 @@ h1 {
 
 .contents > div > div > .mdc-text-field {
     width: 47%;
+}
+
+
+.mdc-text-field:not(.mdc-text-field--disabled) + .mdc-text-field-helper-line .mdc-text-field-helper-text {
+    color: var(--theme-ink-color);
 }
 
 

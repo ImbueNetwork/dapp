@@ -1,6 +1,7 @@
 import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
+import { User, getOrCreateFederatedUser, updateFederatedLoginUser } from "../../../models";
 
 const router = express.Router();
 
@@ -37,42 +38,44 @@ router.get("/:id/project", (req, res, next) => {
 
 
 router.post("/", (req, res, next) => {
-
     const {
         username,
         email,
         password
+    } = req.body;
 
-    } = req.body.user as models.User;
+    let updateUserDetails = async (err: Error, user: User) => {
+        if (err) {
+            next(err);
+        }
 
-    db.transaction(async tx => {
-        try {
-            const federatedUser = models.getOrCreateFederatedUser({
-                password,
-                email,
-                username,
-                updateFederatedLoginUser(user, username, email, password)
-            });
-    
-            if (!federatedUser.id) {
-                return next(new Error(
-                    "Failed to create user."
+        if (!user) {
+            next(new Error("No user provided."));
+        }
+
+        db.transaction(async tx => {
+            try {
+                const updatedUser = await updateFederatedLoginUser(
+                    user, username, email, password
+                )(tx);
+
+                res.send(updatedUser);
+            } catch (e) {
+                tx.rollback();
+                next(new Error(
+                    `Unable to upsert details for user: ${username}`,
+                    { cause: e as Error }
                 ));
             }
-    
-            res.status(201).send(
-                {
-                    status: "Successful",
-                    federatedUserId: federatedUser.id
-                }
-            );    
-        } catch (cause) {
-            next(new Error(
-                `Failed to create user.`,
-                {cause: cause as Error}
-            ));
-        }
-    });
+        });
+    };
+
+    getOrCreateFederatedUser(
+        "Imbue Network",
+        email,
+        username,
+        updateUserDetails);
+
 });
 
 export default router;

@@ -46,6 +46,11 @@ module.exports = {
         alias: {
             lib: path.resolve(__dirname, "lib"),
         },
+        fallback: {
+            "crypto": require.resolve("crypto-browserify"),
+            "stream": require.resolve("stream-browserify"),
+            "buffer": false,
+           },
     },
     output: {
         path: path.resolve(__dirname, "../../public/lib"),

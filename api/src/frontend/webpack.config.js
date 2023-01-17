@@ -6,6 +6,7 @@ module.exports = {
         "proposals": path.resolve(__dirname, "proposals.tsx"),
         "details": path.resolve(__dirname, "details.tsx"),
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
+        "join": path.resolve(__dirname, "join.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx")
     },
     devtool: process.env.NODE_ENV === "development"

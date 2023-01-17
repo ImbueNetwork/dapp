@@ -19,6 +19,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("last_name");
         builder.text("email");
         builder.text("password");
+        builder.integer("briefs_submitted");
 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, usersTableName));

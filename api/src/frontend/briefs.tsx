@@ -70,8 +70,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             // Keys should never be strings, strings are slow. 
             // I can read and match agains enums, much easier.
             // This is a table named "experience"
-            // If you change this you must remigrate the experience table.
-            object: BriefFilterOption.ExpLevel,
+            // If you change this you must remigrate the experience table and add the new field.
+            filterType: BriefFilterOption.ExpLevel,
             label: "Experience Level",
             options: [
                 {
@@ -95,7 +95,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         {
             // This is a field associated with the User.
             // since its a range i need the 
-            object: BriefFilterOption.AmountSubmitted,
+            filterType: BriefFilterOption.AmountSubmitted,
             label: "Briefs Submitted",
             options: [
                 {
@@ -127,8 +127,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         {
             // Should be a field in the database, WILL BE IN DAYS.
             // Again i need the high and low values.
-            object: BriefFilterOption.Length,
-            label: BriefFilterOption.Length,
+            filterType: BriefFilterOption.Length,
+            label: "Project Length",
             options: [
                 {
                     interiorIndex: 0,
@@ -170,13 +170,18 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             ],
         },
         {
-            label: BriefFilterOption.HoursPerWeek,
+            filterType: BriefFilterOption.HoursPerWeek,
+            label: "Hours Per Week",
             options: [
                 {
                     interiorIndex: 0,
+                    low: 0,
+                    high: 30,
                     value: "30hrs/week",
                 },
                 {
+                    low: 0,
+                    high: 50,
                     interiorIndex: 1,
                     value: "50hrs/week",
                 },
@@ -231,9 +236,31 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         super(props);
     }
 
+    // Here we have to get all the checked boxes and try and construct a query out of it...
     onSearch = () => {
-        // get all the checked boxes
-        
+        let elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
+    //console.log(elements);
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].checked) {
+                let id = elements[i].getAttribute("id");
+                if (id != null) {
+                    let [filterType, interiorIndex] = id.split("-");
+                    switch(parseInt(filterType)) {
+                        case BriefFilterOption.ExpLevel:
+
+                        
+                        case BriefFilterOption.AmountSubmitted:
+                        
+                        case BriefFilterOption.Length:
+                        
+                        case BriefFilterOption.HoursPerWeek:
+                        
+                        default:
+                            console.log("Invalid filter option selected or unimplemented.");
+                    }
+                }
+            }
+          }
     };
 
     onSavedBriefs = () => {
@@ -245,8 +272,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             <div className="search-briefs-container">
                 <div className="filter-panel">
                     <div className="filter-heading">Filter By</div>
-                    {this.filters.map(({ label, options }, filterIndex) => (
-                        <div className="filter-section" key={filterIndex}>
+                    {this.filters.map(({ label, options, filterType }) => (
+                        <div className="filter-section" key={filterType}>
                             <div className="filter-label">{label}</div>
                             <div className="filter-option-list">
                                 {options.map(({value, interiorIndex}) => (
@@ -254,7 +281,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                                         className="filter-option"
                                         key={interiorIndex}
                                     >
-                                        <input type="checkbox" />
+                                        <input type="checkbox" className="filtercheckbox" id={filterType.toString() + "-" + interiorIndex} />
                                         <label>{value}</label>
                                     </div>
                                 ))}

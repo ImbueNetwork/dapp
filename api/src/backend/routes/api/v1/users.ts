@@ -15,8 +15,6 @@ type ProjectPkg = models.Project & {
     milestones: models.Milestone[]
 }
 
-type UserPkg = models.User;
-
 router.get("/:id/project", (req, res, next) => {
     const id = req.params.id;
 

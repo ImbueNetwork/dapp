@@ -59,8 +59,6 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
     }
 }
 
-
-
 export const badRouteEvent = (type: BadRoute) => new CustomEvent(
     config.event.badRoute,
     {

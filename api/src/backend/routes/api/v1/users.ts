@@ -3,7 +3,13 @@ import db from "../../../db";
 import * as models from "../../../models";
 import { User, getOrCreateFederatedUser, updateFederatedLoginUser } from "../../../models";
 
+// @ts-ignore
+import * as passportJwt from "passport-jwt"
+// @ts-ignore
+import jwt from 'jsonwebtoken';
+
 const router = express.Router();
+
 
 type ProjectPkg = models.Project & {
     milestones: models.Milestone[]
@@ -77,5 +83,25 @@ router.post("/", (req, res, next) => {
         updateUserDetails);
 
 });
+
+
+router.get("/:userOrEmail", (req, res, next) => {
+    const userOrEmail = req.params.userOrEmail;
+    db.transaction(async tx => {
+        try {
+            const user = await models.fetchUserOrEmail(userOrEmail)(tx);
+            if (!user) {
+                return res.status(404).end();
+            }
+            res.send(user);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch user ${userOrEmail}`,
+                { cause: e as Error }
+            ));
+        }
+    });
+});
+
 
 export default router;

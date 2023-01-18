@@ -34,7 +34,7 @@ function Join() {
             password: hashedPassword
         };
 
-        const resp = await fetch(`${config.apiBase}/users/`, {
+        const resp = await fetch(`/auth/imbue/register`, {
             headers: postAPIHeaders,
             method: "post",
             body: JSON.stringify(body),
@@ -43,6 +43,7 @@ function Join() {
         console.log("resp is");
         console.log(resp);
         if (resp.ok) {
+            //TODO redirect to next page
         }
     }
 

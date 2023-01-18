@@ -4,14 +4,17 @@ import { useRef, useState, useEffect } from "react";
 
 import { Dialogue } from "./components/dialogue";
 import { AccountChoice } from "./components/accountChoice";
-
+import { User } from "./models";
 import { signWeb3Challenge } from "./utils/polkadot";
+import { fetchUserOrEmail } from "./utils";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
-
+import * as config from "./config";
+import bcrypt from 'bcryptjs'
 import "../../public/registration.css"
+
 const getAPIHeaders = {
   accept: "application/json",
 };
@@ -22,14 +25,14 @@ const postAPIHeaders = {
 };
 
 
-
 type LoginProps = {};
 type LoginState = {
   showPolkadotAccounts: boolean;
   creds: {
-    username?: string
+    userOrEmail?: string
     password?: string
-  }
+  },
+  errorMessage?: string
 };
 
 async function getAccountAndSign(account: InjectedAccountWithMeta) {
@@ -81,15 +84,15 @@ async function authorise(
   }
 }
 
-
 class Login extends React.Component<LoginProps, LoginState> {
 
   state: LoginState = {
     showPolkadotAccounts: false,
     creds: {
-      username: undefined,
+      userOrEmail: undefined,
       password: undefined
-    }
+    },
+    errorMessage: undefined
   };
 
   async clicked() {
@@ -108,13 +111,26 @@ class Login extends React.Component<LoginProps, LoginState> {
   }
 
 
-
-
-  imbueLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    this.setState({ errorMessage: undefined });
     event.preventDefault();
-    console.log(this.state.creds.username);
-    console.log(this.state.creds.password);
-    console.log("***** login in clicked");
+
+
+    const resp = await fetch(`/auth/imbue/`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify({
+        userOrEmail: this.state.creds.userOrEmail,
+        password: this.state.creds.password,
+      }),
+    });
+
+    if (resp.ok) {
+      const user: User = await resp.json()
+    } else {
+      console.log("User not found");
+      this.setState({ errorMessage: "incorrect username or password" });
+    }
   }
 
 
@@ -146,7 +162,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                   <div>
                     <TextField
                       label="Email/Username"
-                      onChange={(e: any) => this.setCreds("username", e.target.value)}
+                      onChange={(e: any) => this.setCreds("userOrEmail", e.target.value)}
                       outlined className="mdc-text-field" required />
                   </div>
                   <div>
@@ -157,6 +173,9 @@ class Login extends React.Component<LoginProps, LoginState> {
                       outlined className="mdc-text-field" required />
                   </div>
 
+                  <div>
+                    <span className={!this.state.errorMessage ? "hide" : "error"}>{this.state.errorMessage}</span>
+                  </div>
                   <div>
                     <button
                       type="submit"

@@ -185,6 +185,15 @@ class Login extends React.Component<LoginProps, LoginState> {
                       Sign In
                     </button>
                   </div>
+
+                  <div>
+                    <span>Don't have an account?</span><a href="/dapp/join" className="signup">Sign up</a>
+                    <span
+                      onClick={() => this.clicked()}
+                      className="mdc-deprecated-list-item__text"
+                    >
+                    </span>
+                  </div>
                 </div>
 
               </form>

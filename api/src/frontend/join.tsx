@@ -15,6 +15,7 @@ const postAPIHeaders = {
     ...getAPIHeaders,
     "content-type": "application/json",
 };
+
 function Join() {
 
     const userRef = useRef();
@@ -29,7 +30,6 @@ function Join() {
         const hashedPassword = bcrypt.hashSync(password, salt);
         console.log(hashedPassword);
 
-
         var body = {
             username: user,
             email: email,
@@ -41,7 +41,6 @@ function Join() {
             method: "post",
             body: JSON.stringify(body),
         });
-
 
         console.log("resp is");
         console.log(resp);
@@ -62,6 +61,7 @@ function Join() {
                             value={user}
                             onChange={(e: any) => setUser(e.target.value)}
                             type="text"
+                            pattern="^[A-z][A-z0-9-_]{3,23}$"
                             label="Username"
                             outlined className="mdc-text-field" required />
                     </div>

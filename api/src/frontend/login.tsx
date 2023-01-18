@@ -69,18 +69,22 @@ async function authorise(
   });
 
   if (resp.ok) {
-    const redirect =
-      new URLSearchParams(window.location.search).get("redirect") || "/dapp";
-    const isRelative =
-      new URL(document.baseURI).origin ===
-      new URL(redirect, document.baseURI).origin;
-    if (isRelative) {
-      location.replace(redirect);
-    } else {
-      location.replace("/dapp");
-    }
+    await redirectBack();
   } else {
     // TODO: UX for 401
+  }
+}
+
+async function redirectBack() {
+  const redirect =
+    new URLSearchParams(window.location.search).get("redirect") || "/dapp";
+  const isRelative =
+    new URL(document.baseURI).origin ===
+    new URL(redirect, document.baseURI).origin;
+  if (isRelative) {
+    location.replace(redirect);
+  } else {
+    location.replace("/dapp");
   }
 }
 
@@ -99,7 +103,6 @@ class Login extends React.Component<LoginProps, LoginState> {
     this.setState({ showPolkadotAccounts: true });
   }
 
-
   async setCreds(name: string, value: string) {
     this.setState({
       ...this.state,
@@ -109,7 +112,6 @@ class Login extends React.Component<LoginProps, LoginState> {
       },
     });
   }
-
 
   imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     this.setState({ errorMessage: undefined });
@@ -126,9 +128,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     });
 
     if (resp.ok) {
-      const user: User = await resp.json()
+      await redirectBack();
     } else {
-      console.log("User not found");
       this.setState({ errorMessage: "incorrect username or password" });
     }
   }

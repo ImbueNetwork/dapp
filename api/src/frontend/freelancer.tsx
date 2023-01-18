@@ -2,11 +2,11 @@ import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
 import {
-    stepData,
-    freelancedBeforeStatic,
+    stepData, freelancedBefore,
 } from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
+import { Option } from "./components/option";
 import { web3Accounts } from "@polkadot/extension-dapp";
 import {ListItemFreelancer } from "./components/listItemFreelancer";
 
@@ -48,7 +48,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
             id: "",
             education: "",
             experience: "",
-            freelanced_before: false,
+            freelanced_before: "",
             work_type: "",
             skills: "",
             title: "",
@@ -88,6 +88,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
 
 
     updateFormData = (name: string, value: string | number | string[]) => {
+        console.log("This is",value);
         this.setState({
             ...this.state,
             info: {
@@ -116,17 +117,22 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
         );
 
         const FreelancedBefore = (
-            <div className="freelanced-before">
+            <div className="freelancedBefore">
                 <div className="content-text-small-flex">
                     <p>{stepData[step].content} </p>
                 </div>
-                <div className="choices">
-                    <ul>
-                        {freelancedBeforeStatic.map((item) => (
-                            <ListItemFreelancer content={item}></ListItemFreelancer>
-                        ))}
-                    </ul>
-                </div>
+                 {freelancedBefore.map(({ label, value}, index) => (
+                     <div key={index} className="button">
+                     <input
+                         type="radio"
+                         value={value}
+                         checked={this.state.info.freelanced_before === value}
+                         onChange={(e) =>  this.updateFormData("freelanced_before", value)}
+                     />
+                         <label className="btn btn-default" htmlFor={label}>{label}</label>
+                         <br/>
+                     </div>
+                    ))}
             </div>
         );
 

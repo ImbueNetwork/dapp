@@ -157,7 +157,6 @@ p {
 }
 
 .freelanced-before {
-    display: flex;
 }
 
 .content-text-small-flex {
@@ -173,9 +172,42 @@ p {
 
 .freelancer-li {
     display: flex;
-    align-items: flex-start;
-    background-color: #FFF;
+    background-color: #FFFFFF;
+    flex-direction: column;
     width: 60%;
-    text-align: left;
-    border-radius: 2%;
+    color: blue;
+    justify-content: right;
+    border-radius: 5%;
 }
+
+.button {
+    background: #FFFFFF;
+    float: left;
+    margin: 0 5px 0 0;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    color: blue;
+}
+
+.button label,
+.button input {
+    display: block;
+    position: absolute;
+}
+
+.button input[type="radio"] {
+    opacity: 0.011;
+    z-index: 1000;
+}
+
+.button input[type="radio"]:checked + label {
+    background: #20b8be;
+    border-radius: 4px;
+}
+
+.button label {
+    cursor: pointer;
+    line-height: 1em;
+}
+

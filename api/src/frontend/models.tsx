@@ -103,7 +103,7 @@ export type Freelancer = {
     id?: string | number;
     education: string;
     experience: string;
-    freelanced_before: boolean;
+    freelanced_before: string;
     work_type: string;
     skills: string;
     title: string;

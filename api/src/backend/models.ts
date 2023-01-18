@@ -82,6 +82,8 @@ export type Brief = {
     duration: string;
     budget: number;
     user_id?: string | number;
+    experience_level: string,
+    hours_per_week: number,
 };
 
 export const fetchWeb3Account = (address: string) =>
@@ -288,10 +290,10 @@ export const getOrCreateFederatedUser = (
 export const searchBriefs = (
     experience_id: number, submitted_low: number, submitted_high: number,
     length_low: number, length_high: number, max_hours_pw: number) => {
-        async (knex : Knex.Transaction) => {
+        async (tx : Knex.Transaction) => {
 
-            await knex.select()
-                .from("briefs")
+            tx.select()
+                .from<Brief>("briefs")
                 .join("experience", {'briefs.experience_id': "experience.id"})
                 .join("users", {"briefs.user_id": "users.id"})
                 .whereBetween("briefs_submitted", [submitted_low, submitted_high])

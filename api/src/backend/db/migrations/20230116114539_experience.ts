@@ -4,15 +4,15 @@ import { auditFields, onUpdateTrigger } from "../utils";
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable("experience", (builder) => {
         builder.increments("id", { primaryKey: true });
-        builder.string("level");
+        builder.string("experience_level");
         auditFields(knex, builder);
 
     }).then(function() {
         return knex("experience").insert([
-            {id: 0, level: "Entry Level"},
-            {id: 1, level: "Intermediate"},
-            {id: 2, level: "Expert"},
-            {id: 3, level: "Specialist"},
+            {id: 0, experience_level: "Entry Level"},
+            {id: 1, experience_level: "Intermediate"},
+            {id: 2, experience_level: "Expert"},
+            {id: 3, experience_level: "Specialist"},
         ])
     }).then(function() {
         return knex.schema.alterTable("briefs", (table) => {

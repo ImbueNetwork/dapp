@@ -25,17 +25,17 @@ const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-type FilterOption = {
-    key: string;
-    value: string;
-};
+type Range = {
+    low: number,
+    high: number,
+}
 
-type Filter = {
-    experience: string;
-    proposals: string;
-    length: string;
-    hours: string;
-};
+type BriefFilter = {
+    experience_id: number,
+    hours_pw: number
+    submitted_briefs: Range,
+    brief_length: Range,
+}
 
 type BriefItem = {
     title: string;
@@ -52,11 +52,38 @@ export enum BriefFilterOption {
     AmountSubmitted = 1,
     Length = 2,
     HoursPerWeek = 3,
-
 };
 
+const callSearchBriefs = async (filter: BriefFilter) => {
+    const resp = await fetch(`${config.apiBase}/briefs/`, {
+        headers: postAPIHeaders,
+        method: "post",
+        body: JSON.stringify(filter),
+      });
+
+      if (resp.ok) {
+        return resp.body
+      } else {
+        //handle error?
+      }
+  }
+
+  const getAllBriefs = async () => {
+    const resp = await fetch(`${config.apiBase}/briefs/`, {
+        headers: postAPIHeaders,
+        method: "get",
+      });
+
+    if (resp.ok) {
+        const data = await resp.json();
+        return data as Array<BriefItem>;
+    } else {
+        //handle error?
+      }
+  }
 
 export type BriefProps = {};
+
 
 export type BriefState = {
     briefs: Array<BriefItem>;
@@ -64,6 +91,7 @@ export type BriefState = {
 
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
+
     
     filters = [
         {
@@ -189,48 +217,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         },
     ];
     state: BriefState = {
-        briefs: [
-            {
-                title: "Product Development Engineer",
-                xpLevel: "Intermediate",
-                length: "More than 6 months",
-                posted: "5 days ago",
-                description:
-                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
-                tags: ["Product Development", "Health", "Wellness"],
-                proposals: "Less than 5",
-            },
-            {
-                title: "Product Development Engineer",
-                xpLevel: "Intermediate",
-                length: "More than 6 months",
-                posted: "5 days ago",
-                description:
-                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
-                tags: ["Product Development", "Health", "Wellness"],
-                proposals: "Less than 5",
-            },
-            {
-                title: "Product Development Engineer",
-                xpLevel: "Intermediate",
-                length: "More than 6 months",
-                posted: "5 days ago",
-                description:
-                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
-                tags: ["Product Development", "Health", "Wellness"],
-                proposals: "Less than 5",
-            },
-            {
-                title: "Product Development Engineer",
-                xpLevel: "Intermediate",
-                length: "More than 6 months",
-                posted: "5 days ago",
-                description:
-                    "Looking to build a team of product developers who have experience building products in the healthcare industry",
-                tags: ["Product Development", "Health", "Wellness"],
-                proposals: "Less than 5",
-            },
-        ],
+        briefs: await getAllBriefs()
     };
     constructor(props: BriefProps) {
         super(props);

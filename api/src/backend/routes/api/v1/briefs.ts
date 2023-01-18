@@ -13,6 +13,8 @@ type BriefPkg = models.Brief;
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
+    //const brief_parameters: BriefFilter = req.body
+
     db.transaction(async tx => {
         try {
             const briefs = await models.fetchAllBriefs()(tx);
@@ -25,6 +27,8 @@ router.get("/", (req, res, next) => {
         }
     });
 });
+
+
 
 /*
 router.get("/:id", (req, res, next) => {
@@ -71,7 +75,9 @@ router.post("/", (req, res, next) => {
         scope,
         duration,
         budget,
-        user_id
+        user_id,
+        experience_level,
+        hours_per_week,
 
     } = req.body.brief as models.Brief;
 
@@ -86,6 +92,8 @@ router.post("/", (req, res, next) => {
                 duration,
                 budget,
                 user_id,
+                experience_level,
+                hours_per_week,
             })(tx);
     
             if (!brief.id) {

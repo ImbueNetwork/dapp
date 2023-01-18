@@ -17,8 +17,6 @@ const postAPIHeaders = {
 };
 
 function Join() {
-
-    const userRef = useRef();
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

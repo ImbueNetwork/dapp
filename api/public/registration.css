@@ -78,3 +78,15 @@ h1 {
     padding-left: 10px !important;
 }
 
+.login {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.login > div {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+

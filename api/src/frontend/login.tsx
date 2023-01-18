@@ -117,7 +117,6 @@ class Login extends React.Component<LoginProps, LoginState> {
     this.setState({ errorMessage: undefined });
     event.preventDefault();
 
-
     const resp = await fetch(`/auth/imbue/`, {
       headers: postAPIHeaders,
       method: "post",

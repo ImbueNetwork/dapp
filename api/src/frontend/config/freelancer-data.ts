@@ -200,20 +200,15 @@ export const importInformation = [
 ];
 
 export const suggestedFreelancingSkills = [
-    "Web3",
-    "DeFi",
-    "Education",
-    "Agriculture",
-    "Communications",
-    "Health",
-    "Wellness",
-    "Energy",
-    "Sustainability",
-    "Arts and Culture",
-    "Entertainment",
-    "Real Estate",
-    "Technology",
-    "Supply Chain",
+    "Javascript",
+    "Go",
+    "Rust",
+    "Substrate",
+    "Solidity",
+    "Adobe Photoshop",
+    "Graphic Design",
+    "Wireframing",
+    "UI/UX Design",
 ];
 
 export const suggestedLanguages = [
@@ -227,8 +222,12 @@ export const suggestedLanguages = [
 ];
 
 export const suggestedServices = [
-    "Web3",
-    "DeFi",
-    "Education",
-    "Agriculture",
+    "Web Development",
+    "Web Design",
+    "Mobile (Android/iOS)",
+    "Copywriting",
+    "Smart Contracts",
+    "Copywriting",
+    "Video Editing",
+    "NFT",
 ];

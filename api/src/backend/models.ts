@@ -288,7 +288,7 @@ export const getOrCreateFederatedUser = (
 };
 
 export const searchBriefs = (
-    experience_id: number, submitted_low: number, submitted_high: number,
+    experience_id_high: number, experience_id_low: number, submitted_low: number, submitted_high: number,
     length_low: number, length_high: number, max_hours_pw: number) => {
         async (tx : Knex.Transaction) => {
 
@@ -299,7 +299,7 @@ export const searchBriefs = (
                 .whereBetween("briefs_submitted", [submitted_low, submitted_high])
                 .whereBetween("duration", [length_low, length_high])
                 .whereBetween("hpw", [0, max_hours_pw])
-                .where("experience_id", experience_id)
+                .whereBetween("experience_id", [experience_id_high, experience_id_low])
     }        
 };
 

@@ -15,6 +15,7 @@ import {
 } from "./config/briefs-data";
 import * as config from "./config";
 import { lchown } from "fs";
+import e from "express";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -31,7 +32,7 @@ type Range = {
 }
 
 type BriefFilter = {
-    experience_id: number,
+    experience_id: Range,
     hours_pw: number
     submitted_briefs: Range,
     brief_length: Range,
@@ -47,39 +48,32 @@ type BriefItem = {
     proposals: string;
 };
 
-export enum BriefFilterOption {
-    ExpLevel = 0,
-    AmountSubmitted = 1,
-    Length = 2,
-    HoursPerWeek = 3,
-};
 
 const callSearchBriefs = async (filter: BriefFilter) => {
     const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: postAPIHeaders,
         method: "post",
         body: JSON.stringify(filter),
-      });
+    });
 
-      if (resp.ok) {
-        return resp.body
-      } else {
-        //handle error?
-      }
+    if (resp.ok) {
+        return await resp.json() as Array<BriefItem>
+    } else {
+        throw new Error('Failed to search briefs. status:' + resp.status);
+    }
   }
 
   const getAllBriefs = async () => {
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
+    const resp =  await fetch(`${config.apiBase}/briefs/`, {
         headers: postAPIHeaders,
         method: "get",
-      });
+    })
 
     if (resp.ok) {
-        const data = await resp.json();
-        return data as Array<BriefItem>;
+        return await resp.json() as Array<BriefItem>
     } else {
-        //handle error?
-      }
+        throw new Error('Failed to get all briefs. status:' + resp.status);
+    }
   }
 
 export type BriefProps = {};
@@ -90,9 +84,18 @@ export type BriefState = {
 };
 
 
+export enum BriefFilterOption {
+    ExpLevel = 0,
+    AmountSubmitted = 1,
+    Length = 2,
+    HoursPerWeek = 3,
+};
+
+
 export class Briefs extends React.Component<BriefProps, BriefState> {
 
-    
+    // IF YOU REORDER THESE IT WILL BREAK.
+    // to add a new filter add to the enum BriefFilterOption, add to the bottom of the list with the correct index
     filters = [
         {
             // Keys should never be strings, strings are slow. 
@@ -216,27 +219,41 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             ],
         },
     ];
-    state: BriefState = {
-        briefs: await getAllBriefs()
-    };
+    
     constructor(props: BriefProps) {
         super(props);
+        getAllBriefs().then((briefs) => {
+            this.setState({ briefs: briefs });
+          });
     }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
     onSearch = () => {
         let elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
-    //console.log(elements);
+    
+        // The filter initially should return all values
+        let filter: BriefFilter = {
+            experience_id: {low: 0, high: 0},
+            hours_pw: 0,
+            submitted_briefs: {low: 0, high: 0},
+            brief_length: {low: 0, high: 0},
+        };
+        let is_search: boolean = false;
+
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].checked) {
+                is_search = true
                 let id = elements[i].getAttribute("id");
                 if (id != null) {
                     let [filterType, interiorIndex] = id.split("-");
+                    let filter_index = parseInt(filterType)
                     // Here we are trying to build teh paramaters required to buidl the
                     // model searchBriefs
+                    //let current_data =  this.filters.filter()
                     switch(parseInt(filterType)) {
                         case BriefFilterOption.ExpLevel:
-                        
+                            // get lowest an highes where 
+
                         case BriefFilterOption.AmountSubmitted:
                         
                         case BriefFilterOption.Length:
@@ -249,6 +266,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 }
             }
         }
+
         // Search briefs
         //update state with new list.
     };

@@ -15,7 +15,7 @@ import { web3Accounts } from "@polkadot/extension-dapp";
 import { ListItemFreelancer } from "./components/listItemFreelancer";
 import { TagsInput } from "./components/tagsInput";
 import { suggestedSkills } from "./config/briefs-data";
-import { TextInput } from "./components/textInput";
+import * as utils from "./utils";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -69,7 +69,7 @@ export class Freelancers extends React.Component<
             bio: "",
             user_id: "",
         },
-        step: 0,
+        step: 8,
     };
     constructor(props: FreelancerProps) {
         super(props);
@@ -93,8 +93,8 @@ export class Freelancers extends React.Component<
         // invokeFreelancerAPI(Freelancer);
     };
 
-    onDiscoverBriefs = (Freelancer: Freelancer) => {
-        // redirect to discover Freelancers page
+    onDiscoverBriefs = (freelancer: Freelancer) => {
+        utils.redirect("/dapp/briefs");
     };
 
     updateFormData = (name: string, value: string | number | string[]) => {

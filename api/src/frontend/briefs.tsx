@@ -27,13 +27,13 @@ const postAPIHeaders = {
 };
 
 type Range = {
-    low: number,
-    high: number,
+    whereIn: Array<number>,
+    or_max: boolean,
 }
 
 type BriefFilter = {
     experience_id: Range,
-    hours_pw: number
+    hours_pw: Range,
     submitted_briefs: Range,
     brief_length: Range,
 }
@@ -131,27 +131,27 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             options: [
                 {
                     interiorIndex: 0,
-                    low: 0,
-                    high: 4,
+                    search_for: [0, 1, 2, 3, 4],
                     value: "0-4",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 1,
-                    low: 5,
-                    high: 9,
+                    search_for: [5, 6, 7, 8, 9],
                     value: "5-9",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 2,
-                    low: 10,
-                    high: 14,
+                    search_for: [10, 11, 12, 13, 14],
                     value: "10-14",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 3,
-                    low: 15,
-                    high: 100000,
+                    search_for: [15, 10000],
                     value: "15+",
+                    or_max: true,
                 },
             ],
         },
@@ -163,39 +163,39 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             options: [
                 {
                     interiorIndex: 0,
-                    low: 0,
-                    high: 28,
-                    value: "1 month"
+                    search_for: [1],
+                    value: "1 month",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 1,
-                    low: 29,
-                    high: 28 * 3,
+                    search_for: [1,2,3],
                     value: "1-3 months",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 2,
-                    low: (3 * 28) + 1,
-                    high: 28 * 6,
+                    search_for: [3,4,5,6],
                     value: "3-6 months",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 3,
-                    low: (6 * 28) + 1,
-                    high: 12 * 28,
+                    search_for: Array.from({length: 6}, (_, i) => (i + 6) + 1),
                     value: "6-12 months",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 4,
-                    low: (12 * 28) + 1,
-                    high: 10_000_000,
+                    search_for: [12],
+                    or_max: true,
                     value: "1 year +",
                 },
                 {
                     // years * months * days
                     interiorIndex: 5,
-                    low: (5 * 12 * 28),
-                    high: 10_000_000,
+                    search_for: [12*5],
+                    or_max: true,
                     value: "5 years +",
                 },
             ],
@@ -206,12 +206,13 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             options: [
                 {
                     interiorIndex: 0,
-                    low: 0,
-                    high: 30,
+                    search_for: Array.from({length: 30}, (_, i) => (i) + 1),
+                    or_max: false,
                     value: "30hrs/week",
                 },
                 {
                     low: 0,
+                    search_for: Array.from({length: 50}, (_, i) => (i) + 1),
                     high: 50,
                     interiorIndex: 1,
                     value: "50hrs/week",
@@ -232,12 +233,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         let elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
     
         // The filter initially should return all values
-        let filter: BriefFilter = {
-            experience_id: {low: 0, high: 0},
-            hours_pw: 0,
-            submitted_briefs: {low: 0, high: 0},
-            brief_length: {low: 0, high: 0},
-        };
         let is_search: boolean = false;
 
         for (let i = 0; i < elements.length; i++) {
@@ -249,7 +244,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     let filter_index = parseInt(filterType)
                     // Here we are trying to build teh paramaters required to buidl the
                     // model searchBriefs
-                    //let current_data =  this.filters.filter()
                     switch(parseInt(filterType)) {
                         case BriefFilterOption.ExpLevel:
                             // get lowest an highes where 

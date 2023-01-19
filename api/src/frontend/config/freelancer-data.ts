@@ -70,6 +70,11 @@ export const stepData = [
         helps us match you with clients who need your unique expertise.\n
         Search for a service`,
         progress: 11,
+    },
+    {
+        heading: "That's It. All done!",
+        content: `Once you submit your profile you will be able to search and apply for briefs`,
+        progress: 12,
     }
 
 ];

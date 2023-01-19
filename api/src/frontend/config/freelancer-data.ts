@@ -14,12 +14,64 @@ export const stepData = [
         progress: 2,
     },
     {
-        heading: "What skills do you require?",
-        content: `This helps your brief post stand out to the right candidates.
-    It’s the first thing they’ll see, so make it count!`,
-        next: "Scope",
-        progress: 1.0,
+        heading: "Great, so what’s your biggest goal for freelancing?",
+        content: `Different people come to Imbue for different reasons. We want to highlight \n
+        the projects that fit your goals best – while still showing you all the \n
+        possibilities. Which of these feels most right for you? `,
+        progress: 3,
     },
+    {
+        heading: "How would you like to tell us about yourself?",
+        content: `We need to get a sense of your education, experience and skills. It’s quickest \n
+         to import your information — you can edit it before your profile goes live. `,
+        progress: 4,
+    },
+    {
+        heading: "Great. Now, add a title to tell the world what you do.",
+        content: `It’s the very first thing clients see, so make it count. Stand out \n
+        by describing your expertise in your own words.`,
+        progress: 5,
+    },
+    {
+        heading: "Add your relevant work experience here.",
+        content: `Freelancers who add their experience are twice as likely to win work. But if \n
+         you’re just starting out, you can still create a great profile. Just head on to \n
+         the next page. `,
+        progress: 6,
+    },
+    {
+        heading: "Clients like to know what you know - add your education here.",
+        content: `You don’t have to have a degree. Adding any relevant education helps \n
+        make your profile more visible.`,
+        progress: 7,
+    },
+    {
+        heading: "Looking good. Next, tell us which languages you speak.",
+        content: `Upwork is global, so clients are often interested to know what languages \n
+         you speak. English is a must, but do you speak any other languages?`,
+        progress: 8,
+    },
+    {
+        heading: "Almost done! What work are you here to do?",
+        content: `Your skills show clients what you can offer. Add or remove the ones we’ve \n
+         suggested, or start typing to pick more. It’s up to you.`,
+        progress: 9,
+    },
+    {
+        heading: "Now write a bio to tell the world about yourself.",
+        content: `Help people get to know you at a glance. What work are you best at? \n
+        Tell them clearly, using paragraphs or bullet points. You can always edit later - \n
+        just make sure you proofread now!`,
+        progress: 10,
+    },
+    {
+        heading: "What are the main services you offer?",
+        content: `Choose at least 1 service that best describes the type of work you do. This \n
+        helps us match you with clients who need your unique expertise.\n
+        Search for a service`,
+        progress: 11,
+    }
+
 ];
 
 export const nameExamples = [
@@ -111,4 +163,62 @@ export const freelancedBefore = [
         label: "Yes I'm a pro, I've been doing it for years",
         value: "Yes I'm a pro, I've been doing it for years",
     },
+];
+
+export const freelancingGoal = [
+    {
+        label: "To earn my primary income.",
+        value: "To earn my primary income.",
+    },
+    {
+        label: "To make a little extra money on the side",
+        value: "To make a little extra money on the side",
+    },
+    {
+        label: "To gain experience, so that I can get a full-time job.",
+        value: "To gain experience, so that I can get a full-time job.",
+    },
+    {
+        label: "I’m just exploring.",
+        value: "I’m just exploring.",
+    },
+];
+
+export const importInformation = [
+    {
+        label: "Import from Linkedin",
+        value: "Import from Linkedin",
+    },
+    {
+        label: "Upload your resume",
+        value: "Upload your resume",
+    },
+    {
+        label: "Fill it out manually (15 mins)",
+        value: "Fill it out manually (15 mins)",
+    }
+];
+
+export const suggestedFreelancingSkills = [
+    "Web3",
+    "DeFi",
+    "Education",
+    "Agriculture",
+    "Communications",
+    "Health",
+    "Wellness",
+    "Energy",
+    "Sustainability",
+    "Arts and Culture",
+    "Entertainment",
+    "Real Estate",
+    "Technology",
+    "Supply Chain",
+];
+
+export const suggestedServices = [
+    "Web3",
+    "DeFi",
+    "Education",
+    "Agriculture",
 ];

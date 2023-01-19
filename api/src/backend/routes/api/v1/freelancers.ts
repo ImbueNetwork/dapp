@@ -44,6 +44,7 @@ router.post("/", (req, res, next) => {
     const {
         education,
         experience,
+        freelancing_goal,
         freelanced_before,
         skills,
         bio,
@@ -60,6 +61,7 @@ router.post("/", (req, res, next) => {
             const freelancer = await models.insertFreelancerDetails({
                 education,
                 experience,
+                freelancing_goal,
                 freelanced_before,
                 skills,
                 bio,
@@ -97,6 +99,7 @@ router.put("/:id", (req, res, next) => {
     const {
         education,
         experience,
+        freelancing_goal,
         freelanced_before,
         skills,
         bio,
@@ -123,6 +126,7 @@ router.put("/:id", (req, res, next) => {
             const freelancer = await models.updateFreelancerDetails(id, {
                 education,
                 experience,
+                freelancing_goal,
                 freelanced_before,
                 skills,
                 bio,

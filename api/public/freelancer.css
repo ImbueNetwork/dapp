@@ -44,11 +44,11 @@ p {
     display: flex;
     flex-direction: column;
     background-color: var(--theme-ink-color);
-    padding: 32px 64px;
+    padding: 20px 54px;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    border-radius: 20px;
+    border-radius: 30px;
 }
 
 .help {
@@ -161,7 +161,7 @@ p {
 .freelance-xp-options {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     margin-top: 16px;
 }
 .freelance-xp-item {
@@ -169,10 +169,10 @@ p {
     flex-direction: column;
     background: var(--theme-imbue-white);
     color: var(--theme-imbue-purple);
-    font-size: 20px;
-    line-height: 1.2;
-    padding: 24px;
-    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.0;
+    padding: 17px;
+    border-radius: 8px;
 }
 
 .freelance-xp-item.active {
@@ -185,47 +185,3 @@ p {
     color: #2c2c2c;
 }
 
-.choices {
-    display: flex;
-    flex-direction: column;
-}
-
-.freelancer-li {
-    display: flex;
-    background-color: #ffffff;
-    flex-direction: column;
-    width: 60%;
-    color: blue;
-    justify-content: right;
-    border-radius: 5%;
-}
-
-.button {
-    background: #ffffff;
-    float: left;
-    margin: 0 5px 0 0;
-    width: 100px;
-    height: 100px;
-    position: relative;
-    color: blue;
-}
-
-.button label,
-.button input {
-    display: block;
-}
-
-.button input[type="radio"] {
-    opacity: 0.011;
-    z-index: 1000;
-}
-
-.button input[type="radio"]:checked + label {
-    background: #20b8be;
-    border-radius: 4px;
-}
-
-.button label {
-    cursor: pointer;
-    line-height: 1em;
-}

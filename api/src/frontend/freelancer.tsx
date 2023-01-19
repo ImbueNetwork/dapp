@@ -1,12 +1,21 @@
 import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import { stepData, freelancedBefore } from "./config/freelancer-data";
+import {
+    stepData,
+    freelancedBefore,
+    freelancingGoal,
+    importInformation,
+    suggestedFreelancingSkills, suggestedServices,
+} from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
 import { Option } from "./components/option";
 import { web3Accounts } from "@polkadot/extension-dapp";
 import { ListItemFreelancer } from "./components/listItemFreelancer";
+import { TagsInput } from "./components/tagsInput";
+import { suggestedSkills } from "./config/briefs-data";
+import { TextInput } from "./components/textInput";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -50,11 +59,13 @@ export class Freelancers extends React.Component<
             education: "",
             experience: "",
             freelanced_before: "",
+            freelancing_goal: "",
+            resume: "",
             work_type: "",
-            skills: "",
+            skills: [],
             title: "",
             languages: "",
-            services_offer: "",
+            services_offer: [],
             bio: "",
             user_id: "",
         },
@@ -97,6 +108,16 @@ export class Freelancers extends React.Component<
         });
     };
 
+    handleChange(event: { target: { value: any; }; }) {
+        this.setState({
+            ...this.state,
+            info: {
+                ...this.state.info,
+                ['bio']: event.target.value,
+            },
+        });
+    }
+
     render() {
         const { step } = this.state;
 
@@ -137,13 +158,186 @@ export class Freelancers extends React.Component<
             </div>
         );
 
+
+        const FreelancingGoal = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                <div className="freelance-xp-options">
+                    {freelancingGoal.map(({ label, value }, index) => (
+                        <div
+                            key={index}
+                            className={`freelance-xp-item ${
+                                this.state.info.freelancing_goal === value
+                                    ? "active"
+                                    : ""
+                            }`}
+                            onClick={() =>
+                                this.updateFormData("freelancing_goal", value)
+                            }
+                        >
+                            {label}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+
+        const ImportResume = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                <div className="freelance-xp-options">
+                    {importInformation.map(({ label, value }, index) => (
+                        <div
+                            key={index}
+                            className={`freelance-xp-item ${
+                                this.state.info.resume === value
+                                    ? "active"
+                                    : ""
+                            }`}
+                            onClick={() =>
+                                this.updateFormData("resume", value)
+                            }
+                        >
+                            {label}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const TitlePanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                <div className="name-panel-input-wrapper">
+                    <input
+                        className="field-input"
+                        placeholder="Enter your title"
+                        name="title"
+                        value={this.state.info.title}
+                        onChange={(e) => this.updateFormData("title", e.target.value)}
+                    />
+                </div>
+            </div>
+        );
+
+        const ExperiencePanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const EducationPanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const LanguagePanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const SkillsPanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                <p className="field-name">Your Skills</p><br/>
+                <br/>
+                <div className="skills-container">
+                    <TagsInput
+                        suggestData={suggestedFreelancingSkills}
+                        tags={this.state.info.skills}
+                        onChange={(tags: string[]) => this.updateFormData("skills", tags)}
+                    />
+                </div>
+            </div>
+        );
+
+        const BioPanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                {/*<div className="name-panel-input-wrapper">*/}
+                {/*    <textarea value={this.state.info.bio} onChange={this.handleChange} maxLength={1000} />*/}
+                {/*    <TextInput*/}
+                {/*        value={this.state.info.bio}*/}
+                {/*        name="description"*/}
+                {/*        maxLength={5000}*/}
+                {/*        onChange={(e) => this.updateFormData("bio", e.target.value)}*/}
+                {/*    />*/}
+                {/*</div>*/}
+
+                <div className="name-panel-input-wrapper">
+                    <input
+                        className="field-input"
+                        placeholder="Enter your bio"
+                        name="title"
+                        value={this.state.info.bio}
+                        onChange={(e) => this.updateFormData("bio", e.target.value)}
+                    />
+                </div>
+            </div>
+        );
+
+        const ServicesPanel = (
+            <div className="freelance-xp-container">
+                <div className="content-text-small-flex">
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
+                </div>
+                <div className="skills-container">
+                    <TagsInput
+                        suggestData={suggestedServices}
+                        tags={this.state.info.services_offer}
+                        onChange={(tags: string[]) => this.updateFormData("services_offer", tags)}
+                    />
+                </div>
+            </div>
+        );
+
+
         const ConfirmPanel = (
             <div className="description-panel">
                 <p className="content-text">Thank you for your submission!</p>
             </div>
         );
 
-        const panels = [HelloPanel, FreelanceExperience, ConfirmPanel];
+        const panels = [HelloPanel, FreelanceExperience,FreelancingGoal,
+            ImportResume,TitlePanel,ExperiencePanel,EducationPanel,LanguagePanel,SkillsPanel,BioPanel,ServicesPanel,
+            ConfirmPanel];
 
         return (
             <div className="freelancer-details-container">

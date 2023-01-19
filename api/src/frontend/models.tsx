@@ -105,10 +105,10 @@ export type Freelancer = {
     experience: string;
     freelanced_before: string;
     work_type: string;
-    skills: string;
+    skills: string[];
     title: string;
     languages: string;
-    services_offer: string;
+    services_offer: string[];
     bio: string;
     user_id?: string | number;
 };

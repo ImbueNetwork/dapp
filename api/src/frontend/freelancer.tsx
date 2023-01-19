@@ -6,7 +6,7 @@ import {
     freelancedBefore,
     freelancingGoal,
     importInformation,
-    suggestedFreelancingSkills, suggestedServices,
+    suggestedFreelancingSkills, suggestedServices, suggestedLanguages,
 } from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
@@ -64,12 +64,12 @@ export class Freelancers extends React.Component<
             work_type: "",
             skills: [],
             title: "",
-            languages: "",
+            languages: [],
             services_offer: [],
             bio: "",
             user_id: "",
         },
-        step: 0,
+        step: 6,
     };
     constructor(props: FreelancerProps) {
         super(props);
@@ -260,6 +260,13 @@ export class Freelancers extends React.Component<
                         <p key={index}>{line}</p>
                     ))}
                 </div>
+                <div className="skills-container">
+                    <TagsInput
+                        suggestData={suggestedLanguages}
+                        tags={this.state.info.languages}
+                        onChange={(tags: string[]) => this.updateFormData("languages", tags)}
+                    />
+                </div>
             </div>
         );
 
@@ -300,10 +307,11 @@ export class Freelancers extends React.Component<
                 {/*</div>*/}
 
                 <div className="name-panel-input-wrapper">
-                    <input
-                        className="field-input"
+                    <textarea
+                        className="field-input large"
                         placeholder="Enter your bio"
                         name="title"
+                        maxLength={5000}
                         value={this.state.info.bio}
                         onChange={(e) => this.updateFormData("bio", e.target.value)}
                     />
@@ -335,8 +343,20 @@ export class Freelancers extends React.Component<
             </div>
         );
 
-        const panels = [HelloPanel, FreelanceExperience,FreelancingGoal,
-            ImportResume,TitlePanel,ExperiencePanel,EducationPanel,LanguagePanel,SkillsPanel,BioPanel,ServicesPanel,
+        // const panels = [HelloPanel, FreelanceExperience,FreelancingGoal,
+        //     ImportResume,TitlePanel,ExperiencePanel,EducationPanel,LanguagePanel,SkillsPanel,BioPanel,ServicesPanel,
+        //     ConfirmPanel];
+        const panels = [
+            HelloPanel, 
+            FreelanceExperience
+            ,FreelancingGoal,
+            // ImportResume,
+            TitlePanel,
+            // ExperiencePanel,EducationPanel,
+            LanguagePanel,
+            SkillsPanel,
+            BioPanel,
+            ServicesPanel,
             ConfirmPanel];
 
         return (

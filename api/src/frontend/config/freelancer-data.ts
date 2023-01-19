@@ -20,34 +20,34 @@ export const stepData = [
         possibilities. Which of these feels most right for you? `,
         progress: 3,
     },
-    {
-        heading: "How would you like to tell us about yourself?",
-        content: `We need to get a sense of your education, experience and skills. It’s quickest \n
-         to import your information — you can edit it before your profile goes live. `,
-        progress: 4,
-    },
+    // {
+    //     heading: "How would you like to tell us about yourself?",
+    //     content: `We need to get a sense of your education, experience and skills. It’s quickest \n
+    //      to import your information — you can edit it before your profile goes live. `,
+    //     progress: 4,
+    // },
     {
         heading: "Great. Now, add a title to tell the world what you do.",
         content: `It’s the very first thing clients see, so make it count. Stand out \n
         by describing your expertise in your own words.`,
         progress: 5,
     },
-    {
-        heading: "Add your relevant work experience here.",
-        content: `Freelancers who add their experience are twice as likely to win work. But if \n
-         you’re just starting out, you can still create a great profile. Just head on to \n
-         the next page. `,
-        progress: 6,
-    },
-    {
-        heading: "Clients like to know what you know - add your education here.",
-        content: `You don’t have to have a degree. Adding any relevant education helps \n
-        make your profile more visible.`,
-        progress: 7,
-    },
+    // {
+    //     heading: "Add your relevant work experience here.",
+    //     content: `Freelancers who add their experience are twice as likely to win work. But if \n
+    //      you’re just starting out, you can still create a great profile. Just head on to \n
+    //      the next page. `,
+    //     progress: 6,
+    // },
+    // {
+    //     heading: "Clients like to know what you know - add your education here.",
+    //     content: `You don’t have to have a degree. Adding any relevant education helps \n
+    //     make your profile more visible.`,
+    //     progress: 7,
+    // },
     {
         heading: "Looking good. Next, tell us which languages you speak.",
-        content: `Upwork is global, so clients are often interested to know what languages \n
+        content: `Imbue is global, so clients are often interested to know what languages \n
          you speak. English is a must, but do you speak any other languages?`,
         progress: 8,
     },
@@ -214,6 +214,16 @@ export const suggestedFreelancingSkills = [
     "Real Estate",
     "Technology",
     "Supply Chain",
+];
+
+export const suggestedLanguages = [
+    "French",
+    "German",
+    "Dutch",
+    "Spanish",
+    "Arabic",
+    "Urdu",
+    "Hindi",
 ];
 
 export const suggestedServices = [

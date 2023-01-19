@@ -107,7 +107,7 @@ export type Freelancer = {
     work_type: string;
     skills: string[];
     title: string;
-    languages: string;
+    languages: string[];
     services_offer: string[];
     bio: string;
     user_id?: string | number;

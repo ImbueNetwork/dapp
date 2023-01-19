@@ -23,6 +23,9 @@ p {
     line-height: 1.5;
 }
 
+.large {
+    height: 30%;
+}
 .freelancer-details-container {
     display: flex;
     flex-direction: row;

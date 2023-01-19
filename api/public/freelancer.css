@@ -8,7 +8,7 @@ h1 {
 
 p {
     font-size: 20px;
-    line-height: 1.15;
+    line-height: 1.2;
 }
 
 .field-input {
@@ -26,11 +26,10 @@ p {
 .freelancer-details-container {
     display: flex;
     flex-direction: row;
-    width: 90vw;
     min-height: 650px;
-    max-height: 650px;
-    max-width: 1250px;
-    /* margin-left: auto; */
+    max-height: 700px;
+    max-width: 800px;
+    margin-left: auto;
     margin-right: auto;
     border-radius: 20px;
 }
@@ -47,6 +46,9 @@ p {
     background-color: var(--theme-ink-color);
     padding: 32px 64px;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
 }
 
 .help {
@@ -59,6 +61,7 @@ p {
     padding-top: 2%;
     padding-bottom: 2%;
     height: 100%;
+    flex-grow: 1;
 }
 
 .button-left {
@@ -99,16 +102,14 @@ p {
 
 .name-title {
     color: var(--theme-secondary);
-    width: 60%;
 }
 
 .content-text-small {
-    position: static;
+    width: 90%;
     color: #2c2c2c;
-    width: 60%;
     font-size: 23px;
-    text-align: center;
-    padding-top: 5%
+    text-align: left;
+    padding-top: 5%;
 }
 
 .right-panel-details {
@@ -117,7 +118,6 @@ p {
     width: 20%;
     height: 100%;
     background-color: white;
-
 }
 
 .inner-right-panel-details {
@@ -128,24 +128,23 @@ p {
 }
 
 .hello-panel {
-    height: 100%;
-    width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 
 /* Rectangle 42 */
 
-.bar-panel{
+.bar-panel {
     position: absolute;
     width: 19vw;
     height: 31vw;
     left: 63vw;
     top: 13.5vw;
-    background: #FFFFFF;
+    background: #ffffff;
     border-radius: 25px;
 }
 
-.chess-panel{
-
+.chess-panel {
     position: absolute;
     width: 16vw;
     height: 15vw;
@@ -156,13 +155,34 @@ p {
     border-radius: 23px;
 }
 
-.freelanced-before {
+.freelance-xp-container {
+}
+
+.freelance-xp-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+.freelance-xp-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-imbue-white);
+    color: var(--theme-imbue-purple);
+    font-size: 20px;
+    line-height: 1.2;
+    padding: 24px;
+    border-radius: 10px;
+}
+
+.freelance-xp-item.active {
+    border: 2px solid rgba(56, 29, 193, 0.5);
 }
 
 .content-text-small-flex {
     justify-content: center;
-    align-items:flex-start;
-    color:#2c2c2c;
+    align-items: flex-start;
+    color: #2c2c2c;
 }
 
 .choices {
@@ -172,7 +192,7 @@ p {
 
 .freelancer-li {
     display: flex;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     flex-direction: column;
     width: 60%;
     color: blue;
@@ -181,7 +201,7 @@ p {
 }
 
 .button {
-    background: #FFFFFF;
+    background: #ffffff;
     float: left;
     margin: 0 5px 0 0;
     width: 100px;
@@ -193,7 +213,6 @@ p {
 .button label,
 .button input {
     display: block;
-    position: absolute;
 }
 
 .button input[type="radio"] {
@@ -210,4 +229,3 @@ p {
     cursor: pointer;
     line-height: 1em;
 }
-

@@ -2,14 +2,14 @@ export const stepData = [
     {
         heading: `Hello {name}, ready to
         find an opportunity?`,
-        content: `Answer a few questions and start building your profile
-        Apply for open briefs or list your skills for clients to hire
+        content: `Answer a few questions and start building your profile\n
+        Apply for open briefs or list your skills for clients to hire\n
         Get paid safely and securely!`,
         progress: 1,
     },
     {
         heading: "A few quick questions: have you freelanced before?",
-        content: `This tells us how much help to give you along the way.
+        content: `This tells us how much help to give you along the way.\n
         (We won’t share your answer with anyone else, including potential clients.)`,
         progress: 2,
     },
@@ -22,7 +22,11 @@ export const stepData = [
     },
 ];
 
-export const nameExamples = ["Build a dapp", "Write a smart contract", "Generate Content, e.g. blog, videos"];
+export const nameExamples = [
+    "Build a dapp",
+    "Write a smart contract",
+    "Generate Content, e.g. blog, videos",
+];
 
 export const scopeData = [
     {
@@ -85,8 +89,14 @@ export const suggestedIndustries = [
     "Supply Chain",
 ];
 
-
-export const suggestedSkills = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];
+export const suggestedSkills = [
+    "Substrate",
+    "Rust",
+    "Polkadot",
+    "Kusama",
+    "React",
+    "Typescript",
+];
 
 export const freelancedBefore = [
     {
@@ -100,5 +110,5 @@ export const freelancedBefore = [
     {
         label: "Yes I'm a pro, I've been doing it for years",
         value: "Yes I'm a pro, I've been doing it for years",
-    }
-]
+    },
+];

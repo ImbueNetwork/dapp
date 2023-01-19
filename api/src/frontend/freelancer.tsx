@@ -1,14 +1,12 @@
 import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import {
-    stepData, freelancedBefore,
-} from "./config/freelancer-data";
+import { stepData, freelancedBefore } from "./config/freelancer-data";
 import * as config from "./config";
 import { Freelancer, User } from "./models";
 import { Option } from "./components/option";
 import { web3Accounts } from "@polkadot/extension-dapp";
-import {ListItemFreelancer } from "./components/listItemFreelancer";
+import { ListItemFreelancer } from "./components/listItemFreelancer";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -42,7 +40,10 @@ async function invokeFreelancerAPI(Freelancer: Freelancer) {
     }
 }
 
-export class Freelancers extends React.Component<FreelancerProps, FreelancerState> {
+export class Freelancers extends React.Component<
+    FreelancerProps,
+    FreelancerState
+> {
     state = {
         info: {
             id: "",
@@ -57,7 +58,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
             bio: "",
             user_id: "",
         },
-        step: 0
+        step: 0,
     };
     constructor(props: FreelancerProps) {
         super(props);
@@ -71,24 +72,22 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
     onNext = () => {
         const { step } = this.state;
         step < stepData.length - 1 &&
-        this.setState({ ...this.state, step: step + 1 });
+            this.setState({ ...this.state, step: step + 1 });
     };
 
     onReviewPost = (Freelancer: Freelancer) => {
         const { step } = this.state;
         step < stepData.length - 1 &&
-        this.setState({ ...this.state, step: step + 1 });
+            this.setState({ ...this.state, step: step + 1 });
         invokeFreelancerAPI(Freelancer);
     };
-
 
     onDiscoverFreelancers = (Freelancer: Freelancer) => {
         // redirect to discover Freelancers page
     };
 
-
     updateFormData = (name: string, value: string | number | string[]) => {
-        console.log("This is",value);
+        console.log("This is", value);
         this.setState({
             ...this.state,
             info: {
@@ -104,35 +103,37 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
         const HelloPanel = (
             <div className="hello-panel">
                 <div className="content-text-small">
-                    <p>{stepData[step].content} </p>
-                </div>
-                <div>
-                    <div className="bar-panel">
-                </div>
-                    <div className="chess-panel">
-                </div>
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                    ))}
                 </div>
             </div>
-
         );
 
-        const FreelancedBefore = (
-            <div className="freelancedBefore">
+        const FreelanceExperience = (
+            <div className="freelance-xp-container">
                 <div className="content-text-small-flex">
-                    <p>{stepData[step].content} </p>
-                </div>
-                 {freelancedBefore.map(({ label, value}, index) => (
-                     <div key={index} className="button">
-                     <input
-                         type="radio"
-                         value={value}
-                         checked={this.state.info.freelanced_before === value}
-                         onChange={(e) =>  this.updateFormData("freelanced_before", value)}
-                     />
-                         <label className="btn btn-default" htmlFor={label}>{label}</label>
-                         <br/>
-                     </div>
+                    {stepData[step].content.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
                     ))}
+                </div>
+                <div className="freelance-xp-options">
+                    {freelancedBefore.map(({ label, value }, index) => (
+                        <div
+                            key={index}
+                            className={`freelance-xp-item ${
+                                this.state.info.freelanced_before === value
+                                    ? "active"
+                                    : ""
+                            }`}
+                            onClick={() =>
+                                this.updateFormData("freelanced_before", value)
+                            }
+                        >
+                            {label}
+                        </div>
+                    ))}
+                </div>
             </div>
         );
 
@@ -142,24 +143,18 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
             </div>
         );
 
-        const panels = [
-            HelloPanel,
-            FreelancedBefore,
-            ConfirmPanel,
-        ];
+        const panels = [HelloPanel, FreelanceExperience, ConfirmPanel];
 
         return (
             <div className="freelancer-details-container">
                 <div className="main-panel">
-                    {/*<h1 className="heading">{stepData[0].heading}</h1>*/}
                     <div className="contents">
-                        <div>
-                            <h2 className="name-title"> {stepData[step].heading} </h2>
-                        </div>
+                        <h2 className="name-title">{stepData[step].heading}</h2>
                         {panels[step] ?? <></>}
                     </div>
-                    <div className={step === 0 ? "button-left" : "button-right"}>
-
+                    <div
+                        className={step === 0 ? "button-left" : "button-right"}
+                    >
                         {step >= 1 && (
                             <button
                                 disabled={step < 1}
@@ -182,7 +177,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
                                 className="primary-btn in-dark w-button"
                                 onClick={this.onNext}
                             >
-                                {stepData[step].next ? `Next: ${stepData[step].next}` : "Next"}
+                                Next
                             </button>
                         )}
                     </div>
@@ -193,7 +188,7 @@ export class Freelancers extends React.Component<FreelancerProps, FreelancerStat
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-    ReactDOMClient.createRoot(document.getElementById("freelancer-details")!).render(
-        <Freelancers username={"STATIC ANN"}
-     /> )}
-);
+    ReactDOMClient.createRoot(
+        document.getElementById("freelancer-details")!
+    ).render(<Freelancers username={"STATIC ANN"} />);
+});

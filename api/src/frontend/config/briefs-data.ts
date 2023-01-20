@@ -20,7 +20,7 @@ export const stepData = [
   },
   {
     heading: "What skills do you require?",
-    content: `This helps your brief post stand out to the right candidates. 
+    content: `This helps your brief post stand out to the right candidates.
     It’s the first thing they’ll see, so make it count!`,
     next: "Scope",
     progress: 1.0,

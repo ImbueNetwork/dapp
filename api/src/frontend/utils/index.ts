@@ -9,8 +9,7 @@ export type BadRoute =
 
 
 export const redirect = (path: string) => {
-    window.history.pushState({}, "", `${config.context}${path}`);
-    window.dispatchEvent(new Event("popstate"));
+    window.location.replace(path);
 };
 
 

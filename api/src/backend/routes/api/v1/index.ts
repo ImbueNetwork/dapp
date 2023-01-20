@@ -5,6 +5,7 @@ import usersRouter from "./users";
 import briefsRouter from "./briefs";
 import config from "../../../config";
 import milestonesRouter from "./milestones"
+import freelancersRouter from "./freelancers"
 
 const router = express.Router();
 
@@ -23,4 +24,5 @@ router.use("/projects", projectsRouter);
 router.use("/users", usersRouter);
 router.use("/milestones",milestonesRouter)
 router.use("/briefs", briefsRouter);
+router.use("/freelancers", freelancersRouter);
 export default router;

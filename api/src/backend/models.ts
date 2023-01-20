@@ -287,19 +287,42 @@ export const getOrCreateFederatedUser = (
     });
 };
 
-export const searchBriefs = (
-    experience_id_high: number, experience_id_low: number, submitted_low: number, submitted_high: number,
-    length_low: number, length_high: number, max_hours_pw: number) => {
-        async (tx : Knex.Transaction) => {
 
+// The search briefs and all these lovely parameters.
+// Since we are using checkboxes only i unfortunatly ended up using all these parameters.
+// Because we could have multiple ranges of values and open ended ors.
+export const searchBriefs = (
+    experience_range: Array<number>, 
+    submitted_range: Array<number>, submitted_is_max: boolean,
+    length_range: Array<number>, length_is_max: number, 
+    max_hours_pw: number, hours_pw_is_max: boolean) => {
+        
+        // First we deal with the numbers they want.
+        async (tx : Knex.Transaction) => {
             tx.select()
                 .from<Brief>("briefs")
                 .join("experience", {'briefs.experience_id': "experience.id"})
                 .join("users", {"briefs.user_id": "users.id"})
-                .whereBetween("briefs_submitted", [submitted_low, submitted_high])
-                .whereBetween("duration", [length_low, length_high])
-                .whereBetween("hpw", [0, max_hours_pw])
-                .whereBetween("experience_id", [experience_id_high, experience_id_low])
+                .whereIn("experience_id", experience_range)
+                .where(function() {
+                    this.whereIn("briefs_submitted", submitted_range)
+                    if (submitted_is_max) {
+                        this.orWhere('briefs_submitted', '>=', Math.max(...submitted_range))
+                    }
+                  })
+                .where(function() {
+                    this.whereIn("duration", length_range)
+                    if (length_is_max) {
+                        this.orWhere('duration', '>=', Math.max(...length_range))
+                    }
+                  })
+                .where(function() {
+                    this.whereBetween("hours_per_week", [0, max_hours_pw]);
+                    if (hours_pw_is_max) {
+                        this.orWhere('hours_per_week', '>=', max_hours_pw)
+                    }
+                })
+        
     }        
 };
 

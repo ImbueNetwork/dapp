@@ -1,12 +1,19 @@
 import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
+import { useRef, useState, useEffect } from "react";
 
 import { Dialogue } from "./components/dialogue";
 import { AccountChoice } from "./components/accountChoice";
-
+import { User } from "./models";
 import { signWeb3Challenge } from "./utils/polkadot";
+import { fetchUserOrEmail } from "./utils";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
+import { TextField } from "@rmwc/textfield";
+import '@rmwc/textfield/styles';
+import * as config from "./config";
+import bcrypt from 'bcryptjs'
+import "../../public/registration.css"
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -17,9 +24,15 @@ const postAPIHeaders = {
   "content-type": "application/json",
 };
 
+
 type LoginProps = {};
 type LoginState = {
   showPolkadotAccounts: boolean;
+  creds: {
+    userOrEmail?: string
+    password?: string
+  },
+  errorMessage?: string
 };
 
 async function getAccountAndSign(account: InjectedAccountWithMeta) {
@@ -56,29 +69,70 @@ async function authorise(
   });
 
   if (resp.ok) {
-    const redirect =
-      new URLSearchParams(window.location.search).get("redirect") || "/dapp";
-    const isRelative =
-      new URL(document.baseURI).origin ===
-      new URL(redirect, document.baseURI).origin;
-    if (isRelative) {
-      location.replace(redirect);
-    } else {
-      location.replace("/dapp");
-    }
+    await redirectBack();
   } else {
     // TODO: UX for 401
   }
 }
 
+async function redirectBack() {
+  const redirect =
+    new URLSearchParams(window.location.search).get("redirect") || "/dapp";
+  const isRelative =
+    new URL(document.baseURI).origin ===
+    new URL(redirect, document.baseURI).origin;
+  if (isRelative) {
+    location.replace(redirect);
+  } else {
+    location.replace("/dapp");
+  }
+}
+
 class Login extends React.Component<LoginProps, LoginState> {
+
   state: LoginState = {
     showPolkadotAccounts: false,
+    creds: {
+      userOrEmail: undefined,
+      password: undefined
+    },
+    errorMessage: undefined
   };
 
   async clicked() {
     this.setState({ showPolkadotAccounts: true });
   }
+
+  async setCreds(name: string, value: string) {
+    this.setState({
+      ...this.state,
+      creds: {
+        ...this.state.creds,
+        [name]: value,
+      },
+    });
+  }
+
+  imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    this.setState({ errorMessage: undefined });
+    event.preventDefault();
+
+    const resp = await fetch(`/auth/imbue/`, {
+      headers: postAPIHeaders,
+      method: "post",
+      body: JSON.stringify({
+        userOrEmail: this.state.creds.userOrEmail,
+        password: this.state.creds.password,
+      }),
+    });
+
+    if (resp.ok) {
+      await redirectBack();
+    } else {
+      this.setState({ errorMessage: "incorrect username or password" });
+    }
+  }
+
 
   async accountSelected(account: InjectedAccountWithMeta) {
     const result = await getAccountAndSign(account);
@@ -99,25 +153,69 @@ class Login extends React.Component<LoginProps, LoginState> {
         <Dialogue
           title="You must be signed in to continue"
           content={<p>Please use the link below to sign in.</p>}
+
           actionList={
-            <li
-              className="mdc-deprecated-list-item"
-              tabIndex={0}
-              data-mdc-dialog-action="web3"
-            >
-              <span className="mdc-deprecated-list-item__graphic">
-                <img
-                  src="https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
-                  style={{ maxWidth: "100%" }}
-                />
-              </span>
-              <span
-                onClick={() => this.clicked()}
-                className="mdc-deprecated-list-item__text"
+            <div >
+              <form id="contribution-submission-form" name="contribution-submission-form" method="get" onSubmit={this.imbueLogin}>
+
+                <div className="login">
+                  <div>
+                    <TextField
+                      label="Email/Username"
+                      onChange={(e: any) => this.setCreds("userOrEmail", e.target.value)}
+                      outlined className="mdc-text-field" required />
+                  </div>
+                  <div>
+                    <TextField
+                      label="Password"
+                      onChange={(e: any) => this.setCreds("password", e.target.value)}
+                      type="password"
+                      outlined className="mdc-text-field" required />
+                  </div>
+
+                  <div>
+                    <span className={!this.state.errorMessage ? "hide" : "error"}>{this.state.errorMessage}</span>
+                  </div>
+                  <div>
+                    <button
+                      type="submit"
+                      // disabled={!this.state.creds.username && !this.state.creds.password}
+                      className="primary-btn in-dark confirm"
+                      id="sign-in">
+                      Sign In
+                    </button>
+                  </div>
+
+                  <div>
+                    <span>Don't have an account?</span><a href="/dapp/join" className="signup">Sign up</a>
+                    <span
+                      onClick={() => this.clicked()}
+                      className="mdc-deprecated-list-item__text"
+                    >
+                    </span>
+                  </div>
+                </div>
+
+              </form>
+              <li
+                className="mdc-deprecated-list-item"
+                tabIndex={0}
+                data-mdc-dialog-action="web3"
               >
-                {"Sign in with your polkadot{.js} extension"}
-              </span>
-            </li>
+                <span className="mdc-deprecated-list-item__graphic">
+                  <img
+                    src="https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
+                    style={{ maxWidth: "100%" }}
+                  />
+                </span>
+                <span
+                  onClick={() => this.clicked()}
+                  className="mdc-deprecated-list-item__text"
+                >
+                  {"Sign in with your polkadot{.js} extension"}
+                </span>
+              </li>
+            </div>
           }
         />
       );

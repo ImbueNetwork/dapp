@@ -8,8 +8,8 @@ module.exports = {
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
-        "new-brief": path.resolve(__dirname, "new-brief.tsx"),
         "freelancer": path.resolve(__dirname, "freelancer.tsx")
+        "join": path.resolve(__dirname, "join.tsx"),
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"
@@ -48,6 +48,11 @@ module.exports = {
         alias: {
             lib: path.resolve(__dirname, "lib"),
         },
+        fallback: {
+            "crypto": require.resolve("crypto-browserify"),
+            "stream": require.resolve("stream-browserify"),
+            "buffer": false,
+           },
     },
     output: {
         path: path.resolve(__dirname, "../../public/lib"),

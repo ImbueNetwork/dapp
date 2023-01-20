@@ -19,6 +19,9 @@ export type User = {
     id: number;
     display_name: string;
     web3Accounts: Web3Account[];
+    username: string;
+    email: string;
+    password: string;
 };
 
 export type ProposedMilestone = {
@@ -110,7 +113,11 @@ export const fetchUser = (id: number) =>
     (tx: Knex.Transaction) =>
         tx<User>("users").where({ id }).first();
 
-
+export const fetchUserOrEmail = (userOrEmail: string) =>
+    (tx: Knex.Transaction) =>
+        tx<User>("users").where({ username: userOrEmail })
+            .orWhere({ email: userOrEmail })
+            .first();
 
 export const upsertWeb3Challenge = (
     user: User,
@@ -155,6 +162,17 @@ export const insertUserByDisplayName = (displayName: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
             display_name: displayName
+        }).returning("*")
+    )[0];
+
+export const updateFederatedLoginUser = (user: User, username: string, email: string, password: string) =>
+    async (tx: Knex.Transaction) => (
+        await tx<User>("users").update({
+            username: username,
+            email: email,
+            password: password
+        }).where({
+            id: user.id
         }).returning("*")
     )[0];
 
@@ -221,22 +239,22 @@ export const fetchProjectMilestones = (id: string | number) =>
         tx<Milestone>("milestones").select().where({ project_id: id });
 
 export const updateMilestoneDetails = (id: string | number, milestoneId: string | number, details: string) => (tx: Knex.Transaction) =>
-        tx<MilestoneDetails>("milestone_details").where({ project_id: id}).where('index', '=', milestoneId).update('details',details).returning("*");
+    tx<MilestoneDetails>("milestone_details").where({ project_id: id }).where('index', '=', milestoneId).update('details', details).returning("*");
 
-export const insertMilestoneDetails = (value:MilestoneDetails) => async (tx: Knex.Transaction) => (await
+export const insertMilestoneDetails = (value: MilestoneDetails) => async (tx: Knex.Transaction) => (await
     tx<MilestoneDetails>("milestone_details").insert(value).returning("*"))[0];
 
 export const fetchAllMilestone = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<MilestoneDetails>("milestone_details").where('project_id','=',id);
+        tx<MilestoneDetails>("milestone_details").where('project_id', '=', id);
 
-export const fetchMilestoneByIndex = (projectId: string | number,milestoneId: string | number) =>
+export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId}).where('index', '=', milestoneId);
+        tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
 export const fetchAllBriefs = () =>
-(tx: Knex.Transaction) =>
-    tx<Brief>("briefs").whereNotNull('id').select();
+    (tx: Knex.Transaction) =>
+        tx<Brief>("briefs").whereNotNull('id').select();
 
 export const insertBrief = (brief: Brief) =>
     async (tx: Knex.Transaction) => (
@@ -294,7 +312,7 @@ export const getOrCreateFederatedUser = (
             done(null, user);
         } catch (err) {
             done(new Error(
-                "Failed to upsert federated authentication." 
+                "Failed to upsert federated authentication."
             ));
         }
     });

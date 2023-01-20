@@ -331,7 +331,7 @@ class ChainService {
         const rounds: any =
             await await this.imbueApi.imbue.api.query.imbueProposals.rounds.entries();
 
-        let roundKey = undefined;
+        let roundKey:number | undefined = undefined;
         for (var i = Object.keys(rounds).length - 1; i >= 0; i--) {
             const [id, round] = rounds[i];
             const readableRound = round.toHuman();

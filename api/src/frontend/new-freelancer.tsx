@@ -11,15 +11,7 @@ import { Freelancer, User } from "./models";
 import { TagsInput } from "./components/tagsInput";
 import * as utils from "./utils";
 import { FreelancerService } from "./services/freelancerService";
-
-const getAPIHeaders = {
-    accept: "application/json",
-};
-
-const postAPIHeaders = {
-    ...getAPIHeaders,
-    "content-type": "application/json",
-};
+import "../../public/new-freelancer.css"
 
 const freelancerService = new FreelancerService()
 
@@ -57,7 +49,7 @@ export class Freelancers extends React.Component<
         display_name: "freelancer"
     };
 
- constructor(props: FreelancerProps) {
+    constructor(props: FreelancerProps) {
         super(props);
     }
 
@@ -65,14 +57,16 @@ export class Freelancers extends React.Component<
     async componentDidMount() {
         const user: User = await utils.getCurrentUser();
         if (user) {
-            this.setState({ ...this.state, 
-                display_name: user.display_name, 
+            this.setState({
+                ...this.state,
+                display_name: user.display_name,
                 info: {
                     ...this.state.info,
                     user_id: user.id
-                } })
+                }
+            })
         }
-      }
+    }
 
     onBack = () => {
         const { step } = this.state;
@@ -86,7 +80,6 @@ export class Freelancers extends React.Component<
     };
 
     createProfile = (freelancer: Freelancer) => {
-        console.log("Final data",this.state);
         const { step } = this.state;
         step < stepData.length - 1 &&
             this.setState({ ...this.state, step: step + 1 });
@@ -132,8 +125,8 @@ export class Freelancers extends React.Component<
                         <div
                             key={index}
                             className={`freelance-xp-item ${this.state.info.freelanced_before === value
-                                    ? "active"
-                                    : ""
+                                ? "active"
+                                : ""
                                 }`}
                             onClick={() =>
                                 this.updateFormData("freelanced_before", value)
@@ -159,8 +152,8 @@ export class Freelancers extends React.Component<
                         <div
                             key={index}
                             className={`freelance-xp-item ${this.state.info.freelancing_goal === value
-                                    ? "active"
-                                    : ""
+                                ? "active"
+                                : ""
                                 }`}
                             onClick={() =>
                                 this.updateFormData("freelancing_goal", value)
@@ -186,8 +179,8 @@ export class Freelancers extends React.Component<
                         <div
                             key={index}
                             className={`freelance-xp-item ${this.state.info.resume === value
-                                    ? "active"
-                                    : ""
+                                ? "active"
+                                : ""
                                 }`}
                             onClick={() =>
                                 this.updateFormData("resume", value)
@@ -362,19 +355,19 @@ export class Freelancers extends React.Component<
                             </button>
                         ) : step === stepData.length - 1 ? (
                             <button
-                              className="primary-btn in-dark w-button"
-                              onClick={() => this.onDiscoverBriefs(this.state.info)}
+                                className="primary-btn in-dark w-button"
+                                onClick={() => this.onDiscoverBriefs(this.state.info)}
                             >
-                              Discover Briefs
+                                Discover Briefs
                             </button>
-                          ) :  step === stepData.length - 2 ? (
+                        ) : step === stepData.length - 2 ? (
                             <button
-                              className="primary-btn in-dark w-button"
-                              onClick={() => this.createProfile(this.state.info)}
+                                className="primary-btn in-dark w-button"
+                                onClick={() => this.createProfile(this.state.info)}
                             >
-                              Submit
+                                Submit
                             </button>
-                          ) : (
+                        ) : (
                             <button
                                 className="primary-btn in-dark w-button"
                                 onClick={this.onNext}
@@ -391,12 +384,14 @@ export class Freelancers extends React.Component<
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     const user = await utils.getCurrentUser();
-    if(!user) {
-      const returnUrl = `${window.location.href}`
-      const redirectUrl = `login`
-      utils.redirect(redirectUrl, returnUrl);
+    if (!user) {
+        const returnUrl = `${window.location.href}`
+        const redirectUrl = `login`
+        utils.redirect(redirectUrl, returnUrl);
     }
 
+    //TODO If the current user has a freelancer profile, forward to their profile
+    
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!
     ).render(<Freelancers username={"STATIC ANN"} />);

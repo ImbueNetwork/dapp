@@ -16,6 +16,8 @@ import {
 } from "./config/briefs-data";
 import * as config from "./config";
 import { User } from "./models";
+import "../../public/new-brief.css"
+
 
 const getAPIHeaders = {
   accept: "application/json",

@@ -45,7 +45,7 @@ router.get("/googlelogin", (req, res) => {
 });
 
 router.get("/freelancers/new", (req, res) => {
-    res.render("freelancer");
+    res.render("new-freelancer");
 });
 
 router.use((_req, res, next) => {

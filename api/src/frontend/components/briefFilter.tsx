@@ -18,6 +18,7 @@ export class BriefFilter extends React.Component<BriefFilterProps> {
                 {this.props.filter_options.map(({value, interiorIndex}) => (
                     <div
                         className="filter-option"
+                        key={value}
                     >
                         <input type="checkbox" className="filtercheckbox" id={this.props.filter_type.toString() + "-" + interiorIndex} />
                         <label>{value}</label>

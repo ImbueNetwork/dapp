@@ -10,6 +10,8 @@ export async function seed(knex: Knex): Promise<void> {
             { status: "submitted" },
             { status: "finalized" },
         ]);
+        
+        
     } catch (e) {
         //
     }

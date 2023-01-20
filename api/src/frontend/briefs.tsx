@@ -13,13 +13,14 @@ const postAPIHeaders = {
 };
 
 type BriefItem = {
-    title: string;
-    xpLevel: string;
-    length: string;
-    posted: string;
+    headline: string;
+    experience_level: string;
+    duration: string;
+    user: string;
     description: string;
-    tags: string[];
-    proposals: string;
+    skills: string;
+    briefs_submitted: number;
+    created: string;
 };
 
 export type FilterOption = {
@@ -223,9 +224,13 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     
     constructor(props: BriefProps) {
         super(props);
-        getAllBriefs().then((briefs) => {
-            this.setState({ briefs: briefs });
-          });
+        this.state = ({briefs: []});
+    }
+
+    async componentDidMount() {
+        let data = await getAllBriefs();
+        console.log(data);
+        this.setState({ briefs: data});
     }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
@@ -308,11 +313,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             <div className="search-briefs-container">
                 <div className="filter-panel">
                     <div className="filter-heading">Filter By</div>
-                    // todo, put into a componant and spawn each of the filters
                     <BriefFilter label={this.expfilter.label} filter_type={BriefFilterOption.ExpLevel} filter_options={this.expfilter.options}></BriefFilter>
-                    <BriefFilter label={this.submittedFilters.label} filter_type={BriefFilterOption.AmountSubmitted} filter_options={this.expfilter.options}></BriefFilter>
-                    <BriefFilter label={this.lengthFilters.label} filter_type={BriefFilterOption.Length} filter_options={this.expfilter.options}></BriefFilter>
-                    <BriefFilter label={this.hoursPwFilter.label} filter_type={BriefFilterOption.HoursPerWeek} filter_options={this.expfilter.options}></BriefFilter>
+                    <BriefFilter label={this.submittedFilters.label} filter_type={BriefFilterOption.AmountSubmitted} filter_options={this.submittedFilters.options}></BriefFilter>
+                    <BriefFilter label={this.lengthFilters.label} filter_type={BriefFilterOption.Length} filter_options={this.lengthFilters.options}></BriefFilter>
+                    <BriefFilter label={this.hoursPwFilter.label} filter_type={BriefFilterOption.HoursPerWeek} filter_options={this.hoursPwFilter.options}></BriefFilter>
                 </div>
                 <div className="briefs-section">
                     <div className="briefs-heading">
@@ -336,29 +340,29 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     <div className="briefs-list">
                         {this.state.briefs.map((item, itemIndex) => (
                             <div className="brief-item" key={itemIndex}>
-                                <div className="brief-title">{item.title}</div>
+                                <div className="brief-title">{item.headline}</div>
                                 <div className="brief-time-info">
-                                    {`${item.xpLevel}, Est. Time: ${item.length}. Posted ${item.posted}`}
+                                    {`${item.experience_level}, Est. Time: ${item.duration}. Posted ${item.created}`}
                                 </div>
                                 <div className="brief-description">
                                     {item.description}
                                 </div>
                                 <div className="brief-tags">
-                                    {item.tags.map((tag, tagIndex) => (
+                                    {/* {item.skills.map((skill: any, skillIndex: any) => (
                                         <div
                                             className="tag-item"
-                                            key={tagIndex}
+                                            key={skillIndex}
                                         >
-                                            {tag}
+                                            {skill}
                                         </div>
-                                    ))}
+                                    ))} */}
                                 </div>
                                 <div className="brief-proposals">
                                     <span className="proposals-heading">
                                         Proposals Submitted:{" "}
                                     </span>
                                     <span className="proposals-count">
-                                        {item.proposals}
+                                        {item.briefs_submitted}
                                     </span>
                                 </div>
                             </div>

@@ -94,11 +94,12 @@ export enum BriefFilterOption {
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
 
-    // IF YOU REORDER THESE IT WILL BREAK.
-    // to add a new filter add to the enum BriefFilterOption, add to the bottom of the list with the correct index
+
+    // The thing with this implentation is that the interior order must stay totally ordered.
+    // The interior index is used to specify which entry will be used in the search brief.
+    // This is not a good implementation but im afraid if we filter and find itll be slow.
+    // I can change this on request: felix
     expfilter = {
-            // Keys should never be strings, strings are slow. 
-            // I can read and match agains enums, much easier.
             // This is a table named "experience"
             // If you change this you must remigrate the experience table and add the new field.
             filterType: BriefFilterOption.ExpLevel,
@@ -157,7 +158,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             ],
         }
         
-        submittedFilters = 
+        lengthFilters = 
         {
             // Should be a field in the database, WILL BE IN DAYS.
             // Again i need the high and low values.
@@ -236,6 +237,12 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     
         // The filter initially should return all values
         let is_search: boolean = false;
+        let exp_range: Array<number> = [];
+        let submitted_range: Array<number> = [];
+        let length_range: Array<number> = [];
+        // default is max
+        let hpw_max: number = 50;
+
 
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].checked) {
@@ -243,12 +250,20 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 let id = elements[i].getAttribute("id");
                 if (id != null) {
                     let [filterType, interiorIndex] = id.split("-");
+<<<<<<< HEAD
                     let filter_index = parseInt(filterType)
                     // Here we are trying to build teh paramaters required to buidl the
                     // model searchBriefs
+=======
+                    // Here we are trying to build teh paramaters required to build the query
+                    // We build an array for each to get the values we want,
+                    // and also specify if we want more than using the is_max field. 
+                    let parsed_index = parseInt(interiorIndex)
+>>>>>>> 028a6a2 (need to pull)
                     switch(parseInt(filterType)) {
                         case BriefFilterOption.ExpLevel:
-                            // get lowest an highes where 
+                            let option = this.expfilter.options[parsed_index]
+
 
                         case BriefFilterOption.AmountSubmitted:
                         
@@ -263,7 +278,14 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             }
         }
 
+
+        if (is_search) {
         // Search briefs
+
+        } else {
+            // call get all
+        }
+
         //update state with new list.
     };
 

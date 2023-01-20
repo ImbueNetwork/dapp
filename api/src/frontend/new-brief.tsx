@@ -307,7 +307,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 document.addEventListener("DOMContentLoaded", async (event) => {
   const userIsLoggedIn = await getCurrentUser();
   if(!userIsLoggedIn) {
-    const redirectUrl = `/login?redirect=${window.location.href}`
+    const redirectUrl = `/dapp/login?redirect=${window.location.href}`
     redirect(redirectUrl);
   }
 

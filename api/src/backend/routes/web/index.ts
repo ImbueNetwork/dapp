@@ -28,6 +28,11 @@ router.get("/projects/:projectId", (req, res) => {
     res.render("details")
 });
 
+
+router.get("/briefs", (req, res) => {
+    res.render("briefs");
+});
+
 router.get("/briefs/new", (req, res) => {
     res.render("new-brief");
 });

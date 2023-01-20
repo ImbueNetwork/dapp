@@ -353,7 +353,7 @@ export const searchBriefs = (
 export const searchBriefs = (
     experience_range: Array<number>, 
     submitted_range: Array<number>, submitted_is_max: boolean,
-    length_range: Array<number>, length_is_max: number, 
+    length_range: Array<number>, length_is_max: boolean, 
     max_hours_pw: number, hours_pw_is_max: boolean) => {
         
         async (tx : Knex.Transaction) => {

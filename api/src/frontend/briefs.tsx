@@ -32,7 +32,7 @@ type Range = {
 }
 
 type BriefFilter = {
-    experience_id: Range,
+    experience: Range,
     hours_pw: Range,
     submitted_briefs: Range,
     brief_length: Range,
@@ -49,11 +49,15 @@ type BriefItem = {
 };
 
 
-const callSearchBriefs = async (filter: BriefFilter) => {
+const callSearchBriefs = async (
+    experience_range: Array<number>, 
+    submitted_range: Array<number>, submitted_is_max: boolean,
+    length_range: Array<number>, length_is_max: boolean, 
+    max_hours_pw: number, hours_pw_is_max: boolean) => {
     const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: postAPIHeaders,
         method: "post",
-        body: JSON.stringify(filter),
+        body: JSON.stringify(experience_range, submitted_range, submitted_is_max, length_is_max, length_range, max_hours_pw, hours_pw_is_max),
     });
 
     if (resp.ok) {
@@ -99,6 +103,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     // The interior index is used to specify which entry will be used in the search brief.
     // This is not a good implementation but im afraid if we filter and find itll be slow.
     // I can change this on request: felix
+    
+
     expfilter = {
             // This is a table named "experience"
             // If you change this you must remigrate the experience table and add the new field.
@@ -107,19 +113,28 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             options: [
                 {
                     interiorIndex: 0,
+                    search_for: [0],
                     value: "Entry Level",
+                    or_max: false,
+
                 },
                 {
                     interiorIndex: 1,
+                    search_for: [1],
                     value: "Intermediate",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 2,
+                    search_for: [2],
                     value: "Expert",
+                    or_max: false,
                 },
                 {
                     interiorIndex: 3,
+                    search_for: [3],
                     value: "Specialist",
+                    or_max: false,
                 },
             ],
         }
@@ -204,22 +219,23 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 },
             ],
         }
-        hoursPwFilter = {
+        hoursPwFilter: any = {
             filterType: BriefFilterOption.HoursPerWeek,
             label: "Hours Per Week",
             options: [
                 {
                     interiorIndex: 0,
-                    search_for: Array.from({length: 30}, (_, i) => (i) + 1),
+                    // This will be 0-30 as we actually use this as max value
+                    search_for: [30],
                     or_max: false,
                     value: "30hrs/week",
                 },
                 {
-                    low: 0,
-                    search_for: Array.from({length: 50}, (_, i) => (i) + 1),
-                    high: 50,
                     interiorIndex: 1,
+                    // Same goes for this
+                    search_for: [50],
                     value: "50hrs/week",
+                    or_max: true,
                 },
             ],
         }
@@ -232,16 +248,23 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
-    onSearch = () => {
+    onSearch = async ()  =>  {
         let elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
     
         // The filter initially should return all values
         let is_search: boolean = false;
+        
         let exp_range: Array<number> = [];
+        
         let submitted_range: Array<number> = [];
+        let submitted_is_max: boolean = false
+        
         let length_range: Array<number> = [];
+        let length_is_max: boolean = false
+        
         // default is max
         let hpw_max: number = 50;
+        let hpw_is_max: boolean = false;
 
 
         for (let i = 0; i < elements.length; i++) {
@@ -250,26 +273,31 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 let id = elements[i].getAttribute("id");
                 if (id != null) {
                     let [filterType, interiorIndex] = id.split("-");
-<<<<<<< HEAD
-                    let filter_index = parseInt(filterType)
-                    // Here we are trying to build teh paramaters required to buidl the
-                    // model searchBriefs
-=======
                     // Here we are trying to build teh paramaters required to build the query
-                    // We build an array for each to get the values we want,
+                    // We build an array for each to get the values we want through concat.
                     // and also specify if we want more than using the is_max field. 
                     let parsed_index = parseInt(interiorIndex)
->>>>>>> 028a6a2 (need to pull)
                     switch(parseInt(filterType)) {
                         case BriefFilterOption.ExpLevel:
-                            let option = this.expfilter.options[parsed_index]
-
-
+                            let o = this.expfilter.options[parsed_index];    
+                            exp_range.concat(o.search_for);
+                       
                         case BriefFilterOption.AmountSubmitted:
-                        
+                            let o1 = this.submittedFilters.options[parsed_index];
+                            submitted_range.concat(o1.search_for);
+                            submitted_is_max = o1.or_max; 
+
                         case BriefFilterOption.Length:
+                            let o2 = this.lengthFilters.options[parsed_index]
+                            length_range.concat(o2.search_for);
+                            length_is_max = o2.or_max;
                         
                         case BriefFilterOption.HoursPerWeek:
+                            let o3 = this.hoursPwFilter.options[parsed_index];
+                            if (o3.search_for[0] > hpw_max) {
+                                hpw_max = o3.search_for[0];
+                            }
+                            hpw_is_max = o3.or_max; 
                         
                         default:
                             console.log("Invalid filter option selected or unimplemented.");
@@ -278,15 +306,16 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             }
         }
 
-
         if (is_search) {
-        // Search briefs
+            let briefs = await callSearchBriefs(
+                exp_range, submitted_range, submitted_is_max, length_range, length_is_max, hpw_max, hpw_is_max 
+            )
+            this.setState({ briefs: briefs });
 
         } else {
-            // call get all
+            let briefs = await getAllBriefs()
+            this.setState({ briefs: briefs });
         }
-
-        //update state with new list.
     };
 
     onSavedBriefs = () => {
@@ -298,6 +327,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             <div className="search-briefs-container">
                 <div className="filter-panel">
                     <div className="filter-heading">Filter By</div>
+                    // todo, put into a componant and spawn each of the filters
                     {this.filters.map(({ label, options, filterType }) => (
                         <div className="filter-section" key={filterType}>
                             <div className="filter-label">{label}</div>

@@ -1,21 +1,7 @@
-import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import { Option } from "./components/option";
-import { ProgressBar } from "./components/progressBar";
-import { TagsInput } from "./components/tagsInput";
-import { TextInput } from "./components/textInput";
-import {
-    stepData,
-    scopeData,
-    timeData,
-    nameExamples,
-    suggestedIndustries,
-    suggestedSkills,
-} from "./config/briefs-data";
 import * as config from "./config";
-import { lchown } from "fs";
-import e from "express";
+import BriefFilter from "./components/briefFilter";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -25,18 +11,6 @@ const postAPIHeaders = {
     ...getAPIHeaders,
     "content-type": "application/json",
 };
-
-type Range = {
-    whereIn: Array<number>,
-    or_max: boolean,
-}
-
-type BriefFilter = {
-    experience: Range,
-    hours_pw: Range,
-    submitted_briefs: Range,
-    brief_length: Range,
-}
 
 type BriefItem = {
     title: string;
@@ -48,6 +22,13 @@ type BriefItem = {
     proposals: string;
 };
 
+export type FilterOption = {
+    interiorIndex: number;
+    search_for: Array<number>;
+    or_max: boolean;
+    value: string;
+};
+
 
 const callSearchBriefs = async (
     experience_range: Array<number>, 
@@ -57,7 +38,7 @@ const callSearchBriefs = async (
     const resp = await fetch(`${config.apiBase}/briefs/`, {
         headers: postAPIHeaders,
         method: "post",
-        body: JSON.stringify(experience_range, submitted_range, submitted_is_max, length_is_max, length_range, max_hours_pw, hours_pw_is_max),
+        body: JSON.stringify({experience_range, submitted_range, submitted_is_max, length_is_max, length_range, max_hours_pw, hours_pw_is_max}),
     });
 
     if (resp.ok) {
@@ -328,22 +309,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 <div className="filter-panel">
                     <div className="filter-heading">Filter By</div>
                     // todo, put into a componant and spawn each of the filters
-                    {this.filters.map(({ label, options, filterType }) => (
-                        <div className="filter-section" key={filterType}>
-                            <div className="filter-label">{label}</div>
-                            <div className="filter-option-list">
-                                {options.map(({value, interiorIndex}) => (
-                                    <div
-                                        className="filter-option"
-                                        key={interiorIndex}
-                                    >
-                                        <input type="checkbox" className="filtercheckbox" id={filterType.toString() + "-" + interiorIndex} />
-                                        <label>{value}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
+                    <BriefFilter label={this.expfilter.label} filter_type={BriefFilterOption.ExpLevel} filter_options={this.expfilter.options}></BriefFilter>
+                    <BriefFilter label={this.submittedFilters.label} filter_type={BriefFilterOption.AmountSubmitted} filter_options={this.expfilter.options}></BriefFilter>
+                    <BriefFilter label={this.lengthFilters.label} filter_type={BriefFilterOption.Length} filter_options={this.expfilter.options}></BriefFilter>
+                    <BriefFilter label={this.hoursPwFilter.label} filter_type={BriefFilterOption.HoursPerWeek} filter_options={this.expfilter.options}></BriefFilter>
                 </div>
                 <div className="briefs-section">
                     <div className="briefs-heading">

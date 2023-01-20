@@ -16,8 +16,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("languages");
         builder.text("bio");
         builder.text("services_offer");
-        // builder.integer("budget");
-        builder.string("user_id");
+        builder.integer("user_id");
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, tableName));
 }

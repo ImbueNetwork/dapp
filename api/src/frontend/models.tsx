@@ -112,5 +112,5 @@ export type Freelancer = {
     languages: string[];
     services_offer: string[];
     bio: string;
-    user_id?: string | number;
+    user_id?: number;
 };

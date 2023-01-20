@@ -15,6 +15,7 @@ import {
   suggestedSkills,
 } from "./config/briefs-data";
 import * as config from "./config";
+import { User } from "./models";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -40,6 +41,7 @@ export type BriefInfo = {
   duration: string;
   skills: string[];
   budget: number | undefined;
+  user_id: number | undefined;
 };
 
 async function invokeBriefAPI(brief: BriefInfo) {
@@ -67,10 +69,24 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
       duration: "",
       skills: [],
       budget: undefined,
+      user_id: undefined
     },
   };
+  
   constructor(props: BriefProps) {
     super(props);
+  }
+
+
+  async componentDidMount() {
+    const user: User = await utils.getCurrentUser();
+    if (user) {
+        this.setState({ ...this.state,
+            info: {
+                ...this.state.info,
+                user_id: user.id
+            } })
+    }
   }
 
   onBack = () => {

@@ -51,7 +51,7 @@ export class Freelancers extends React.Component<
             languages: [],
             services_offer: [],
             bio: "",
-            user_id: "",
+            user_id: undefined,
         },
         step: 0,
         display_name: "freelancer"
@@ -65,7 +65,12 @@ export class Freelancers extends React.Component<
     async componentDidMount() {
         const user: User = await utils.getCurrentUser();
         if (user) {
-            this.setState({ ...this.state, display_name: user.display_name })
+            this.setState({ ...this.state, 
+                display_name: user.display_name, 
+                info: {
+                    ...this.state.info,
+                    user_id: user.id
+                } })
         }
       }
 

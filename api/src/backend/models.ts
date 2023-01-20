@@ -115,8 +115,8 @@ export const fetchUser = (id: number) =>
 
 export const fetchUserOrEmail = (userOrEmail: string) =>
     (tx: Knex.Transaction) =>
-        tx<User>("users").where({ username: userOrEmail })
-            .orWhere({ email: userOrEmail })
+        tx<User>("users").where({ username: userOrEmail.toLowerCase() })
+            .orWhere({ email: userOrEmail.toLowerCase() })
             .first();
 
 export const upsertWeb3Challenge = (
@@ -168,8 +168,8 @@ export const insertUserByDisplayName = (displayName: string) =>
 export const updateFederatedLoginUser = (user: User, username: string, email: string, password: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").update({
-            username: username,
-            email: email,
+            username: username.toLowerCase(),
+            email: email.toLowerCase(),
             password: password
         }).where({
             id: user.id

@@ -1,6 +1,6 @@
 import express from "express";
 import type { Session } from "express-session";
-import passport from "passport";
+import passport, { use } from "passport";
 import { getOrCreateFederatedUser, updateFederatedLoginUser, User } from "../../../models";
 import config from "../../../config";
 import db from "../../../db";
@@ -37,12 +37,17 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
         password
     } = req.body;
 
+
     db.transaction(async tx => {
         try {
             const user = await models.fetchUserOrEmail(userOrEmail)(tx);
+            console.log("****** userorEmail is ", userOrEmail.toLowerCase());
+            console.log("****** user is ", user);
+
             if (!user) {
                 return res.status(404).end();
             }
+            console.log("****** user is ", user);
             const loginSuccessful = await bcrypt.compare(password, user.password)
             if (!loginSuccessful) {
                 return res.status(404).end();
@@ -98,7 +103,7 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
 
                 db.transaction(async tx => {
                     try {
-                        const updatedUser = await updateFederatedLoginUser(
+                        await updateFederatedLoginUser(
                             user, username, email, password
                         )(tx);
 
@@ -121,8 +126,8 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
 
             getOrCreateFederatedUser(
                 "Imbue Network",
-                email,
-                username,
+                email.toLowerCase(),
+                username.toLowerCase(),
                 updateUserDetails);
         }
 

@@ -58,7 +58,7 @@ export const scopeData = [
     label: "Complex",
     value: "complex",
     description:
-      "A long term project with complex initiatives,  intersecting tasks and numeroous teams.",
+      "A long term project with complex initiatives, intersecting tasks and numerous teams.",
   },
   {
     label: "Large",

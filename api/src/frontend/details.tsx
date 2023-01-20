@@ -174,7 +174,7 @@ class Details extends React.Component<DetailsProps, DetailsState> {
         if (this.props.projectId) {
             const project: ProjectOnChain = await this.props.chainService.getProject(this.props.projectId);
             if (!project) {
-                utils.redirect("/not-found");
+                utils.redirect("not-found");
                 location.reload();
                 return;
             }

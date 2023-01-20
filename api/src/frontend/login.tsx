@@ -14,6 +14,7 @@ import '@rmwc/textfield/styles';
 import * as config from "./config";
 import bcrypt from 'bcryptjs'
 import "../../public/registration.css"
+import * as utils from "./utils"
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -69,22 +70,9 @@ async function authorise(
   });
 
   if (resp.ok) {
-    await redirectBack();
+    await utils.redirectBack();
   } else {
     // TODO: UX for 401
-  }
-}
-
-async function redirectBack() {
-  const redirect =
-    new URLSearchParams(window.location.search).get("redirect") || "/dapp";
-  const isRelative =
-    new URL(document.baseURI).origin ===
-    new URL(redirect, document.baseURI).origin;
-  if (isRelative) {
-    location.replace(redirect);
-  } else {
-    location.replace("/dapp");
   }
 }
 
@@ -127,7 +115,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     });
 
     if (resp.ok) {
-      await redirectBack();
+      await utils.redirectBack();
     } else {
       this.setState({ errorMessage: "incorrect username or password" });
     }
@@ -187,7 +175,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                   </div>
 
                   <div>
-                    <span>Don't have an account?</span><a href="/dapp/join" className="signup">Sign up</a>
+                    <span>Don't have an account?</span><a href="#" onClick={() => utils.redirect("join", )} className="signup">Sign up</a>
                     <span
                       onClick={() => this.clicked()}
                       className="mdc-deprecated-list-item__text"

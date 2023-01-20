@@ -7,7 +7,7 @@ import {
     importInformation,
     suggestedFreelancingSkills, suggestedServices, suggestedLanguages,
 } from "./config/freelancer-data";
-import { Freelancer } from "./models";
+import { Freelancer, User } from "./models";
 import { TagsInput } from "./components/tagsInput";
 import * as utils from "./utils";
 import { FreelancerService } from "./services/freelancerService";
@@ -30,6 +30,7 @@ export type FreelancerProps = {
 export type FreelancerState = {
     step: number;
     info: Freelancer;
+    display_name: string;
 };
 
 export class Freelancers extends React.Component<
@@ -53,11 +54,20 @@ export class Freelancers extends React.Component<
             user_id: "",
         },
         step: 0,
+        display_name: "freelancer"
     };
 
-constructor(props: FreelancerProps) {
+ constructor(props: FreelancerProps) {
         super(props);
     }
+
+
+    async componentDidMount() {
+        const user: User = await utils.getCurrentUser();
+        if (user) {
+            this.setState({ ...this.state, display_name: user.display_name })
+        }
+      }
 
     onBack = () => {
         const { step } = this.state;
@@ -79,7 +89,7 @@ constructor(props: FreelancerProps) {
     };
 
     onDiscoverBriefs = (freelancer: Freelancer) => {
-        utils.redirect("/dapp/briefs");
+        utils.redirect("briefs");
     };
 
     updateFormData = (name: string, value: string | number | string[]) => {
@@ -322,7 +332,7 @@ constructor(props: FreelancerProps) {
             <div className="freelancer-details-container">
                 <div className="main-panel">
                     <div className="contents">
-                        <h2 className="name-title">{stepData[step].heading}</h2>
+                        <h2 className="name-title">{stepData[step].heading.replace("{name}", this.state.display_name)}</h2>
                         {panels[step] ?? <></>}
                     </div>
                     <div
@@ -374,7 +384,14 @@ constructor(props: FreelancerProps) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener("DOMContentLoaded", async (event) => {
+    const user = await utils.getCurrentUser();
+    if(!user) {
+      const returnUrl = `${window.location.href}`
+      const redirectUrl = `login`
+      utils.redirect(redirectUrl, returnUrl);
+    }
+
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!
     ).render(<Freelancers username={"STATIC ANN"} />);

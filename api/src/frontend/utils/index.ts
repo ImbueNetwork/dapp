@@ -8,14 +8,37 @@ export type BadRoute =
     | "bad-route";
 
 
-export const redirect = (path: string) => {
-    window.location.replace(path);
+export function redirect(path: string, returnUrl?: string) {
+    if (returnUrl) {
+       let redirect = new URL(`${window.location.origin}/dapp/${path}?redirect=${returnUrl}`);
+        window.location.replace(redirect);
+    } else {
+        let redirect = new URL(`${window.location.origin}/dapp/${path}`);
+        redirect.search = window.location.search;
+        window.location.replace(redirect);
+    }
 };
 
+
+export async function redirectBack() {
+    const redirect =
+      new URLSearchParams(window.location.search).get("redirect") || "/dapp";
+    const isRelative =
+      new URL(document.baseURI).origin ===
+      new URL(redirect, document.baseURI).origin;
+
+    if (isRelative) {
+      location.replace(redirect);
+    } else {
+      location.replace("/dapp");
+    }
+}
 
 export const validProjectId = (candidate: any) => {
     return !!Number(String(candidate));
 }
+
+
 
 
 export const getCurrentUser = async () => {

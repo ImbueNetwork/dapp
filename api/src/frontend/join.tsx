@@ -6,6 +6,7 @@ import '@rmwc/textfield/styles';
 import "../../public/registration.css"
 import bcrypt from 'bcryptjs'
 import * as config from "./config";
+import * as utils from "./utils"
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -21,12 +22,13 @@ function Join() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [matchPassword, setMatchPassword] = useState('');
+    const [error, setError] = useState('');
+
     const salt = bcrypt.genSaltSync(10)
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const hashedPassword = bcrypt.hashSync(password, salt);
-        console.log(hashedPassword);
 
         var body = {
             username: user,
@@ -40,20 +42,21 @@ function Join() {
             body: JSON.stringify(body),
         });
 
-        console.log("resp is");
-        console.log(resp);
         if (resp.ok) {
-            //TODO redirect to next page
+            await utils.redirectBack();
+        } else {
+            const error = await resp.json();
+            setError(error);
         }
     }
 
     return (
-        <form id="contribution-submission-form" name="contribution-submission-form" method="get" onSubmit={handleSubmit}>
 
+        <form id="contribution-submission-form" name="contribution-submission-form" method="get" onSubmit={handleSubmit}>
             <div id="registration-form" className='registration-container'>
 
                 <div className="contents">
-                    <div><h1>Sign Up To Imbue Enterprise</h1></div>
+                    <div><h1>Sign up</h1></div>
 
                     <div>
                         <TextField
@@ -90,6 +93,9 @@ function Join() {
                             helpText={password != matchPassword ? "Please match password" : ""}
                             type="password"
                             outlined className="mdc-text-field" required />
+                    </div>
+                    <div>
+                        <span className={!error ? "hide" : "error"}>{error}</span>
                     </div>
                     <div>
                         <button

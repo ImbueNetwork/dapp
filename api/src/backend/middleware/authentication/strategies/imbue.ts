@@ -75,42 +75,57 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
         password
     } = req.body;
 
-    let updateUserDetails = async (err: Error, user: User) => {
-        if (err) {
-            next(err);
-        }
 
-        if (!user) {
-            next(new Error("No user provided."));
-        }
+    ensureParams(req.body, next, ["username", "email", "password"]);
 
-        db.transaction(async tx => {
-            try {
-                const updatedUser = await updateFederatedLoginUser(
-                    user, username, email, password
-                )(tx);
 
-                const payload = { id: user.id };
-                const token = jwt.sign(payload, jwtOptions.secretOrKey);
-                res.cookie("access_token", token, {
-                    secure: config.environment !== "development",
-                    httpOnly: true
+    db.transaction(async tx => {
+        const usernameExists = await models.fetchUserOrEmail(username)(tx);
+        const emailExists = await models.fetchUserOrEmail(email)(tx);
+        if (usernameExists) {
+            return res.status(409).send(JSON.stringify('Username already exists.'));
+        } else if (emailExists) {
+            return res.status(409).send(JSON.stringify('Email already exists.'));
+        } else {
+            let updateUserDetails = async (err: Error, user: User) => {
+                if (err) {
+                    next(err);
+                }
+
+                if (!user) {
+                    next(new Error("No user provided."));
+                }
+
+                db.transaction(async tx => {
+                    try {
+                        const updatedUser = await updateFederatedLoginUser(
+                            user, username, email, password
+                        )(tx);
+
+                        const payload = { id: user.id };
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey);
+                        res.cookie("access_token", token, {
+                            secure: config.environment !== "development",
+                            httpOnly: true
+                        });
+                        res.send({ id: user.id, display_name: user.display_name });
+                    } catch (e) {
+                        tx.rollback();
+                        next(new Error(
+                            `Unable to upsert details for user: ${username}`,
+                            { cause: e as Error }
+                        ));
+                    }
                 });
-                res.send({id: user.id, display_name: user.display_name});
-            } catch (e) {
-                tx.rollback();
-                next(new Error(
-                    `Unable to upsert details for user: ${username}`,
-                    { cause: e as Error }
-                ));
-            }
-        });
-    };
+            };
 
-    getOrCreateFederatedUser(
-        "Imbue Network",
-        email,
-        username,
-        updateUserDetails);
+            getOrCreateFederatedUser(
+                "Imbue Network",
+                email,
+                username,
+                updateUserDetails);
+        }
+
+    });
 
 });

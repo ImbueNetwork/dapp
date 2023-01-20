@@ -5,7 +5,7 @@ import { Option } from "./components/option";
 import { ProgressBar } from "./components/progressBar";
 import { TagsInput } from "./components/tagsInput";
 import { TextInput } from "./components/textInput";
-import { getCurrentUser, redirect } from "./utils";
+import * as utils from "./utils";
 import {
   stepData,
   scopeData,
@@ -305,10 +305,11 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-  const userIsLoggedIn = await getCurrentUser();
-  if(!userIsLoggedIn) {
-    const redirectUrl = `/dapp/login?redirect=${window.location.href}`
-    redirect(redirectUrl);
+  const user = await utils.getCurrentUser();
+  if(!user) {
+    const returnUrl = `${window.location.href}`
+    const redirectUrl = `login`
+    utils.redirect(redirectUrl, returnUrl);
   }
 
   ReactDOMClient.createRoot(document.getElementById("brief-details")!).render(

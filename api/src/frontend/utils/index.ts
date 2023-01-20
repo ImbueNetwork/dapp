@@ -48,6 +48,17 @@ export const fetchProject = async (projectId: string | number | null) => {
     }
 }
 
+export const fetchUserOrEmail = async (userOrEmail: string) => {
+    const resp = await fetch(
+        `${config.apiBase}/users/${userOrEmail}`,
+        { headers: config.getAPIHeaders }
+    );
+    if (resp.ok) {
+        const user = await resp.json();
+        return user;
+    }
+}
+
 export const badRouteEvent = (type: BadRoute) => new CustomEvent(
     config.event.badRoute,
     {

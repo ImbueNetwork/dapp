@@ -89,6 +89,8 @@ export type User = {
     id: number;
     display_name: string;
     web3Accounts: Web3Account[];
+    username?: string;
+    password?: string;
 };
 
 export interface BasicTxResponse {

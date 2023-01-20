@@ -58,9 +58,14 @@ html
                                 span() Create A Proposal
 
                         li(class="menu-item" id="menu-item__account-dashboard")
+                            a(href="/dapp/briefs/new" title="Submit a brief")
+                                i(class="material-icons" aria-hidden="true") work
+                                span() Submit A Brief
+
+                        li(class="menu-item" id="menu-item__account-dashboard")
                             a(href="/dapp/proposals" title="Discover")
                                 i(class="material-icons" aria-hidden="true") search
-                                span() Discover
+                                span() Discover Proposals
 
                         li(class="menu-item" id="menu-item__account-dashboard")
                             a(href="/dapp/relay" title="Transfer Funds")
@@ -68,15 +73,34 @@ html
                                 span() Transfer Funds
 
                         li(class="menu-item" id="menu-item__account-dashboard")
-                            a(href="/dapp/logout" title="Log out")
+                            a(href="/logout" id="sign-in-href" title="Sign out")
                                 i(class="material-icons" aria-hidden="true") logout
-                                span() Log out
+                                span(id="sign-in-title") Sign out
+
 
             main(id="content-root" class="padded")
                 block content
-        script(type='text/javascript').
+        script(async, defer, type='text/javascript').
+            const protocol = location.protocol;
+            const slashes = protocol.concat("//");
+            const userInfoApiUrl = slashes.concat(window.location.host).concat("/api/v1/user");
+
+            const request = new XMLHttpRequest();
+            request.open('GET', userInfoApiUrl, false);  // `false` makes the request synchronous
+            request.send(null);
+            const userIsLoggedIn = request.status == 200;
+
+            if(!userIsLoggedIn) {
+                const signInHref =  document.getElementById("sign-in-href")
+                const signInTitle =  document.getElementById("sign-in-title")
+                const currentUrl = window.location.href;
+                signInHref.href = "/dapp/login".concat("?redirect=").concat(currentUrl);
+                signInTitle.innerHTML = "Sign in"
+            }
+
             const drawer =  document.getElementById("right-drawer")
             const modal =  document.getElementById("modal")
+
             function openDrawer() {
                 drawer.classList.add("open")
                 modal.classList.add("show")

@@ -8,7 +8,7 @@ module.exports = {
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "new-brief": path.resolve(__dirname, "new-brief.tsx"),
-        "freelancer": path.resolve(__dirname, "freelancer.tsx")
+        "freelancer": path.resolve(__dirname, "freelancer.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
     },
     devtool: process.env.NODE_ENV === "development"

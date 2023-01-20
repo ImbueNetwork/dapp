@@ -96,8 +96,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
     // IF YOU REORDER THESE IT WILL BREAK.
     // to add a new filter add to the enum BriefFilterOption, add to the bottom of the list with the correct index
-    filters = [
-        {
+    expfilter = {
             // Keys should never be strings, strings are slow. 
             // I can read and match agains enums, much easier.
             // This is a table named "experience"
@@ -122,8 +121,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     value: "Specialist",
                 },
             ],
-        },
-        {
+        }
+
+
+    submittedFilters = {
             // This is a field associated with the User.
             // since its a range i need the 
             filterType: BriefFilterOption.AmountSubmitted,
@@ -154,7 +155,9 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     or_max: true,
                 },
             ],
-        },
+        }
+        
+        submittedFilters = 
         {
             // Should be a field in the database, WILL BE IN DAYS.
             // Again i need the high and low values.
@@ -199,8 +202,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     value: "5 years +",
                 },
             ],
-        },
-        {
+        }
+        hoursPwFilter = {
             filterType: BriefFilterOption.HoursPerWeek,
             label: "Hours Per Week",
             options: [
@@ -218,8 +221,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     value: "50hrs/week",
                 },
             ],
-        },
-    ];
+        }
     
     constructor(props: BriefProps) {
         super(props);

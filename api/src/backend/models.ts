@@ -356,7 +356,6 @@ export const searchBriefs = (
     length_range: Array<number>, length_is_max: number, 
     max_hours_pw: number, hours_pw_is_max: boolean) => {
         
-        // First we deal with the numbers they want.
         async (tx : Knex.Transaction) => {
             tx.select()
                 .from<Brief>("briefs")

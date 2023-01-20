@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
 import {
@@ -8,14 +7,10 @@ import {
     importInformation,
     suggestedFreelancingSkills, suggestedServices, suggestedLanguages,
 } from "./config/freelancer-data";
-import * as config from "./config";
-import { Freelancer, User } from "./models";
-import { Option } from "./components/option";
-import { web3Accounts } from "@polkadot/extension-dapp";
-import { ListItemFreelancer } from "./components/listItemFreelancer";
+import { Freelancer } from "./models";
 import { TagsInput } from "./components/tagsInput";
-import { suggestedSkills } from "./config/briefs-data";
 import * as utils from "./utils";
+import { FreelancerService } from "./services/freelancerService";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -26,6 +21,8 @@ const postAPIHeaders = {
     "content-type": "application/json",
 };
 
+const freelancerService = new FreelancerService()
+
 export type FreelancerProps = {
     username: string;
 };
@@ -34,20 +31,6 @@ export type FreelancerState = {
     step: number;
     info: Freelancer;
 };
-
-async function invokeFreelancerAPI(Freelancer: Freelancer) {
-    const resp = await fetch(`${config.apiBase}/Freelancers/`, {
-        headers: postAPIHeaders,
-        method: "post",
-        body: JSON.stringify({ Freelancer }),
-    });
-
-    if (resp.ok) {
-        // could be 200 or 201
-        // Freelancer API successfully invoked
-        console.log("Freelancer created successfully via Freelancer REST API");
-    }
-}
 
 export class Freelancers extends React.Component<
     FreelancerProps,
@@ -69,9 +52,10 @@ export class Freelancers extends React.Component<
             bio: "",
             user_id: "",
         },
-        step: 8,
+        step: 0,
     };
-    constructor(props: FreelancerProps) {
+
+constructor(props: FreelancerProps) {
         super(props);
     }
 
@@ -86,11 +70,12 @@ export class Freelancers extends React.Component<
             this.setState({ ...this.state, step: step + 1 });
     };
 
-    onReviewPost = (freelancer: Freelancer) => {
+    createProfile = (freelancer: Freelancer) => {
+        console.log("Final data",this.state);
         const { step } = this.state;
         step < stepData.length - 1 &&
             this.setState({ ...this.state, step: step + 1 });
-        // invokeFreelancerAPI(Freelancer);
+        freelancerService.createFreelancingProfile(freelancer).then(r => console.log("Saving the profile"));
     };
 
     onDiscoverBriefs = (freelancer: Freelancer) => {
@@ -106,16 +91,6 @@ export class Freelancers extends React.Component<
             },
         });
     };
-
-    handleChange(event: { target: { value: any; }; }) {
-        this.setState({
-            ...this.state,
-            info: {
-                ...this.state.info,
-                ['bio']: event.target.value,
-            },
-        });
-    }
 
     render() {
         const { step } = this.state;
@@ -292,15 +267,6 @@ export class Freelancers extends React.Component<
                         <p key={index}>{line}</p>
                     ))}
                 </div>
-                {/*<div className="name-panel-input-wrapper">*/}
-                {/*    <textarea value={this.state.info.bio} onChange={this.handleChange} maxLength={1000} />*/}
-                {/*    <TextInput*/}
-                {/*        value={this.state.info.bio}*/}
-                {/*        name="description"*/}
-                {/*        maxLength={5000}*/}
-                {/*        onChange={(e) => this.updateFormData("bio", e.target.value)}*/}
-                {/*    />*/}
-                {/*</div>*/}
 
                 <div className="name-panel-input-wrapper">
                     <textarea
@@ -339,9 +305,6 @@ export class Freelancers extends React.Component<
             </div>
         );
 
-        // const panels = [HelloPanel, FreelanceExperience,FreelancingGoal,
-        //     ImportResume,TitlePanel,ExperiencePanel,EducationPanel,LanguagePanel,SkillsPanel,BioPanel,ServicesPanel,
-        //     ConfirmPanel];
         const panels = [
             HelloPanel,
             FreelanceExperience
@@ -392,7 +355,7 @@ export class Freelancers extends React.Component<
                           ) :  step === stepData.length - 2 ? (
                             <button
                               className="primary-btn in-dark w-button"
-                              onClick={() => this.onReviewPost(this.state.info)}
+                              onClick={() => this.createProfile(this.state.info)}
                             >
                               Submit
                             </button>

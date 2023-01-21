@@ -332,7 +332,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                             <div className="brief-item" key={itemIndex}>
                                 <div className="brief-title">{item.headline}</div>
                                 <div className="brief-time-info">
-                                    {`${item.experience_level}, Est. Time: ${item.duration}. Posted ${item.created_by}`}
+                                    {`${item.experience_level}, ${item.duration} Months, Posted by ${item.created_by}`}
                                 </div>
                                 <div className="brief-description">
                                     {item.description}

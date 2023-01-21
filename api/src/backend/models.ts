@@ -224,8 +224,8 @@ export const fetchMilestoneByIndex = (projectId: string | number,milestoneId: st
 
 export const fetchAllBriefs = () =>
 (tx: Knex.Transaction) =>
-    tx.select<Brief>(
-        "id",
+    tx.select(
+        "briefs.id",
         "headline",
         "industries",
         "description",
@@ -238,7 +238,7 @@ export const fetchAllBriefs = () =>
         "hours_per_week",
         "users.briefs_submitted as briefs_submitted_by",
         )
-        .whereNotNull('id')
+        .from("briefs")
         .innerJoin("experience", {'briefs.experience_id': "experience.id"})
         .innerJoin("users", {"briefs.user_id": "users.id"})
 
@@ -317,7 +317,7 @@ export const searchBriefs = (
         async (tx : Knex.Transaction) => {
             // select everything that is associated with brief.
             tx.select(
-                "id",
+                "briefs.id",
                 "headline",
                 "industries",
                 "description",

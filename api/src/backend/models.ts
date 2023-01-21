@@ -81,9 +81,10 @@ export type Brief = {
     scope: string;
     duration: string;
     budget: number;
-    user_id?: string | number;
+    created_by: string;
     experience_level: string,
     hours_per_week: number,
+    briefs_submitted_by: number,
 };
 
 export const fetchWeb3Account = (address: string) =>
@@ -223,7 +224,23 @@ export const fetchMilestoneByIndex = (projectId: string | number,milestoneId: st
 
 export const fetchAllBriefs = () =>
 (tx: Knex.Transaction) =>
-    tx<Brief>("briefs").whereNotNull('id').select();
+    tx.select<Brief>(
+        "id",
+        "headline",
+        "industries",
+        "description",
+        "skills",
+        "scope",
+        "duration",
+        "budget",
+        "users.display_name as created_by",
+        "experience_level",
+        "hours_per_week",
+        "users.briefs_submitted as briefs_submitted_by",
+        )
+        .whereNotNull('id')
+        .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+        .innerJoin("users", {"briefs.user_id": "users.id"})
 
 export const insertBrief = (brief: Brief) =>
     async (tx: Knex.Transaction) => (
@@ -298,25 +315,45 @@ export const searchBriefs = (
     max_hours_pw: number, hours_pw_is_max: boolean) => {
         
         async (tx : Knex.Transaction) => {
-            tx.select()
+            // select everything that is associated with brief.
+            tx.select(
+                "id",
+                "headline",
+                "industries",
+                "description",
+                "skills",
+                "scope",
+                "duration",
+                "budget",
+                "users.display_name as created_by",
+                "experience_level",
+                "hours_per_week",
+                "users.briefs_submitted as briefs_submitted_by",
+                )
                 .from<Brief>("briefs")
-                .join("experience", {'briefs.experience_id': "experience.id"})
-                .join("users", {"briefs.user_id": "users.id"})
+                .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+                .innerJoin("users", {"briefs.user_id": "users.id"})
                 .whereIn("experience_id", experience_range)
                 .where(function() {
-                    this.whereIn("briefs_submitted", submitted_range)
+                    if (submitted_range.length > 0) {
+                        this.whereIn("briefs_submitted", submitted_range)
+                    }
                     if (submitted_is_max) {
                         this.orWhere('briefs_submitted', '>=', Math.max(...submitted_range))
                     }
                   })
                 .where(function() {
-                    this.whereIn("duration", length_range)
+                    if (length_range.length > 0) {
+                        this.whereIn("duration", length_range)
+                    }
                     if (length_is_max) {
                         this.orWhere('duration', '>=', Math.max(...length_range))
                     }
                   })
                 .where(function() {
-                    this.whereBetween("hours_per_week", [0, max_hours_pw]);
+                    if (max_hours_pw > 0) {
+                        this.whereBetween("hours_per_week", [0, max_hours_pw]);
+                    }
                     if (hours_pw_is_max) {
                         this.orWhere('hours_per_week', '>=', max_hours_pw)
                     }

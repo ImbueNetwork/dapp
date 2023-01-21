@@ -10,18 +10,14 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("industries"); 
         builder.text("description");   
         builder.text("skills");  
-        builder.text("scope");  
+        builder.text("scope");
+        // in months atm.  
         builder.integer("duration");  
-        //builder.enu("scope",["Complex","Large","Medium","Small"]); 
-        //builder.enu("duration",["OneToThreeMonths","ThreeToSixMonths","MoreThan6Months","MoreThan1Year"]);  
         builder.integer("budget");          
         builder.integer("hours_per_week");
+        // stored in its own table
         builder.integer("experience_id");
-
-        //builder.integer("project_id").notNullable();
-        //builder.foreign("project_id")
-         //   .references("projects.id");
-        builder.string("user_id"); 
+        builder.foreign("user_id").references("users.id"); 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, tableName));
 }

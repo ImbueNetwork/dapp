@@ -98,3 +98,19 @@ export interface BasicTxResponse {
     transactionHash?: string;
     txError?: boolean;
 }
+
+// The same as backend/briefs
+export type Brief = {
+    id?: string | number;
+    headline: string;
+    industries: string;
+    description: string;
+    skills: string;
+    scope: string;
+    duration: string;
+    budget: number;
+    created_by: string;
+    experience_level: string,
+    hours_per_week: number,
+    briefs_submitted_by: number,
+};

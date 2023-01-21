@@ -110,7 +110,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     };
 
     onDiscoverBriefs = (brief: BriefInfo) => {
-        // redirect to discover briefs page
+        utils.redirect("briefs");
     };
 
     updateFormData = (name: string, value: string | number | string[]) => {
@@ -121,6 +121,35 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 [name]: value,
             },
         });
+    };
+
+    validate = (): boolean => {
+        const { step, info } = this.state;
+        console.log(info);
+        // TODO: show notification
+        if (step === 0 && !info.headline) {
+            return false;
+        }
+        if (step === 1 && !info.industries.length) {
+            return false;
+        }
+        if (step === 2 && !info.description) {
+            // TODO: minimum required length for description
+            return false;
+        }
+        if (step === 3 && !info.skills.length) {
+            return false;
+        }
+        if (step === 4 && !info.scope) {
+            return false;
+        }
+        if (step === 5 && info.duration === "") {
+            return false;
+        }
+        if (step === 6 && !info.budget) {
+            return false;
+        }
+        return true;
     };
 
     render() {
@@ -299,7 +328,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     <div className="buttons">
                         {step >= 1 && (
                             <button
-                                disabled={step < 1}
                                 className="secondary-btn"
                                 onClick={this.onBack}
                             >
@@ -319,6 +347,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         ) : step === stepData.length - 2 ? (
                             <button
                                 className="primary-btn in-dark w-button"
+                                disabled={!this.validate()}
                                 onClick={() =>
                                     this.onReviewPost(this.state.info)
                                 }
@@ -329,6 +358,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                             <button
                                 className="primary-btn in-dark w-button"
                                 onClick={this.onNext}
+                                disabled={!this.validate()}
                             >
                                 {stepData[step].next
                                     ? `Next: ${stepData[step].next}`

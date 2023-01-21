@@ -8,21 +8,18 @@ h1 {
 
 .registration-container {
     display: flex;
-    /* flex-direction: row; */
-    width: 90vw;
-    min-height: 650px;
-    max-height: 650px;
-    /* max-width: 1250px; */
-    /* margin-right: auto; */
-    /* border-radius: 20px; */
+    width: 100%;
 }
 
 .contents {
     display: flex;
     flex-direction: column;
+    gap: 34px;
     width: 75%;
     justify-content: space-between;
     padding-bottom: 16px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .contents > div {
@@ -43,11 +40,11 @@ h1 {
     width: 47%;
 }
 
-
-.mdc-text-field:not(.mdc-text-field--disabled) + .mdc-text-field-helper-line .mdc-text-field-helper-text {
+.mdc-text-field:not(.mdc-text-field--disabled)
+    + .mdc-text-field-helper-line
+    .mdc-text-field-helper-text {
     color: var(--theme-ink-color);
 }
-
 
 .confirm {
     width: 70% !important;
@@ -64,7 +61,6 @@ h1 {
     padding-left: 10px !important;
     color: var(--theme-ink-color) !important;
     width: 70%;
-
 }
 .mdc-text-field__input {
     color: var(--theme-ink-color) !important;
@@ -91,7 +87,7 @@ h1 {
 }
 
 .error {
-    color:  var(--theme-error);
+    color: var(--theme-error);
 }
 
 .hide {
@@ -101,4 +97,3 @@ h1 {
 .signup {
     padding-left: 10px;
 }
-

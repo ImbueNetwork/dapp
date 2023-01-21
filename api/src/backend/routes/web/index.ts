@@ -58,9 +58,16 @@ router.get("/googlelogin", (req, res) => {
     res.render("googlelogin");
 });
 
-router.get("/freelancers/new", (req, res) => {
-    res.render("new-freelancer");
-});
+router.get(
+    "/freelancers/new",
+    passport.authenticate("jwt", {
+        session: false,
+        failureRedirect: "/dapp/login?redirect=/dapp/freelancers/new",
+    }),
+    (req, res) => {
+        res.render("new-freelancer");
+    }
+);
 
 router.use((_req, res, next) => {
     res.render("legacy");

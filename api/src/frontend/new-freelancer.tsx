@@ -18,7 +18,7 @@ import "../../public/new-freelancer.css";
 const freelancerService = new FreelancerService();
 
 export type FreelancerProps = {
-    username: string;
+    username: string; // TODO: usecase?
 };
 
 export type FreelancerState = {
@@ -403,14 +403,7 @@ export class Freelancers extends React.Component<
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    const user = await utils.getCurrentUser();
-    if (!user) {
-        const returnUrl = `${window.location.href}`;
-        const redirectUrl = `login`;
-        utils.redirect(redirectUrl, returnUrl);
-    }
-
-    //TODO If the current user has a freelancer profile, forward to their profile
+    //TODO: If the current user has a freelancer profile, forward to their profile
 
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!

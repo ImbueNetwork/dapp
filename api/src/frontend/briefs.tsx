@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOMClient from "react-dom/client";
 import * as config from "./config";
 import BriefFilter from "./components/briefFilter";
-
+import {Brief} from "./models";
 const getAPIHeaders = {
     accept: "application/json",
 };
@@ -12,16 +12,6 @@ const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-type BriefItem = {
-    headline: string;
-    experience_level: string;
-    duration: string;
-    user: string;
-    description: string;
-    skills: string;
-    briefs_submitted: number;
-    created: string;
-};
 
 export type FilterOption = {
     interiorIndex: number;
@@ -43,7 +33,7 @@ const callSearchBriefs = async (
     });
 
     if (resp.ok) {
-        return await resp.json() as Array<BriefItem>
+        return await resp.json() as Array<Brief>
     } else {
         throw new Error('Failed to search briefs. status:' + resp.status);
     }
@@ -56,7 +46,7 @@ const callSearchBriefs = async (
     })
 
     if (resp.ok) {
-        return await resp.json() as Array<BriefItem>
+        return await resp.json() as Array<Brief>
     } else {
         throw new Error('Failed to get all briefs. status:' + resp.status);
     }
@@ -66,7 +56,7 @@ export type BriefProps = {};
 
 
 export type BriefState = {
-    briefs: Array<BriefItem>;
+    briefs: Array<Brief>;
 };
 
 
@@ -342,27 +332,28 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                             <div className="brief-item" key={itemIndex}>
                                 <div className="brief-title">{item.headline}</div>
                                 <div className="brief-time-info">
-                                    {`${item.experience_level}, Est. Time: ${item.duration}. Posted ${item.created}`}
+                                    {`${item.experience_level}, Est. Time: ${item.duration}. Posted ${item.created_by}`}
                                 </div>
                                 <div className="brief-description">
                                     {item.description}
                                 </div>
                                 <div className="brief-tags">
-                                    {/* {item.skills.map((skill: any, skillIndex: any) => (
+                                    {/* THIS HAS BEEN COMMENTED OUT UNTIL WE HAVE A ONE TO MANY TABLE FOR SKILLS. */}
+                                    {/* { {item.skills.map((skill: any, skillIndex: any) => ( */}
                                         <div
                                             className="tag-item"
-                                            key={skillIndex}
+                                            // key={skillIndex}
                                         >
-                                            {skill}
+                                            {item.skills}
                                         </div>
-                                    ))} */}
+                                    {/* ))} } */}
                                 </div>
                                 <div className="brief-proposals">
                                     <span className="proposals-heading">
                                         Proposals Submitted:{" "}
                                     </span>
                                     <span className="proposals-count">
-                                        {item.briefs_submitted}
+                                        {item.briefs_submitted_by}
                                     </span>
                                 </div>
                             </div>

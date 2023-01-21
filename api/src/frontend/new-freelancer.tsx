@@ -103,6 +103,12 @@ export class Freelancers extends React.Component<
         });
     };
 
+    // TODO:
+    validate = (): boolean => {
+        const { step, info } = this.state;
+        return true;
+    };
+
     render() {
         const { step } = this.state;
 
@@ -354,7 +360,6 @@ export class Freelancers extends React.Component<
                     >
                         {step >= 1 && (
                             <button
-                                disabled={step < 1}
                                 className="secondary-btn"
                                 onClick={this.onBack}
                             >
@@ -369,14 +374,14 @@ export class Freelancers extends React.Component<
                             >
                                 Get Started!
                             </button>
-                        ) : step === stepData.length - 1 ? (
+                        ) : step === stepData.length - 1 ? ( // TODO:
                             <button
                                 className="primary-btn in-dark w-button"
                                 onClick={() =>
                                     this.onDiscoverBriefs(this.state.info)
                                 }
                             >
-                                Discover Briefs
+                                Discover Freelancers
                             </button>
                         ) : step === stepData.length - 2 ? (
                             <button

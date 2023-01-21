@@ -381,7 +381,7 @@ export class Freelancers extends React.Component<
                                     this.onDiscoverBriefs(this.state.info)
                                 }
                             >
-                                Discover Freelancers
+                                Discover Briefs
                             </button>
                         ) : step === stepData.length - 2 ? (
                             <button

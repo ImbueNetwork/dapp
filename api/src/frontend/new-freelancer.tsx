@@ -5,18 +5,20 @@ import {
     freelancedBefore,
     freelancingGoal,
     importInformation,
-    suggestedFreelancingSkills, suggestedServices, suggestedLanguages,
+    suggestedFreelancingSkills,
+    suggestedServices,
+    suggestedLanguages,
 } from "./config/freelancer-data";
 import { Freelancer, User } from "./models";
 import { TagsInput } from "./components/tagsInput";
 import * as utils from "./utils";
 import { FreelancerService } from "./services/freelancerService";
-import "../../public/new-freelancer.css"
+import "../../public/new-freelancer.css";
 
-const freelancerService = new FreelancerService()
+const freelancerService = new FreelancerService();
 
 export type FreelancerProps = {
-    username: string;
+    username: string; // TODO: usecase?
 };
 
 export type FreelancerState = {
@@ -46,13 +48,12 @@ export class Freelancers extends React.Component<
             user_id: undefined,
         },
         step: 0,
-        display_name: "freelancer"
+        display_name: "freelancer",
     };
 
     constructor(props: FreelancerProps) {
         super(props);
     }
-
 
     async componentDidMount() {
         const user: User = await utils.getCurrentUser();
@@ -62,9 +63,9 @@ export class Freelancers extends React.Component<
                 display_name: user.display_name,
                 info: {
                     ...this.state.info,
-                    user_id: user.id
-                }
-            })
+                    user_id: user.id,
+                },
+            });
         }
     }
 
@@ -83,7 +84,9 @@ export class Freelancers extends React.Component<
         const { step } = this.state;
         step < stepData.length - 1 &&
             this.setState({ ...this.state, step: step + 1 });
-        freelancerService.createFreelancingProfile(freelancer).then(r => console.log("Saving the profile"));
+        freelancerService
+            .createFreelancingProfile(freelancer)
+            .then((r) => console.log("Saving the profile"));
     };
 
     onDiscoverBriefs = (freelancer: Freelancer) => {
@@ -98,6 +101,12 @@ export class Freelancers extends React.Component<
                 [name]: value,
             },
         });
+    };
+
+    // TODO:
+    validate = (): boolean => {
+        const { step, info } = this.state;
+        return true;
     };
 
     render() {
@@ -124,10 +133,11 @@ export class Freelancers extends React.Component<
                     {freelancedBefore.map(({ label, value }, index) => (
                         <div
                             key={index}
-                            className={`freelance-xp-item ${this.state.info.freelanced_before === value
-                                ? "active"
-                                : ""
-                                }`}
+                            className={`freelance-xp-item ${
+                                this.state.info.freelanced_before === value
+                                    ? "active"
+                                    : ""
+                            }`}
                             onClick={() =>
                                 this.updateFormData("freelanced_before", value)
                             }
@@ -138,7 +148,6 @@ export class Freelancers extends React.Component<
                 </div>
             </div>
         );
-
 
         const FreelancingGoal = (
             <div className="freelance-xp-container">
@@ -151,10 +160,11 @@ export class Freelancers extends React.Component<
                     {freelancingGoal.map(({ label, value }, index) => (
                         <div
                             key={index}
-                            className={`freelance-xp-item ${this.state.info.freelancing_goal === value
-                                ? "active"
-                                : ""
-                                }`}
+                            className={`freelance-xp-item ${
+                                this.state.info.freelancing_goal === value
+                                    ? "active"
+                                    : ""
+                            }`}
                             onClick={() =>
                                 this.updateFormData("freelancing_goal", value)
                             }
@@ -165,7 +175,6 @@ export class Freelancers extends React.Component<
                 </div>
             </div>
         );
-
 
         const ImportResume = (
             <div className="freelance-xp-container">
@@ -178,13 +187,10 @@ export class Freelancers extends React.Component<
                     {importInformation.map(({ label, value }, index) => (
                         <div
                             key={index}
-                            className={`freelance-xp-item ${this.state.info.resume === value
-                                ? "active"
-                                : ""
-                                }`}
-                            onClick={() =>
-                                this.updateFormData("resume", value)
-                            }
+                            className={`freelance-xp-item ${
+                                this.state.info.resume === value ? "active" : ""
+                            }`}
+                            onClick={() => this.updateFormData("resume", value)}
                         >
                             {label}
                         </div>
@@ -206,7 +212,9 @@ export class Freelancers extends React.Component<
                         placeholder="Enter your title"
                         name="title"
                         value={this.state.info.title}
-                        onChange={(e) => this.updateFormData("title", e.target.value)}
+                        onChange={(e) =>
+                            this.updateFormData("title", e.target.value)
+                        }
                     />
                 </div>
             </div>
@@ -243,7 +251,9 @@ export class Freelancers extends React.Component<
                     <TagsInput
                         suggestData={suggestedLanguages}
                         tags={this.state.info.languages}
-                        onChange={(tags: string[]) => this.updateFormData("languages", tags)}
+                        onChange={(tags: string[]) =>
+                            this.updateFormData("languages", tags)
+                        }
                     />
                 </div>
             </div>
@@ -256,13 +266,16 @@ export class Freelancers extends React.Component<
                         <p key={index}>{line}</p>
                     ))}
                 </div>
-                <p className="field-name">Your Skills</p><br />
+                <p className="field-name">Your Skills</p>
+                <br />
                 <br />
                 <div className="skills-container">
                     <TagsInput
                         suggestData={suggestedFreelancingSkills}
                         tags={this.state.info.skills}
-                        onChange={(tags: string[]) => this.updateFormData("skills", tags)}
+                        onChange={(tags: string[]) =>
+                            this.updateFormData("skills", tags)
+                        }
                     />
                 </div>
             </div>
@@ -283,7 +296,9 @@ export class Freelancers extends React.Component<
                         name="title"
                         maxLength={5000}
                         value={this.state.info.bio}
-                        onChange={(e) => this.updateFormData("bio", e.target.value)}
+                        onChange={(e) =>
+                            this.updateFormData("bio", e.target.value)
+                        }
                     />
                 </div>
             </div>
@@ -300,12 +315,13 @@ export class Freelancers extends React.Component<
                     <TagsInput
                         suggestData={suggestedServices}
                         tags={this.state.info.services_offer}
-                        onChange={(tags: string[]) => this.updateFormData("services_offer", tags)}
+                        onChange={(tags: string[]) =>
+                            this.updateFormData("services_offer", tags)
+                        }
                     />
                 </div>
             </div>
         );
-
 
         const ConfirmPanel = (
             <div className="description-panel">
@@ -315,8 +331,8 @@ export class Freelancers extends React.Component<
 
         const panels = [
             HelloPanel,
-            FreelanceExperience
-            , FreelancingGoal,
+            FreelanceExperience,
+            FreelancingGoal,
             // ImportResume,
             TitlePanel,
             // ExperiencePanel,EducationPanel,
@@ -324,13 +340,19 @@ export class Freelancers extends React.Component<
             SkillsPanel,
             BioPanel,
             ServicesPanel,
-            ConfirmPanel];
+            ConfirmPanel,
+        ];
 
         return (
             <div className="freelancer-details-container">
                 <div className="main-panel">
                     <div className="contents">
-                        <h2 className="name-title">{stepData[step].heading.replace("{name}", this.state.display_name)}</h2>
+                        <h2 className="name-title">
+                            {stepData[step].heading.replace(
+                                "{name}",
+                                this.state.display_name
+                            )}
+                        </h2>
                         {panels[step] ?? <></>}
                     </div>
                     <div
@@ -338,7 +360,6 @@ export class Freelancers extends React.Component<
                     >
                         {step >= 1 && (
                             <button
-                                disabled={step < 1}
                                 className="secondary-btn"
                                 onClick={this.onBack}
                             >
@@ -353,17 +374,21 @@ export class Freelancers extends React.Component<
                             >
                                 Get Started!
                             </button>
-                        ) : step === stepData.length - 1 ? (
+                        ) : step === stepData.length - 1 ? ( // TODO:
                             <button
                                 className="primary-btn in-dark w-button"
-                                onClick={() => this.onDiscoverBriefs(this.state.info)}
+                                onClick={() =>
+                                    this.onDiscoverBriefs(this.state.info)
+                                }
                             >
-                                Discover Briefs
+                                Discover Freelancers
                             </button>
                         ) : step === stepData.length - 2 ? (
                             <button
                                 className="primary-btn in-dark w-button"
-                                onClick={() => this.createProfile(this.state.info)}
+                                onClick={() =>
+                                    this.createProfile(this.state.info)
+                                }
                             >
                                 Submit
                             </button>
@@ -383,15 +408,8 @@ export class Freelancers extends React.Component<
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    const user = await utils.getCurrentUser();
-    if (!user) {
-        const returnUrl = `${window.location.href}`
-        const redirectUrl = `login`
-        utils.redirect(redirectUrl, returnUrl);
-    }
+    //TODO: If the current user has a freelancer profile, forward to their profile
 
-    //TODO If the current user has a freelancer profile, forward to their profile
-    
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!
     ).render(<Freelancers username={"STATIC ANN"} />);

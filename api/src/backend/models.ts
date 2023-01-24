@@ -88,10 +88,10 @@ export type Brief = {
 };
 
 export type BriefSqlFilter = {
-    experience_range: Array<number>;
-    submitted_range: Array<number>;
+    experience_range: number[];
+    submitted_range: number[];
     submitted_is_max: boolean;
-    length_range: Array<number>;
+    length_range: number[];
     length_is_max: boolean;
     max_hours_pw: number;
     hours_pw_is_max: boolean;
@@ -118,7 +118,7 @@ export const upsertWeb3Challenge = (
 ) => async (tx: Knex.Transaction):
         Promise<[web3Account: Web3Account, isInsert: boolean]> => {
 
-        let web3Account = await tx<Web3Account>("web3_accounts")
+        const web3Account = await tx<Web3Account>("web3_accounts")
             .select()
             .where({
                 user_id: user?.id
@@ -308,7 +308,7 @@ export const getOrCreateFederatedUser = (
             done(null, user);
         } catch (err) {
             done(new Error(
-                "Failed to upsert federated authentication." 
+                "Failed to upsert federated authentication."
             ));
         }
     });
@@ -318,9 +318,8 @@ export const getOrCreateFederatedUser = (
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
-export const  searchBriefs  = 
-    async (tx: Knex.Transaction, filter: BriefSqlFilter) => { 
-            console.log(filter)
+export const  searchBriefs  =
+    async (tx: Knex.Transaction, filter: BriefSqlFilter) => {
             // select everything that is associated with brief.
             await tx<Brief>("briefs").select(
                 "briefs.id",

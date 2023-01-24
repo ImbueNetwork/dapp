@@ -6,7 +6,7 @@ import {callSearchBriefs, getAllBriefs} from "./services/briefsService";
 
 export type FilterOption = {
     interiorIndex: number;
-    search_for: Array<number>;
+    search_for: number[];
     or_max: boolean;
     value: string;
 };
@@ -15,7 +15,7 @@ export type FilterOption = {
 export type BriefProps = {};
 
 export type BriefState = {
-    briefs: Array<Brief>;
+    briefs: Brief[];
 };
 
 export enum BriefFilterOption {
@@ -34,7 +34,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
     // The interior index is used to specify which entry will be used in the search brief.
     // This is not a good implementation but im afraid if we filter and find itll be slow.
     // I can change this on request: felix
-    
+
 
     expfilter = {
             // This is a table named "experience"
@@ -73,7 +73,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
     submittedFilters = {
             // This is a field associated with the User.
-            // since its a range i need the 
+            // since its a range i need the
             filterType: BriefFilterOption.AmountSubmitted,
             label: "Briefs Submitted",
             options: [
@@ -103,8 +103,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 },
             ],
         }
-        
-        lengthFilters = 
+
+        lengthFilters =
         {
             // Should be a field in the database, WILL BE IN DAYS.
             // Again i need the high and low values.
@@ -170,33 +170,33 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 },
             ],
         }
-    
+
     constructor(props: BriefProps) {
         super(props);
         this.state = ({briefs: []});
     }
 
     async componentDidMount() {
-        let data = await getAllBriefs();
+        const data = await getAllBriefs();
         console.log(data);
         this.setState({ briefs: data});
     }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
     onSearch = async ()  =>  {
-        let elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
-    
+        const elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
+
         // The filter initially should return all values
         let is_search: boolean = false;
-        
-        let exp_range: Array<number> = [];
-        
-        let submitted_range: Array<number> = [];
+
+        let exp_range: number[] = [];
+
+        let submitted_range: number[] = [];
         let submitted_is_max: boolean = false
-        
-        let length_range: Array<number> = [];
+
+        let length_range: number[] = [];
         let length_is_max: boolean = false
-        
+
         // default is max
         let hpw_max: number = 50;
         let hpw_is_max: boolean = false;
@@ -204,38 +204,38 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].checked) {
                 is_search = true
-                let id = elements[i].getAttribute("id");
+                const id = elements[i].getAttribute("id");
                 if (id != null) {
-                    let [filterType, interiorIndex] = id.split("-");
+                    const [filterType, interiorIndex] = id.split("-");
                     // Here we are trying to build teh paramaters required to build the query
                     // We build an array for each to get the values we want through concat.
-                    // and also specify if we want more than using the is_max field. 
+                    // and also specify if we want more than using the is_max field.
                     switch(parseInt(filterType) as BriefFilterOption) {
                         case BriefFilterOption.ExpLevel:
-                            let o = this.expfilter.options[parseInt(interiorIndex)];    
+                            const o = this.expfilter.options[parseInt(interiorIndex)];
                             exp_range = [...exp_range ,...o.search_for.slice()];
                             break
-                        
+
                             case BriefFilterOption.AmountSubmitted:
-                            let o1 = this.submittedFilters.options[parseInt(interiorIndex)];
+                            const o1 = this.submittedFilters.options[parseInt(interiorIndex)];
                             submitted_range = [...submitted_range ,...o1.search_for.slice()];
-                            submitted_is_max = o1.or_max; 
+                            submitted_is_max = o1.or_max;
                             break
 
                         case BriefFilterOption.Length:
-                            let o2 = this.lengthFilters.options[parseInt(interiorIndex)]
+                            const o2 = this.lengthFilters.options[parseInt(interiorIndex)]
                             length_range = [...length_range ,...o2.search_for.slice()];
                             length_is_max = o2.or_max;
                             break
-                        
+
                         case BriefFilterOption.HoursPerWeek:
-                            let o3 = this.hoursPwFilter.options[parseInt(interiorIndex)];
+                            const o3 = this.hoursPwFilter.options[parseInt(interiorIndex)];
                             if (o3.search_for[0] > hpw_max) {
                                 hpw_max = o3.search_for[0];
                             }
-                            hpw_is_max = o3.or_max; 
+                            hpw_is_max = o3.or_max;
                             break
-                        
+
                         default:
                             console.log("Invalid filter option selected or unimplemented. type:" + filterType);
                     }
@@ -244,21 +244,21 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         }
 
         if (is_search) {
-            let filter: BriefSqlFilter = {
+            const filter: BriefSqlFilter = {
                 experience_range: exp_range,
-                submitted_range: submitted_range,
-                submitted_is_max: submitted_is_max,
-                length_range: length_range,
-                length_is_max: length_is_max,
+                submitted_range,
+                submitted_is_max,
+                length_range,
+                length_is_max,
                 max_hours_pw: hpw_max,
-                hours_pw_is_max: hpw_is_max 
+                hours_pw_is_max: hpw_is_max
             }
-            let briefs = await callSearchBriefs(filter)
-            this.setState({ briefs: briefs });
+            const briefs = await callSearchBriefs(filter)
+            this.setState({ briefs });
 
         } else {
-            let briefs = await getAllBriefs()
-            this.setState({ briefs: briefs });
+            const briefs = await getAllBriefs()
+            this.setState({ briefs });
         }
     };
 

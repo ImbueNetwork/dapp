@@ -24,9 +24,7 @@ router.get("/", (req, res, next) => {
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
-            let data: BriefSqlFilter = await req.body.json;
-
-            // console.log("indata = " + data)
+            const data: BriefSqlFilter = req.body;
             const briefs = await searchBriefs(tx, data);
             res.send(briefs);
         } catch (e) {

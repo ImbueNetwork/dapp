@@ -378,10 +378,11 @@ export const searchBriefs = (
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
-export const searchBriefs = (filter: BriefSqlFilter) => 
-    (tx: Knex.Transaction) => 
+export const  searchBriefs  = 
+    async (tx: Knex.Transaction, filter: BriefSqlFilter) => { 
+            console.log(filter)
             // select everything that is associated with brief.
-             tx<Brief>("Briefs").select(
+            await tx<Brief>("briefs").select(
                 "briefs.id",
                 "headline",
                 "industries",
@@ -397,7 +398,6 @@ export const searchBriefs = (filter: BriefSqlFilter) =>
                 )
                 .innerJoin("experience", {'briefs.experience_id': "experience.id"})
                 .innerJoin("users", {"briefs.user_id": "users.id"})
-                .whereIn("experience_id", filter.experience_range)
                 .where(function() {
                     if (filter.submitted_range.length > 0) {
                         this.whereIn("briefs_submitted", filter.submitted_range)
@@ -406,6 +406,7 @@ export const searchBriefs = (filter: BriefSqlFilter) =>
                         this.orWhere('briefs_submitted', '>=', Math.max(...filter.submitted_range))
                     }
                   })
+                .whereIn("experience_id", filter.experience_range)
                 .where(function() {
                     if (filter.length_range.length > 0) {
                         this.whereIn("duration", filter.length_range)
@@ -421,4 +422,6 @@ export const searchBriefs = (filter: BriefSqlFilter) =>
                     if (filter.hours_pw_is_max) {
                         this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
                     }
-                })
+                }).debug(true)
+
+            }

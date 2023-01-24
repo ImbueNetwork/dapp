@@ -150,7 +150,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 },
             ],
         }
-        hoursPwFilter: any = {
+        hoursPwFilter = {
             filterType: BriefFilterOption.HoursPerWeek,
             label: "Hours Per Week",
             options: [
@@ -201,7 +201,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         let hpw_max: number = 50;
         let hpw_is_max: boolean = false;
 
-
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].checked) {
                 is_search = true
@@ -211,31 +210,34 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     // Here we are trying to build teh paramaters required to build the query
                     // We build an array for each to get the values we want through concat.
                     // and also specify if we want more than using the is_max field. 
-                    let parsed_index = parseInt(interiorIndex)
-                    switch(parseInt(filterType)) {
+                    switch(parseInt(filterType) as BriefFilterOption) {
                         case BriefFilterOption.ExpLevel:
-                            let o = this.expfilter.options[parsed_index];    
-                            exp_range.concat(o.search_for);
-                       
-                        case BriefFilterOption.AmountSubmitted:
-                            let o1 = this.submittedFilters.options[parsed_index];
-                            submitted_range.concat(o1.search_for);
+                            let o = this.expfilter.options[parseInt(interiorIndex)];    
+                            exp_range = [...exp_range ,...o.search_for.slice()];
+                            break
+                        
+                            case BriefFilterOption.AmountSubmitted:
+                            let o1 = this.submittedFilters.options[parseInt(interiorIndex)];
+                            submitted_range = [...submitted_range ,...o1.search_for.slice()];
                             submitted_is_max = o1.or_max; 
+                            break
 
                         case BriefFilterOption.Length:
-                            let o2 = this.lengthFilters.options[parsed_index]
-                            length_range.concat(o2.search_for);
+                            let o2 = this.lengthFilters.options[parseInt(interiorIndex)]
+                            length_range = [...length_range ,...o2.search_for.slice()];
                             length_is_max = o2.or_max;
+                            break
                         
                         case BriefFilterOption.HoursPerWeek:
-                            let o3 = this.hoursPwFilter.options[parsed_index];
+                            let o3 = this.hoursPwFilter.options[parseInt(interiorIndex)];
                             if (o3.search_for[0] > hpw_max) {
                                 hpw_max = o3.search_for[0];
                             }
                             hpw_is_max = o3.or_max; 
+                            break
                         
                         default:
-                            console.log("Invalid filter option selected or unimplemented.");
+                            console.log("Invalid filter option selected or unimplemented. type:" + filterType);
                     }
                 }
             }

@@ -24,13 +24,14 @@ router.get("/", (req, res, next) => {
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
-            let data: BriefSqlFilter = await JSON.parse(req.body);
+            let data: BriefSqlFilter = await req.body.json;
 
-            const briefs = await searchBriefs(data)(tx);
+            // console.log("indata = " + data)
+            const briefs = await searchBriefs(tx, data);
             res.send(briefs);
         } catch (e) {
             next(new Error(
-                `Failed to fetch all briefs`,
+                `Failed to search all briefs`,
                 {cause: e as Error}
             ));
         }

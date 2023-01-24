@@ -130,3 +130,13 @@ export type Brief = {
     hours_per_week: number,
     briefs_submitted_by: number,
 };
+
+export type BriefSqlFilter = {
+    experience_range: Array<number>;
+    submitted_range: Array<number>;
+    submitted_is_max: boolean;
+    length_range: Array<number>;
+    length_is_max: boolean;
+    max_hours_pw: number;
+    hours_pw_is_max: boolean;
+}

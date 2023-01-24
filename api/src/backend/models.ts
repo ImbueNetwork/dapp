@@ -90,6 +90,7 @@ export type Brief = {
     briefs_submitted_by: number,
 };
 
+
 export type Freelancer = {
     id?: string | number;
     education: string;
@@ -104,6 +105,16 @@ export type Freelancer = {
     bio: string;
     user_id?: string | number;
 };
+
+export type BriefSqlFilter = {
+    experience_range: Array<number>;
+    submitted_range: Array<number>;
+    submitted_is_max: boolean;
+    length_range: Array<number>;
+    length_is_max: boolean;
+    max_hours_pw: number;
+    hours_pw_is_max: boolean;
+}
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
@@ -367,15 +378,10 @@ export const searchBriefs = (
 // The search briefs and all these lovely parameters.
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
-export const searchBriefs = (
-    experience_range: Array<number>, 
-    submitted_range: Array<number>, submitted_is_max: boolean,
-    length_range: Array<number>, length_is_max: boolean, 
-    max_hours_pw: number, hours_pw_is_max: boolean) => {
-        
-        async (tx : Knex.Transaction) => {
+export const searchBriefs = (filter: BriefSqlFilter) => 
+    (tx: Knex.Transaction) => 
             // select everything that is associated with brief.
-            tx.select(
+             tx<Brief>("Briefs").select(
                 "briefs.id",
                 "headline",
                 "industries",
@@ -389,35 +395,30 @@ export const searchBriefs = (
                 "hours_per_week",
                 "users.briefs_submitted as briefs_submitted_by",
                 )
-                .from<Brief>("briefs")
                 .innerJoin("experience", {'briefs.experience_id': "experience.id"})
                 .innerJoin("users", {"briefs.user_id": "users.id"})
-                .whereIn("experience_id", experience_range)
+                .whereIn("experience_id", filter.experience_range)
                 .where(function() {
-                    if (submitted_range.length > 0) {
-                        this.whereIn("briefs_submitted", submitted_range)
+                    if (filter.submitted_range.length > 0) {
+                        this.whereIn("briefs_submitted", filter.submitted_range)
                     }
-                    if (submitted_is_max) {
-                        this.orWhere('briefs_submitted', '>=', Math.max(...submitted_range))
+                    if (filter.submitted_is_max) {
+                        this.orWhere('briefs_submitted', '>=', Math.max(...filter.submitted_range))
                     }
                   })
                 .where(function() {
-                    if (length_range.length > 0) {
-                        this.whereIn("duration", length_range)
+                    if (filter.length_range.length > 0) {
+                        this.whereIn("duration", filter.length_range)
                     }
-                    if (length_is_max) {
-                        this.orWhere('duration', '>=', Math.max(...length_range))
+                    if (filter.length_is_max) {
+                        this.orWhere('duration', '>=', Math.max(...filter.length_range))
                     }
                   })
                 .where(function() {
-                    if (max_hours_pw > 0) {
-                        this.whereBetween("hours_per_week", [0, max_hours_pw]);
+                    if (filter.max_hours_pw > 0) {
+                        this.whereBetween("hours_per_week", [0, filter.max_hours_pw]);
                     }
-                    if (hours_pw_is_max) {
-                        this.orWhere('hours_per_week', '>=', max_hours_pw)
+                    if (filter.hours_pw_is_max) {
+                        this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
                     }
                 })
-        
-    }        
-};
-

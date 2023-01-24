@@ -1,19 +1,16 @@
 import express, { response } from "express";
 import db from "../../../db";
-import * as models from "../../../models";
-import passport from "passport";
+import { fetchAllBriefs, searchBriefs, BriefSqlFilter, Brief } from "../../../models";
+import { json } from "stream/consumers";
 
-
-type BriefPkg = models.Brief;
 
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
-    //const brief_parameters: BriefFilter = req.body
 
     db.transaction(async tx => {
         try {
-            const briefs = await models.fetchAllBriefs()(tx);
+            const briefs = await fetchAllBriefs()(tx);
             res.send(briefs);
         } catch (e) {
             next(new Error(
@@ -24,12 +21,12 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.get("/", (req, res, next) => {
-    //const brief_parameters: BriefFilter = req.body
-
+router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
-            const briefs = await models.fetchAllBriefs()(tx);
+            let data: BriefSqlFilter = await JSON.parse(req.body);
+
+            const briefs = await searchBriefs(data)(tx);
             res.send(briefs);
         } catch (e) {
             next(new Error(

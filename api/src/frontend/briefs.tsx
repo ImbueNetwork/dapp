@@ -1,17 +1,8 @@
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import * as config from "./config";
 import BriefFilter from "./components/briefFilter";
-import {Brief} from "./models";
-const getAPIHeaders = {
-    accept: "application/json",
-};
-
-const postAPIHeaders = {
-    ...getAPIHeaders,
-    "content-type": "application/json",
-};
-
+import {Brief, BriefSqlFilter} from "./models";
+import {callSearchBriefs, getAllBriefs} from "./services/briefsService";
 
 export type FilterOption = {
     interiorIndex: number;
@@ -21,44 +12,11 @@ export type FilterOption = {
 };
 
 
-const callSearchBriefs = async (
-    experience_range: Array<number>, 
-    submitted_range: Array<number>, submitted_is_max: boolean,
-    length_range: Array<number>, length_is_max: boolean, 
-    max_hours_pw: number, hours_pw_is_max: boolean) => {
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
-        headers: postAPIHeaders,
-        method: "post",
-        body: JSON.stringify({experience_range, submitted_range, submitted_is_max, length_is_max, length_range, max_hours_pw, hours_pw_is_max}),
-    });
-
-    if (resp.ok) {
-        return await resp.json() as Array<Brief>
-    } else {
-        throw new Error('Failed to search briefs. status:' + resp.status);
-    }
-  }
-
-  const getAllBriefs = async () => {
-    const resp =  await fetch(`${config.apiBase}/briefs/`, {
-        headers: postAPIHeaders,
-        method: "get",
-    })
-
-    if (resp.ok) {
-        return await resp.json() as Array<Brief>
-    } else {
-        throw new Error('Failed to get all briefs. status:' + resp.status);
-    }
-  }
-
 export type BriefProps = {};
-
 
 export type BriefState = {
     briefs: Array<Brief>;
 };
-
 
 export enum BriefFilterOption {
     ExpLevel = 0,
@@ -66,6 +24,7 @@ export enum BriefFilterOption {
     Length = 2,
     HoursPerWeek = 3,
 };
+
 
 
 export class Briefs extends React.Component<BriefProps, BriefState> {
@@ -283,9 +242,16 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         }
 
         if (is_search) {
-            let briefs = await callSearchBriefs(
-                exp_range, submitted_range, submitted_is_max, length_range, length_is_max, hpw_max, hpw_is_max 
-            )
+            let filter: BriefSqlFilter = {
+                experience_range: exp_range,
+                submitted_range: submitted_range,
+                submitted_is_max: submitted_is_max,
+                length_range: length_range,
+                length_is_max: length_is_max,
+                max_hours_pw: hpw_max,
+                hours_pw_is_max: hpw_is_max 
+            }
+            let briefs = await callSearchBriefs(filter)
             this.setState({ briefs: briefs });
 
         } else {

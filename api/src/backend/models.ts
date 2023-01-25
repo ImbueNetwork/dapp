@@ -95,6 +95,7 @@ export type BriefSqlFilter = {
     length_is_max: boolean;
     max_hours_pw: number;
     hours_pw_is_max: boolean;
+    search_input: string;
 }
 
 export const fetchWeb3Account = (address: string) =>
@@ -365,7 +366,9 @@ export const  searchBriefs  =
                     if (filter.hours_pw_is_max) {
                         this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
                     }
-                }).limit(30)
+                }).where("headline", "ilike", "%" + filter.search_input + "%")
+                .limit(30)
+                .debug(true)
 
             
     

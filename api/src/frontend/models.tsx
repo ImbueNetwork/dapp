@@ -123,4 +123,5 @@ export type BriefSqlFilter = {
     length_is_max: boolean;
     max_hours_pw: number;
     hours_pw_is_max: boolean;
+    search_input: string;
 }

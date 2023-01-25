@@ -191,14 +191,19 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         let exp_range: number[] = [];
 
         let submitted_range: number[] = [];
-        let submitted_is_max: boolean = false
+        let submitted_is_max: boolean = false;
 
         let length_range: number[] = [];
-        let length_is_max: boolean = false
+        let length_is_max: boolean = false;
 
         // default is max
         let hpw_max: number = 50;
         let hpw_is_max: boolean = false;
+        let search_input = document.getElementById("search-input") as HTMLInputElement;
+        let search_value = search_input.value; 
+        if (search_value !== "") {
+            is_search = true
+        }
 
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].checked) {
@@ -250,7 +255,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 length_range,
                 length_is_max,
                 max_hours_pw: hpw_max,
-                hours_pw_is_max: hpw_is_max
+                hours_pw_is_max: hpw_is_max,
+                search_input: search_value
             }
             console.log(filter);
 
@@ -291,9 +297,9 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                                 Saved Briefs
                             </div>
                         </div>
-                        <input className="search-input" placeholder="Search" />
+                        <input id="search-input" className="search-input" placeholder="Search" />
                         <div className="search-result">
-                            <span className="result-count">34,643</span>
+                            <span className="result-count">{(this.state.briefs.length)}</span>
                             <span> briefs found</span>
                         </div>
                     </div>

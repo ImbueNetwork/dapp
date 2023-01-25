@@ -178,7 +178,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
     async componentDidMount() {
         const data = await getAllBriefs();
-        console.log(data);
         this.setState({ briefs: data});
     }
 
@@ -253,7 +252,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 max_hours_pw: hpw_max,
                 hours_pw_is_max: hpw_is_max
             }
+            console.log(filter);
+
             const briefs = await callSearchBriefs(filter)
+
             this.setState({ briefs });
 
         } else {

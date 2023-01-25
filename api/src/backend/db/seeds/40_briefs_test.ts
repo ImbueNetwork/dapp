@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
-    await knex("briefs").del();
     await knex("briefs").insert([
     {
         id: 0,

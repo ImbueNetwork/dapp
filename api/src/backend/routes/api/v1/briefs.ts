@@ -25,7 +25,7 @@ router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
             const data: BriefSqlFilter = req.body;
-            const briefs = await searchBriefs(tx, data);
+            const briefs: Array<Brief> = await searchBriefs(tx, data);
             res.send(briefs);
         } catch (e) {
             next(new Error(

@@ -319,9 +319,9 @@ export const getOrCreateFederatedUser = (
 // Since we are using checkboxes only i unfortunatly ended up using all these parameters.
 // Because we could have multiple ranges of values and open ended ors.
 export const  searchBriefs  =
-    async (tx: Knex.Transaction, filter: BriefSqlFilter) => {
+    async (tx: Knex.Transaction, filter: BriefSqlFilter) => 
             // select everything that is associated with brief.
-            await tx<Brief>("briefs").select(
+            await tx.select(
                 "briefs.id",
                 "headline",
                 "industries",
@@ -334,7 +334,7 @@ export const  searchBriefs  =
                 "experience_level",
                 "hours_per_week",
                 "users.briefs_submitted as briefs_submitted_by",
-                )
+                ).from("briefs")
                 .innerJoin("experience", {'briefs.experience_id': "experience.id"})
                 .innerJoin("users", {"briefs.user_id": "users.id"})
                 .where(function() {
@@ -345,7 +345,11 @@ export const  searchBriefs  =
                         this.orWhere('briefs_submitted', '>=', Math.max(...filter.submitted_range))
                     }
                   })
-                .whereIn("experience_id", filter.experience_range)
+                .where(function() {
+                    if (filter.experience_range.length > 0) {
+                        this.whereIn("experience_id", filter.experience_range)
+                    }
+                })
                 .where(function() {
                     if (filter.length_range.length > 0) {
                         this.whereIn("duration", filter.length_range)
@@ -363,4 +367,5 @@ export const  searchBriefs  =
                     }
                 }).debug(true)
 
-            }
+            
+    

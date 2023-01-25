@@ -1,7 +1,6 @@
 import { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
-        await knex("experience").del();
         await knex("experience").insert([
             {id: 0, experience_level: "Entry Level"},
             {id: 1, experience_level: "Intermediate"},

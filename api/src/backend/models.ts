@@ -365,7 +365,7 @@ export const  searchBriefs  =
                     if (filter.hours_pw_is_max) {
                         this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
                     }
-                }).debug(true)
+                }).limit(30)
 
             
     

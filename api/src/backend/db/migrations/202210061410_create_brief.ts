@@ -7,9 +7,10 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tableName, (builder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("headline");
-        builder.text("industries");
+        builder.specificType("industries", "text[]");
+
         builder.text("description");
-        builder.text("skills");
+        builder.specificType("skills", "text[]");
         builder.text("scope");
 
         // in months atm.  

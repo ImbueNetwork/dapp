@@ -119,7 +119,7 @@ export type Freelancer = {
 export type Brief = {
     id?: string | number;
     headline: string;
-    industries: string;
+    industries: string[];
     description: string;
     skills: string[];
     scope: string;

@@ -121,7 +121,7 @@ export type Brief = {
     headline: string;
     industries: string;
     description: string;
-    skills: string;
+    skills: string[];
     scope: string;
     duration: string;
     budget: number;

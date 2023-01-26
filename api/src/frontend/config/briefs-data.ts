@@ -12,7 +12,7 @@ export const stepData = [
     progress: 0.5,
   },
   {
-    heading: "Describe the  project you are envisioning.",
+    heading: "Describe the project you are envisioning.",
     content: `This is how imbuers figure out what you need and why you’re great to work with!
     Include your expectations about the task or deliverable, what you’re looking for in a work relationship, and anything unique about your project, team, or company.`,
     next: "Skills",
@@ -24,6 +24,13 @@ export const stepData = [
     It’s the first thing they’ll see, so make it count!`,
     next: "Scope",
     progress: 1.0,
+  },
+  {
+    heading: "Experience?",
+    content: `This is how imbuers figure out who should apply to this brief! 
+    The more experienced they are the bigger you should set your budget`,
+    next: "Skills",
+    progress: 0.5,
   },
   {
     heading: "Next, estimate the scope of your project.",
@@ -96,6 +103,26 @@ export const timeData = [
     value: "4",
   },
 ];
+
+export const experiencedLevel = [
+  {
+    label: "Entry Level",
+    value: "0",
+  },
+  {
+    label: "Intermediate",
+    value: "1",
+  },
+  {
+    label: "Expert",
+    value: "2",
+  },
+  {
+    label: "Specialist",
+    value: "3",
+  },
+];
+
 
 export const suggestedIndustries = [
   "Web3",

@@ -314,11 +314,11 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                                     {item.description}
                                 </div>
                                 <div className="brief-tags">
-                                    {/* THIS HAS BEEN COMMENTED OUT UNTIL WE HAVE A ONE TO MANY TABLE FOR SKILLS. */}
-                                    {/* { {item.skills.map((skill: any, skillIndex: any) => ( */}
+                                    THIS HAS BEEN COMMENTED OUT UNTIL WE HAVE A ONE TO MANY TABLE FOR SKILLS.
+                                    { {item.skills.map((skill: any, skillIndex: any) => (
                                         <div
                                             className="tag-item"
-                                            // key={skillIndex}
+                                            key={skillIndex}
                                         >
                                             {item.skills}
                                         </div>

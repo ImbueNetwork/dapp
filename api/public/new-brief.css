@@ -125,6 +125,13 @@ p {
     margin-bottom: 120px;
 }
 
+.experience-level-container {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    margin-bottom: 120px;
+}
+
 .budget-input-container {
     position: relative;
     margin-top: 24px;

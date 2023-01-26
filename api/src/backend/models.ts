@@ -85,13 +85,11 @@ export type Brief = {
     duration: string;
     budget: bigint;
     // created_by: string;
-    // experience_level: string,
+    experience_id: number,
     // hours_per_week: number,
     // briefs_submitted_by: number,
     user_id?: string | number;
 };
-
-
 
 export type Freelancer = {
     id?: string | number;

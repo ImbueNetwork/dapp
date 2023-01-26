@@ -3,7 +3,6 @@ import { Knex } from "knex";
 export async function seed(knex: Knex): Promise<void> {
     await knex("briefs").insert([
     {
-        id: 0,
         headline: "Amazing Frontend Developer NEEDED!!",
         industries: "Something Cool, Another Weird Thing",
         description: "We need some absolute wizard to create an ultra dynamic thing with carosels",
@@ -16,7 +15,6 @@ export async function seed(knex: Knex): Promise<void> {
 
     },
     {
-        id: 1,
         headline: "Amazing C++ Developer",
         industries: "Something Cool, Another Weird Thing but on the backend!",
         description: "We need some absolute wizard to create an ultra cool, mega thing with spinning balls",

@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
          */
         builder.increments("id", { primaryKey: true });
         builder.text("display_name");
-        builder.integer("briefs_submitted");
+        builder.integer("briefs_submitted").defaultTo(0);
 
 
         auditFields(knex, builder);

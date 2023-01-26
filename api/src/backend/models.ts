@@ -22,6 +22,7 @@ export type User = {
     username: string;
     email: string;
     password: string;
+    briefs_submitted: number;
 };
 
 export type ProposedMilestone = {
@@ -88,7 +89,7 @@ export type Brief = {
     experience_id: number,
     // hours_per_week: number,
     // briefs_submitted_by: number,
-    user_id?: string | number;
+    user_id: number;
 };
 
 export type Freelancer = {
@@ -287,10 +288,15 @@ export const fetchAllBriefs = () =>
         .innerJoin("experience", {'briefs.experience_id': "experience.id"})
         .innerJoin("users", {"briefs.user_id": "users.id"})
 
-export const insertBrief = (brief: Brief) =>
+export const insertBrief = (brief: Brief) => 
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").insert(brief).returning("*")
     )[0];
+
+export const incrementUserBriefSubmissions = (id: number) => 
+    async (tx: Knex.Transaction) => (
+        tx<User>("users").where({ id: id }).increment('briefs_submitted',1)
+    );
 
 export const insertFederatedCredential = (
     id: number,

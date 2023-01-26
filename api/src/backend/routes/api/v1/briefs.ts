@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, searchBriefs, BriefSqlFilter, Brief } from "../../../models";
+import { fetchAllBriefs, insertBrief, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
 import { json } from "stream/consumers";
 
 
@@ -57,6 +57,8 @@ router.post("/", (req, res, next) => {
                     "Failed to create brief."
                 ));
             }
+
+            await incrementUserBriefSubmissions(brief.user_id)(tx);
     
             res.status(201).send(
                 {

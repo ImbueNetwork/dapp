@@ -22,14 +22,14 @@ export const stepData = [
     heading: "What skills do you require?",
     content: `This helps your brief post stand out to the right candidates.
     It’s the first thing they’ll see, so make it count!`,
-    next: "Scope",
+    next: "Skills",
     progress: 1.0,
   },
   {
     heading: "Experience?",
     content: `This is how imbuers figure out who should apply to this brief! 
     The more experienced they are the bigger you should set your budget`,
-    next: "Skills",
+    next: "Scope",
     progress: 0.5,
   },
   {

@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOMClient from "react-dom/client";
 import BriefFilter from "./components/briefFilter";
-import {Brief, BriefSqlFilter} from "./models";
-import {callSearchBriefs, getAllBriefs} from "./services/briefsService";
+import { Brief, BriefSqlFilter } from "./models";
+import { callSearchBriefs, getAllBriefs } from "./services/briefsService";
 
 export type FilterOption = {
     interiorIndex: number;
@@ -37,74 +37,74 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
 
     expfilter = {
-            // This is a table named "experience"
-            // If you change this you must remigrate the experience table and add the new field.
-            filterType: BriefFilterOption.ExpLevel,
-            label: "Experience Level",
-            options: [
-                {
-                    interiorIndex: 0,
-                    search_for: [0],
-                    value: "Entry Level",
-                    or_max: false,
+        // This is a table named "experience"
+        // If you change this you must remigrate the experience table and add the new field.
+        filterType: BriefFilterOption.ExpLevel,
+        label: "Experience Level",
+        options: [
+            {
+                interiorIndex: 0,
+                search_for: [0],
+                value: "Entry Level",
+                or_max: false,
 
-                },
-                {
-                    interiorIndex: 1,
-                    search_for: [1],
-                    value: "Intermediate",
-                    or_max: false,
-                },
-                {
-                    interiorIndex: 2,
-                    search_for: [2],
-                    value: "Expert",
-                    or_max: false,
-                },
-                {
-                    interiorIndex: 3,
-                    search_for: [3],
-                    value: "Specialist",
-                    or_max: false,
-                },
-            ],
-        }
+            },
+            {
+                interiorIndex: 1,
+                search_for: [1],
+                value: "Intermediate",
+                or_max: false,
+            },
+            {
+                interiorIndex: 2,
+                search_for: [2],
+                value: "Expert",
+                or_max: false,
+            },
+            {
+                interiorIndex: 3,
+                search_for: [3],
+                value: "Specialist",
+                or_max: false,
+            },
+        ],
+    }
 
 
     submittedFilters = {
-            // This is a field associated with the User.
-            // since its a range i need the
-            filterType: BriefFilterOption.AmountSubmitted,
-            label: "Briefs Submitted",
-            options: [
-                {
-                    interiorIndex: 0,
-                    search_for: [0, 1, 2, 3, 4],
-                    value: "0-4",
-                    or_max: false,
-                },
-                {
-                    interiorIndex: 1,
-                    search_for: [5, 6, 7, 8, 9],
-                    value: "5-9",
-                    or_max: false,
-                },
-                {
-                    interiorIndex: 2,
-                    search_for: [10, 11, 12, 13, 14],
-                    value: "10-14",
-                    or_max: false,
-                },
-                {
-                    interiorIndex: 3,
-                    search_for: [15, 10000],
-                    value: "15+",
-                    or_max: true,
-                },
-            ],
-        }
+        // This is a field associated with the User.
+        // since its a range i need the
+        filterType: BriefFilterOption.AmountSubmitted,
+        label: "Briefs Submitted",
+        options: [
+            {
+                interiorIndex: 0,
+                search_for: [0, 1, 2, 3, 4],
+                value: "0-4",
+                or_max: false,
+            },
+            {
+                interiorIndex: 1,
+                search_for: [5, 6, 7, 8, 9],
+                value: "5-9",
+                or_max: false,
+            },
+            {
+                interiorIndex: 2,
+                search_for: [10, 11, 12, 13, 14],
+                value: "10-14",
+                or_max: false,
+            },
+            {
+                interiorIndex: 3,
+                search_for: [15, 10000],
+                value: "15+",
+                or_max: true,
+            },
+        ],
+    }
 
-        lengthFilters =
+    lengthFilters =
         {
             // Should be a field in the database, WILL BE IN DAYS.
             // Again i need the high and low values.
@@ -119,19 +119,19 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 },
                 {
                     interiorIndex: 1,
-                    search_for: [1,2,3],
+                    search_for: [1, 2, 3],
                     value: "1-3 months",
                     or_max: false,
                 },
                 {
                     interiorIndex: 2,
-                    search_for: [3,4,5,6],
+                    search_for: [3, 4, 5, 6],
                     value: "3-6 months",
                     or_max: false,
                 },
                 {
                     interiorIndex: 3,
-                    search_for: Array.from({length: 6}, (_, i) => (i + 6) + 1),
+                    search_for: Array.from({ length: 6 }, (_, i) => (i + 6) + 1),
                     value: "6-12 months",
                     or_max: false,
                 },
@@ -144,45 +144,45 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                 {
                     // years * months * days
                     interiorIndex: 5,
-                    search_for: [12*5],
+                    search_for: [12 * 5],
                     or_max: true,
                     value: "5 years +",
                 },
             ],
         }
-        hoursPwFilter = {
-            filterType: BriefFilterOption.HoursPerWeek,
-            label: "Hours Per Week",
-            options: [
-                {
-                    interiorIndex: 0,
-                    // This will be 0-30 as we actually use this as max value
-                    search_for: [30],
-                    or_max: false,
-                    value: "30hrs/week",
-                },
-                {
-                    interiorIndex: 1,
-                    // Same goes for this
-                    search_for: [50],
-                    value: "50hrs/week",
-                    or_max: true,
-                },
-            ],
-        }
+    hoursPwFilter = {
+        filterType: BriefFilterOption.HoursPerWeek,
+        label: "Hours Per Week",
+        options: [
+            {
+                interiorIndex: 0,
+                // This will be 0-30 as we actually use this as max value
+                search_for: [30],
+                or_max: false,
+                value: "30hrs/week",
+            },
+            {
+                interiorIndex: 1,
+                // Same goes for this
+                search_for: [50],
+                value: "50hrs/week",
+                or_max: true,
+            },
+        ],
+    }
 
     constructor(props: BriefProps) {
         super(props);
-        this.state = ({briefs: []});
+        this.state = ({ briefs: [] });
     }
 
     async componentDidMount() {
         const data = await getAllBriefs();
-        this.setState({ briefs: data});
+        this.setState({ briefs: data });
     }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
-    onSearch = async ()  =>  {
+    onSearch = async () => {
         const elements = document.getElementsByClassName("filtercheckbox") as HTMLCollectionOf<HTMLInputElement>;
 
         // The filter initially should return all values
@@ -200,7 +200,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         let hpw_max: number = 50;
         let hpw_is_max: boolean = false;
         let search_input = document.getElementById("search-input") as HTMLInputElement;
-        let search_value = search_input.value; 
+        let search_value = search_input.value;
         if (search_value !== "") {
             is_search = true
         }
@@ -214,21 +214,21 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     // Here we are trying to build teh paramaters required to build the query
                     // We build an array for each to get the values we want through concat.
                     // and also specify if we want more than using the is_max field.
-                    switch(parseInt(filterType) as BriefFilterOption) {
+                    switch (parseInt(filterType) as BriefFilterOption) {
                         case BriefFilterOption.ExpLevel:
                             const o = this.expfilter.options[parseInt(interiorIndex)];
-                            exp_range = [...exp_range ,...o.search_for.slice()];
+                            exp_range = [...exp_range, ...o.search_for.slice()];
                             break
 
-                            case BriefFilterOption.AmountSubmitted:
+                        case BriefFilterOption.AmountSubmitted:
                             const o1 = this.submittedFilters.options[parseInt(interiorIndex)];
-                            submitted_range = [...submitted_range ,...o1.search_for.slice()];
+                            submitted_range = [...submitted_range, ...o1.search_for.slice()];
                             submitted_is_max = o1.or_max;
                             break
 
                         case BriefFilterOption.Length:
                             const o2 = this.lengthFilters.options[parseInt(interiorIndex)]
-                            length_range = [...length_range ,...o2.search_for.slice()];
+                            length_range = [...length_range, ...o2.search_for.slice()];
                             length_is_max = o2.or_max;
                             break
 
@@ -313,17 +313,20 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                                 <div className="brief-description">
                                     {item.description}
                                 </div>
+
                                 <div className="brief-tags">
-                                    THIS HAS BEEN COMMENTED OUT UNTIL WE HAVE A ONE TO MANY TABLE FOR SKILLS.
-                                    { {item.skills.map((skill: any, skillIndex: any) => (
+                                    {item.skills.map((skill: any, skillIndex: any) => (
+
                                         <div
                                             className="tag-item"
                                             key={skillIndex}
                                         >
-                                            {item.skills}
+                                            {skill}
                                         </div>
-                                    {/* ))} } */}
+                                    ))}
+
                                 </div>
+
                                 <div className="brief-proposals">
                                     <span className="proposals-heading">
                                         Proposals Submitted:{" "}

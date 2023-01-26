@@ -83,7 +83,7 @@ export type Brief = {
     skills: string;
     scope: string;
     duration: string;
-    budget: number;
+    budget: bigint;
     // created_by: string;
     // experience_level: string,
     // hours_per_week: number,
@@ -283,7 +283,6 @@ export const fetchAllBriefs = () =>
         "budget",
         "users.display_name as created_by",
         "experience_level",
-        "hours_per_week",
         "users.briefs_submitted as briefs_submitted_by",
         )
         .from("briefs")

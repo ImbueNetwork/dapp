@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
 
         // in months atm.  
         builder.integer("duration");  
-        builder.integer("budget");          
+        builder.bigInteger("budget");          
         builder.integer("experience_id");
 
         // stored in its own table

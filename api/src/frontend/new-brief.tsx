@@ -41,7 +41,7 @@ export type BriefInfo = {
     scope: string;
     duration: string;
     skills: string[];
-    budget: number | undefined;
+    budget: bigint | undefined;
     user_id: number | undefined;
 };
 

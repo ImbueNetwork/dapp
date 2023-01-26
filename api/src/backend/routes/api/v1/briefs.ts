@@ -1,7 +1,8 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, searchBriefs, BriefSqlFilter, Brief } from "../../../models";
+import { fetchAllBriefs, insertBrief, searchBriefs, BriefSqlFilter, Brief } from "../../../models";
 import { json } from "stream/consumers";
+
 
 
 const router = express.Router();
@@ -21,19 +22,54 @@ router.get("/", (req, res, next) => {
     });
 });
 
+
 router.post("/", (req, res, next) => {
+
+    const {
+        headline,
+        industries,
+        description,
+        skills,
+        scope,
+        duration,
+        budget,
+        user_id
+
+    } = req.body.brief as Brief;
+
     db.transaction(async tx => {
         try {
-            const data: BriefSqlFilter = req.body;
-            const briefs: Array<Brief> = await searchBriefs(tx, data);
-            res.send(briefs);
-        } catch (e) {
+            const brief = await insertBrief({
+                headline,
+                industries,
+                description,
+                skills,
+                scope,
+                duration,
+                budget,
+                user_id,
+            })(tx);
+    
+            if (!brief.id) {
+                return next(new Error(
+                    "Failed to create brief."
+                ));
+            }
+    
+            res.status(201).send(
+                {
+                    status: "Successful",
+                    brief_id: brief.id
+                }
+            );    
+        } catch (cause) {
             next(new Error(
-                `Failed to search all briefs`,
-                {cause: e as Error}
+                `Failed to insert brief .`,
+                {cause: cause as Error}
             ));
         }
     });
 });
+
 
 export default router;

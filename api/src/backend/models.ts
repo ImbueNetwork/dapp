@@ -84,11 +84,13 @@ export type Brief = {
     scope: string;
     duration: string;
     budget: number;
-    created_by: string;
-    experience_level: string,
-    hours_per_week: number,
-    briefs_submitted_by: number,
+    // created_by: string;
+    // experience_level: string,
+    // hours_per_week: number,
+    // briefs_submitted_by: number,
+    user_id?: string | number;
 };
+
 
 
 export type Freelancer = {
@@ -105,6 +107,7 @@ export type Freelancer = {
     bio: string;
     user_id?: string | number;
 };
+
 
 export type BriefSqlFilter = {
     experience_range: number[];
@@ -367,13 +370,6 @@ export const updateFreelancerDetails = (userId: string,freelancer: Freelancer) =
         await tx<Freelancer>("freelancers").where({user_id: userId}).update(freelancer).returning("*")
     )[0];
 
- export const searchBriefs = (
-    experience_id: number, submitted_low: number, submitted_high: number,
-
-export const searchBriefs = (
-    experience_id_high: number, experience_id_low: number, submitted_low: number, submitted_high: number,
-
-    length_low: number, length_high: number, max_hours_pw: number) => {
 
 
 // The search briefs and all these lovely parameters.

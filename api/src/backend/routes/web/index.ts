@@ -56,6 +56,11 @@ router.get("/join", (req, res) => {
 
 router.get("/googlelogin", (req, res) => {
     res.render("googlelogin");
+
+});
+
+router.get("/briefs/", (req, res) => {
+    res.render("briefs");
 });
 
 router.get(

@@ -10,6 +10,7 @@ import {
     stepData,
     scopeData,
     timeData,
+    experiencedLevel,
     nameExamples,
     suggestedIndustries,
     suggestedSkills,
@@ -39,9 +40,10 @@ export type BriefInfo = {
     industries: string[];
     description: string;
     scope: string;
+    experience_id: number | undefined;
     duration: string;
     skills: string[];
-    budget: number | undefined;
+    budget: bigint | undefined;
     user_id: number | undefined;
 };
 
@@ -69,6 +71,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             scope: "",
             duration: "",
             skills: [],
+            experience_id: undefined,
             budget: undefined,
             user_id: undefined,
         },
@@ -140,13 +143,16 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         if (step === 3 && !info.skills.length) {
             return false;
         }
-        if (step === 4 && !info.scope) {
+        if (step === 4 && !info.experience_id) {
             return false;
         }
-        if (step === 5 && info.duration === "") {
+        if (step === 5 && !info.scope) {
             return false;
         }
-        if (step === 6 && !info.budget) {
+        if (step === 6 && info.duration === "") {
+            return false;
+        }
+        if (step === 7 && !info.budget) {
             return false;
         }
         return true;
@@ -227,6 +233,20 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             </>
         );
 
+        const ExperienceLevelPanel = (
+            <div className="experience-level-container">
+            {experiencedLevel.map(({ label, value }, index) => (
+                <Option
+                    label={label}
+                    value={value}
+                    key={index}
+                    checked={this.state.info.experience_id === value}
+                    onSelect={() => this.updateFormData("experience_id", value)}
+                />
+            ))}
+        </div>
+        );
+
         const ScopePanel = (
             <div className="scope-container">
                 {scopeData.map(({ label, value, description }, index) => (
@@ -296,6 +316,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             IndustriesPanel,
             DescriptionPanel,
             SkillsPanel,
+            ExperienceLevelPanel,
             ScopePanel,
             TimePanel,
             BudgetPanel,

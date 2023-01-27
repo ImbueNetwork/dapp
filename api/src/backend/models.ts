@@ -1,4 +1,4 @@
-import type { Knex } from "knex";
+import { knex, Knex } from "knex";
 import db from "./db/index";
 
 
@@ -22,6 +22,7 @@ export type User = {
     username: string;
     email: string;
     password: string;
+    briefs_submitted: number;
 };
 
 export type ProposedMilestone = {
@@ -78,13 +79,17 @@ export type ProjectProperties = {
 export type Brief = {
     id?: string | number;
     headline: string;
-    industries: string;
+    industries: string[];
     description: string;
-    skills: string;
+    skills: string[];
     scope: string;
     duration: string;
-    budget: number;
-    user_id?: string | number;
+    budget: bigint;
+    // created_by: string;
+    experience_id: number,
+    // hours_per_week: number,
+    // briefs_submitted_by: number,
+    user_id: number;
 };
 
 export type Freelancer = {
@@ -101,6 +106,18 @@ export type Freelancer = {
     bio: string;
     user_id?: string | number;
 };
+
+
+export type BriefSqlFilter = {
+    experience_range: number[];
+    submitted_range: number[];
+    submitted_is_max: boolean;
+    length_range: number[];
+    length_is_max: boolean;
+    max_hours_pw: number;
+    hours_pw_is_max: boolean;
+    search_input: string;
+}
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
@@ -127,7 +144,7 @@ export const upsertWeb3Challenge = (
 ) => async (tx: Knex.Transaction):
         Promise<[web3Account: Web3Account, isInsert: boolean]> => {
 
-        let web3Account = await tx<Web3Account>("web3_accounts")
+        const web3Account = await tx<Web3Account>("web3_accounts")
             .select()
             .where({
                 user_id: user?.id
@@ -253,13 +270,33 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
 export const fetchAllBriefs = () =>
-    (tx: Knex.Transaction) =>
-        tx<Brief>("briefs").whereNotNull('id').select();
+(tx: Knex.Transaction) =>
+    tx.select(
+        "briefs.id",
+        "headline",
+        "industries",
+        "description",
+        "skills",
+        "scope",
+        "duration",
+        "budget",
+        "users.display_name as created_by",
+        "experience_level",
+        "users.briefs_submitted as briefs_submitted_by",
+        )
+        .from("briefs")
+        .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+        .innerJoin("users", {"briefs.user_id": "users.id"})
 
-export const insertBrief = (brief: Brief) =>
+export const insertBrief = (brief: Brief) => 
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").insert(brief).returning("*")
     )[0];
+
+export const incrementUserBriefSubmissions = (id: number) => 
+    async (tx: Knex.Transaction) => (
+        tx<User>("users").where({ id: id }).increment('briefs_submitted',1)
+    );
 
 export const insertFederatedCredential = (
     id: number,
@@ -318,7 +355,6 @@ export const getOrCreateFederatedUser = (
     });
 };
 
-// freelancer crud interaction
 export const fetchFreelancerDetailsByUserID = (userId: string) =>
     (tx: Knex.Transaction) =>
         tx<Freelancer>("freelancers").whereNotNull('id').select().where({ user_id: userId}).first();
@@ -337,3 +373,61 @@ export const updateFreelancerDetails = (userId: string,freelancer: Freelancer) =
         await tx<Freelancer>("freelancers").where({user_id: userId}).update(freelancer).returning("*")
     )[0];
 
+
+
+// The search briefs and all these lovely parameters.
+// Since we are using checkboxes only i unfortunatly ended up using all these parameters.
+// Because we could have multiple ranges of values and open ended ors.
+export const  searchBriefs  =
+    async (tx: Knex.Transaction, filter: BriefSqlFilter) => 
+            // select everything that is associated with brief.
+            await tx.select(
+                "briefs.id",
+                "headline",
+                "industries",
+                "description",
+                "skills",
+                "scope",
+                "duration",
+                "budget",
+                "users.display_name as created_by",
+                "experience_level",
+                "hours_per_week",
+                "users.briefs_submitted as briefs_submitted_by",
+                ).from("briefs")
+                .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+                .innerJoin("users", {"briefs.user_id": "users.id"})
+                .where(function() {
+                    if (filter.submitted_range.length > 0) {
+                        this.whereIn("briefs_submitted", filter.submitted_range)
+                    }
+                    if (filter.submitted_is_max) {
+                        this.orWhere('briefs_submitted', '>=', Math.max(...filter.submitted_range))
+                    }
+                  })
+                .where(function() {
+                    if (filter.experience_range.length > 0) {
+                        this.whereIn("experience_id", filter.experience_range)
+                    }
+                })
+                .where(function() {
+                    if (filter.length_range.length > 0) {
+                        this.whereIn("duration", filter.length_range)
+                    }
+                    if (filter.length_is_max) {
+                        this.orWhere('duration', '>=', Math.max(...filter.length_range))
+                    }
+                  })
+                .where(function() {
+                    if (filter.max_hours_pw > 0) {
+                        this.whereBetween("hours_per_week", [0, filter.max_hours_pw]);
+                    }
+                    if (filter.hours_pw_is_max) {
+                        this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
+                    }
+                }).where("headline", "ilike", "%" + filter.search_input + "%")
+                .limit(30)
+                .debug(true)
+
+            
+    

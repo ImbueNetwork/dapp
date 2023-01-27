@@ -7,13 +7,21 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tableName, (builder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("headline");
-        builder.text("industries");
+        builder.specificType("industries", "text[]");
+
         builder.text("description");
-        builder.text("skills");
+        builder.specificType("skills", "text[]");
         builder.text("scope");
-        builder.text("duration");
-        builder.integer("budget");
+
+        // in months atm.  
+        builder.integer("duration");  
+        builder.bigInteger("budget");          
+        builder.integer("experience_id");
+
+        // stored in its own table
+        // The foreign key is put on in the experience migration.
         builder.integer("user_id");
+        builder.foreign("user_id").references("users.id"); 
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, tableName));
 }

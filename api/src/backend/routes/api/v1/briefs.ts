@@ -1,21 +1,17 @@
 import express, { response } from "express";
 import db from "../../../db";
-import * as models from "../../../models";
-import passport from "passport";
+import { fetchAllBriefs, insertBrief, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
+import { json } from "stream/consumers";
 
 
-type BriefPkg = models.Brief;
-
-/**
- * FIXME: all of this is terriblme
- */
 
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
+
     db.transaction(async tx => {
         try {
-            const briefs = await models.fetchAllBriefs()(tx);
+            const briefs = await fetchAllBriefs()(tx);
             res.send(briefs);
         } catch (e) {
             next(new Error(
@@ -26,40 +22,6 @@ router.get("/", (req, res, next) => {
     });
 });
 
-/*
-router.get("/:id", (req, res, next) => {
-    const id = req.params.id;
-
-    db.transaction(async tx => {
-        try {
-            const project = await models.fetchProject(id)(tx);
-
-            if (!project) {
-                return res.status(404).end();
-            }
-
-            const pkg: ProjectPkg = {
-                ...project,
-                milestones: await models.fetchProjectMilestones(id)(tx)
-            };
-
-            res.send(pkg);
-        } catch (e) {
-            next(new Error(
-                `Failed to fetch project by id: ${id}`,
-                {cause: e as Error}
-            ));
-        }
-    });
-});
-
-
-
-/**
- * TODO: json schema or something better instead.
- */
-
-
 
 router.post("/", (req, res, next) => {
 
@@ -68,20 +30,22 @@ router.post("/", (req, res, next) => {
         industries,
         description,
         skills,
+        experience_id,
         scope,
         duration,
         budget,
         user_id
 
-    } = req.body.brief as models.Brief;
+    } = req.body.brief as Brief;
 
     db.transaction(async tx => {
         try {
-            const brief = await models.insertBrief({
+            const brief = await insertBrief({
                 headline,
                 industries,
                 description,
                 skills,
+                experience_id,
                 scope,
                 duration,
                 budget,
@@ -93,6 +57,8 @@ router.post("/", (req, res, next) => {
                     "Failed to create brief."
                 ));
             }
+
+            await incrementUserBriefSubmissions(brief.user_id)(tx);
     
             res.status(201).send(
                 {
@@ -108,8 +74,6 @@ router.post("/", (req, res, next) => {
         }
     });
 });
-
-
 
 
 export default router;

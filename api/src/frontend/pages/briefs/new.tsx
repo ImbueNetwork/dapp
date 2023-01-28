@@ -1,11 +1,11 @@
 import { timeStamp } from "console";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
-import { Option } from "./components/option";
-import { ProgressBar } from "./components/progressBar";
-import { TagsInput } from "./components/tagsInput";
-import { TextInput } from "./components/textInput";
-import * as utils from "./utils";
+import { Option } from "../../components/option";
+import { ProgressBar } from "../../components/progressBar";
+import { TagsInput } from "../../components/tagsInput";
+import { TextInput } from "../../components/textInput";
+import * as utils from "../../utils";
 import {
     stepData,
     scopeData,
@@ -14,10 +14,10 @@ import {
     nameExamples,
     suggestedIndustries,
     suggestedSkills,
-} from "./config/briefs-data";
-import * as config from "./config";
-import { User } from "./models";
-import "../../public/new-brief.css";
+} from "../../config/briefs-data";
+import * as config from "../../config";
+import { User } from "../../models";
+import "../../../../public/new-brief.css";
 
 const getAPIHeaders = {
     accept: "application/json",
@@ -235,16 +235,18 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
         const ExperienceLevelPanel = (
             <div className="experience-level-container">
-            {experiencedLevel.map(({ label, value }, index) => (
-                <Option
-                    label={label}
-                    value={value}
-                    key={index}
-                    checked={this.state.info.experience_id === value}
-                    onSelect={() => this.updateFormData("experience_id", value)}
-                />
-            ))}
-        </div>
+                {experiencedLevel.map(({ label, value }, index) => (
+                    <Option
+                        label={label}
+                        value={value}
+                        key={index}
+                        checked={this.state.info.experience_id === value}
+                        onSelect={() =>
+                            this.updateFormData("experience_id", value)
+                        }
+                    />
+                ))}
+            </div>
         );
 
         const ScopePanel = (

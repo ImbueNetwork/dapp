@@ -8,12 +8,12 @@ import {
     suggestedFreelancingSkills,
     suggestedServices,
     suggestedLanguages,
-} from "./config/freelancer-data";
-import { Freelancer, User } from "./models";
-import { TagsInput } from "./components/tagsInput";
-import * as utils from "./utils";
-import { FreelancerService } from "./services/freelancerService";
-import "../../public/new-freelancer.css";
+} from "../../config/freelancer-data";
+import { Freelancer, User } from "../../models";
+import { TagsInput } from "../../components/tagsInput";
+import * as utils from "../../utils";
+import { FreelancerService } from "../../services/freelancerService";
+import "../../../../public/new-freelancer.css";
 
 const freelancerService = new FreelancerService();
 

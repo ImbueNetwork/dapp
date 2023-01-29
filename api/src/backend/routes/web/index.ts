@@ -56,7 +56,6 @@ router.get("/join", (req, res) => {
 
 router.get("/googlelogin", (req, res) => {
     res.render("googlelogin");
-
 });
 
 router.get("/briefs/", (req, res) => {
@@ -73,6 +72,10 @@ router.get(
         res.render("new-freelancer");
     }
 );
+
+router.get("/freelancers/profile", (req, res) => {
+    res.render("freelancer-profile");
+});
 
 router.use((_req, res, next) => {
     res.render("legacy");

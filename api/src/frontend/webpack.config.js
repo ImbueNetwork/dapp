@@ -8,6 +8,7 @@ module.exports = {
         "briefs": path.resolve(__dirname, "pages", "briefs", "index.tsx"),
         "new-brief": path.resolve(__dirname, "pages", "briefs", "new.tsx"),
         "new-freelancer": path.resolve(__dirname, "pages", "freelancer", "new.tsx"),
+        "freelancer-profile": path.resolve(__dirname, "pages", "freelancer", "profile.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
     },

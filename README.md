@@ -16,17 +16,37 @@ To go through this guide you will need:
 
 ## Local deployment quickstart with docker-compose
 
-From the top-level of the repo, all that's required is to run
+From the top-level of the repo.
 
+1. Add some env variables to your bash profile and source.
 ```bash
-docker-compose up -d
+echo 'export IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> $HOME/.bashrc;
+echo 'export RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> $HOME/.bashrc;
+source $HOME/.bashrc;
 ```
 
-to build the associated images and start all services. 
+2. Then build the associated images 
+```bash
+docker-compose up -d;
+```
 
-Once all the services are build you need to set up the databases using the command `docker exec api make db_up;`
+3. Setup DB and install.
+```bash
+cd api;
+make db_up;
+```
 
-If you face any issues after the databases are created then restart the services using `docker-compose down;docker-compose up -d`
+4. Finally to start the project, simply
+```bash
+yarn start;
+```
+
+If you face any issues after the databases are created then restart the services from the top level repo. 
+```bash
+docker-compose down;
+docker-compose up -d 
+``` 
+
 
 _Please note if you are using a Apple silicon e.g. M1 then you need to replace the Docker files_
 

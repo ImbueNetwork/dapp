@@ -15,10 +15,32 @@ import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 import "../../../../public/freelancer-profile.css";
-import { timeStamp } from "console";
+import { TextInput } from "../../components/textInput";
 
 export type ProfileProps = {};
 export type ProfileState = {
+    isEditingBio: boolean;
+    bioEdit: string;
+    userInfo: UserInfo;
+};
+
+export type UserInfo = {
+    name: string;
+    profileImageUrl: string;
+    location: {
+        country: string;
+        address: string;
+    };
+    rating: {
+        stars: number;
+        level: string;
+        numReviews: number;
+    };
+    contact: {
+        id: string;
+        title: string;
+    };
+    bio: string;
     socials?: {
         facebook: string;
         twitter: string;
@@ -69,51 +91,84 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         },
     ];
     state: ProfileState = {
-        portfolio: [
-            {
-                category: "NFT",
-                rate: 64.32,
+        isEditingBio: false,
+        userInfo: {
+            name: "Idris Muhammad",
+            profileImageUrl: "/public/profile-image.png",
+            location: {
+                country: "US",
+                address: "Los Angeles, United State",
             },
-        ],
-        projects: [
-            {
-                image: "",
-                title: "NFT project",
-                percent: 52,
-                milestoneComplete: 2,
-                milestoneCount: 4,
+            bio: `The Blockchain world has never been more exciting than right now.\nBut in this fast-growing space, finding top talent and the perfect project can be tough\n| Cryptocurrency | Blockchain | Ethereum | Web3 | Smart Contract | DApps | DeFi | Solidity |\n| Rust | C | C ++ | C# | Python | Golang | Java | Javascript | Scala | Simplicity | Haskell |`,
+            rating: {
+                level: "Top Rated",
+                numReviews: 1434,
+                stars: 4,
             },
-            {
-                image: "",
-                title: "NFT project",
-                percent: 52,
-                milestoneComplete: 2,
-                milestoneCount: 4,
+            portfolio: [
+                {
+                    category: "NFT",
+                    rate: 64.32,
+                },
+            ],
+            contact: {
+                id: "abbioty",
+                title: "Lead product designer Google",
             },
-            {
-                image: "",
-                title: "NFT project",
-                percent: 52,
-                milestoneComplete: 2,
-                milestoneCount: 4,
-            },
-            {
-                image: "",
-                title: "NFT project",
-                percent: 52,
-                milestoneComplete: 2,
-                milestoneCount: 4,
-            },
-            {
-                image: "",
-                title: "NFT project",
-                percent: 52,
-                milestoneComplete: 2,
-                milestoneCount: 4,
-            },
-        ],
+            projects: [
+                {
+                    image: "",
+                    title: "NFT project",
+                    percent: 52,
+                    milestoneComplete: 2,
+                    milestoneCount: 4,
+                },
+                {
+                    image: "",
+                    title: "NFT project",
+                    percent: 52,
+                    milestoneComplete: 2,
+                    milestoneCount: 4,
+                },
+                {
+                    image: "",
+                    title: "NFT project",
+                    percent: 52,
+                    milestoneComplete: 2,
+                    milestoneCount: 4,
+                },
+                {
+                    image: "",
+                    title: "NFT project",
+                    percent: 52,
+                    milestoneComplete: 2,
+                    milestoneCount: 4,
+                },
+                {
+                    image: "",
+                    title: "NFT project",
+                    percent: 52,
+                    milestoneComplete: 2,
+                    milestoneCount: 4,
+                },
+            ],
+        },
+        bioEdit: "",
     };
+
+    onSaveBio = () => {
+        this.setState({
+            ...this.state,
+            isEditingBio: false,
+            userInfo: {
+                ...this.state.userInfo,
+                bio: this.state.bioEdit,
+            },
+        });
+    };
+
     render() {
+        const { userInfo } = this.state;
         return (
             <div className="profile-container">
                 <div className="banner">
@@ -127,15 +182,17 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                     <div className="section summary">
                         <div className="profile-image">
                             <img
-                                src="/public/profile-image.png"
+                                src={userInfo.profileImageUrl}
                                 alt="profile image"
                             />
                         </div>
                         <div className="profile-summary">
-                            <h5>Idris Muhammad</h5>
+                            <h5>{userInfo.name}</h5>
                             <div className="location">
-                                <ReactCountryFlag countryCode="US" />
-                                <p>Los Angeles, United State</p>
+                                <ReactCountryFlag
+                                    countryCode={userInfo.location.country}
+                                />
+                                <p>{userInfo.location.address}</p>
                             </div>
                             <div className="rating">
                                 <p>
@@ -145,19 +202,19 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                     <FaStar color="var(--theme-yellow)" />
                                 </p>
                                 <p>
-                                    <span>Top Rated</span>
+                                    <span>{userInfo.rating.level}</span>
                                     <span className="review-count">
-                                        (1434 reviews)
+                                        {`(${userInfo.rating.numReviews} reviews)`}
                                     </span>
                                 </p>
                             </div>
                             <div className="contact">
-                                <p>@abbioty</p>
+                                <p>@{userInfo.contact.id}</p>
                                 <IoPeople
                                     color="var(--theme-secondary)"
                                     size="24px"
                                 />
-                                <p>Lead product designer Google</p>
+                                <p>{userInfo.contact.title}</p>
                             </div>
                             <div className="connect-buttons">
                                 <button className="message">Message</button>
@@ -176,26 +233,63 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                     <div className="section about">
                         <div className="header-editable">
                             <h5>About</h5>
-                            <div className="edit-icon">
-                                <FiEdit />
-                            </div>
+                            {!this.state.isEditingBio && (
+                                <div
+                                    className="edit-icon"
+                                    onClick={() =>
+                                        this.setState({
+                                            ...this.state,
+                                            isEditingBio: true,
+                                            bioEdit: userInfo.bio,
+                                        })
+                                    }
+                                >
+                                    <FiEdit />
+                                </div>
+                            )}
                         </div>
-                        <p>
-                            The Blockchain world has never been more exciting
-                            than right now.
-                        </p>
-                        <p>
-                            But in this fast-growing space, finding top talent
-                            and the perfect project can be tough
-                        </p>
-                        <p>
-                            | Cryptocurrency | Blockchain | Ethereum | Web3 |
-                            Smart Contract | DApps | DeFi | Solidity |
-                        </p>
-                        <p>
-                            | Rust | C | C ++ | C# | Python | Golang | Java |
-                            Javascript | Scala | Simplicity | Haskell |
-                        </p>
+                        {this.state.isEditingBio ? (
+                            <>
+                                <TextInput
+                                    maxLength={1000}
+                                    value={this.state.bioEdit}
+                                    onChange={(e) =>
+                                        this.setState({
+                                            ...this.state,
+                                            bioEdit: e.target.value,
+                                        })
+                                    }
+                                    className="bio-input"
+                                />
+                                <div className="edit-bio-buttons">
+                                    <button
+                                        className="primary-btn in-dark w-full"
+                                        onClick={this.onSaveBio}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        className="secondary-btn in-dark w-full"
+                                        onClick={() =>
+                                            this.setState({
+                                                ...this.state,
+                                                isEditingBio: false,
+                                            })
+                                        }
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="bio">
+                                {this.state.userInfo.bio
+                                    .split("\n")
+                                    .map((line, index) => (
+                                        <p key={index}>{line}</p>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                     <div className="portfolio">
                         <div className="detailed-info">
@@ -211,8 +305,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                                 >
                                                     <p>{label}</p>
                                                     <button className="social-btn">
-                                                        {this.state.socials &&
-                                                        this.state.socials[key]
+                                                        {userInfo.socials &&
+                                                        userInfo.socials[key]
                                                             ? icon
                                                             : "+"}
                                                     </button>
@@ -228,7 +322,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         <div className="btn-add">Add Now</div>
                                     </div>
                                     <div className="skills">
-                                        {this.state.skills?.map(
+                                        {userInfo.skills?.map(
                                             (skill, index) => (
                                                 <p
                                                     className="skill"
@@ -257,7 +351,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </div>
                                 <div className="divider" />
                                 <div className="subsection">
-                                    {this.state.portfolio?.map(
+                                    {userInfo.portfolio?.map(
                                         ({ category, rate }, index) => (
                                             <div
                                                 className="breakdown-item"
@@ -297,7 +391,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                             </div>
                         </div>
                         <div className="projects">
-                            {this.state.projects?.map(
+                            {userInfo.projects?.map(
                                 (
                                     {
                                         image,

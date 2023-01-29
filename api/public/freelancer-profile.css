@@ -149,6 +149,25 @@ button:active {
     padding: 30px 50px 80px 100px;
 }
 
+.about .bio {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.about .bio-input {
+    min-height: 300px;
+}
+
+.about .textarea-remaining {
+    color: var(--theme-ink-color);
+}
+
+.edit-bio-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .header-editable {
     display: flex;
     justify-content: space-between;

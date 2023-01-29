@@ -287,6 +287,7 @@ export const fetchAllBriefs = () =>
         .from("briefs")
         .innerJoin("experience", {'briefs.experience_id': "experience.id"})
         .innerJoin("users", {"briefs.user_id": "users.id"})
+        .orderBy("briefs.created","desc")
 
 export const insertBrief = (brief: Brief) => 
     async (tx: Knex.Transaction) => (

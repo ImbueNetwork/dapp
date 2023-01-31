@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
 import { json } from "stream/consumers";
 
 
@@ -31,23 +31,26 @@ router.post("/", (req, res, next) => {
         description,
         skills,
         experience_id,
-        scope,
-        duration,
+        scope_id,
+        duration_id,
         budget,
         user_id
 
-    } = req.body.brief as Brief;
+    } = req.body.brief;
 
     db.transaction(async tx => {
         try {
+            const skill_ids = await upsertItems(skills, "skills")(tx);
+            const industry_ids = await upsertItems(industries,"industries")(tx);
+
             const brief = await insertBrief({
                 headline,
-                industries,
+                industry_ids,
                 description,
-                skills,
+                skill_ids,
                 experience_id,
-                scope,
-                duration,
+                scope_id,
+                duration_id,
                 budget,
                 user_id,
             })(tx);
@@ -65,7 +68,7 @@ router.post("/", (req, res, next) => {
                     status: "Successful",
                     brief_id: brief.id
                 }
-            );    
+            );
         } catch (cause) {
             next(new Error(
                 `Failed to insert brief .`,

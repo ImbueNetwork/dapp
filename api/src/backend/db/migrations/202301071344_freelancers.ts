@@ -12,11 +12,22 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("education");
         builder.text("experience");
         builder.text("title");
-        builder.text("skills");
-        builder.text("languages");
+
+        builder.specificType("skill_ids", "integer[]");
+        builder.specificType("language_ids", "integer[]");
         builder.text("bio");
-        builder.text("services_offer");
+        builder.specificType("client_ids", "integer[]");
+        builder.specificType("services_ids", "integer[]");
+
+        builder.text("facebook_link");
+        builder.text("twitter_link");
+        builder.text("telegram_link");
+        builder.text("discord_link");
+
         builder.integer("user_id");
+        builder.foreign("user_id")
+        .references("users.id");
+        
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, tableName));
 }

@@ -38,13 +38,21 @@ export class Freelancers extends React.Component<
             experience: "",
             freelanced_before: "",
             freelancing_goal: "",
+            facebook_link: "",
+            twitter_link: "",
+            telegram_link: "",
+            discord_link: "",
             resume: "",
             work_type: "",
             skills: [],
             title: "",
             languages: [],
-            services_offer: [],
+            services: [],
+            clients: [],
+            client_images: [],
             bio: "",
+            display_name: "",
+            username: "",
             user_id: undefined,
         },
         step: 0,
@@ -314,9 +322,9 @@ export class Freelancers extends React.Component<
                 <div className="skills-container">
                     <TagsInput
                         suggestData={suggestedServices}
-                        tags={this.state.info.services_offer}
+                        tags={this.state.info.services}
                         onChange={(tags: string[]) =>
-                            this.updateFormData("services_offer", tags)
+                            this.updateFormData("services", tags)
                         }
                     />
                 </div>

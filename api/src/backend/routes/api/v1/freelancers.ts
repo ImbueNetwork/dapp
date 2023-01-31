@@ -2,6 +2,7 @@ import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import passport from "passport";
+import { upsertItems } from "../../../models";
 
 const router = express.Router();
 
@@ -19,20 +20,26 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.get("/:id", (req, res, next) => {
-    const userId = req.params.id;
-
+router.get("/:username", (req, res, next) => {
+    const username = req.params.username;
     db.transaction(async tx => {
         try {
-            const freelancer = await models.fetchFreelancerDetailsByUserID(userId)(tx);
+            const user = await models.fetchUserOrEmail(username)(tx);
+            if (!user) {
+                return res.status(404).end();
+            }
 
+            const freelancer = await models.fetchFreelancerDetailsByUserID(user.id)(tx);
             if (!freelancer) {
                 return res.status(404).end();
             }
+
             res.send(freelancer);
+
+
         } catch (e) {
             next(new Error(
-                `Failed to fetch freelancer details by userid: ${userId}`,
+                `Failed to fetch freelancer details by userid: ${username}`,
                 {cause: e as Error}
             ));
         }
@@ -40,36 +47,49 @@ router.get("/:id", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
+    // TODO VERIFY user is allowed to edit table
 
     const {
+        client_ids,
+        discord_link,
         education,
         experience,
+        facebook_link,
         freelancing_goal,
         freelanced_before,
         skills,
         bio,
         title,
+        twitter_link,
+        telegram_link,
         languages,
         work_type,
-        services_offer,
-        user_id
-
-    } = req.body.freelancer as models.Freelancer;
+        services,
+        user_id,
+    } = req.body.freelancer;
 
     db.transaction(async tx => {
         try {
+            const skill_ids = await upsertItems(skills, "skills")(tx);
+            const language_ids = await upsertItems(languages, "languages")(tx);
+            const services_ids = await upsertItems(services, "services")(tx);
             const freelancer = await models.insertFreelancerDetails({
                 education,
                 experience,
                 freelancing_goal,
                 freelanced_before,
-                skills,
+                skill_ids,
+                language_ids,
+                client_ids,
                 bio,
                 title,
-                languages,
                 work_type,
-                services_offer,
-                user_id
+                services_ids,
+                facebook_link,
+                twitter_link,
+                telegram_link,
+                discord_link,
+                user_id,
             })(tx);
 
             if (!freelancer.id) {
@@ -93,22 +113,26 @@ router.post("/", (req, res, next) => {
     });
 });
 
-
 router.put("/:id", (req, res, next) => {
+    // TODO VERIFY user is allowed to edit table
     const id = req.params.id;
     const {
+        client_ids,
+        discord_link,
         education,
         experience,
+        facebook_link,
         freelancing_goal,
         freelanced_before,
-        skills,
+        skill_ids,
         bio,
         title,
-        languages,
+        twitter_link,
+        telegram_link,
+        language_ids,
         work_type,
-        services_offer,
-        user_id
-    } = req.body.freelancer as models.Freelancer;
+        services_ids,
+    } = req.body.freelancer;
 
     db.transaction(async tx => {
         try {
@@ -119,22 +143,23 @@ router.put("/:id", (req, res, next) => {
                 return res.status(404).end();
             }
 
-            if (freelancerDetails.user_id !== id) {
-                return res.status(403).end();
-            }
 
             const freelancer = await models.updateFreelancerDetails(id, {
                 education,
                 experience,
                 freelancing_goal,
                 freelanced_before,
-                skills,
+                skill_ids,
+                language_ids,
+                client_ids,
                 bio,
                 title,
-                languages,
                 work_type,
-                services_offer,
-                user_id
+                services_ids,
+                facebook_link,
+                twitter_link,
+                telegram_link,
+                discord_link,
             })(tx);
 
             if (!freelancer.id) {

@@ -7,15 +7,14 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tableName, (builder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("headline");
-        builder.specificType("industries", "text[]");
+        builder.specificType("industry_ids", "integer[]");
 
         builder.text("description");
-        builder.specificType("skills", "text[]");
-        builder.text("scope");
+        builder.specificType("skill_ids", "integer[]");
+        builder.integer("scope_id");
 
-        // in months atm.  
-        builder.integer("duration");  
-        builder.bigInteger("budget");          
+        builder.integer("duration_id");
+        builder.bigInteger("budget");
         builder.integer("experience_id");
 
         // stored in its own table

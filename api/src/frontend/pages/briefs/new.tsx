@@ -39,9 +39,9 @@ export type BriefInfo = {
     headline: string;
     industries: string[];
     description: string;
-    scope: string;
+    scope_id: number | undefined;
     experience_id: number | undefined;
-    duration: string;
+    duration_id: number | undefined;
     skills: string[];
     budget: bigint | undefined;
     user_id: number | undefined;
@@ -68,8 +68,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             headline: "",
             industries: [],
             description: "",
-            scope: "",
-            duration: "",
+            scope_id: undefined,
+            duration_id: undefined,
             skills: [],
             experience_id: undefined,
             budget: undefined,
@@ -128,7 +128,6 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
     validate = (): boolean => {
         const { step, info } = this.state;
-        console.log(info);
         // TODO: show notification
         if (step === 0 && !info.headline) {
             return false;
@@ -146,10 +145,10 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         if (step === 4 && !info.experience_id) {
             return false;
         }
-        if (step === 5 && !info.scope) {
+        if (step === 5 && !info.scope_id) {
             return false;
         }
-        if (step === 6 && info.duration === "") {
+        if (step === 6 && !info.duration_id) {
             return false;
         }
         if (step === 7 && !info.budget) {
@@ -256,8 +255,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         label={label}
                         value={value}
                         key={index}
-                        checked={this.state.info.scope === value}
-                        onSelect={() => this.updateFormData("scope", value)}
+                        checked={this.state.info.scope_id === value}
+                        onSelect={() => this.updateFormData("scope_id", value)}
                     >
                         {description ? (
                             <div className="scope-item-description">
@@ -278,8 +277,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         label={label}
                         value={value}
                         key={index}
-                        checked={this.state.info.duration === value}
-                        onSelect={() => this.updateFormData("duration", value)}
+                        checked={this.state.info.duration_id === value}
+                        onSelect={() => this.updateFormData("duration_id", value)}
                     />
                 ))}
             </div>

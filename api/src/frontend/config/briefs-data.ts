@@ -63,24 +63,24 @@ export const nameExamples = ["Build a dapp", "Write a smart contract", "Generate
 export const scopeData = [
   {
     label: "Complex",
-    value: "complex",
+    value: "4",
     description:
       "A long term project with complex initiatives, intersecting tasks and numerous teams.",
   },
   {
     label: "Large",
-    value: "large",
+    value: "3",
     description:
       "A long term project with multiple tasks and requirements, with well defined milestones and a set plan",
   },
   {
     label: "Medium",
-    value: "medium",
+    value: "2",
     description: "A well-defined project, with tasks already mapped out",
   },
   {
     label: "Small",
-    value: "small",
+    value: "1",
     description: "A relatively fast and straightforward project",
   },
 ];
@@ -88,38 +88,38 @@ export const scopeData = [
 export const timeData = [
   {
     label: "More than a year",
-    value: "1",
+    value: "4",
   },
   {
     label: "More than 6 months",
-    value: "2",
-  },
-  {
-    label: "3-6 months",
     value: "3",
   },
   {
+    label: "3-6 months",
+    value: "2",
+  },
+  {
     label: "1 to 3 months",
-    value: "4",
+    value: "1",
   },
 ];
 
 export const experiencedLevel = [
   {
     label: "Entry Level",
-    value: "0",
-  },
-  {
-    label: "Intermediate",
     value: "1",
   },
   {
-    label: "Expert",
+    label: "Intermediate",
     value: "2",
   },
   {
-    label: "Specialist",
+    label: "Expert",
     value: "3",
+  },
+  {
+    label: "Specialist",
+    value: "4",
   },
 ];
 
@@ -142,4 +142,4 @@ export const suggestedIndustries = [
 ];
 
 
-export const suggestedSkills = ['Substrate', 'Rust', 'Polkadot', 'Kusama', 'React', 'Typescript'];
+export const suggestedSkills = ['Substrate', 'Rust', 'Adobe Photoshop', 'Figma', 'React', 'Typescript'];

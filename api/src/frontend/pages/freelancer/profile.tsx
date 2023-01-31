@@ -16,6 +16,8 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 
 import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
+import { getFreelancerProfile } from "../../services/briefsService";
+import { Freelancer } from "../../models";
 
 export type ProfileProps = {};
 export type ProfileState = {
@@ -37,14 +39,14 @@ export type UserInfo = {
         numReviews: number;
     };
     contact: {
-        id: string;
-        title: string;
+        username: string;
+        displayName: string;
     };
     bio: string;
     socials?: {
         facebook: string;
         twitter: string;
-        google: string;
+        // google: string;
         telegram: string;
         discord: string;
     };
@@ -74,11 +76,11 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             key: "twitter",
             icon: <FaTwitter />,
         },
-        {
-            label: "Google",
-            key: "google",
-            icon: <FaGoogle />,
-        },
+        // {
+        //     label: "Google",
+        //     key: "google",
+        //     icon: <FaGoogle />,
+        // },
         {
             label: "Telegram",
             key: "telegram",
@@ -112,8 +114,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                 },
             ],
             contact: {
-                id: "abbioty",
-                title: "Lead product designer Google",
+                username: "abbioty",
+                displayName: "Lead product designer Google",
             },
             projects: [
                 {
@@ -167,6 +169,27 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         });
     };
 
+
+    async componentDidMount() {
+        const freelancer = await getFreelancerProfile("web3dev");
+        await this.populateProfile(freelancer)
+    }
+
+
+    async populateProfile(freelancer: Freelancer) {
+
+        this.setState({
+            ...this.state,
+            userInfo: {
+                ...this.state.userInfo,
+                contact: {username: freelancer.username, displayName: freelancer.display_name },
+                name: freelancer.display_name,
+                bio: freelancer.bio,
+                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
+            },
+        });
+    }
+
     render() {
         const { userInfo } = this.state;
         return (
@@ -209,12 +232,12 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 </p>
                             </div>
                             <div className="contact">
-                                <p>@{userInfo.contact.id}</p>
+                                <p>@{userInfo.contact.username}</p>
                                 <IoPeople
                                     color="var(--theme-secondary)"
                                     size="24px"
                                 />
-                                <p>{userInfo.contact.title}</p>
+                                <p>{userInfo.contact.displayName}</p>
                             </div>
                             <div className="connect-buttons">
                                 <button className="message">Message</button>

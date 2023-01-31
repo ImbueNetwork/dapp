@@ -40,7 +40,7 @@ export type UserInfo = {
     };
     contact: {
         username: string;
-        displayName: string;
+        title: string;
     };
     bio: string;
     socials?: {
@@ -115,7 +115,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             ],
             contact: {
                 username: "abbioty",
-                displayName: "Lead product designer Google",
+                title: "Lead product designer Google",
             },
             projects: [
                 {
@@ -182,8 +182,9 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             ...this.state,
             userInfo: {
                 ...this.state.userInfo,
-                contact: {username: freelancer.username, displayName: freelancer.display_name },
+                contact: {username: freelancer.username, title: freelancer.title },
                 name: freelancer.display_name,
+                skills: freelancer.skills,
                 bio: freelancer.bio,
                 socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
             },
@@ -237,7 +238,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                     color="var(--theme-secondary)"
                                     size="24px"
                                 />
-                                <p>{userInfo.contact.displayName}</p>
+                                <p>{userInfo.contact.title}</p>
                             </div>
                             <div className="connect-buttons">
                                 <button className="message">Message</button>

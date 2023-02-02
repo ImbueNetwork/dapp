@@ -106,6 +106,30 @@ export class Freelancers extends React.Component<
     // TODO:
     validate = (): boolean => {
         const { step, info } = this.state;
+        console.log(info);
+        // TODO: show notification
+        if (step === 1 && !info.freelanced_before) {
+            return false;
+        }
+        if (step === 2 && !info.freelancing_goal) {
+            return false;
+        }
+        if (step === 3 && !info.title) {
+            // TODO: minimum required length for description
+            return false;
+        }
+        if (step === 4 && !info.languages.length) {
+            return false;
+        }
+        if (step === 5 && !info.skills.length) {
+            return false;
+        }
+        if (step === 6 && !info.bio) {
+            return false;
+        }
+        if (step === 7 && !info.services_offer.length) {
+            return false;
+        }
         return true;
     };
 
@@ -386,6 +410,7 @@ export class Freelancers extends React.Component<
                         ) : step === stepData.length - 2 ? (
                             <button
                                 className="primary-btn in-dark w-button"
+                                disabled={!this.validate()}
                                 onClick={() =>
                                     this.createProfile(this.state.info)
                                 }
@@ -396,6 +421,7 @@ export class Freelancers extends React.Component<
                             <button
                                 className="primary-btn in-dark w-button"
                                 onClick={this.onNext}
+                                disabled={!this.validate()}
                             >
                                 Next
                             </button>

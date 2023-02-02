@@ -13,11 +13,15 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("experience");
         builder.text("title");
 
-        builder.specificType("skill_ids", "integer[]");
-        builder.specificType("language_ids", "integer[]");
         builder.text("bio");
-        builder.specificType("client_ids", "integer[]");
-        builder.specificType("services_ids", "integer[]");
+
+        // These fields can be found in tables:
+        // freelancer_language, freelancer_client, freelancer_services, freelancer_skills
+        
+        //builder.specificType("language_ids", "integer[]");
+        //builder.specificType("client_ids", "integer[]");
+        //builder.specificType("services_ids", "integer[]");
+        //builder.specificType("skill_ids", "integer[]");
 
         builder.text("facebook_link");
         builder.text("twitter_link");

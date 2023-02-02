@@ -545,6 +545,56 @@ export const fetchAllFreelancers = () =>
         "username",
         "display_name",
     )
+    .from("freelancers")
+    // Join services and many to many
+    .leftJoin("freelancer_services", { 'freelancers.id': "freelancer_services.freelancer_id" })
+    .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
+    // Join clients and many to many
+    .leftJoin("freelancer_clients", { 'freelancers.id': "freelancer_clients.freelancer_id" })
+    .leftJoin("clients", { 'freelancers_clients.client_id': "clients.id" })
+    // Join skills and many to many
+    .leftJoin("freelancer_skills", { 'freelancers.id': "freelancer_skills.freelancer_id" })
+    .leftJoin("skills", { 'freelancers_skills.skill_id': "skills.id" })
+    // Join languages and many to many
+    .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
+    .leftJoin("language", { 'freelancer_language.language_id': "languages.id" })
+    .innerJoin("users", { "all_freelancers.user_id": "users.id" })
+
+    // order and group by many-many selects
+    .orderBy("all_freelancers.created", "desc")
+    .groupBy("services")
+    .groupBy("skills")
+    .groupBy("clients")
+    .groupBy("clients_images")
+    .groupBy("languages")
+
+    
+
+export const fetchAllFreelancers2 = () =>
+    (tx: Knex.Transaction) =>
+    
+    tx.select(
+        "all_freelancers.id",
+        "freelanced_before",
+        "freelancing_goal",
+        "work_type",
+        "education",
+        "experience",
+        "skills",
+        "languages",
+        "clients",
+        "client_images",
+        "services",
+        "facebook_link",
+        "twitter_link",
+        "telegram_link",
+        "discord_link",
+        "title",
+        "bio",
+        "user_id",
+        "username",
+        "display_name",
+    )
     .from(tx.raw(`\
 (WITH joined_skills AS ( SELECT freelancers.id as freelancer_id,
                         ARRAY_AGG(skills.name) as skills

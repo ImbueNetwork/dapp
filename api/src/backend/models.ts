@@ -567,85 +567,11 @@ export const fetchAllFreelancers = () =>
     .groupBy("clients")
     .groupBy("clients_images")
     .groupBy("languages")
+    .limit(50)
+    .debug(false)
 
     
 
-export const fetchAllFreelancers2 = () =>
-    (tx: Knex.Transaction) =>
-    
-    tx.select(
-        "all_freelancers.id",
-        "freelanced_before",
-        "freelancing_goal",
-        "work_type",
-        "education",
-        "experience",
-        "skills",
-        "languages",
-        "clients",
-        "client_images",
-        "services",
-        "facebook_link",
-        "twitter_link",
-        "telegram_link",
-        "discord_link",
-        "title",
-        "bio",
-        "user_id",
-        "username",
-        "display_name",
-    )
-    .from(tx.raw(`\
-(WITH joined_skills AS ( SELECT freelancers.id as freelancer_id,
-                        ARRAY_AGG(skills.name) as skills
-                        FROM freelancers
-                        LEFT JOIN skills
-                        ON skills.id = ANY (freelancers.skill_ids)
-                        GROUP BY freelancers.id),
-joined_languages AS (SELECT freelancers.id as freelancer_id,
-                        ARRAY_AGG(languages.name) as languages
-                        FROM freelancers
-                        LEFT JOIN languages ON languages.id = ANY (freelancers.language_ids)
-                        GROUP BY freelancers.id),
-joined_clients AS (SELECT freelancers.id as freelancer_id,
-                            ARRAY_AGG(clients.name) as clients,
-                            ARRAY_AGG(clients.img) as client_images
-                            FROM freelancers
-                            LEFT JOIN clients ON clients.id = ANY (freelancers.client_ids)
-                            GROUP BY freelancers.id),
-joined_services AS (SELECT freelancers.id as freelancer_id,
-                                ARRAY_AGG(services.name) as services
-                                FROM freelancers
-                                LEFT JOIN services ON services.id = ANY (freelancers.services_ids)
-                                GROUP BY freelancers.id)
-SELECT 
-                        id,
-                        freelanced_before,
-                        freelancing_goal,
-                        work_type,
-                        education,
-                        experience,
-                        skills,
-                        languages,
-                        clients,
-                        client_images,
-                        services,
-                        facebook_link,
-                        twitter_link,
-                        telegram_link,
-                        discord_link,
-                        title,
-                        bio,
-                        user_id,
-                        created from
-                        freelancers 
-                        join joined_skills on freelancers.id = joined_skills.freelancer_id
-                        join joined_languages on freelancers.id = joined_languages.freelancer_id
-                        join joined_clients on freelancers.id = joined_clients.freelancer_id
-                        join joined_services on freelancers.id = joined_services.freelancer_id) as all_freelancers
-                        `))
-    .innerJoin("users", { "all_freelancers.user_id": "users.id" })
-    .orderBy("all_freelancers.created", "desc")
 
 
 export const insertFreelancerDetails = (freelancer: Freelancer) =>
@@ -712,6 +638,6 @@ export const searchBriefs =
                 }
             }).where("headline", "ilike", "%" + filter.search_input + "%")
             .limit(30)
-            .debug(true)
+            .debug(false)
 
 

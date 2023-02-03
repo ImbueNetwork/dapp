@@ -49,7 +49,7 @@ export async function up(knex: Knex): Promise<void> {
             builder.foreign("language_id").references("languages.id"); 
             builder.foreign("freelancer_id").references("freelancers.id"); 
             auditFields(knex, builder);
-        });
+        });     
     }); 
 
 

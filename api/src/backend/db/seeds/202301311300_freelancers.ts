@@ -28,40 +28,40 @@ export async function seed(knex: Knex): Promise<void> {
         },
     ]).then(async () => {
         await knex("freelancer_services").insert([
-            {freelancer_id: 0, service_id: 0}, 
-            {freelancer_id: 0, service_id: 1},
-            {freelancer_id: 0, service_id: 2}, 
-            {freelancer_id: 0, service_id: 3},
-            {freelancer_id: 1, service_id: 0}, 
+            {freelancer_id: 1, service_id: 4}, 
             {freelancer_id: 1, service_id: 1},
-            {freelancer_id: 1, service_id: 3}, 
+            {freelancer_id: 1, service_id: 2}, 
+            {freelancer_id: 1, service_id: 3},
+            {freelancer_id: 2, service_id: 2}, 
+            {freelancer_id: 2, service_id: 1},
+            {freelancer_id: 2, service_id: 3}, 
         ])
     
         await knex("freelancer_clients").insert([
-            {freelancer_id: 0, client_id: 0}, 
-            {freelancer_id: 0, client_id: 1},
-            {freelancer_id: 0, client_id: 2}, 
-            {freelancer_id: 0, client_id: 3},
-            {freelancer_id: 1, client_id: 0}, 
+            {freelancer_id: 2, client_id: 4}, 
+            {freelancer_id: 2, client_id: 1},
+            {freelancer_id: 2, client_id: 2}, 
+            {freelancer_id: 2, client_id: 3},
+            {freelancer_id: 1, client_id: 2}, 
             {freelancer_id: 1, client_id: 1},
             {freelancer_id: 1, client_id: 3}, 
         ])
         
         await knex("freelancer_skills").insert([
-            {freelancer_id: 0, skill_id: 0}, 
-            {freelancer_id: 0, skill_id: 1},
-            {freelancer_id: 0, skill_id: 2}, 
-            {freelancer_id: 0, skill_id: 3},
+            {freelancer_id: 2, skill_id: 4}, 
+            {freelancer_id: 2, skill_id: 1},
+            {freelancer_id: 2, skill_id: 2}, 
+            {freelancer_id: 2, skill_id: 3},
             {freelancer_id: 1, skill_id: 4}, 
             {freelancer_id: 1, skill_id: 5},
             {freelancer_id: 1, skill_id: 6},
         ])
         
         await knex("freelancer_languages").insert([
-            {freelancer_id: 0, language_id: 0}, 
-            {freelancer_id: 0, language_id: 1},
-            {freelancer_id: 0, language_id: 2}, 
-            {freelancer_id: 0, language_id: 3},
+            {freelancer_id: 2, language_id: 4}, 
+            {freelancer_id: 2, language_id: 1},
+            {freelancer_id: 2, language_id: 2}, 
+            {freelancer_id: 2, language_id: 3},
             {freelancer_id: 1, language_id: 4}, 
             {freelancer_id: 1, language_id: 5},
             {freelancer_id: 1, language_id: 6},

@@ -2,7 +2,7 @@ import React from "react";
 
 export type OptionProps = {
   label: string;
-  value: string;
+  value: string | number;
   checked?: boolean;
   children?: React.ReactNode;
   onSelect: () => void;

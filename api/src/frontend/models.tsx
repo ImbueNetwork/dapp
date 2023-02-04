@@ -106,6 +106,7 @@ export type Freelancer = {
     education: string;
     experience: string;
     freelanced_before: string;
+    freelancing_goal: string;
     work_type: string;
     skills: string[];
     title: string;
@@ -126,9 +127,9 @@ export type Brief = {
     duration: string;
     budget: number;
     created_by: string;
-    experience_level: string,
-    hours_per_week: number,
-    briefs_submitted_by: number,
+    experience_level: string;
+    hours_per_week: number;
+    briefs_submitted_by: number;
 };
 
 export type BriefSqlFilter = {
@@ -140,4 +141,4 @@ export type BriefSqlFilter = {
     max_hours_pw: number;
     hours_pw_is_max: boolean;
     search_input: string;
-}
+};

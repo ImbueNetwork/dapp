@@ -1,5 +1,5 @@
 import { timeStamp } from "console";
-import React from "react";
+import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Option } from "../../components/option";
 import { ProgressBar } from "../../components/progressBar";
@@ -61,343 +61,286 @@ async function invokeBriefAPI(brief: BriefInfo) {
     }
 }
 
-export class Briefs extends React.Component<BriefProps, BriefState> {
-    state = {
-        step: 0,
-        info: {
-            headline: "",
-            industries: [],
-            description: "",
-            scope: "",
-            duration: "",
-            skills: [],
-            experience_id: undefined,
-            budget: undefined,
-            user_id: undefined,
-        },
-    };
+export const NewBrief = (props: BriefProps): JSX.Element => {
+    const [step, setStep] = useState(0);
+    const [headline, setHeadline] = useState("");
+    const [industries, setIndustries] = useState<string[]>([]);
+    const [description, setDescription] = useState("");
+    const [skills, setSkills] = useState<string[]>([]);
+    const [expId, setExpId] = useState<number>();
+    const [scope, setScope] = useState('');
+    const [duration, setDuration] = useState<number>();
+    const [budget, setBudget] = useState<number>();
 
-    constructor(props: BriefProps) {
-        super(props);
-    }
+    const NamePanel = (
+        <>
+            <p className="field-name">Write a headline for your brief</p>
+            <div className="name-panel-input-wrapper">
+                <input
+                    className="field-input"
+                    placeholder="Enter the name of your project"
+                    name="headline"
+                    value={headline}
+                    onChange={(e) => setHeadline(e.target.value)}
+                />
+            </div>
+            <p className="field-name">Examples</p>
+            <div className="name-panel-name-examples">
+                {nameExamples.map((name, index) => (
+                    <p className="name-panel-name-example" key={index}>
+                        {name}
+                    </p>
+                ))}
+            </div>
+        </>
+    );
 
-    async componentDidMount() {
-        const user: User = await utils.getCurrentUser();
-        if (user) {
-            this.setState({
-                ...this.state,
-                info: {
-                    ...this.state.info,
-                    user_id: user.id,
-                },
-            });
-        }
-    }
+    const IndustriesPanel = (
+        <>
+            <p className="field-name">Search industries or add your own</p>
+            <div className="industry-container">
+                <TagsInput
+                    suggestData={suggestedIndustries}
+                    tags={industries}
+                    onChange={(tags: string[]) => setIndustries(tags)}
+                />
+            </div>
+        </>
+    );
 
-    onBack = () => {
-        const { step } = this.state;
-        step >= 1 && this.setState({ ...this.state, step: step - 1 });
-    };
+    const DescriptionPanel = (
+        <div className="description-panel">
+            <p className="field-name">
+                Describe your project in a few sentences
+            </p>
+            <div className="description-container">
+                <TextInput
+                    value={description}
+                    name="description"
+                    maxLength={5000}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+            </div>
+        </div>
+    );
 
-    onNext = () => {
-        const { step } = this.state;
-        step < stepData.length - 1 &&
-            this.setState({ ...this.state, step: step + 1 });
-    };
+    const SkillsPanel = (
+        <>
+            <p className="field-name">Search the skills</p>
+            <div className="skills-container">
+                <TagsInput
+                    suggestData={suggestedSkills}
+                    tags={skills}
+                    onChange={(tags: string[]) => setSkills(tags)}
+                />
+            </div>
+        </>
+    );
 
-    onReviewPost = (brief: BriefInfo) => {
-        const { step } = this.state;
-        step < stepData.length - 1 &&
-            this.setState({ ...this.state, step: step + 1 });
-        invokeBriefAPI(brief);
-    };
+    const ExperienceLevelPanel = (
+        <div className="experience-level-container">
+            {experiencedLevel.map(({ label, value }, index) => (
+                <Option
+                    label={label}
+                    value={value}
+                    key={index}
+                    checked={expId === value}
+                    onSelect={() => setExpId(value)}
+                />
+            ))}
+        </div>
+    );
 
-    onDiscoverBriefs = (brief: BriefInfo) => {
-        utils.redirect("briefs");
-    };
+    const ScopePanel = (
+        <div className="scope-container">
+            {scopeData.map(({ label, value, description }, index) => (
+                <Option
+                    label={label}
+                    value={value}
+                    key={index}
+                    checked={scope === value}
+                    onSelect={() => setScope(value)}
+                >
+                    {description ? (
+                        <div className="scope-item-description">
+                            {description}
+                        </div>
+                    ) : (
+                        <></>
+                    )}
+                </Option>
+            ))}
+        </div>
+    );
 
-    updateFormData = (name: string, value: string | number | string[]) => {
-        this.setState({
-            ...this.state,
-            info: {
-                ...this.state.info,
-                [name]: value,
-            },
-        });
-    };
+    const TimePanel = (
+        <div className="time-container">
+            {timeData.map(({ label, value }, index) => (
+                <Option
+                    label={label}
+                    value={value}
+                    key={index}
+                    checked={duration === value}
+                    onSelect={() => setDuration(value)}
+                />
+            ))}
+        </div>
+    );
 
-    validate = (): boolean => {
-        const { step, info } = this.state;
-        console.log(info);
+    const BudgetPanel = (
+        <div>
+            <p className="field-name">Maximum project budget (USD)</p>
+            <div className="budget-input-container">
+                <input
+                    className="field-input"
+                    style={{ paddingLeft: "24px" }}
+                    type="number"
+                    value={budget || ""}
+                    onChange={(e) => setBudget(Number(e.target.value))}
+                />
+                <div className="budget-currency-container">$</div>
+            </div>
+            <div className="budget-description">
+                You will be able to set milestones which divide your project
+                into manageable phases.
+            </div>
+        </div>
+    );
+
+    const ConfirmPanel = (
+        <div className="description-panel">
+            <p className="field-name">Thank you for your submission!</p>
+        </div>
+    );
+
+    const panels = [
+        NamePanel,
+        IndustriesPanel,
+        DescriptionPanel,
+        SkillsPanel,
+        ExperienceLevelPanel,
+        ScopePanel,
+        TimePanel,
+        BudgetPanel,
+        ConfirmPanel,
+    ];
+    const validate = (): boolean => {
         // TODO: show notification
-        if (step === 0 && !info.headline) {
+        if (step === 0 && !headline) {
             return false;
         }
-        if (step === 1 && !info.industries.length) {
+        if (step === 1 && !industries.length) {
             return false;
         }
-        if (step === 2 && !info.description) {
+        if (step === 2 && !description) {
             // TODO: minimum required length for description
             return false;
         }
-        if (step === 3 && !info.skills.length) {
+        if (step === 3 && !skills.length) {
             return false;
         }
-        if (step === 4 && !info.experience_id) {
+        if (step === 4 && expId === undefined) {
             return false;
         }
-        if (step === 5 && !info.scope) {
+        if (step === 5 && !scope) {
             return false;
         }
-        if (step === 6 && info.duration === "") {
+        if (step === 6 && duration === undefined) {
             return false;
         }
-        if (step === 7 && !info.budget) {
+        if (step === 7 && !budget) {
             return false;
         }
         return true;
     };
 
-    render() {
-        const { step } = this.state;
-        const NamePanel = (
-            <>
-                <p className="field-name">Write a headline for your brief</p>
-                <div className="name-panel-input-wrapper">
-                    <input
-                        className="field-input"
-                        placeholder="Enter the name of your project"
-                        name="headline"
-                        value={this.state.info.headline}
-                        onChange={(e) =>
-                            this.updateFormData("headline", e.target.value)
-                        }
-                    />
-                </div>
-                <p className="field-name">Examples</p>
-                <div className="name-panel-name-examples">
-                    {nameExamples.map((name, index) => (
-                        <p className="name-panel-name-example" key={index}>
-                            {name}
+    const onReviewPost = async () => {
+        const resp = await fetch(`${config.apiBase}/briefs/`, {
+            headers: postAPIHeaders,
+            method: "post",
+            body: JSON.stringify({ headline, industries, description, scope, experience_id: expId, duration, skills, budget }),
+        });
+
+        if (resp.ok) {
+            // could be 200 or 201
+            // Brief API successfully invoked
+            console.log("Brief created successfully via Brief REST API");
+        }
+        else {
+            console.log("Failed to submit the brief");
+        }
+        setStep(step + 1);
+    };
+
+    return (
+        <div className="brief-details-container">
+            <div className="left-panel">
+                <ProgressBar
+                    titleArray={[
+                        "Description",
+                        "Skills",
+                        "Scope",
+                        "Budget",
+                    ]}
+                    currentValue={stepData[step].progress}
+                />
+                <h1 className="heading">{stepData[step].heading}</h1>
+                {stepData[step].content
+                    .split("\n")
+                    .map((content, index) => (
+                        <p className="help" key={index}>
+                            {content}
                         </p>
                     ))}
-                </div>
-            </>
-        );
+            </div>
+            <div className="right-panel">
+                <div className="contents">{panels[step] ?? <></>}</div>
+                <div className="buttons">
+                    {step >= 1 && (
+                        <button
+                            className="secondary-btn"
+                            onClick={() => setStep(step - 1)}
+                        >
+                            Back
+                        </button>
+                    )}
 
-        const IndustriesPanel = (
-            <>
-                <p className="field-name">Search industries or add your own</p>
-                <div className="industry-container">
-                    <TagsInput
-                        suggestData={suggestedIndustries}
-                        tags={this.state.info.industries}
-                        onChange={(tags: string[]) =>
-                            this.updateFormData("industries", tags)
-                        }
-                    />
-                </div>
-            </>
-        );
-
-        const DescriptionPanel = (
-            <div className="description-panel">
-                <p className="field-name">
-                    Describe your project in a few sentences
-                </p>
-                <div className="description-container">
-                    <TextInput
-                        value={this.state.info.description}
-                        name="description"
-                        maxLength={5000}
-                        onChange={(e) =>
-                            this.updateFormData("description", e.target.value)
-                        }
-                    />
+                    {step === stepData.length - 1 ? (
+                        <button
+                            className="primary-btn in-dark w-button"
+                            onClick={() => utils.redirect("briefs")}
+                        >
+                            Discover Briefs
+                        </button>
+                    ) : step === stepData.length - 2 ? (
+                        <button
+                            className="primary-btn in-dark w-button"
+                            disabled={!validate()}
+                            onClick={() => onReviewPost()}
+                        >
+                            Submit
+                        </button>
+                    ) : (
+                        <button
+                            className="primary-btn in-dark w-button"
+                            onClick={() => setStep(step + 1)}
+                            disabled={!validate()}
+                        >
+                            {stepData[step].next
+                                ? `Next: ${stepData[step].next}`
+                                : "Next"}
+                        </button>
+                    )}
                 </div>
             </div>
-        );
+        </div>
+    );
 
-        const SkillsPanel = (
-            <>
-                <p className="field-name">Search the skills</p>
-                <div className="skills-container">
-                    <TagsInput
-                        suggestData={suggestedSkills}
-                        tags={this.state.info.skills}
-                        onChange={(tags: string[]) =>
-                            this.updateFormData("skills", tags)
-                        }
-                    />
-                </div>
-            </>
-        );
-
-        const ExperienceLevelPanel = (
-            <div className="experience-level-container">
-                {experiencedLevel.map(({ label, value }, index) => (
-                    <Option
-                        label={label}
-                        value={value}
-                        key={index}
-                        checked={this.state.info.experience_id === value}
-                        onSelect={() =>
-                            this.updateFormData("experience_id", value)
-                        }
-                    />
-                ))}
-            </div>
-        );
-
-        const ScopePanel = (
-            <div className="scope-container">
-                {scopeData.map(({ label, value, description }, index) => (
-                    <Option
-                        label={label}
-                        value={value}
-                        key={index}
-                        checked={this.state.info.scope === value}
-                        onSelect={() => this.updateFormData("scope", value)}
-                    >
-                        {description ? (
-                            <div className="scope-item-description">
-                                {description}
-                            </div>
-                        ) : (
-                            <></>
-                        )}
-                    </Option>
-                ))}
-            </div>
-        );
-
-        const TimePanel = (
-            <div className="time-container">
-                {timeData.map(({ label, value }, index) => (
-                    <Option
-                        label={label}
-                        value={value}
-                        key={index}
-                        checked={this.state.info.duration === value}
-                        onSelect={() => this.updateFormData("duration", value)}
-                    />
-                ))}
-            </div>
-        );
-
-        const BudgetPanel = (
-            <div>
-                <p className="field-name">Maximum project budget (USD)</p>
-                <div className="budget-input-container">
-                    <input
-                        className="field-input"
-                        style={{ paddingLeft: "24px" }}
-                        type="number"
-                        value={this.state.info.budget || ""}
-                        onChange={(e) =>
-                            this.updateFormData("budget", e.target.value)
-                        }
-                    />
-                    <div className="budget-currency-container">$</div>
-                </div>
-                <div className="budget-description">
-                    You will be able to set milestones which divide your project
-                    into manageable phases.
-                </div>
-            </div>
-        );
-
-        const ConfirmPanel = (
-            <div className="description-panel">
-                <p className="field-name">Thank you for your submission!</p>
-            </div>
-        );
-
-        const panels = [
-            NamePanel,
-            IndustriesPanel,
-            DescriptionPanel,
-            SkillsPanel,
-            ExperienceLevelPanel,
-            ScopePanel,
-            TimePanel,
-            BudgetPanel,
-            ConfirmPanel,
-        ];
-
-        return (
-            <div className="brief-details-container">
-                <div className="left-panel">
-                    <ProgressBar
-                        titleArray={[
-                            "Description",
-                            "Skills",
-                            "Scope",
-                            "Budget",
-                        ]}
-                        currentValue={stepData[step].progress}
-                    />
-                    <h1 className="heading">{stepData[step].heading}</h1>
-                    {stepData[step].content
-                        .split("\n")
-                        .map((content, index) => (
-                            <p className="help" key={index}>
-                                {content}
-                            </p>
-                        ))}
-                </div>
-                <div className="right-panel">
-                    <div className="contents">{panels[step] ?? <></>}</div>
-                    <div className="buttons">
-                        {step >= 1 && (
-                            <button
-                                className="secondary-btn"
-                                onClick={this.onBack}
-                            >
-                                Back
-                            </button>
-                        )}
-
-                        {step === stepData.length - 1 ? (
-                            <button
-                                className="primary-btn in-dark w-button"
-                                onClick={() =>
-                                    this.onDiscoverBriefs(this.state.info)
-                                }
-                            >
-                                Discover Briefs
-                            </button>
-                        ) : step === stepData.length - 2 ? (
-                            <button
-                                className="primary-btn in-dark w-button"
-                                disabled={!this.validate()}
-                                onClick={() =>
-                                    this.onReviewPost(this.state.info)
-                                }
-                            >
-                                Submit
-                            </button>
-                        ) : (
-                            <button
-                                className="primary-btn in-dark w-button"
-                                onClick={this.onNext}
-                                disabled={!this.validate()}
-                            >
-                                {stepData[step].next
-                                    ? `Next: ${stepData[step].next}`
-                                    : "Next"}
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
+};
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     const user = await utils.getCurrentUser();
     ReactDOMClient.createRoot(document.getElementById("brief-details")!).render(
-        <Briefs />
+        <NewBrief />
     );
 });

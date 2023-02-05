@@ -25,3 +25,4 @@ export const onUpdateTrigger = (knex: Knex, table: string) => () => knex.raw(`
     FOR EACH ROW
     EXECUTE PROCEDURE on_update_timestamp();
 `);
+

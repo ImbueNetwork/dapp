@@ -445,7 +445,8 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
     fetchAllFreelancers()(tx)
     .where({user_id})
     .orderBy("freelancers.created", "desc")
-    .first();
+    .first()
+    .debug(true)
 
 
 export const fetchAllFreelancers = () =>
@@ -473,7 +474,7 @@ export const fetchAllFreelancers = () =>
         "username",
         "display_name",
     )
-    .from("freelancers")
+    .from<Freelancer>("freelancers")
     // Join services and many to many
     .leftJoin("freelancer_services", { 'freelancers.id': "freelancer_services.freelancer_id" })
     .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
@@ -496,16 +497,66 @@ export const fetchAllFreelancers = () =>
     .groupBy("clients_images")
     .groupBy("languages")
     .limit(50)
-    .debug(false)
+    .debug(true)
 
     
 
 
 
-export const insertFreelancerDetails = (freelancer: Freelancer) =>
+export const insertFreelancerDetails = (f: Freelancer) =>
     async (tx: Knex.Transaction) => (
-        await tx<Freelancer>("freelancers").insert(freelancer).returning("*")
-    )[0];
+        knex("freelancers")
+        .insert({
+          freelanced_before: f.freelanced_before,
+          freelancing_goal: f.freelancing_goal,
+          work_type: f.work_type,
+          education: f.education,
+          experience: f.experience,
+          title: f.title,
+          bio: f.bio,
+          facebook_link: f.facebook_link,
+          twitter_link: f.twitter_link,
+          telegram_link: f.telegram_link,
+          discord_link: f.discord_link,
+          user_id: f.user_id
+        }).returning("id")
+        .then(async ids => {
+            f.skill_ids.forEach(skillId => {
+                knex("freelancer_skills")
+                .insert({
+                    freelancer_id: ids[0],
+                    skill_id: skillId
+                })
+            })
+            f.language_ids.forEach(langId => {
+                knex("freelancer_languages")
+                .insert({
+                    freelancer_id: ids[0],
+                    skill_id: langId
+                })
+            })
+            f.client_ids.forEach(clientId => {
+                knex("freelancer_clients")
+                .insert({
+                    freelancer_id: ids[0],
+                    skill_id: clientId
+                })
+            })
+            f.services_ids.forEach(serviceId => {
+                knex("freelancer_services")
+                .insert({
+                    freelancer_id: ids[0],
+                    skill_id: serviceId
+                })
+            })
+
+        })
+    );
+
+    // skill_ids: number[];
+    // language_ids: number[];
+    // client_ids: number[];
+    // services_ids: number[];
 
 export const updateFreelancerDetails = (userId: string, freelancer: Freelancer) =>
     async (tx: Knex.Transaction) => (

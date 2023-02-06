@@ -459,11 +459,15 @@ export const fetchAllFreelancers = () =>
         "work_type",
         "education",
         "experience",
-        "skills",
-        "languages",
-        "clients",
-        "client_images",
-        "services",
+        "skills.id as skill_ids",
+        "skills.skill",
+        "languages.id as language_ids",
+        "languages.language",
+        "clients.id as client_ids",
+        "clients.client",
+        "clients.img",
+        "services.id as service.ids",
+        "services.service",
         "facebook_link",
         "twitter_link",
         "telegram_link",
@@ -487,15 +491,17 @@ export const fetchAllFreelancers = () =>
     // Join languages and many to many
     .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
     .leftJoin("language", { 'freelancer_language.language_id': "languages.id" })
-    .innerJoin("users", { "all_freelancers.user_id": "users.id" })
+    .innerJoin("users", { "freelancers.user_id": "users.id" })
 
     // order and group by many-many selects
     .orderBy("freelancers.created", "desc")
-    .groupBy("services")
-    .groupBy("skills")
-    .groupBy("clients")
-    .groupBy("clients_images")
-    .groupBy("languages")
+    .groupBy("freelancers.id")
+    // todo: Maybe dont need these 
+    //.groupBy("services")
+    //.groupBy("skill")
+    //.groupBy("clients")
+    //.groupBy("clients_images")
+    //.groupBy("languages")
     .limit(50)
     .debug(true)
 
@@ -504,7 +510,7 @@ export const fetchAllFreelancers = () =>
 
 
 export const insertFreelancerDetails = (f: Freelancer) =>
-    async (tx: Knex.Transaction) => (
+    async (tx: Knex.Transaction) => 
         knex("freelancers")
         .insert({
           freelanced_before: f.freelanced_before,
@@ -549,15 +555,11 @@ export const insertFreelancerDetails = (f: Freelancer) =>
                     skill_id: serviceId
                 })
             })
-
+            return ids[0]
         })
-    );
+    
 
-    // skill_ids: number[];
-    // language_ids: number[];
-    // client_ids: number[];
-    // services_ids: number[];
-
+// TODO.
 export const updateFreelancerDetails = (userId: string, freelancer: Freelancer) =>
     async (tx: Knex.Transaction) => (
         await tx<Freelancer>("freelancers").where({ user_id: userId }).update(freelancer).returning("*")

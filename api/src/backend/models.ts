@@ -513,7 +513,7 @@ export const insertFreelancerDetails = (f: Freelancer) =>
     async (tx: Knex.Transaction) => 
         knex("freelancers")
         .insert({
-          freelanced_before: f.freelanced_before,
+          freelanced_before: f.freelanced_before.toString(),
           freelancing_goal: f.freelancing_goal,
           work_type: f.work_type,
           education: f.education,
@@ -525,7 +525,7 @@ export const insertFreelancerDetails = (f: Freelancer) =>
           telegram_link: f.telegram_link,
           discord_link: f.discord_link,
           user_id: f.user_id
-        }).returning("id")
+        }).returning("id").debug(true)
         .then(async ids => {
             f.skill_ids.forEach(skillId => {
                 knex("freelancer_skills")
@@ -557,7 +557,8 @@ export const insertFreelancerDetails = (f: Freelancer) =>
             })
             return ids[0]
         })
-    
+
+        
 
 // TODO.
 export const updateFreelancerDetails = (userId: string, freelancer: Freelancer) =>

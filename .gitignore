@@ -5,6 +5,7 @@ api/build/*
 # vim
 *.swp
 *.swo
+.vscode
 
 .DS_Store
 

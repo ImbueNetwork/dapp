@@ -459,15 +459,11 @@ export const fetchAllFreelancers = () =>
         "work_type",
         "education",
         "experience",
-        "skills.id as skill_ids",
-        "skills.name",
-        "languages.id as language_ids",
-        "languages.name",
-        "clients.id as client_ids",
-        "clients.name",
-        "clients.img",
-        "services.id as service.ids",
-        "services.name",
+        //"skills.name",
+        //"languages.name",
+        //"clients.name",
+        //"clients.img",
+        //"services.name",
         "facebook_link",
         "twitter_link",
         "telegram_link",
@@ -477,8 +473,13 @@ export const fetchAllFreelancers = () =>
         "user_id",
         "username",
         "display_name",
-    )
-    .from<Freelancer>("freelancers")
+        "freelancers.created",
+        tx.raw("STRING_AGG(DISTINCT CAST(skills.id as text), ', ') as skill_ids"),
+        tx.raw("STRING_AGG(DISTINCT CAST(languages.id as text), ', ') as language_ids"),
+        tx.raw("STRING_AGG(DISTINCT CAST(services.id as text), ', ') as service_ids"),
+        tx.raw("STRING_AGG(DISTINCT CAST(clients.id as text), ', ') as client_ids")
+
+    ).from<Freelancer>("freelancers")
     // Join services and many to many
     .leftJoin("freelancer_services", { 'freelancers.id': "freelancer_services.freelancer_id" })
     .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
@@ -495,13 +496,11 @@ export const fetchAllFreelancers = () =>
 
     // order and group by many-many selects
     .orderBy("freelancers.created", "desc")
-    // .groupBy("freelancers.id")
-    // todo: Maybe dont need these 
-    //.groupBy("services")
-    //.groupBy("skill")
-    //.groupBy("clients")
-    //.groupBy("clients_images")
-    //.groupBy("languages")
+    .groupBy("freelancers.id")
+    .groupBy("users.username")
+    .groupBy("users.display_name")
+    
+
     .limit(50)
     .debug(true)
 

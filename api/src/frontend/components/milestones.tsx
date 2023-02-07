@@ -1,5 +1,5 @@
-import React from 'react';
-import { Milestone, ProjectOnChain, ProjectState } from "../models";
+import React, { useState } from 'react';
+import { ProjectOnChain, ProjectState } from "../models";
 import MilestoneItem from './milestoneItem';
 
 export type MilestonesProps = {
@@ -7,39 +7,25 @@ export type MilestonesProps = {
     firstPendingMilestoneIndex: number
 }
 
-type MilestonesState = {
-    activeMilestone: number
-}
+export const Milestones = ({ projectOnChain, firstPendingMilestoneIndex }: MilestonesProps): JSX.Element => {
+    const [activeMilestone, setActiveMilestone] = useState(0);
 
-export class Milestones extends React.Component<MilestonesProps, MilestonesState> {
-
-    state: MilestonesState = {
-        activeMilestone: 0,
-    }
-
-    toggleMilestone = (milestoneKey: number) => {
-        this.setState({
-            activeMilestone: milestoneKey != this.state.activeMilestone ? milestoneKey : -1
-        })
+    const toggleMilestone = (milestoneKey: number) => {
+        setActiveMilestone(milestoneKey != activeMilestone ? milestoneKey : -1);
     };
 
 
-    render() {
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div className="container accordion">
-                    {this.props.projectOnChain.milestones.map((milestone, index) => (
-                        <MilestoneItem
-                            key={milestone.milestoneKey}
-                            projectOnChain={this.props.projectOnChain}
-                            milestone={milestone}
-                            isInVotingRound={milestone.milestoneKey === this.props.firstPendingMilestoneIndex && this.props.projectOnChain.projectState === ProjectState.OpenForVoting}
-                            toggleActive={this.state.activeMilestone === (milestone.milestoneKey)}
-                            toggleMilestone={this.toggleMilestone}
-                        />
-                    ))}
-                </div>
-            );
-        }
-    }
+    return projectOnChain.milestones ?
+        <div className="container accordion">
+            {projectOnChain.milestones.map((milestone, index) => (
+                <MilestoneItem
+                    key={milestone.milestoneKey}
+                    projectOnChain={projectOnChain}
+                    milestone={milestone}
+                    isInVotingRound={milestone.milestoneKey === firstPendingMilestoneIndex && projectOnChain.projectState === ProjectState.OpenForVoting}
+                    toggleActive={activeMilestone === (milestone.milestoneKey)}
+                    toggleMilestone={toggleMilestone}
+                />
+            ))}
+        </div> : <></>;
 }

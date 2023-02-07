@@ -459,11 +459,6 @@ export const fetchAllFreelancers = () =>
         "work_type",
         "education",
         "experience",
-        //"skills.name",
-        //"languages.name",
-        //"clients.name",
-        //"clients.img",
-        //"services.name",
         "facebook_link",
         "twitter_link",
         "telegram_link",
@@ -474,10 +469,10 @@ export const fetchAllFreelancers = () =>
         "username",
         "display_name",
         "freelancers.created",
-        tx.raw("STRING_AGG(DISTINCT CAST(skills.id as text), ', ') as skill_ids"),
-        tx.raw("STRING_AGG(DISTINCT CAST(languages.id as text), ', ') as language_ids"),
-        tx.raw("STRING_AGG(DISTINCT CAST(services.id as text), ', ') as service_ids"),
-        tx.raw("STRING_AGG(DISTINCT CAST(clients.id as text), ', ') as client_ids")
+        tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+        tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
+        tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
+        tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients")
 
     ).from<Freelancer>("freelancers")
     // Join services and many to many
@@ -499,14 +494,6 @@ export const fetchAllFreelancers = () =>
     .groupBy("freelancers.id")
     .groupBy("users.username")
     .groupBy("users.display_name")
-    
-
-    .limit(50)
-    .debug(true)
-
-    
-
-
 
 export const insertFreelancerDetails = (f: Freelancer) =>
     async (tx: Knex.Transaction) => 
@@ -640,7 +627,5 @@ export const searchBriefs =
                     this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
                 }
             }).where("headline", "ilike", "%" + filter.search_input + "%")
-            .limit(30)
-            .debug(false)
 
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import BriefFilter from "../../components/briefFilter";
 import { Brief, BriefSqlFilter } from "../../models";
@@ -7,17 +7,15 @@ import { BriefFilterOption } from "../../types/briefs";
 
 export type BriefProps = {};
 
-export type BriefState = {
-    briefs: Brief[];
-};
+export const Briefs = (): JSX.Element => {
+    const [briefs, setBriefs] = useState<Brief[]>([]);
 
-export class Briefs extends React.Component<BriefProps, BriefState> {
     // The thing with this implentation is that the interior order must stay totally ordered.
     // The interior index is used to specify which entry will be used in the search brief.
     // This is not a good implementation but im afraid if we filter and find itll be slow.
     // I can change this on request: felix
 
-    expfilter = {
+    const expfilter = {
         // This is a table named "experience"
         // If you change this you must remigrate the experience table and add the new field.
         filterType: BriefFilterOption.ExpLevel,
@@ -50,7 +48,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         ],
     };
 
-    submittedFilters = {
+    const submittedFilters = {
         // This is a field associated with the User.
         // since its a range i need the
         filterType: BriefFilterOption.AmountSubmitted,
@@ -83,7 +81,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         ],
     };
 
-    lengthFilters = {
+    const lengthFilters = {
         // Should be a field in the database, WILL BE IN DAYS.
         // Again i need the high and low values.
         filterType: BriefFilterOption.Length,
@@ -128,7 +126,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             },
         ],
     };
-    hoursPwFilter = {
+    const hoursPwFilter = {
         filterType: BriefFilterOption.HoursPerWeek,
         label: "Hours Per Week",
         options: [
@@ -149,18 +147,17 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
         ],
     };
 
-    constructor(props: BriefProps) {
-        super(props);
-        this.state = { briefs: [] };
-    }
-
-    async componentDidMount() {
+    const fetchAndSetBriefs = async () => {
         const data = await getAllBriefs();
-        this.setState({ briefs: data });
-    }
+        setBriefs(data);
+    };
+
+    useEffect(() => {
+        void fetchAndSetBriefs();
+    }, []);
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
-    onSearch = async () => {
+    const onSearch = async () => {
         const elements = document.getElementsByClassName(
             "filtercheckbox"
         ) as HTMLCollectionOf<HTMLInputElement>;
@@ -199,14 +196,14 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                     switch (parseInt(filterType) as BriefFilterOption) {
                         case BriefFilterOption.ExpLevel:
                             const o =
-                                this.expfilter.options[parseInt(interiorIndex)];
+                                expfilter.options[parseInt(interiorIndex)];
                             exp_range = [...exp_range, ...o.search_for.slice()];
                             break;
 
                         case BriefFilterOption.AmountSubmitted:
                             const o1 =
-                                this.submittedFilters.options[
-                                    parseInt(interiorIndex)
+                                submittedFilters.options[
+                                parseInt(interiorIndex)
                                 ];
                             submitted_range = [
                                 ...submitted_range,
@@ -217,8 +214,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
                         case BriefFilterOption.Length:
                             const o2 =
-                                this.lengthFilters.options[
-                                    parseInt(interiorIndex)
+                                lengthFilters.options[
+                                parseInt(interiorIndex)
                                 ];
                             length_range = [
                                 ...length_range,
@@ -229,8 +226,8 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
 
                         case BriefFilterOption.HoursPerWeek:
                             const o3 =
-                                this.hoursPwFilter.options[
-                                    parseInt(interiorIndex)
+                                hoursPwFilter.options[
+                                parseInt(interiorIndex)
                                 ];
                             if (o3.search_for[0] > hpw_max) {
                                 hpw_max = o3.search_for[0];
@@ -241,7 +238,7 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
-                                    filterType
+                                filterType
                             );
                     }
                 }
@@ -261,109 +258,107 @@ export class Briefs extends React.Component<BriefProps, BriefState> {
             };
             console.log(filter);
 
-            const briefs = await callSearchBriefs(filter);
+            const briefs_filtered = await callSearchBriefs(filter);
 
-            this.setState({ briefs });
+            setBriefs(briefs_filtered);
         } else {
-            const briefs = await getAllBriefs();
-            this.setState({ briefs });
+            const briefs_all = await getAllBriefs();
+            setBriefs(briefs_all);
         }
     };
 
-    onSavedBriefs = () => {};
+    const onSavedBriefs = () => { };
 
-    render() {
-        return (
-            <div className="search-briefs-container">
-                <div className="filter-panel">
-                    <div className="filter-heading">Filter By</div>
-                    <BriefFilter
-                        label={this.expfilter.label}
-                        filter_type={BriefFilterOption.ExpLevel}
-                        filter_options={this.expfilter.options}
-                    ></BriefFilter>
-                    <BriefFilter
-                        label={this.submittedFilters.label}
-                        filter_type={BriefFilterOption.AmountSubmitted}
-                        filter_options={this.submittedFilters.options}
-                    ></BriefFilter>
-                    <BriefFilter
-                        label={this.lengthFilters.label}
-                        filter_type={BriefFilterOption.Length}
-                        filter_options={this.lengthFilters.options}
-                    ></BriefFilter>
-                    <BriefFilter
-                        label={this.hoursPwFilter.label}
-                        filter_type={BriefFilterOption.HoursPerWeek}
-                        filter_options={this.hoursPwFilter.options}
-                    ></BriefFilter>
+    return (
+        <div className="search-briefs-container">
+            <div className="filter-panel">
+                <div className="filter-heading">Filter By</div>
+                <BriefFilter
+                    label={expfilter.label}
+                    filter_type={BriefFilterOption.ExpLevel}
+                    filter_options={expfilter.options}
+                ></BriefFilter>
+                <BriefFilter
+                    label={submittedFilters.label}
+                    filter_type={BriefFilterOption.AmountSubmitted}
+                    filter_options={submittedFilters.options}
+                ></BriefFilter>
+                <BriefFilter
+                    label={lengthFilters.label}
+                    filter_type={BriefFilterOption.Length}
+                    filter_options={lengthFilters.options}
+                ></BriefFilter>
+                <BriefFilter
+                    label={hoursPwFilter.label}
+                    filter_type={BriefFilterOption.HoursPerWeek}
+                    filter_options={hoursPwFilter.options}
+                ></BriefFilter>
+            </div>
+            <div className="briefs-section">
+                <div className="briefs-heading">
+                    <div className="tab-section">
+                        <div className="tab-item" onClick={onSearch}>
+                            Search
+                        </div>
+                        <div
+                            className="tab-item"
+                            onClick={onSavedBriefs}
+                        >
+                            Saved Briefs
+                        </div>
+                    </div>
+                    <input
+                        id="search-input"
+                        className="search-input"
+                        placeholder="Search"
+                    />
+                    <div className="search-result">
+                        <span className="result-count">
+                            {briefs.length}
+                        </span>
+                        <span> briefs found</span>
+                    </div>
                 </div>
-                <div className="briefs-section">
-                    <div className="briefs-heading">
-                        <div className="tab-section">
-                            <div className="tab-item" onClick={this.onSearch}>
-                                Search
+                <div className="briefs-list">
+                    {briefs.map((item, itemIndex) => (
+                        <div className="brief-item" key={itemIndex}>
+                            <div className="brief-title">
+                                {item.headline}
                             </div>
-                            <div
-                                className="tab-item"
-                                onClick={this.onSavedBriefs}
-                            >
-                                Saved Briefs
+                            <div className="brief-time-info">
+                                {`${item.experience_level}, ${item.duration} Months, Posted by ${item.created_by}`}
+                            </div>
+                            <div className="brief-description">
+                                {item.description}
+                            </div>
+
+                            <div className="brief-tags">
+                                {item.skills.map(
+                                    (skill: any, skillIndex: any) => (
+                                        <div
+                                            className="tag-item"
+                                            key={skillIndex}
+                                        >
+                                            {skill}
+                                        </div>
+                                    )
+                                )}
+                            </div>
+
+                            <div className="brief-proposals">
+                                <span className="proposals-heading">
+                                    Proposals Submitted:{" "}
+                                </span>
+                                <span className="proposals-count">
+                                    {item.briefs_submitted_by}
+                                </span>
                             </div>
                         </div>
-                        <input
-                            id="search-input"
-                            className="search-input"
-                            placeholder="Search"
-                        />
-                        <div className="search-result">
-                            <span className="result-count">
-                                {this.state.briefs.length}
-                            </span>
-                            <span> briefs found</span>
-                        </div>
-                    </div>
-                    <div className="briefs-list">
-                        {this.state.briefs.map((item, itemIndex) => (
-                            <div className="brief-item" key={itemIndex}>
-                                <div className="brief-title">
-                                    {item.headline}
-                                </div>
-                                <div className="brief-time-info">
-                                    {`${item.experience_level}, ${item.duration} Months, Posted by ${item.created_by}`}
-                                </div>
-                                <div className="brief-description">
-                                    {item.description}
-                                </div>
-
-                                <div className="brief-tags">
-                                    {item.skills.map(
-                                        (skill: any, skillIndex: any) => (
-                                            <div
-                                                className="tag-item"
-                                                key={skillIndex}
-                                            >
-                                                {skill}
-                                            </div>
-                                        )
-                                    )}
-                                </div>
-
-                                <div className="brief-proposals">
-                                    <span className="proposals-heading">
-                                        Proposals Submitted:{" "}
-                                    </span>
-                                    <span className="proposals-count">
-                                        {item.briefs_submitted_by}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    ))}
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {

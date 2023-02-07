@@ -511,54 +511,76 @@ export const fetchAllFreelancers = () =>
 
 export const insertFreelancerDetails = (f: Freelancer) =>
     async (tx: Knex.Transaction) => 
-        knex("freelancers")
-        .insert({
-          freelanced_before: f.freelanced_before.toString(),
-          freelancing_goal: f.freelancing_goal,
-          work_type: f.work_type,
-          education: f.education,
-          experience: f.experience,
-          title: f.title,
-          bio: f.bio,
-          facebook_link: f.facebook_link,
-          twitter_link: f.twitter_link,
-          telegram_link: f.telegram_link,
-          discord_link: f.discord_link,
-          user_id: f.user_id
-        }).returning("id").debug(true)
-        .then(async ids => {
-            f.skill_ids.forEach(skillId => {
-                knex("freelancer_skills")
-                .insert({
-                    freelancer_id: ids[0],
-                    skill_id: skillId
+        await tx<Freelancer>("freelancers").insert(
+                {
+                    freelanced_before: f.freelanced_before.toString(),
+                    freelancing_goal: f.freelancing_goal,
+                    work_type: f.work_type,
+                    education: f.education,
+                    experience: f.experience,
+                    title: f.title,
+                    bio: f.bio,
+                    facebook_link: f.facebook_link,
+                    twitter_link: f.twitter_link,
+                    telegram_link: f.telegram_link,
+                    discord_link: f.discord_link,
+                    user_id: f.user_id
                 })
-            })
-            f.language_ids.forEach(langId => {
-                knex("freelancer_languages")
-                .insert({
-                    freelancer_id: ids[0],
-                    skill_id: langId
-                })
-            })
-            f.client_ids.forEach(clientId => {
-                knex("freelancer_clients")
-                .insert({
-                    freelancer_id: ids[0],
-                    skill_id: clientId
-                })
-            })
-            f.services_ids.forEach(serviceId => {
-                knex("freelancer_services")
-                .insert({
-                    freelancer_id: ids[0],
-                    skill_id: serviceId
-                })
-            })
-            return ids[0]
-        })
-
         
+            .returning("id")
+            .then(ids => {
+                if (f.skill_ids != undefined) {
+                    f.skill_ids.forEach(async(skillId) => {
+                        if (skillId != undefined) {
+                            await tx("freelancer_skills")
+                            .insert({
+                                freelancer_id: ids[0],
+                                skill_id: skillId
+                            })
+                        }
+                        
+                    })
+                }
+                
+                if (f.language_ids != undefined) {
+                    f.language_ids.forEach(async(langId) => {
+                        if (langId != undefined) {
+                            await tx("freelancer_languages")
+                            .insert({
+                                freelancer_id: ids[0],
+                                language_id: langId
+                            })
+                        }
+                    })
+                }
+                
+                if (f.client_ids != undefined) {
+                    f.client_ids.forEach(async(clientId) => {
+                        if (clientId != undefined) {
+                            await tx("freelancer_clients")
+                            .insert({
+                                freelancer_id: ids[0],
+                                client_id: clientId
+                            })
+                        }
+                    })
+                }
+                
+                if (f.services_ids != undefined) {
+                    f.services_ids.forEach(async(serviceId) => {
+                        if (serviceId != undefined) {
+                            await tx("freelancer_services")
+                            .insert({
+                                freelancer_id: ids[0],
+                                service_id: serviceId
+                            })
+                        }
+                    })
+                } 
+                
+                return ids[0]
+        })  
+
 
 // TODO.
 export const updateFreelancerDetails = (userId: string, freelancer: Freelancer) =>

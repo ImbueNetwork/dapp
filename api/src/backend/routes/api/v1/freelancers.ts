@@ -73,7 +73,7 @@ router.post("/", (req, res, next) => {
             const skill_ids = await upsertItems(skills, "skills")(tx);
             const language_ids = await upsertItems(languages, "languages")(tx);
             const services_ids = await upsertItems(services, "services")(tx);
-            const freelancer = await models.insertFreelancerDetails({
+            const freelancer_id = await models.insertFreelancerDetails({
                 education,
                 experience,
                 freelancing_goal,
@@ -92,7 +92,7 @@ router.post("/", (req, res, next) => {
                 user_id,
             })(tx);
 
-            if (!freelancer.id) {
+            if (!freelancer_id) {
                 return next(new Error(
                     "Failed to insert freelancer details."
                 ));
@@ -101,7 +101,7 @@ router.post("/", (req, res, next) => {
             res.status(201).send(
                 {
                     status: "Successful",
-                    freelancer_id: freelancer.id
+                    freelancer_id: freelancer_id
                 }
             );
         } catch (cause) {

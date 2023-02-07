@@ -13,7 +13,7 @@ router.get("/", (req, res, next) => {
             res.send(freelancers);
         } catch (e) {
             next(new Error(
-                `Failed to fetch all briefs`,
+                `Failed to fetch all freelancers`,
                 {cause: e as Error}
             ));
         }

@@ -460,14 +460,14 @@ export const fetchAllFreelancers = () =>
         "education",
         "experience",
         "skills.id as skill_ids",
-        "skills.skill",
+        "skills.name",
         "languages.id as language_ids",
-        "languages.language",
+        "languages.name",
         "clients.id as client_ids",
-        "clients.client",
+        "clients.name",
         "clients.img",
         "services.id as service.ids",
-        "services.service",
+        "services.name",
         "facebook_link",
         "twitter_link",
         "telegram_link",
@@ -484,18 +484,18 @@ export const fetchAllFreelancers = () =>
     .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
     // Join clients and many to many
     .leftJoin("freelancer_clients", { 'freelancers.id': "freelancer_clients.freelancer_id" })
-    .leftJoin("clients", { 'freelancers_clients.client_id': "clients.id" })
+    .leftJoin("clients", { 'freelancer_clients.client_id': "clients.id" })
     // Join skills and many to many
     .leftJoin("freelancer_skills", { 'freelancers.id': "freelancer_skills.freelancer_id" })
-    .leftJoin("skills", { 'freelancers_skills.skill_id': "skills.id" })
+    .leftJoin("skills", { 'freelancer_skills.skill_id': "skills.id" })
     // Join languages and many to many
     .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
-    .leftJoin("language", { 'freelancer_language.language_id': "languages.id" })
+    .leftJoin("languages", { 'freelancer_languages.language_id': "languages.id" })
     .innerJoin("users", { "freelancers.user_id": "users.id" })
 
     // order and group by many-many selects
     .orderBy("freelancers.created", "desc")
-    .groupBy("freelancers.id")
+    // .groupBy("freelancers.id")
     // todo: Maybe dont need these 
     //.groupBy("services")
     //.groupBy("skill")

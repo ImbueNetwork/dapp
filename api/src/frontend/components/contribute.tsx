@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
 
@@ -31,29 +31,30 @@ type ContributeState = {
     buttonState: ButtonState
 }
 
-export class Contribute extends React.Component<ContributeProps> {
-    state: ContributeState = {
-        showPolkadotAccounts: false,
-        showErrorDialog: false,
-        errorMessage: null,
-        contribution: 0,
-        status: "pendingApproval",
-        buttonState: ButtonState.Default
-    }
+export const Contribute = ({ chainService, projectOnChain }: ContributeProps): JSX.Element => {
+    const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+    const [errorDialogVisible, showErrorDialog] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [contribution, setContribution] = useState(0);
+    const [status, setStatus] = useState("pendingApproval");
+    const [buttonState, setButtonState] = useState(ButtonState.Default);
 
-    async contribute(account: InjectedAccountWithMeta): Promise<void> {
-        await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.contribute(account,
-            this.props.projectOnChain,
-            BigInt(this.state.contribution * 1e12));
+    const contribute = async (account: InjectedAccountWithMeta): Promise<void> => {
+        showPolkadotAccounts(false);
+        setButtonState(ButtonState.Saving);
+        const result: BasicTxResponse = await chainService.contribute(account,
+            projectOnChain,
+            BigInt(contribution * 1e12));
 
         // TODO timeout the while loop
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
-                    await this.setState({ buttonState: ButtonState.Done });
+                    setButtonState(ButtonState.Done);
                 } else if (result.txError) {
-                    await this.setState({ buttonState: ButtonState.Default, showErrorDialog: true, errorMessage: result.errorMessage });
+                    setButtonState(ButtonState.Default);
+                    showErrorDialog(true);
+                    setErrorMessage(result.errorMessage);
                 }
                 break;
             }
@@ -61,51 +62,48 @@ export class Contribute extends React.Component<ContributeProps> {
         }
     }
 
-    updateContributionValue(newContribution: number) {
-        this.setState({ contribution: newContribution });
-    }
 
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
+        showPolkadotAccounts(true);
     }
 
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
+    const closeErrorDialog = () => {
+        showErrorDialog(false);
     }
 
-    render() {
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div>
-                    <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
+    return (
+        projectOnChain.milestones ?
+            <div>
+                <ErrorDialog errorMessage={errorMessage} showDialog={errorDialogVisible} closeDialog={closeErrorDialog} />
 
-                     {this.state.showPolkadotAccounts ?
-                        <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.contribute(account)} />
-                        </h3>
-                        : null
-                    }
-                    <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <TextField
-                            type="number"
-                            step="any"
-                            onChange={(event: React.FormEvent) => this.updateContributionValue(parseFloat((event.target as HTMLInputElement).value))}
-                            outlined className="mdc-text-field" prefix={`$${this.props.projectOnChain.currencyId as Currency}`}
-                            label="Contribution Amount..." required />
-                        <button
-                            type="submit"
-                            disabled={this.state.buttonState == ButtonState.Saving}
-                            className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="contribute">
-                            {
-                                this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Contribution Succeeded"
-                                        : "Contribute"}
-                        </button>
-                    </form>
-                </div>
-            );
-        }
-    }
+                {polkadotAccountsVisible ?
+                    <h3 id="project-state-headline">
+                        <AccountChoice accountSelected={(account) => contribute(account)} />
+                    </h3>
+                    : null
+                }
+                <form id="contribution-submission-form" name="contribution-submission-form" method="get" className="form" onSubmit={handleSubmit}>
+                    <TextField
+                        type="number"
+                        step="any"
+                        onChange={(event: React.FormEvent) => setContribution(parseFloat((event.target as HTMLInputElement).value))}
+                        outlined
+                        className="mdc-text-field"
+                        prefix={`$${projectOnChain.currencyId as Currency}`}
+                        label="Contribution Amount..." required />
+                    <button
+                        type="submit"
+                        disabled={buttonState == ButtonState.Saving}
+                        className={buttonState == ButtonState.Saving ? "button primary blob" : buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
+                        id="contribute">
+                        {
+                            buttonState == ButtonState.Saving ? "Saving....."
+                                : buttonState == ButtonState.Done ? "Contribution Succeeded"
+                                    : "Contribute"}
+                    </button>
+                </form>
+            </div> : <></>
+    );
+
 }

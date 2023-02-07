@@ -14,41 +14,16 @@ To go through this guide you will need:
 
 
 
-## Local deployment quickstart with docker-compose
+## Local deployment with virtualBox
 
-From the top-level of the repo.
+1. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
+2. Download Ubuntu ISO file from https://ubuntu.com/download 
+3. Boot the VM from the ISO file, a good guide is here: https://www.youtube.com/watch?v=J1Bf8FM8yN8 
+4. Install yarn on the VM: https://linuxize.com/post/how-to-install-yarn-on-ubuntu-20-04/ 
+5. CD into the API directory 
+6. Run make
+7. Run yarn start
 
-1. Add some env variables to your bash profile and source.
-```bash
-echo 'export IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> $HOME/.bashrc;
-echo 'export RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> $HOME/.bashrc;
-source $HOME/.bashrc;
-```
-
-2. Then build the associated images 
-```bash
-docker-compose up -d;
-```
-
-3. Setup DB and install.
-```bash
-cd api;
-make db_up;
-```
-
-4. Finally to start the project, simply
-```bash
-yarn start;
-```
-
-If you face any issues after the databases are created then restart the services from the top level repo. 
-```bash
-docker-compose down;
-docker-compose up -d 
-``` 
-
-
-_Please note if you are using a Apple silicon e.g. M1 then you need to replace the Docker files_
 
 
 ## Steps to create a new Imbue Network Project

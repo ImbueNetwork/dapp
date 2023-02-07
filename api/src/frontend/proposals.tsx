@@ -1,4 +1,5 @@
-import * as React from "react";
+import React from 'react';
+import { useState, useEffect } from 'react';
 import * as ReactDOMClient from "react-dom/client";
 import * as config from "./config";
 
@@ -45,11 +46,6 @@ export type Proposal = DraftProposal & {
   milestones: Milestone[];
 };
 
-type ProposalsProps = {};
-type ProposalsState = {
-  projectsList: Proposal[];
-};
-
 const fetchProjects = async () => {
   const resp = await fetch(`${config.apiBase}/projects/`, {
     headers: config.getAPIHeaders,
@@ -63,35 +59,29 @@ const fetchProjects = async () => {
   }
 };
 
-class Proposals extends React.Component<ProposalsProps, ProposalsState> {
-  state: ProposalsState = {
-    projectsList: [],
-  };
+export const Proposals = (): JSX.Element => {
+  const [projectsList, setProjectsList] = useState<Proposal[]>([]);
 
-  constructor(props: ProposalsProps) {
-    super(props);
-
+  useEffect(() => {
     fetchProjects().then((projects) => {
-      this.setState({ projectsList: projects });
+      setProjectsList(projects);
     });
-  }
+  }, []);
 
-  render() {
-    return (
-      <div>
-        <ol id="list" className="proposals-list">
-          {this.state.projectsList.map((p) => (
-            <ProposalItem
-              key={p.id}
-              projectId={p.id}
-              imageSrc={p.logo}
-              name={p.name}
-            ></ProposalItem>
-          ))}
-        </ol>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <ol id="list" className="proposals-list">
+        {projectsList.map((p) => (
+          <ProposalItem
+            key={p.id}
+            projectId={p.id}
+            imageSrc={p.logo}
+            name={p.name}
+          ></ProposalItem>
+        ))}
+      </ol>
+    </div>
+  );
 }
 
 type ProposalItemProps = {
@@ -100,26 +90,17 @@ type ProposalItemProps = {
   name: string;
 };
 
-type ProposalItemState = {};
-
-class ProposalItem extends React.Component<
-  ProposalItemProps,
-  ProposalItemState
-> {
-  state: ProposalItemState = {};
-
-  render() {
-    return (
-      <div className="imbu-proposal-item">
-        <li>
-          <a id="contribute" href={`/dapp/projects/${this.props.projectId}`}>
-            <img id="img" src={this.props.imageSrc} />
-            <div id="name">{this.props.name}</div>
-          </a>
-        </li>
-      </div>
-    );
-  }
+const ProposalItem = ({ projectId, imageSrc, name }: ProposalItemProps): JSX.Element => {
+  return (
+    <div className="imbu-proposal-item">
+      <li>
+        <a id="contribute" href={`/dapp/projects/${projectId}`}>
+          <img id="img" src={imageSrc} />
+          <div id="name">{name}</div>
+        </a>
+      </li>
+    </div>
+  );
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {

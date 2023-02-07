@@ -43,8 +43,8 @@ export async function seed(knex: Knex): Promise<void> {
             for (let c = 1; c < languages.length; c++) {
                 for (let d = 1; d < services.length; d++) {
                     id = id + 1;
-                    let rsmall =  Math.floor(Math.random() * (3 - 1 + 1)) + 1;
-                    let rbig =  Math.floor(Math.random() * (10000 - 1 + 1)) + 1;
+                    let rsmall =  Math.floor(Math.random() * (5));
+                    let rbig =  Math.floor(Math.random() * (10000));
                     // new user associated
                     await knex("users").insert(
                         [{

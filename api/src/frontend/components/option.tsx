@@ -8,23 +8,21 @@ export type OptionProps = {
   onSelect: () => void;
 };
 
-export class Option extends React.Component<OptionProps> {
-  render() {
-    return (
-      <div className="option-container" onClick={this.props.onSelect}>
-        <div className="option-inner">
-          <input
-            type="radio"
-            value={this.props.value}
-            checked={this.props.checked}
-            onChange={(e) => {
-              e.target.checked && this.props.onSelect();
-            }}
-          />
-          <p className="field-name">{this.props.label}</p>
-        </div>
-        <div className="option-children-container">{this.props.children}</div>
+export const Option = ({ label, value, checked, children, onSelect }: OptionProps): JSX.Element => {
+  return (
+    <div className="option-container" onClick={onSelect}>
+      <div className="option-inner">
+        <input
+          type="radio"
+          value={value}
+          checked={checked}
+          onChange={(e) => {
+            e.target.checked && onSelect();
+          }}
+        />
+        <p className="field-name">{label}</p>
       </div>
-    );
-  }
+      <div className="option-children-container">{children}</div>
+    </div>
+  );
 }

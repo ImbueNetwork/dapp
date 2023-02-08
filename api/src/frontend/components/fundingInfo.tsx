@@ -1,11 +1,9 @@
-import * as React from 'react';
-import { LinearProgress } from "@rmwc/linear-progress";
-
-// @ts-ignore
+import React, { useState, useEffect } from 'react';
 import { ProgressBar, Step } from "react-step-progress-bar";
-
-import "react-step-progress-bar/styles.css";
+import { LinearProgress } from "@rmwc/linear-progress";
 import '@rmwc/linear-progress/styles';
+import "react-step-progress-bar/styles.css";
+
 import { Currency, ProjectOnChain, ProjectState, User } from "../models";
 
 export type FundingInfoProps = {
@@ -13,69 +11,52 @@ export type FundingInfoProps = {
     lastApprovedMilestoneIndex: number,
 }
 
-type FundingInfoState = {
-    percentageFunded: number | undefined,
-}
+export const FundingInfo = ({ projectOnChain, lastApprovedMilestoneIndex }: FundingInfoProps): JSX.Element => {
+    const [percentageFunded, setPercentageFunded] = useState<number>();
 
-export class FundingInfo extends React.Component<FundingInfoProps> {
-    state: FundingInfoState = {
-        percentageFunded: undefined,
-    }
-
-    async componentDidUpdate() {
-        if (this.props.projectOnChain.milestones && !this.state.percentageFunded) {
-            this.setProjectState();
+    useEffect(() => {
+        if (projectOnChain.milestones && !percentageFunded) {
+            const funded = (projectOnChain.raisedFundsFormatted / projectOnChain.requiredFundsFormatted) * 100;
+            if (Number(funded.toFixed(1)) != percentageFunded) {
+                setPercentageFunded(Number(funded.toFixed(1)));
+            }
         }
-    }
+    }, [projectOnChain, percentageFunded]);
 
-    async setProjectState() {
-        const percentageFunded = (this.props.projectOnChain.raisedFundsFormatted / this.props.projectOnChain.requiredFundsFormatted) * 100;
-        if (Number(percentageFunded.toFixed(1)) != this.state.percentageFunded) {
-            this.setState({
-                percentageFunded: percentageFunded.toFixed(1),
-            })
-        }
-    }
-
-    render() {
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div>
-                    <div id="funding-info">
-                        <div className="progress-info">
-                            <LinearProgress progress={(this.state.percentageFunded ?? 0)/100} buffer={this.props.projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} ></LinearProgress>
-                            <span>{this.state.percentageFunded}% Funded</span>
-                            <div className="funding-goal">
-                                <span className="detail-label">Funding Goal</span>
-                                <span className="funds-required">{this.props.projectOnChain.requiredFundsFormatted.toLocaleString()}</span>
-                                <span id="project-detail-currency"
-                                    className="funds-required">${this.props.projectOnChain.currencyId as Currency}</span>{' '}
-                            </div>
-                        </div>
-
-                        <div className="progress-info">
-                            <ProgressBar percent={100 * ((this.props.lastApprovedMilestoneIndex + 1) / this.props.projectOnChain.milestones.length)}>
-                                {this.props.projectOnChain.milestones.map((milestone, index, arr) => {
-                                    return (
-                                        <Step
-                                            position={100 * (index / arr.length)}
-                                            transition="scale"
-                                            key={milestone.milestoneKey}
-                                            children={({ }) => (
-                                                <div className={milestone.isApproved ? "progress-dot completed" : "progress-dot"} title={milestone.name}>
-                                                </div>
-                                            )}
-                                        />
-                                    );
-                                })}
-                            </ProgressBar>
-                            <span>{this.props.projectOnChain.milestones.length} Milestones</span> {''}
-                        </div>
-
+    return projectOnChain.milestones ?
+        <div>
+            <div id="funding-info">
+                <div className="progress-info">
+                    <LinearProgress progress={(percentageFunded ?? 0) / 100} buffer={projectOnChain.projectState == ProjectState.OpenForContribution ? 0.1 : 1} />
+                    <span>{percentageFunded}% Funded</span>
+                    <div className="funding-goal">
+                        <span className="detail-label">Funding Goal</span>
+                        <span className="funds-required">{projectOnChain.requiredFundsFormatted.toLocaleString()}</span>
+                        <span id="project-detail-currency"
+                            className="funds-required">${projectOnChain.currencyId as Currency}</span>{' '}
                     </div>
-
                 </div>
-            );
-        }
-    }
+
+                <div className="progress-info">
+                    <ProgressBar percent={100 * ((lastApprovedMilestoneIndex + 1) / projectOnChain.milestones.length)}>
+                        {projectOnChain.milestones.map((milestone, index, arr) => {
+                            return (
+                                <Step
+                                    position={100 * (index / arr.length)}
+                                    transition="scale"
+                                    key={milestone.milestoneKey}
+                                    children={({ }) => (
+                                        <div className={milestone.isApproved ? "progress-dot completed" : "progress-dot"} title={milestone.name}>
+                                        </div>
+                                    )}
+                                />
+                            );
+                        })}
+                    </ProgressBar>
+                    <span>{projectOnChain.milestones.length} Milestones</span> {''}
+                </div>
+
+            </div>
+
+        </div> : <></>
 }

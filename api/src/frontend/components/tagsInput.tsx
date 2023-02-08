@@ -1,4 +1,4 @@
-import React, { KeyboardEvent } from "react";
+import React, { useState, KeyboardEvent } from "react";
 
 export type TagsInputProps = {
   tags: string[];
@@ -6,96 +6,71 @@ export type TagsInputProps = {
   onChange: (tags: string[]) => void;
 };
 
-export type TagsInputState = {
-  tags: string[];
-  input: string;
-};
+export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.Element => {
+  const [vtags, setTags] = useState<string[]>(tags);
+  const [input, setInput] = useState("");
 
-export class TagsInput extends React.Component<TagsInputProps, TagsInputState> {
-  constructor(props: TagsInputProps) {
-    super(props);
-    this.state = {
-      tags: props.tags,
-      input: "",
-    };
-  }
-
-  handleDelete = (targetIndex: number) => {
-    this.setState(
-      {
-        ...this.state,
-        tags: this.state.tags.filter((tag, index) => index !== targetIndex),
-      },
-      () => this.props.onChange(this.state.tags)
-    );
+  const handleDelete = (targetIndex: number) => {
+    const newTags = vtags.filter((_, index) => index !== targetIndex);
+    setTags(newTags);
+    onChange(newTags);
   };
 
-  handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Tab") {
       e.preventDefault();
     }
-    if (["Tab", "Enter"].includes(e.key) && this.state.input) {
-      this.setState(
-        {
-          input: "",
-          tags: [...this.state.tags, this.state.input],
-        },
-        () => this.props.onChange(this.state.tags)
-      );
+    if (["Tab", "Enter"].includes(e.key) && input) {
+      const newTags = [...vtags, input];
+      setTags(newTags);
+      setInput("");
+      onChange(newTags);
     }
   };
 
-  addItem = (item: string) => {
-    this.setState(
-      {
-        ...this.state,
-        tags: [...this.state.tags, item],
-      },
-      () => this.props.onChange(this.state.tags)
-    );
+  const addItem = (item: string) => {
+    const newTags = [...vtags, item];
+    setTags(newTags);
+    onChange(newTags);
   };
 
-  render() {
-    return (
-      <>
-        <div className="selected-tags">
-          {this.props.tags.map((tag, i) => (
-            <div key={i} className="selected-tag-item">
-              {tag}
-              <div
-                className="unselect-tag"
-                onClick={() => this.handleDelete(i)}
+  return (
+    <>
+      <div className="selected-tags">
+        {tags.map((tag, i) => (
+          <div key={i} className="selected-tag-item">
+            {tag}
+            <div
+              className="unselect-tag"
+              onClick={() => handleDelete(i)}
+            >
+              x
+            </div>
+          </div>
+        ))}
+        <input
+          type="text"
+          className="new-tag-input"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+      <div className="tags-suggestion-container">
+        {suggestData
+          .filter((item: string) => vtags.indexOf(item) === -1)
+          .map((item, index) => (
+            <div className="tag-suggestion" key={index}>
+              <span className="tag-suggestion-text">{item}</span>
+              <span
+                className="tag-suggest-button"
+                onClick={() => addItem(item)}
               >
-                x
-              </div>
+                +
+              </span>
             </div>
           ))}
-          <input
-            type="text"
-            className="new-tag-input"
-            value={this.state.input}
-            onChange={(e) =>
-              this.setState({ ...this.state, input: e.target.value })
-            }
-            onKeyDown={this.handleKeyDown}
-          />
-        </div>
-        <div className="tags-suggestion-container">
-          {this.props.suggestData
-            .filter((item: string) => this.state.tags.indexOf(item) === -1)
-            .map((item, index) => (
-              <div className="tag-suggestion" key={index}>
-                <span className="tag-suggestion-text">{item}</span>
-                <span
-                  className="tag-suggest-button"
-                  onClick={() => this.addItem(item)}
-                >
-                  +
-                </span>
-              </div>
-            ))}
-        </div>
-      </>
-    );
-  }
+      </div>
+    </>
+  );
 }

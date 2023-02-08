@@ -18,4 +18,18 @@ export class FreelancerService {
         }
     }
 
+    
+
 }
+export async function getFreelancerProfile() {
+    const resp =  await fetch(`${config.apiBase}/freelancers/:username`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json() as Freelancer
+    } else {
+        throw new Error('Failed to get freelancer profile. status:' + resp.status);
+    }
+  }

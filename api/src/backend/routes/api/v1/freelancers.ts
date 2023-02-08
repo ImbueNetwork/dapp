@@ -28,13 +28,15 @@ router.get("/:username", (req, res, next) => {
             if (!user) {
                 return res.status(404).end();
             }
+            console.log(user);
 
             const freelancer = await models.fetchFreelancerDetailsByUserID(user.id)(tx);
             if (!freelancer) {
                 return res.status(404).end();
             }
+            console.log(freelancer);
 
-            res.send(freelancer);
+            //res.send(freelancer);
 
 
         } catch (e) {

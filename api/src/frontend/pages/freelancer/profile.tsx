@@ -16,8 +16,9 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 
 import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
-import { getFreelancerProfile } from "../../services/briefsService";
+import { getFreelancerProfile } from "../../services/freelancerService";
 import { Freelancer } from "../../models";
+import { Freelancers } from "./new";
 
 export type ProfileProps = {};
 export type ProfileState = {
@@ -171,7 +172,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
 
 
     async componentDidMount() {
-        const freelancer = await getFreelancerProfile("web3dev");
+        const freelancer = await getFreelancerProfile();
         await this.populateProfile(freelancer)
     }
 

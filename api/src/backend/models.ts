@@ -444,7 +444,6 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
     (tx: Knex.Transaction) =>
     fetchAllFreelancers()(tx)
     .where({user_id})
-    .orderBy("freelancers.created", "desc")
     .first()
     .debug(true)
 

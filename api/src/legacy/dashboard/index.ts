@@ -80,8 +80,6 @@ export default class Dashboard extends HTMLElement {
 
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
-            console.log(state);
-            console.log(state.user);
             action();
         }
 

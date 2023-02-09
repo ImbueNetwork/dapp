@@ -256,8 +256,6 @@ export const Briefs = (): JSX.Element => {
                 hours_pw_is_max: hpw_is_max,
                 search_input: search_value,
             };
-            console.log(filter);
-
             const briefs_filtered = await callSearchBriefs(filter);
 
             setBriefs(briefs_filtered);

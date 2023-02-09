@@ -26,11 +26,8 @@ router.get("/:username", (req, res, next) => {
         try {
             const freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
             if (!freelancer) {
-                console.log("freelancer");
                 return res.status(404).end();
             }
-            console.log(freelancer);
-
             res.send(freelancer);
         } catch (e) {
             next(new Error(

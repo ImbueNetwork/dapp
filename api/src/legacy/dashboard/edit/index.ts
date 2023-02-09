@@ -259,14 +259,12 @@ export default class Edit extends HTMLElement {
 
     async setupProject(projectId: string) {
         let draft: DraftProposal;
-        console.log(projectId);
 
         try {
             draft = await fetch(
                 `${config.apiBase}/projects/${projectId}`,
                 { headers: config.getAPIHeaders }
             ).then(async resp => {
-                console.log(resp);
                 if (resp.ok) {
                     const project = await resp.json();
                     if (this.user?.id === project.user_id) {
@@ -355,7 +353,6 @@ export default class Edit extends HTMLElement {
      * $number * 1_000_000_000_000 to the blockchain.
      */
     proposalFromForm(formData: FormData): DraftProposal {
-        console.log(Object.fromEntries(formData));
         return {
             name: formData.get("imbu-name") as string,
             logo: formData.get("imbu-logo") as string,
@@ -556,7 +553,6 @@ export default class Edit extends HTMLElement {
         const resp = await model.updateProposal(draft, this.projectId);
         if (resp.ok) {
             const proposal: Proposal = await resp.json();
-            console.log(proposal);
         }
 
 
@@ -565,8 +561,6 @@ export default class Edit extends HTMLElement {
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
             this.user = state.user;
-            console.log(state);
-            console.log(state.user);
             action();
         }
 

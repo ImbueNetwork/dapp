@@ -142,8 +142,6 @@ export default class Form extends HTMLElement {
         if (!this.user) {
             const callback = (state: any) => {
                 this.user = state.user;
-                console.log(state);
-                console.log(state.user);
                 location.reload();
             }
 
@@ -294,7 +292,6 @@ export default class Form extends HTMLElement {
      * $number * 1_000_000_000_000 to the blockchain.
      */
     proposalFromForm(formData: FormData): DraftProposal {
-        console.log(Object.fromEntries(formData));
         return {
             name: formData.get("imbu-name") as string,
             logo: formData.get("imbu-logo") as string,

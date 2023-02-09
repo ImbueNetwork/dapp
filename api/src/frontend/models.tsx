@@ -89,7 +89,7 @@ export type User = {
     id: number;
     display_name: string;
     web3Accounts: Web3Account[];
-    username?: string;
+    username: string;
     password?: string;
 };
 

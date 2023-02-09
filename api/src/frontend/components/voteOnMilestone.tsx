@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Select } from "@rmwc/select";
 import '@rmwc/select/styles';
 
@@ -26,43 +26,43 @@ type VoteOnMilestoneState = {
     buttonState: ButtonState
 }
 
-export class VoteOnMilestone extends React.Component<VoteOnMilestoneProps> {
-    state: VoteOnMilestoneState = {
-        showPolkadotAccounts: false,
-        showErrorDialog: false,
-        errorMessage: null,
-        vote: false,
-        status: "pendingApproval",
-        buttonState: ButtonState.Default
-    }
+export const VoteOnMilestone = (props: VoteOnMilestoneProps): JSX.Element => {
+    const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+    const [errorDialogVisible, showErrorDialog] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [status, setStatus] = useState("fundsWithdrawn");
+    const [buttonState, setButtonState] = useState(ButtonState.Default);
+    const [vote, setVote] = useState(false);
 
-    updateVoteValue(vote: boolean) {
-        this.setState({ vote: vote });
-    }
 
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
+        showPolkadotAccounts(true);
     }
 
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
+    const closeErrorDialog = () => {
+        showErrorDialog(false);
     }
 
-    async submitVote(account: InjectedAccountWithMeta): Promise<void> {
-        await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.voteOnMilestone(account,
-            this.props.projectOnChain,
-            this.props.firstPendingMilestoneIndex,
-            this.state.vote);
+    const submitVote = async (account: InjectedAccountWithMeta): Promise<void> => {
+        showPolkadotAccounts(false);
+        setButtonState(ButtonState.Saving);
+        const result: BasicTxResponse = await props.chainService.voteOnMilestone(
+            account,
+            props.projectOnChain,
+            props.firstPendingMilestoneIndex,
+            vote);
 
         // TODO timeout the while loop
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
-                    await this.setState({ buttonState: ButtonState.Done });
+                    setButtonState(ButtonState.Done);
                 } else if (result.txError) {
-                    await this.setState({ buttonState: ButtonState.Default, showErrorDialog: true, errorMessage: result.errorMessage });
+                    setButtonState(ButtonState.Default);
+                    showErrorDialog(true);
+                    setErrorMessage(result.errorMessage);
                 }
                 break;
             }
@@ -70,41 +70,37 @@ export class VoteOnMilestone extends React.Component<VoteOnMilestoneProps> {
         }
     }
 
-    render() {
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div>
-                    <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
 
-                    {this.state.showPolkadotAccounts ?
-                        <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.submitVote(account)} />
-                        </h3>
-                        : null
-                    }
-                    <form id="vote-submission-form" name="vote-submission-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <Select
-                            label="Vote On Milestone"
-                            required
-                            onChange={(event: React.FormEvent) => this.updateVoteValue(Boolean(parseInt((event.target as HTMLInputElement).value)))}
-                            icon="how_to_vote"
-                        >
-                            <option key="false" value={0} >No</option>
-                            <option key="true" value={1}>Yes</option>
-                        </Select>
-                        <button
-                            type="submit"
-                            disabled={this.state.buttonState == ButtonState.Saving}
-                            className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="vote">
-                            {
-                                this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Vote Registered"
-                                        : "Vote"}
-                        </button>
-                    </form>
-                </div>
-            );
-        }
-    }
+    return props.projectOnChain.milestones ? (
+        <div>
+            <ErrorDialog errorMessage={errorMessage} showDialog={errorDialogVisible} closeDialog={closeErrorDialog} />
+
+            {polkadotAccountsVisible ?
+                <h3 id="project-state-headline">
+                    <AccountChoice accountSelected={(account) => submitVote(account)} />
+                </h3>
+                : null
+            }
+            <form id="vote-submission-form" name="vote-submission-form" method="get" className="form" onSubmit={handleSubmit}>
+                <Select
+                    label="Vote On Milestone"
+                    required
+                    onChange={(event: React.FormEvent) => setVote(Boolean(parseInt((event.target as HTMLInputElement).value)))}
+                    icon="how_to_vote"
+                >
+                    <option key="false" value={0} >No</option>
+                    <option key="true" value={1}>Yes</option>
+                </Select>
+                <button
+                    type="submit"
+                    disabled={buttonState == ButtonState.Saving}
+                    className={buttonState == ButtonState.Saving ? "button primary blob" : buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
+                    id="vote">
+                    {
+                        buttonState == ButtonState.Saving ? "Saving....." :
+                            buttonState == ButtonState.Done ? "Vote Registered" : "Vote"}
+                </button>
+            </form>
+        </div>
+    ) : <></>;
 }

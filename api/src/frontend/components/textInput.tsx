@@ -1,8 +1,4 @@
-import React from "react";
-
-export type TextInputState = {
-    remaining: number;
-};
+import React, { useState } from "react";
 
 export interface TextInputProps
     extends React.DetailedHTMLProps<
@@ -13,37 +9,19 @@ export interface TextInputProps
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-export class TextInput extends React.Component<TextInputProps, TextInputState> {
-    constructor(props: TextInputProps) {
-        super(props);
-        this.state = {
-            remaining: props.maxLength
-                ? props.maxLength -
-                  (this.props.value ? this.props.value.toString().length : 0)
-                : 0,
-        };
-    }
-    handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        this.props.maxLength &&
-            this.setState({
-                ...this.state,
-                remaining: this.props.maxLength - e.target.value.length,
-            });
-        this.props.onChange(e);
-    };
+export const TextInput = (props: TextInputProps): JSX.Element => {
+  const [remaining, setRemaining] = useState(props.maxLength ?? 0);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    props.maxLength && setRemaining(props.maxLength - e.target.value.length);
+    props.onChange(e);
+  };
 
-    render() {
-        return (
-            <>
-                <textarea {...this.props} onChange={this.handleChange} />
-                {this.props.maxLength && (
-                    <p className="textarea-remaining">{`${
-                        this.state.remaining
-                    } character${
-                        this.state.remaining !== 1 ? "s" : ""
-                    } remaining`}</p>
-                )}
-            </>
-        );
-    }
+  return (
+    <>
+      <textarea {...props} onChange={handleChange} />
+      {props.maxLength && (
+        <p className="textarea-remaining">{`${remaining} character${remaining !== 1 ? "s" : ""} remaining`}</p>
+      )}
+    </>
+  );
 }

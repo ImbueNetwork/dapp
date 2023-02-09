@@ -302,55 +302,26 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
 export const fetchAllBriefs = () =>
-    (tx: Knex.Transaction) =>
-        tx.select(
-            "all_briefs.id",
-            "headline",
-            "industries",
-            "description",
-            "skills",
-            "scope_level",
-            "duration",
-            "budget",
-            "users.display_name as created_by",
-            "experience_level",
-            "users.briefs_submitted as briefs_submitted_by",
+(tx: Knex.Transaction) =>
+    tx.select(
+        "briefs.id",
+        "headline",
+        "industries",
+        "description",
+        "skills",
+        "scope",
+        "duration",
+        "budget",
+        "users.display_name as created_by",
+        "experience_level",
+        "users.briefs_submitted as briefs_submitted_by",
         )
-        .from(tx.raw(`\
-    (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
-                            ARRAY_AGG(skills.name) as skills
-                            FROM briefs
-                            LEFT JOIN skills
-                            ON skills.id = ANY (briefs.skill_ids)
-                            GROUP BY briefs.id),
-    joined_industries AS (SELECT briefs.id as brief_id,
-                            ARRAY_AGG(industries.name) as industries
-                            FROM briefs
-                            LEFT JOIN industries ON industries.id = ANY (briefs.industry_ids)
-                            GROUP BY briefs.id)
-    SELECT headline,
-                            id,
-                            description,
-                            budget,
-                            scope_id,
-                            duration_id,
-                            user_id,
-                            briefs.created,
-                            experience_id,
-                            joined_industries.industries,
-                            joined_skills.skills
-                            from briefs
-                            join joined_industries on briefs.id = joined_industries.brief_id
-                            join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
-                            `))
-        .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
-        .innerJoin("users", { "all_briefs.user_id": "users.id" })
-        .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
-        .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
-        .orderBy("all_briefs.created", "desc")
+        .from("briefs")
+        .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+        .innerJoin("users", {"briefs.user_id": "users.id"})
+        .orderBy("briefs.created","desc")
 
-
-export const insertBrief = (brief: Brief) =>
+export const insertBrief = (brief: Brief) => 
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").insert(brief).returning("*")
     )[0];

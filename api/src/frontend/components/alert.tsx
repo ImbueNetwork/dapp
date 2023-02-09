@@ -6,7 +6,7 @@ type AlertProps = {
     message: string
 }
 
-const Alert: FunctionComponent<AlertProps> = ({ type, message }) => {
+const Alert = ({ type, message }: AlertProps): JSX.Element => {
     let alertClassName = 'alert alert-dismissible fade show ';
     let title = '';
 

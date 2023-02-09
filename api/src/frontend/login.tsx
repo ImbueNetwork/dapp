@@ -76,139 +76,113 @@ async function authorise(
   }
 }
 
-class Login extends React.Component<LoginProps, LoginState> {
+export const Login = ({ }: LoginProps): JSX.Element => {
 
-  state: LoginState = {
-    showPolkadotAccounts: false,
-    creds: {
-      userOrEmail: undefined,
-      password: undefined
-    },
-    errorMessage: undefined
-  };
+  const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+  const [userOrEmail, setUserOrEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const [errorMessage, setErrorMessage] = useState<string>();
 
-  async clicked() {
-    this.setState({ showPolkadotAccounts: true });
-  }
 
-  async setCreds(name: string, value: string) {
-    this.setState({
-      ...this.state,
-      creds: {
-        ...this.state.creds,
-        [name]: value,
-      },
-    });
-  }
-
-  imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    this.setState({ errorMessage: undefined });
+  const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    setErrorMessage(undefined);
     event.preventDefault();
 
     const resp = await fetch(`/auth/imbue/`, {
       headers: postAPIHeaders,
       method: "post",
       body: JSON.stringify({
-        userOrEmail: this.state.creds.userOrEmail,
-        password: this.state.creds.password,
+        userOrEmail,
+        password,
       }),
     });
 
     if (resp.ok) {
       await utils.redirectBack();
     } else {
-      this.setState({ errorMessage: "incorrect username or password" });
+      setErrorMessage("incorrect username or password");
     }
   }
 
 
-  async accountSelected(account: InjectedAccountWithMeta) {
+  const selectAccount = async (account: InjectedAccountWithMeta) => {
     const result = await getAccountAndSign(account);
     await authorise(result?.signature as SignerResult, account);
   }
 
-  render() {
-    if (this.state.showPolkadotAccounts) {
-      return (
-        <AccountChoice
-          accountSelected={(account: InjectedAccountWithMeta) =>
-            this.accountSelected(account)
-          }
-        />
-      );
-    } else {
-      return (
-        <Dialogue
-          title="You must be signed in to continue"
-          content={<p>Please use the link below to sign in.</p>}
+  return (
+    polkadotAccountsVisible ? <AccountChoice
+      accountSelected={(account: InjectedAccountWithMeta) => selectAccount(account)}
+    /> :
+      <Dialogue
+        title="You must be signed in to continue"
+        content={<p>Please use the link below to sign in.</p>}
 
-          actionList={
-            <div >
-              <form id="contribution-submission-form" name="contribution-submission-form" method="get" onSubmit={this.imbueLogin}>
+        actionList={
+          <div >
+            <form id="contribution-submission-form" name="contribution-submission-form" method="get" onSubmit={imbueLogin}>
 
-                <div className="login">
-                  <div>
-                    <TextField
-                      label="Email/Username"
-                      onChange={(e: any) => this.setCreds("userOrEmail", e.target.value)}
-                      outlined className="mdc-text-field" required />
-                  </div>
-                  <div>
-                    <TextField
-                      label="Password"
-                      onChange={(e: any) => this.setCreds("password", e.target.value)}
-                      type="password"
-                      outlined className="mdc-text-field" required />
-                  </div>
-
-                  <div>
-                    <span className={!this.state.errorMessage ? "hide" : "error"}>{this.state.errorMessage}</span>
-                  </div>
-                  <div>
-                    <button
-                      type="submit"
-                      // disabled={!this.state.creds.username && !this.state.creds.password}
-                      className="primary-btn in-dark confirm"
-                      id="sign-in">
-                      Sign In
-                    </button>
-                  </div>
-
-                  <div>
-                    <span>Don't have an account?</span><a href="#" onClick={() => utils.redirect("join", )} className="signup">Sign up</a>
-                    <span
-                      onClick={() => this.clicked()}
-                      className="mdc-deprecated-list-item__text"
-                    >
-                    </span>
-                  </div>
+              <div className="login">
+                <div>
+                  <TextField
+                    label="Email/Username"
+                    onChange={(e: any) => setUserOrEmail(e.target.value)}
+                    outlined className="mdc-text-field" required />
+                </div>
+                <div>
+                  <TextField
+                    label="Password"
+                    onChange={(e: any) => setPassword(e.target.value)}
+                    type="password"
+                    outlined className="mdc-text-field" required />
                 </div>
 
-              </form>
-              <li
-                className="mdc-deprecated-list-item"
-                tabIndex={0}
-                data-mdc-dialog-action="web3"
+                <div>
+                  <span className={!errorMessage ? "hide" : "error"}>{errorMessage}</span>
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    // disabled={!this.state.creds.username && !this.state.creds.password}
+                    className="primary-btn in-dark confirm"
+                    id="sign-in">
+                    Sign In
+                  </button>
+                </div>
+
+                <div>
+                  <span>Don't have an account?</span><a href="#" onClick={() => utils.redirect("join",)} className="signup">Sign up</a>
+                  <span
+                    onClick={() => showPolkadotAccounts(true)}
+                    className="mdc-deprecated-list-item__text"
+                  >
+                  </span>
+                </div>
+              </div>
+
+            </form>
+            <li
+              className="mdc-deprecated-list-item"
+              tabIndex={0}
+              data-mdc-dialog-action="web3"
+            >
+              <span className="mdc-deprecated-list-item__graphic">
+                <img
+                  src="https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
+                  style={{ maxWidth: "100%" }}
+                />
+              </span>
+              <span
+                onClick={() => showPolkadotAccounts(true)}
+                className="mdc-deprecated-list-item__text"
               >
-                <span className="mdc-deprecated-list-item__graphic">
-                  <img
-                    src="https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
-                    style={{ maxWidth: "100%" }}
-                  />
-                </span>
-                <span
-                  onClick={() => this.clicked()}
-                  className="mdc-deprecated-list-item__text"
-                >
-                  {"Sign in with your polkadot{.js} extension"}
-                </span>
-              </li>
-            </div>
-          }
-        />
-      );
-    }
-  }
+                {"Sign in with your polkadot{.js} extension"}
+              </span>
+            </li>
+          </div>
+        }
+      />
+  );
 }
 
 document.addEventListener("DOMContentLoaded", function (event) {

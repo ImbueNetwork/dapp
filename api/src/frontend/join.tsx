@@ -17,7 +17,7 @@ const postAPIHeaders = {
     "content-type": "application/json",
 };
 
-function Join() {
+export const Join = (): JSX.Element => {
     const [user, setUser] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Select } from "@rmwc/select";
 import '@rmwc/select/styles';
 
@@ -16,44 +16,36 @@ export type WithdrawProps = {
     chainService: ChainService
 }
 
-type WithdrawState = {
-    showPolkadotAccounts: boolean,
-    showErrorDialog: boolean,
-    errorMessage: String | null,
-    status: string,
-    buttonState: ButtonState
-}
+export const Withdraw = (props: WithdrawProps): JSX.Element => {
+    const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+    const [errorDialogVisible, showErrorDialog] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [status, setStatus] = useState("fundsWithdrawn");
+    const [buttonState, setButtonState] = useState(ButtonState.Default);
 
-export class Withdraw extends React.Component<WithdrawProps> {
-    state: WithdrawState = {
-        showPolkadotAccounts: false,
-        showErrorDialog: false,
-        errorMessage: null,
-        status: "fundsWithdrawn",
-        buttonState: ButtonState.Default
-    }
-
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
+        showPolkadotAccounts(true);
     }
 
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
+    const closeErrorDialog = () => {
+        showErrorDialog(false);
     }
 
-    async withdraw(account: InjectedAccountWithMeta): Promise<void> {
-        await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.withdraw(account,
-            this.props.projectOnChain);
-
+    const withdraw = async (account: InjectedAccountWithMeta): Promise<void> => {
+        showPolkadotAccounts(false);
+        setButtonState(ButtonState.Saving);
+        const result: BasicTxResponse = await props.chainService.withdraw(account,
+            props.projectOnChain);
         // TODO timeout the while loop
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
-                    await this.setState({ buttonState: ButtonState.Done });
+                    setButtonState(ButtonState.Done);
                 } else if (result.txError) {
-                    await this.setState({ buttonState: ButtonState.Default, showErrorDialog: true, errorMessage: result.errorMessage });
+                    setButtonState(ButtonState.Default);
+                    showErrorDialog(true);
+                    setErrorMessage(result.errorMessage);
                 }
                 break;
             }
@@ -61,32 +53,28 @@ export class Withdraw extends React.Component<WithdrawProps> {
         }
     }
 
-    render() {
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div>
-                    <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
+    return props.projectOnChain.milestones ?
+        <div>
+            <ErrorDialog errorMessage={errorMessage} showDialog={errorDialogVisible} closeDialog={closeErrorDialog} />
 
-                    {this.state.showPolkadotAccounts ?
-                        <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.withdraw(account)} />
-                        </h3>
-                        : null
+            {polkadotAccountsVisible ?
+                <h3 id="project-state-headline">
+                    <AccountChoice accountSelected={(account) => withdraw(account)} />
+                </h3>
+                : null
+            }
+            <form id="withdraw-funds-form" name="withdraw-funds-form" method="get" className="form" onSubmit={handleSubmit}>
+                <button
+                    type="submit"
+                    disabled={buttonState == ButtonState.Saving}
+                    className={buttonState == ButtonState.Saving ? "button primary blob" : buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
+                    id="withdraw">
+                    {
+                        buttonState == ButtonState.Saving ?
+                            "Saving....." :
+                            buttonState == ButtonState.Done ? "Funds Withdrawn" : "Withdraw"
                     }
-                    <form id="withdraw-funds-form" name="withdraw-funds-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <button
-                            type="submit"
-                            disabled={this.state.buttonState == ButtonState.Saving}
-                            className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="withdraw">
-                            {
-                                this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Funds Withdrawn"
-                                        : "Withdraw"}
-                        </button>
-                    </form>
-                </div>
-            );
-        }
-    }
+                </button>
+            </form>
+        </div> : <></>
 }

@@ -135,9 +135,9 @@ export type Brief = {
     duration: string;
     budget: number;
     created_by: string;
-    experience_level: string,
-    hours_per_week: number,
-    briefs_submitted_by: number,
+    experience_level: string;
+    hours_per_week: number;
+    briefs_submitted_by: number;
 };
 
 export type BriefSqlFilter = {
@@ -149,4 +149,4 @@ export type BriefSqlFilter = {
     max_hours_pw: number;
     hours_pw_is_max: boolean;
     search_input: string;
-}
+};

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Chip } from "@rmwc/chip";
 import '@rmwc/circular-progress/styles';
@@ -29,34 +29,36 @@ type ApproveMilestoneState = {
     buttonState: ButtonState
 }
 
-export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
-    state: ApproveMilestoneState = {
-        showPolkadotAccounts: false,
-        showErrorDialog: false,
-        errorMessage: null,
-        status: "pendingApproval",
-        percentageOfContributorsVoted: -1,
-        enableApproveButton: false,
-        displayVotingProgress: false,
-        buttonState: ButtonState.Default
+export const ApproveMilestone = ({ projectOnChain, imbueApi, firstPendingMilestoneIndex, chainService }: ApproveMilestoneProps): JSX.Element => {
+    const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
+    const [errorDialogVisible, showErrorDialog] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [status, setStatus] = useState("pendingApproval");
+    const [percentageOfContributorsVoted, setPercentageOfContributorsVoted] = useState(-1);
+    const [approveButtonEnabled, enabledApproveButon] = useState(false);
+    const [displayVotingProgress, showVotingProgress] = useState(false);
+    const [buttonState, setButtonState] = useState(ButtonState.Default);
+
+    const closeErrorDialog = () => {
+        showErrorDialog(false);
     }
 
-    closeErrorDialog = () => {
-        this.setState({ showErrorDialog: false });
-    }
-
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.setState({ showPolkadotAccounts: true });
+        showPolkadotAccounts(true);
     }
 
-    async componentDidMount() {
-        await this.haveAllUsersVotedOnMilestone();
-    }
+    const init = async () => {
+        await haveAllUsersVotedOnMilestone();
+    };
 
-    async haveAllUsersVotedOnMilestone(): Promise<boolean> {
-        const totalContributions = this.props.projectOnChain.raisedFundsFormatted;
-        const milestoneVotes: any = ((await this.props.imbueApi.imbue?.api.query.imbueProposals.milestoneVotes([this.props.projectOnChain.id, this.props.firstPendingMilestoneIndex]))).toHuman();
+    useEffect(() => {
+        void init();
+    }, []);
+
+    const haveAllUsersVotedOnMilestone = async (): Promise<boolean> => {
+        const totalContributions = projectOnChain.raisedFundsFormatted;
+        const milestoneVotes: any = ((await imbueApi.imbue?.api.query.imbueProposals.milestoneVotes([projectOnChain.id, firstPendingMilestoneIndex]))).toHuman();
         if (!milestoneVotes) {
             return false;
         }
@@ -64,32 +66,34 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
         const yayVotes = BigInt(milestoneVotes.yay.replaceAll(",", ""));
         const nayVotes = BigInt(milestoneVotes.nay.replaceAll(",", ""));
         const totalVotes = Number((yayVotes + nayVotes) / BigInt(1e12));
-        const percentageOfContributorsVoted = (totalVotes / totalContributions) * 100;
-        const enableApproveButton = totalVotes == totalContributions;
-        const displayVotingProgress = (this.props.projectOnChain.projectState == ProjectState.OpenForVoting || !this.state.enableApproveButton);
-        if (this.state.percentageOfContributorsVoted != percentageOfContributorsVoted) {
-            this.setState({
-                enableApproveButton: enableApproveButton,
-                percentageOfContributorsVoted: percentageOfContributorsVoted,
-                displayVotingProgress: displayVotingProgress,
-            })
+        const _percentageOfContributorsVoted = (totalVotes / totalContributions) * 100;
+        const _approveButtonEnabled = totalVotes == totalContributions;
+        const _displayVotingProgress = (projectOnChain.projectState == ProjectState.OpenForVoting || !approveButtonEnabled);
+        if (_percentageOfContributorsVoted != _percentageOfContributorsVoted) {
+            enabledApproveButon(_approveButtonEnabled);
+            setPercentageOfContributorsVoted(_percentageOfContributorsVoted);
+            showVotingProgress(_displayVotingProgress);
         }
         return totalVotes == totalContributions;
     }
 
-    async approveMilestone(account: InjectedAccountWithMeta): Promise<void> {
-        await this.setState({ showPolkadotAccounts: false, buttonState: ButtonState.Saving });
-        const result: BasicTxResponse = await this.props.chainService.approveMilestone(account,
-            this.props.projectOnChain,
-            this.props.firstPendingMilestoneIndex);
+    const approveMilestone = async (account: InjectedAccountWithMeta): Promise<void> => {
+        showPolkadotAccounts(false);
+        setButtonState(ButtonState.Saving);
+
+        const result: BasicTxResponse = await chainService.approveMilestone(account,
+            projectOnChain,
+            firstPendingMilestoneIndex);
 
         // TODO timeout the while loop
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
-                    await this.setState({ buttonState: ButtonState.Done });
+                    setButtonState(ButtonState.Done);
                 } else if (result.txError) {
-                    await this.setState({ buttonState: ButtonState.Default, showErrorDialog: true, errorMessage: result.errorMessage });
+                    setButtonState(ButtonState.Default);
+                    showErrorDialog(true);
+                    setErrorMessage(result.errorMessage);
                 }
                 break;
             }
@@ -97,42 +101,37 @@ export class ApproveMilestone extends React.Component<ApproveMilestoneProps> {
         }
     }
 
-    render() {
 
-        if (this.props.projectOnChain.milestones) {
-            return (
-                <div>
-                    <ErrorDialog errorMessage={this.state.errorMessage} showDialog={this.state.showErrorDialog} closeDialog={this.closeErrorDialog}></ErrorDialog>
+    return projectOnChain && projectOnChain.milestones ?
+        <div>
+            <ErrorDialog errorMessage={errorMessage} showDialog={errorDialogVisible} closeDialog={closeErrorDialog} />
 
-                    {this.state.showPolkadotAccounts ?
-                        <h3 id="project-state-headline">
-                            <AccountChoice accountSelected={(account) => this.approveMilestone(account)} />
-                        </h3>
-                        : null
+            {polkadotAccountsVisible ?
+                <h3 id="project-state-headline">
+                    <AccountChoice accountSelected={(account) => approveMilestone(account)} />
+                </h3>
+                : null
+            }
+            <form id="approve-milestone-form" name="approve-milestone-form" method="get" className="form" onSubmit={handleSubmit}>
+                <button
+                    type="submit"
+                    disabled={buttonState == ButtonState.Saving || !approveButtonEnabled}
+                    className={buttonState == ButtonState.Saving ? "button primary blob" : buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
+                    id="approve-milestone">
+                    {
+                        buttonState == ButtonState.Saving ? "Saving....."
+                            : buttonState == ButtonState.Done ? "Milestone Approved"
+                                : "Approve Milestone"
                     }
-                    <form id="approve-milestone-form" name="approve-milestone-form" method="get" className="form" onSubmit={this.handleSubmit}>
-                        <button
-                            type="submit"
-                            disabled={this.state.buttonState == ButtonState.Saving || !this.state.enableApproveButton}
-                            className={this.state.buttonState == ButtonState.Saving ? "button primary blob" : this.state.buttonState == ButtonState.Done ? "button primary finalized" : "button primary"}
-                            id="approve-milestone">
-                            {
-                                this.state.buttonState == ButtonState.Saving ? "Saving....."
-                                    : this.state.buttonState == ButtonState.Done ? "Milestone Approved"
-                                        : "Approve Milestone"
-                            }
-                        </button>
+                </button>
 
-                        {  this.state.displayVotingProgress ?
-                            <div id="vote-progress">
-                                <Chip icon={<CircularProgress />} label={`${this.state.percentageOfContributorsVoted}% Contributors Voted`} />
-                            </div>
-                            : null
-                        }
+                {displayVotingProgress ?
+                    <div id="vote-progress">
+                        <Chip icon={<CircularProgress />} label={`${percentageOfContributorsVoted}% Contributors Voted`} />
+                    </div>
+                    : null
+                }
 
-                    </form>
-                </div>
-            );
-        }
-    }
+            </form>
+        </div> : <></>
 }

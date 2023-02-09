@@ -18,7 +18,7 @@ import "../../../../public/new-freelancer.css";
 const freelancerService = new FreelancerService();
 
 export type FreelancerProps = {
-    username: string; // TODO: usecase?
+    user: User;
 };
 
 export type FreelancerState = {
@@ -27,10 +27,10 @@ export type FreelancerState = {
     display_name: string;
 };
 
-export const Freelancers = ({ username }: FreelancerProps): JSX.Element => {
+export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
     const [step, setStep] = useState(0);
-    const [displayName, setDisplayName] = useState("");
-    const [freelancingXp, setFreelancingXp] = useState("");
+    const displayName = user.display_name;
+    const [freelancingBefore, setFreelancingBefore] = useState("");
     const [goal, setGoal] = useState("");
     const [resume, setResume] = useState("");
     const [title, setTitle] = useState("");
@@ -61,9 +61,9 @@ export const Freelancers = ({ username }: FreelancerProps): JSX.Element => {
                     <div
                         key={index}
                         className={`freelance-xp-item ${
-                            freelancingXp === value ? "active" : ""
+                            freelancingBefore === value ? "active" : ""
                         }`}
-                        onClick={() => setFreelancingXp(value)}
+                        onClick={() => setFreelancingBefore(value)}
                     >
                         {label}
                     </div>
@@ -255,17 +255,19 @@ export const Freelancers = ({ username }: FreelancerProps): JSX.Element => {
 
     const createProfile = () => {
         setStep(step + 1);
+
         freelancerService.createFreelancingProfile({
-            education: "",
-            experience: "",
-            freelanced_before: "",
+            education: undefined,
+            experience: freelancingBefore,
+            freelanced_before: freelancingBefore,
             freelancing_goal: goal,
-            work_type: "",
+            work_type: undefined,
             skills,
             title,
             languages,
             services_offer: services,
-            bio: "",
+            bio,
+            user_id: user.id
         });
     };
 
@@ -325,8 +327,9 @@ export const Freelancers = ({ username }: FreelancerProps): JSX.Element => {
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     //TODO: If the current user has a freelancer profile, forward to their profile
+    const user = await utils.getCurrentUser();
 
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!
-    ).render(<Freelancers username={"STATIC ANN"} />);
+    ).render(<Freelancers user={user} />);
 });

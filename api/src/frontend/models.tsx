@@ -103,11 +103,11 @@ export interface BasicTxResponse {
 
 export type Freelancer = {
     id?: string | number;
-    education: string;
-    experience: string;
+    education?: string;
+    experience?: string;
     freelanced_before: string;
     freelancing_goal: string;
-    work_type: string;
+    work_type?: string;
     skills: string[];
     title: string;
     languages: string[];

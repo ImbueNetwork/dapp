@@ -255,10 +255,12 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
     };
 
     const onReviewPost = async () => {
+        const user_id = (await utils.getCurrentUser()).id;
+
         const resp = await fetch(`${config.apiBase}/briefs/`, {
             headers: postAPIHeaders,
             method: "post",
-            body: JSON.stringify({ headline, industries, description, scope, experience_id: expId, duration, skills, budget }),
+            body: JSON.stringify({ headline, industries, description, scope, experience_id: expId, duration, skills, budget, user_id }),
         });
 
         if (resp.ok) {
@@ -339,7 +341,6 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
 };
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    const user = await utils.getCurrentUser();
     ReactDOMClient.createRoot(document.getElementById("brief-details")!).render(
         <NewBrief />
     );

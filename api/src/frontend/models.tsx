@@ -146,7 +146,5 @@ export type BriefSqlFilter = {
     submitted_is_max: boolean;
     length_range: Array<number>;
     length_is_max: boolean;
-    max_hours_pw: number;
-    hours_pw_is_max: boolean;
     search_input: string;
 };

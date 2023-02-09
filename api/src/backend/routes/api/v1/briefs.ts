@@ -78,4 +78,20 @@ router.post("/", (req, res, next) => {
 });
 
 
+router.post("/search", (req, res, next) => {
+    db.transaction(async tx => {
+        try {
+            const data: BriefSqlFilter = req.body;
+            const briefs: Array<Brief> = await searchBriefs(tx, data);
+            res.send(briefs);
+        } catch (e) {
+            next(new Error(
+                `Failed to search all briefs`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
+
+
 export default router;

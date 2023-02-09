@@ -13,13 +13,12 @@ const postAPIHeaders = {
 
 
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
+    const resp = await fetch(`${config.apiBase}/briefs/search`, {
         headers: postAPIHeaders,
         method: "post",
         body: JSON.stringify(filter),
     });
     if (resp.ok) {
-        
         return await resp.json() as Array<Brief>
     } else {
         throw new Error('Failed to search briefs. status:' + resp.status);

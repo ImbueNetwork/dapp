@@ -139,8 +139,6 @@ export type BriefSqlFilter = {
     submitted_is_max: boolean;
     length_range: number[];
     length_is_max: boolean;
-    max_hours_pw: number;
-    hours_pw_is_max: boolean;
     search_input: string;
 }
 
@@ -590,27 +588,55 @@ export const searchBriefs =
     async (tx: Knex.Transaction, filter: BriefSqlFilter) =>
         // select everything that is associated with brief.
         await tx.select(
-            "briefs.id",
+            "all_briefs.id",
             "headline",
             "industries",
             "description",
             "skills",
-            "scope",
+            "scope_level",
             "duration",
             "budget",
             "users.display_name as created_by",
             "experience_level",
-            "hours_per_week",
             "users.briefs_submitted as briefs_submitted_by",
-        ).from("briefs")
-            .innerJoin("experience", { 'briefs.experience_id': "experience.id" })
-            .innerJoin("users", { "briefs.user_id": "users.id" })
+        )
+        .from(tx.raw(`\
+    (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
+                            ARRAY_AGG(skills.name) as skills
+                            FROM briefs
+                            LEFT JOIN skills
+                            ON skills.id = ANY (briefs.skill_ids)
+                            GROUP BY briefs.id),
+    joined_industries AS (SELECT briefs.id as brief_id,
+                            ARRAY_AGG(industries.name) as industries
+                            FROM briefs
+                            LEFT JOIN industries ON industries.id = ANY (briefs.industry_ids)
+                            GROUP BY briefs.id)
+    SELECT headline,
+                            id,
+                            description,
+                            budget,
+                            scope_id,
+                            duration_id,
+                            user_id,
+                            briefs.created,
+                            experience_id,
+                            joined_industries.industries,
+                            joined_skills.skills
+                            from briefs
+                            join joined_industries on briefs.id = joined_industries.brief_id
+                            join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
+                            `))
+                            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
+                            .innerJoin("users", { "all_briefs.user_id": "users.id" })
+                            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
+                            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
             .where(function () {
                 if (filter.submitted_range.length > 0) {
-                    this.whereIn("briefs_submitted", filter.submitted_range)
+                    this.whereBetween("users.briefs_submitted", [filter.submitted_range[0].toString(), Math.max(...filter.submitted_range).toString()]);
                 }
                 if (filter.submitted_is_max) {
-                    this.orWhere('briefs_submitted', '>=', Math.max(...filter.submitted_range))
+                    this.orWhere('users.briefs_submitted', '>=', Math.max(...filter.submitted_range))
                 }
             })
             .where(function () {
@@ -620,19 +646,12 @@ export const searchBriefs =
             })
             .where(function () {
                 if (filter.length_range.length > 0) {
-                    this.whereIn("duration", filter.length_range)
+                    this.whereIn("duration_id", filter.length_range)
                 }
                 if (filter.length_is_max) {
-                    this.orWhere('duration', '>=', Math.max(...filter.length_range))
+                    this.orWhere('duration_id', '>=', Math.max(...filter.length_range))
                 }
             })
-            .where(function () {
-                if (filter.max_hours_pw > 0) {
-                    this.whereBetween("hours_per_week", [0, filter.max_hours_pw]);
-                }
-                if (filter.hours_pw_is_max) {
-                    this.orWhere('hours_per_week', '>=', filter.max_hours_pw)
-                }
-            }).where("headline", "ilike", "%" + filter.search_input + "%")
+            .where("headline", "ilike", "%" + filter.search_input + "%")
 
 

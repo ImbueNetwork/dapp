@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { Freelancer } from "../models";
 import * as config from "../config";
-import { postAPIHeaders } from "../config";
+import { postAPIHeaders, getAPIHeaders } from "../config";
 
 export class FreelancerService {
      public async createFreelancingProfile(freelancer: Freelancer){
@@ -17,13 +17,12 @@ export class FreelancerService {
             console.log("Freelancer created successfully via Freelancer REST API");
         }
     }
-
-    
-
 }
+
 export async function getFreelancerProfile() {
-    const resp =  await fetch(`${config.apiBase}/freelancers/:username`, {
-        headers: postAPIHeaders,
+        let username = window.location.pathname.split('/').pop();
+    const resp =  await fetch(`${config.apiBase}/freelancers/${username}`, {
+        headers: getAPIHeaders,
         method: "get",
     })
 

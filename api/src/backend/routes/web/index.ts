@@ -73,7 +73,7 @@ router.get(
     }
 );
 
-router.get("/freelancers/profile", (req, res) => {
+router.get("/freelancers/:username", (req, res) => {
     res.render("freelancer-profile");
 });
 

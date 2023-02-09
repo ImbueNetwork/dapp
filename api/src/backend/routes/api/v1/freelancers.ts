@@ -24,21 +24,14 @@ router.get("/:username", (req, res, next) => {
     const username = req.params.username;
     db.transaction(async tx => {
         try {
-            const user = await models.fetchUserOrEmail(username)(tx);
-            if (!user) {
-                return res.status(404).end();
-            }
-            console.log(user);
-
-            const freelancer = await models.fetchFreelancerDetailsByUserID(user.id)(tx);
+            const freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
             if (!freelancer) {
+                console.log("freelancer");
                 return res.status(404).end();
             }
             console.log(freelancer);
 
-            //res.send(freelancer);
-
-
+            res.send(freelancer);
         } catch (e) {
             next(new Error(
                 `Failed to fetch freelancer details by userid: ${username}`,

@@ -326,7 +326,7 @@ export const Briefs = (): JSX.Element => {
                                 {item.headline}
                             </div>
                             <div className="brief-time-info">
-                                {`${item.experience_level}, ${item.duration} Months, Posted by ${item.created_by}`}
+                                {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                             </div>
                             <div className="brief-description">
                                 {item.description}

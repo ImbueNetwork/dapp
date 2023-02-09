@@ -45,11 +45,11 @@ export type UserInfo = {
     };
     bio: string;
     socials?: {
-        facebook: string;
-        twitter: string;
+        facebook?: string;
+        twitter?: string;
         // google: string;
-        telegram: string;
-        discord: string;
+        telegram?: string;
+        discord?: string;
     };
     skills?: Array<string>;
     portfolio?: Array<{

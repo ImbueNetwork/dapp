@@ -257,6 +257,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
         setStep(step + 1);
 
         freelancerService.createFreelancingProfile({
+            bio,
             education: undefined,
             experience: freelancingBefore,
             freelanced_before: freelancingBefore,
@@ -265,9 +266,10 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
             skills,
             title,
             languages,
-            services_offer: services,
-            bio,
-            user_id: user.id
+            services,
+            user_id: user.id,
+            username: user.display_name,
+            display_name: user.display_name
         });
     };
 

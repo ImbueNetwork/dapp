@@ -34,8 +34,7 @@ router.post("/", (req, res, next) => {
         duration_id,
         budget,
         user_id
-    } = req.body as Brief
-
+    } = req.body
 
 
     db.transaction(async tx => {

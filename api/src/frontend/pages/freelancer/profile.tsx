@@ -172,7 +172,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
 
 
     async componentDidMount() {
-        const freelancer = await getFreelancerProfile();
+        let username = window.location.pathname.split('/').pop();
+        const freelancer = await getFreelancerProfile(username);
         await this.populateProfile(freelancer)
     }
 

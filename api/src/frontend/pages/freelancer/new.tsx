@@ -12,7 +12,7 @@ import {
 import { Freelancer, User } from "../../models";
 import { TagsInput } from "../../components/tagsInput";
 import * as utils from "../../utils";
-import { FreelancerService } from "../../services/freelancerService";
+import { FreelancerService, getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/new-freelancer.css";
 
 const freelancerService = new FreelancerService();
@@ -328,8 +328,13 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
 };
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    //TODO: If the current user has a freelancer profile, forward to their profile
-    const user = await utils.getCurrentUser();
+    const user: User = await utils.getCurrentUser();
+    if(user) {
+        const userHasFreelancerProfile = await getFreelancerProfile(user.username);
+        if(userHasFreelancerProfile) {
+            utils.redirect(`freelancers/${user.username}`);
+        }
+    }
 
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-details")!

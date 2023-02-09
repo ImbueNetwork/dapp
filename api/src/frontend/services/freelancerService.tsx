@@ -19,8 +19,7 @@ export class FreelancerService {
     }
 }
 
-export async function getFreelancerProfile() {
-        let username = window.location.pathname.split('/').pop();
+export async function getFreelancerProfile(username: string) {
     const resp =  await fetch(`${config.apiBase}/freelancers/${username}`, {
         headers: getAPIHeaders,
         method: "get",
@@ -29,6 +28,7 @@ export async function getFreelancerProfile() {
     if (resp.ok) {
         return await resp.json() as Freelancer
     } else {
-        throw new Error('Failed to get freelancer profile. status:' + resp.status);
+        // throw new Error('Failed to get freelancer profile. status:' + resp.status);
+        return null
     }
   }

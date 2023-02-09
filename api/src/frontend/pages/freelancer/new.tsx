@@ -269,7 +269,11 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
             services,
             user_id: user.id,
             username: user.display_name,
-            display_name: user.display_name
+            display_name: user.display_name,
+            discord_link: "",
+            facebook_link: "",
+            telegram_link: "",
+            twitter_link: "",
         });
     };
 

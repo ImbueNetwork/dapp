@@ -80,25 +80,36 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
+        console.log(username)
         if(username){
             const freelancer = await getFreelancerProfile(username);
             if (freelancer) {
                 await this.populateProfile(freelancer)
-            }
+            } 
         }
     }
 
 
     async populateProfile(freelancer: Freelancer) {
         this.setState({
-            ...this.state,
+            isEditingBio : false,
+            bioEdit : "",
             userInfo: {
-                ...this.state.userInfo,
+                profileImageUrl: "",
+                location: {country: "", address: ""},
+                rating: {
+                    stars: 3,
+                    level: "default",
+                    numReviews: 0
+                },
                 contact: {username: freelancer.username, title: freelancer.title },
                 name: freelancer.display_name,
                 skills: freelancer.skills,
                 bio: freelancer.bio,
-                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
+                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link},
+                portfolio: [],
+                projects: [],
+
             },
         });
     }

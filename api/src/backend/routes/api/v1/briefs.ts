@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief } from "../../../models";
 import { json } from "stream/consumers";
 
 
@@ -22,6 +22,20 @@ router.get("/", (req, res, next) => {
     });
 });
 
+router.get("/:id", (req, res, next) => {
+    const id = req.params.id;
+    db.transaction(async tx => {
+        try {
+            const briefs = await fetchBrief(id)(tx);
+            res.send(briefs);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch brief with id ${id}`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
 
 router.post("/", (req, res, next) => {
     const {

@@ -248,6 +248,54 @@ export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select().where({ id }).first();
 
+export const fetchBrief = (id: string | number) =>
+    (tx: Knex.Transaction) =>
+        tx.select(
+            "all_briefs.id",
+            "headline",
+            "industries",
+            "description",
+            "skills",
+            "scope_level",
+            "duration",
+            "budget",
+            "users.display_name as created_by",
+            "experience_level",
+            "users.briefs_submitted as briefs_submitted_by",
+        )
+            .from(tx.raw(`\
+(WITH joined_skills AS ( SELECT briefs.id               as brief_id,
+                    ARRAY_AGG(skills.name) as skills
+                    FROM briefs
+                    LEFT JOIN skills
+                    ON skills.id = ANY (briefs.skill_ids)
+                    GROUP BY briefs.id),
+joined_industries AS (SELECT briefs.id as brief_id,
+                    ARRAY_AGG(industries.name) as industries
+                    FROM briefs
+                    LEFT JOIN industries ON industries.id = ANY (briefs.industry_ids)
+                    GROUP BY briefs.id)
+SELECT headline,
+                    id,
+                    description,
+                    budget,
+                    scope_id,
+                    duration_id,
+                    user_id,
+                    briefs.created,
+                    experience_id,
+                    joined_industries.industries,
+                    joined_skills.skills
+                    from briefs
+                    join joined_industries on briefs.id = joined_industries.brief_id
+                    join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
+                    `))
+            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
+            .innerJoin("users", { "all_briefs.user_id": "users.id" })
+            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
+            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
+            .where("all_briefs.id",id)
+            .first()
 
 export const fetchProjectWithProperties = (id: string | number) =>
     (tx: Knex.Transaction) =>
@@ -302,20 +350,20 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
 
 // TODO: Use same many to many relationship as freelancers
 export const fetchAllBriefs = () =>
-        (tx: Knex.Transaction) =>
-            tx.select(
-                "all_briefs.id",
-                "headline",
-                "industries",
-                "description",
-                "skills",
-                "scope_level",
-                "duration",
-                "budget",
-                "users.display_name as created_by",
-                "experience_level",
-                "users.briefs_submitted as briefs_submitted_by",
-            )
+    (tx: Knex.Transaction) =>
+        tx.select(
+            "all_briefs.id",
+            "headline",
+            "industries",
+            "description",
+            "skills",
+            "scope_level",
+            "duration",
+            "budget",
+            "users.display_name as created_by",
+            "experience_level",
+            "users.briefs_submitted as briefs_submitted_by",
+        )
             .from(tx.raw(`\
         (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
                                 ARRAY_AGG(skills.name) as skills
@@ -348,8 +396,8 @@ export const fetchAllBriefs = () =>
             .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
             .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
             .orderBy("all_briefs.created", "desc")
-    
-export const insertBrief = (brief: Brief) => 
+
+export const insertBrief = (brief: Brief) =>
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").insert(brief).returning("*")
     )[0];
@@ -441,136 +489,136 @@ export const getOrCreateFederatedUser = (
 
 export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
     (tx: Knex.Transaction) =>
-    fetchAllFreelancers()(tx)
-    .where({user_id})
-    .first()
-    .debug(true)
+        fetchAllFreelancers()(tx)
+            .where({ user_id })
+            .first()
+            .debug(true)
 
-    export const fetchFreelancerDetailsByUsername = (username: string) =>
+export const fetchFreelancerDetailsByUsername = (username: string) =>
     (tx: Knex.Transaction) =>
-    fetchAllFreelancers()(tx)
-    .where({username: username})
-    .first()
-    .debug(true)
+        fetchAllFreelancers()(tx)
+            .where({ username: username })
+            .first()
+            .debug(true)
 
 
 export const fetchAllFreelancers = () =>
     (tx: Knex.Transaction) =>
-    
-    tx.select(
-        "freelancers.id",
-        "freelanced_before",
-        "freelancing_goal",
-        "work_type",
-        "education",
-        "experience",
-        "facebook_link",
-        "twitter_link",
-        "telegram_link",
-        "discord_link",
-        "title",
-        "bio",
-        "user_id",
-        "username",
-        "display_name",
-        "freelancers.created",
-        tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
-        tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
-        tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
-        tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients")
 
-    ).from<Freelancer>("freelancers")
-    // Join services and many to many
-    .leftJoin("freelancer_services", { 'freelancers.id': "freelancer_services.freelancer_id" })
-    .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
-    // Join clients and many to many
-    .leftJoin("freelancer_clients", { 'freelancers.id': "freelancer_clients.freelancer_id" })
-    .leftJoin("clients", { 'freelancer_clients.client_id': "clients.id" })
-    // Join skills and many to many
-    .leftJoin("freelancer_skills", { 'freelancers.id': "freelancer_skills.freelancer_id" })
-    .leftJoin("skills", { 'freelancer_skills.skill_id': "skills.id" })
-    // Join languages and many to many
-    .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
-    .leftJoin("languages", { 'freelancer_languages.language_id': "languages.id" })
-    .innerJoin("users", { "freelancers.user_id": "users.id" })
+        tx.select(
+            "freelancers.id",
+            "freelanced_before",
+            "freelancing_goal",
+            "work_type",
+            "education",
+            "experience",
+            "facebook_link",
+            "twitter_link",
+            "telegram_link",
+            "discord_link",
+            "title",
+            "bio",
+            "user_id",
+            "username",
+            "display_name",
+            "freelancers.created",
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients")
 
-    // order and group by many-many selects
-    .orderBy("freelancers.created", "desc")
-    .groupBy("freelancers.id")
-    .groupBy("users.username")
-    .groupBy("users.display_name")
+        ).from<Freelancer>("freelancers")
+            // Join services and many to many
+            .leftJoin("freelancer_services", { 'freelancers.id': "freelancer_services.freelancer_id" })
+            .leftJoin("services", { 'freelancer_services.service_id': "services.id" })
+            // Join clients and many to many
+            .leftJoin("freelancer_clients", { 'freelancers.id': "freelancer_clients.freelancer_id" })
+            .leftJoin("clients", { 'freelancer_clients.client_id': "clients.id" })
+            // Join skills and many to many
+            .leftJoin("freelancer_skills", { 'freelancers.id': "freelancer_skills.freelancer_id" })
+            .leftJoin("skills", { 'freelancer_skills.skill_id': "skills.id" })
+            // Join languages and many to many
+            .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
+            .leftJoin("languages", { 'freelancer_languages.language_id': "languages.id" })
+            .innerJoin("users", { "freelancers.user_id": "users.id" })
+
+            // order and group by many-many selects
+            .orderBy("freelancers.created", "desc")
+            .groupBy("freelancers.id")
+            .groupBy("users.username")
+            .groupBy("users.display_name")
 
 export const insertFreelancerDetails = (f: Freelancer) =>
-    async (tx: Knex.Transaction) => 
+    async (tx: Knex.Transaction) =>
         await tx<Freelancer>("freelancers").insert(
-                {
-                    freelanced_before: f.freelanced_before.toString(),
-                    freelancing_goal: f.freelancing_goal,
-                    work_type: f.work_type,
-                    education: f.education,
-                    experience: f.experience,
-                    title: f.title,
-                    bio: f.bio,
-                    facebook_link: f.facebook_link,
-                    twitter_link: f.twitter_link,
-                    telegram_link: f.telegram_link,
-                    discord_link: f.discord_link,
-                    user_id: f.user_id
-                })
-        
+            {
+                freelanced_before: f.freelanced_before.toString(),
+                freelancing_goal: f.freelancing_goal,
+                work_type: f.work_type,
+                education: f.education,
+                experience: f.experience,
+                title: f.title,
+                bio: f.bio,
+                facebook_link: f.facebook_link,
+                twitter_link: f.twitter_link,
+                telegram_link: f.telegram_link,
+                discord_link: f.discord_link,
+                user_id: f.user_id
+            })
+
             .returning("id")
             .then(ids => {
                 if (f.skill_ids != undefined) {
-                    f.skill_ids.forEach(async(skillId) => {
+                    f.skill_ids.forEach(async (skillId) => {
                         if (skillId != undefined) {
                             await tx("freelancer_skills")
-                            .insert({
-                                freelancer_id: ids[0],
-                                skill_id: skillId
-                            })
+                                .insert({
+                                    freelancer_id: ids[0],
+                                    skill_id: skillId
+                                })
                         }
-                        
+
                     })
                 }
-                
+
                 if (f.language_ids != undefined) {
-                    f.language_ids.forEach(async(langId) => {
+                    f.language_ids.forEach(async (langId) => {
                         if (langId != undefined) {
                             await tx("freelancer_languages")
-                            .insert({
-                                freelancer_id: ids[0],
-                                language_id: langId
-                            })
+                                .insert({
+                                    freelancer_id: ids[0],
+                                    language_id: langId
+                                })
                         }
                     })
                 }
-                
+
                 if (f.client_ids != undefined) {
-                    f.client_ids.forEach(async(clientId) => {
+                    f.client_ids.forEach(async (clientId) => {
                         if (clientId != undefined) {
                             await tx("freelancer_clients")
-                            .insert({
-                                freelancer_id: ids[0],
-                                client_id: clientId
-                            })
+                                .insert({
+                                    freelancer_id: ids[0],
+                                    client_id: clientId
+                                })
                         }
                     })
                 }
-                
+
                 if (f.services_ids != undefined) {
-                    f.services_ids.forEach(async(serviceId) => {
+                    f.services_ids.forEach(async (serviceId) => {
                         if (serviceId != undefined) {
                             await tx("freelancer_services")
-                            .insert({
-                                freelancer_id: ids[0],
-                                service_id: serviceId
-                            })
+                                .insert({
+                                    freelancer_id: ids[0],
+                                    service_id: serviceId
+                                })
                         }
                     })
-                } 
-                
+                }
+
                 return ids[0]
-        })  
+            })
 
 
 // TODO.
@@ -600,7 +648,7 @@ export const searchBriefs =
             "experience_level",
             "users.briefs_submitted as briefs_submitted_by",
         )
-        .from(tx.raw(`\
+            .from(tx.raw(`\
     (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
                             ARRAY_AGG(skills.name) as skills
                             FROM briefs
@@ -627,10 +675,10 @@ export const searchBriefs =
                             join joined_industries on briefs.id = joined_industries.brief_id
                             join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
                             `))
-                            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
-                            .innerJoin("users", { "all_briefs.user_id": "users.id" })
-                            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
-                            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
+            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
+            .innerJoin("users", { "all_briefs.user_id": "users.id" })
+            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
+            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
             .where(function () {
                 if (filter.submitted_range.length > 0) {
                     this.whereBetween("users.briefs_submitted", [filter.submitted_range[0].toString(), Math.max(...filter.submitted_range).toString()]);

@@ -93,7 +93,7 @@ router.put("/:username", (req, res, next) => {
                 return res.status(404).end();
             }
 
-            const freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
+            const freelancer_id: Freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
 
             if (!freelancer.id) {
                 return next(new Error(

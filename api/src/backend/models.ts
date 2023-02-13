@@ -99,40 +99,40 @@ export type ProjectProperties = {
 export type Brief = {
     id?: string | number;
     headline: string;
-    industry_ids: number[];
+    industries: string[];
     description: string;
-    skill_ids: number[];
-    scope_id: number;
-    duration_id: number;
+    skills: string[];
+    scope_level: number;
+    duration: number;
     budget: bigint;
     // created_by: string;
-    experience_id: number,
+    experience_level: string,
     // hours_per_week: number,
     // briefs_submitted_by: number,
     user_id: number;
 };
 
 export type Freelancer = {
-    id?: string | number;
+    id: string | number;
     bio: string;
-    education?: string;
-    experience?: string;
+    education: string;
+    experience: string;
     facebook_link: string;
     twitter_link: string;
     telegram_link: string;
     discord_link: string;
     freelanced_before: string;
     freelancing_goal: string;
-    work_type?: string;
+    work_type: string;
     title: string;
     skills: string[];
     languages: string[];
     services: string[];
-    clients?: string[];
-    client_images?: string[];
+    clients: string[];
+    client_images: string[];
     display_name: string;
     username: string;
-    user_id?: number;
+    user_id: number;
     rating?: number;
     num_ratings: number;
 };
@@ -309,49 +309,28 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
 export const fetchAllBriefs = () =>
         (tx: Knex.Transaction) =>
             tx.select(
-                "all_briefs.id",
+                "briefs.id",
                 "headline",
-                "industries",
                 "description",
-                "skills",
-                "scope_level",
-                "duration",
+                "scope.scope_level",
+                "duration.duration",
                 "budget",
                 "users.display_name as created_by",
                 "experience_level",
-                "users.briefs_submitted as briefs_submitted_by",
+                //"users.briefs_submitted as briefs_submitted_by",
+                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text) as industries)"),
+                "users.user_id"
             )
-            .from(tx.raw(`\
-        (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
-                                ARRAY_AGG(skills.name) as skills
-                                FROM briefs
-                                LEFT JOIN skills
-                                ON skills.id = ANY (briefs.skill_ids)
-                                GROUP BY briefs.id),
-        joined_industries AS (SELECT briefs.id as brief_id,
-                                ARRAY_AGG(industries.name) as industries
-                                FROM briefs
-                                LEFT JOIN industries ON industries.id = ANY (briefs.industry_ids)
-                                GROUP BY briefs.id)
-        SELECT headline,
-                                id,
-                                description,
-                                budget,
-                                scope_id,
-                                duration_id,
-                                user_id,
-                                briefs.created,
-                                experience_id,
-                                joined_industries.industries,
-                                joined_skills.skills
-                                from briefs
-                                join joined_industries on briefs.id = joined_industries.brief_id
-                                join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
-                                `))
-            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
-            .innerJoin("users", { "all_briefs.user_id": "users.id" })
-            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
-            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
+            .from("briefs")
+            .leftJoin("brief_industries", {"briefs.id": "brief_industries.brief_id"})
+            .leftJoin("industries", {"briefs_industries.industry_id": "industries.id"})
+            .leftJoin("brief_skills", {"briefs.id": "brief_skills.brief_id"})
+            .leftJoin("skills", {"brief_skills.skill_id": "skills.id"})
+            .leftJoin("experience", { 'briefs.experience_id': "experience.id" })
+            .leftJoin("scope", { "briefs.scope_id": "scope.id" })
+            .leftJoin("duration", { "briefs.duration_id": "duration.id" })
+            .innerJoin("users", { "briefs.user_id": "users.id" })
             .orderBy("all_briefs.created", "desc")
     
 export const insertBrief = (brief: Brief) => 
@@ -482,7 +461,9 @@ export const fetchAllFreelancers = () =>
         tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
         tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
         tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients"),
-        tx.raw("(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating")
+        tx.raw("ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images"),
+        tx.raw("(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating"),
+        tx.raw("COUNT(freelancer_ratings.rating) as num_ratings"),
 
     ).from<Freelancer>("freelancers")
     // Join services and many to many

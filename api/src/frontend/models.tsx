@@ -102,26 +102,26 @@ export interface BasicTxResponse {
 }
 
 export type Freelancer = {
-    id?: string | number;
+    id: string | number;
     bio: string;
-    education?: string;
-    experience?: string;
+    education: string;
+    experience: string;
     facebook_link: string;
     twitter_link: string;
     telegram_link: string;
     discord_link: string;
     freelanced_before: string;
     freelancing_goal: string;
-    work_type?: string;
-    skills: string[];
+    work_type: string;
     title: string;
+    skills: string[];
     languages: string[];
     services: string[];
-    clients?: string[];
-    client_images?: string[];
+    clients: string[];
+    client_images: string[];
     display_name: string;
     username: string;
-    user_id?: number;
+    user_id: number;
     rating?: number;
     num_ratings: number;
 };

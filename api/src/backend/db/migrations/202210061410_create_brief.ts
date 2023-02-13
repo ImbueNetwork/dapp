@@ -7,12 +7,14 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tableName, (builder) => {
         builder.increments("id", { primaryKey: true });
         builder.text("headline");
-        builder.specificType("industry_ids", "integer[]");
 
         builder.text("description");
+        
+        //you can find these in brief_languages and brief_industries tables
         builder.specificType("skill_ids", "integer[]");
-        builder.integer("scope_id");
+        builder.specificType("industry_ids", "integer[]");
 
+        builder.integer("scope_id");
         builder.integer("duration_id");
         builder.bigInteger("budget");
         builder.integer("experience_id");

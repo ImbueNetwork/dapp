@@ -137,7 +137,7 @@ export type Brief = {
     created_by: string;
     experience_level: string;
     hours_per_week: number;
-    briefs_submitted_by: number;
+    number_of_briefs_submitted: number;
 };
 
 export type BriefSqlFilter = {

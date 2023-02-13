@@ -261,7 +261,7 @@ export const fetchBrief = (id: string | number) =>
             "budget",
             "users.display_name as created_by",
             "experience_level",
-            "users.briefs_submitted as briefs_submitted_by",
+            "users.briefs_submitted as number_of_briefs_submitted",
         )
             .from(tx.raw(`\
 (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
@@ -362,7 +362,7 @@ export const fetchAllBriefs = () =>
             "budget",
             "users.display_name as created_by",
             "experience_level",
-            "users.briefs_submitted as briefs_submitted_by",
+            "users.briefs_submitted as number_of_briefs_submitted",
         )
             .from(tx.raw(`\
         (WITH joined_skills AS ( SELECT briefs.id               as brief_id,

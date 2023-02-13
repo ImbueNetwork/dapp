@@ -298,7 +298,7 @@ export const Briefs = (): JSX.Element => {
                                     Proposals Submitted:{" "}
                                 </span>
                                 <span className="proposals-count">
-                                    {item.briefs_submitted_by}
+                                    {item.number_of_briefs_submitted}
                                 </span>
                             </div>
                         </div>

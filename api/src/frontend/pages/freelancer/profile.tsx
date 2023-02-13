@@ -68,14 +68,7 @@ export type UserInfo = {
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
     onSaveBio = () => {
-        this.setState({
-            ...this.state,
-            isEditingBio: false,
-            userInfo: {
-                ...this.state.userInfo,
-                bio: this.state.bioEdit,
-            },
-        });
+        
     };
     
     async componentDidMount() {

@@ -114,22 +114,27 @@ export type Brief = {
 
 export type Freelancer = {
     id?: string | number;
-    freelanced_before: string;
-    freelancing_goal: string;
-    work_type: string;
-    education: string;
-    experience: string;
-    skill_ids: number[];
-    language_ids: number[];
-    client_ids: number[];
-    services_ids: number[];
+    bio: string;
+    education?: string;
+    experience?: string;
     facebook_link: string;
     twitter_link: string;
     telegram_link: string;
     discord_link: string;
+    freelanced_before: string;
+    freelancing_goal: string;
+    work_type?: string;
     title: string;
-    bio: string;
-    user_id?: string | number;
+    skills: string[];
+    languages: string[];
+    services: string[];
+    clients?: string[];
+    client_images?: string[];
+    display_name: string;
+    username: string;
+    user_id?: number;
+    rating?: number;
+    num_ratings: number;
 };
 
 
@@ -391,7 +396,6 @@ export const upsertItems = (items: string[], table_name: string) => async (tx: K
     return item_ids;
 };
 
-
 export const getOrCreateFederatedUser = (
     issuer: string,
     subject: string,
@@ -477,7 +481,8 @@ export const fetchAllFreelancers = () =>
         tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
         tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
         tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
-        tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients")
+        tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients"),
+        tx.raw("(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating")
 
     ).from<Freelancer>("freelancers")
     // Join services and many to many
@@ -493,6 +498,7 @@ export const fetchAllFreelancers = () =>
     .leftJoin("freelancer_languages", { 'freelancers.id': "freelancer_languages.freelancer_id" })
     .leftJoin("languages", { 'freelancer_languages.language_id': "languages.id" })
     .innerJoin("users", { "freelancers.user_id": "users.id" })
+    .leftJoin("freelancer_ratings", {"freelancers.id": "freelancer_ratings.freelancer_id"})
 
     // order and group by many-many selects
     .orderBy("freelancers.created", "desc")
@@ -500,7 +506,11 @@ export const fetchAllFreelancers = () =>
     .groupBy("users.username")
     .groupBy("users.display_name")
 
-export const insertFreelancerDetails = (f: Freelancer) =>
+
+export const insertFreelancerDetails = (
+    f: Freelancer, skill_ids: number[],
+    language_ids: number[], client_ids: number[],
+    service_ids: number[]) =>
     async (tx: Knex.Transaction) => 
         await tx<Freelancer>("freelancers").insert(
                 {
@@ -520,8 +530,8 @@ export const insertFreelancerDetails = (f: Freelancer) =>
         
             .returning("id")
             .then(ids => {
-                if (f.skill_ids != undefined) {
-                    f.skill_ids.forEach(async(skillId) => {
+                if (skill_ids != undefined) {
+                    skill_ids.forEach(async(skillId) => {
                         if (skillId != undefined) {
                             await tx("freelancer_skills")
                             .insert({
@@ -533,8 +543,8 @@ export const insertFreelancerDetails = (f: Freelancer) =>
                     })
                 }
                 
-                if (f.language_ids != undefined) {
-                    f.language_ids.forEach(async(langId) => {
+                if (language_ids != undefined) {
+                    language_ids.forEach(async(langId) => {
                         if (langId != undefined) {
                             await tx("freelancer_languages")
                             .insert({
@@ -545,8 +555,8 @@ export const insertFreelancerDetails = (f: Freelancer) =>
                     })
                 }
                 
-                if (f.client_ids != undefined) {
-                    f.client_ids.forEach(async(clientId) => {
+                if (client_ids != undefined) {
+                    client_ids.forEach(async(clientId) => {
                         if (clientId != undefined) {
                             await tx("freelancer_clients")
                             .insert({
@@ -557,8 +567,8 @@ export const insertFreelancerDetails = (f: Freelancer) =>
                     })
                 }
                 
-                if (f.services_ids != undefined) {
-                    f.services_ids.forEach(async(serviceId) => {
+                if (service_ids != undefined) {
+                    service_ids.forEach(async(serviceId) => {
                         if (serviceId != undefined) {
                             await tx("freelancer_services")
                             .insert({
@@ -574,10 +584,10 @@ export const insertFreelancerDetails = (f: Freelancer) =>
 
 
 // TODO.
-export const updateFreelancerDetails = (userId: string, freelancer: Freelancer) =>
+export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) => 
     async (tx: Knex.Transaction) => (
-        await tx<Freelancer>("freelancers").where({ user_id: userId }).update(freelancer).returning("*")
-    )[0];
+        await tx<Freelancer>("freelancers").update(freelancer).returning("*")
+        )[0];
 
 
 

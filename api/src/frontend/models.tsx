@@ -122,6 +122,8 @@ export type Freelancer = {
     display_name: string;
     username: string;
     user_id?: number;
+    rating?: number;
+    num_ratings: number;
 };
 
 // The same as backend/briefs

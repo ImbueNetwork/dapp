@@ -7,13 +7,15 @@ import "../../../../public/brief-details.css";
 import { Briefs } from ".";
 import { getBrief } from "../../services/briefsService";
 import "../../../../public/freelancer-profile.css";
-
-
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 export type BriefProps = {
     brief: Brief;
 };
+TimeAgo.addDefaultLocale(en)
 
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
+    const timeAgo = new TimeAgo('en-US')
     const BioPanel = (
         <div className="brief-bio">
             <div className="subsection">
@@ -21,7 +23,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     <h3>{brief.headline}</h3>
                 </div>
                 { /* FIXME: time_posted */}
-                <span className="posted-date">Posted 5 days ago by {brief.created_by}</span>
+                <span className="posted-date">Posted {timeAgo.format(new Date(brief.created))} by {brief.created_by}</span>
             </div>
 
             { /* TODO: Do we use same styles for both buttons? */}
@@ -138,6 +140,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
         </div>
     );
     return (
+       
         <div className="brief-details-container">
             <div className="brief-info">
                 {BioPanel}
@@ -186,6 +189,10 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
+
+        console.log(new Date(brief.created).toLocaleDateString());
+        console.log(typeof(new Date(brief.created).toLocaleDateString()));
+
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

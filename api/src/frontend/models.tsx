@@ -134,6 +134,7 @@ export type Brief = {
     scope: string;
     duration: string;
     budget: number;
+    created: Date;
     created_by: string;
     experience_level: string;
     hours_per_week: number;

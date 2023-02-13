@@ -260,6 +260,7 @@ export const fetchBrief = (id: string | number) =>
             "duration",
             "budget",
             "users.display_name as created_by",
+            "all_briefs.created",
             "experience_level",
             "users.briefs_submitted as number_of_briefs_submitted",
         )

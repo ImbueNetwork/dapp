@@ -14,18 +14,17 @@ export type BriefProps = {
 };
 
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
-
-
     const BioPanel = (
         <div className="brief-bio">
             <div className="subsection">
                 <div className="header">
                     <h3>{brief.headline}</h3>
                 </div>
-
+                { /* FIXME: time_posted */}
                 <span className="posted-date">Posted 5 days ago by {brief.created_by}</span>
             </div>
 
+            { /* TODO: Do we use same styles for both buttons? */}
             <div className="subsection">
                 <div className="action-buttons">
                     <button className="primary-btn in-dark w-button">Apply</button>
@@ -69,6 +68,8 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     <h3>Key Skills And Requirements</h3>
                 </div>
                 <ul>
+                    {/* TODO: better have a field in brief object? */}
+                    {/* FIXME: missing {key} */}
                     <li>Create user interface designs for desktop based applications and cloud services for a technical audience.</li>
                     <li>Develop design prototypes for testing with users.</li>
                     <li>Work with Product and Engineering to create new products or improve existing products based on user research and customer feedback.</li>
@@ -93,6 +94,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="header">
+                    { /* FIXME: typo here? Estimated */}
                     <h3>Estimate Project/Contract Length</h3>
                 </div>
                 <span>{brief.duration}</span>
@@ -103,7 +105,6 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
     const BioInsights = (
         <div className="brief-insights">
-
             <div className="subsection">
                 <div className="brief-insights-stat">
                     <h3>Brief Insights</h3>
@@ -112,6 +113,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="brief-insights-stat">
+                    { /* TODO: what about to use one from `react-icons`? */}
                     <i className="material-icons" aria-hidden="true" >dynamic_feed</i>
                     <h3> <span>{brief.number_of_briefs_submitted}</span> projects posted</h3>
                 </div>
@@ -119,6 +121,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="brief-insights-stat">
+                    { /* TODO: what about to use one from `react-icons`? */}
                     <i className="material-icons" aria-hidden="true" >account_balance_wallet</i>
                     <h3>Total Spent <span>$250,000</span></h3>
                 </div>
@@ -126,6 +129,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="brief-insights-stat">
+                    { /* TODO: what about to use one from `react-icons`? */}
                     <i className="material-icons" aria-hidden="true" >groups</i>
                     <h3>Applications: <span>10-20</span> </h3>
                 </div>
@@ -145,11 +149,12 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                 <h3>Similar projects on Imbue</h3>
                 <div className="divider"></div>
 
+                {/* TODO: Need an object for the list of similar projects */}
+                {/* FIXME: missing {key} */}
                 <div className="similar-brief">
                     <div className="similar-brief-details">
                         <p>NFT Minting</p>
                         <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-
                     </div>
                     <button className="primary-btn in-dark w-button">View Brief</button>
                 </div>
@@ -158,7 +163,6 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     <div className="similar-brief-details">
                         <p>NFT Minting</p>
                         <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-
                     </div>
                     <button className="primary-btn in-dark w-button">View Brief</button>
                 </div>
@@ -167,7 +171,6 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     <div className="similar-brief-details">
                         <p>NFT Minting</p>
                         <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-
                     </div>
                     <button className="primary-btn in-dark w-button">View Brief</button>
                 </div>
@@ -187,5 +190,4 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);
     }
-
 });

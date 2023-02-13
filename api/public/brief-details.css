@@ -35,7 +35,6 @@ p {
     border-radius: 20px;
 }
 
-
 .brief-info {
     display: flex;
     flex-direction: row;
@@ -44,9 +43,6 @@ p {
     margin-right: auto;
     border-radius: 20px;
 }
-
-
-
 
 .left-panel {
     background-color: #2c2c2c;
@@ -165,6 +161,7 @@ p {
     left: 64.5vw;
     top: 15vw;
 
+    /* Why not download and save the image in /public/ ? */
     background: url(https://w7.pngwing.com/pngs/606/180/png-transparent-english-draughts-checkerboard-checkerboard-angle-white-text-thumbnail.png);
     border-radius: 23px;
 }
@@ -184,7 +181,7 @@ p {
     background: var(--theme-imbue-white);
     color: var(--theme-imbue-purple);
     font-size: 15px;
-    line-height: 1.0;
+    line-height: 1;
     padding: 17px;
     border-radius: 8px;
 }
@@ -199,7 +196,6 @@ p {
     color: #2c2c2c;
 }
 
-
 .brief-bio {
     flex: 1 0 30%;
     width: 35%;
@@ -209,7 +205,6 @@ p {
     margin-right: 40px;
 }
 
-
 .brief-insights {
     width: 25%;
     background-color: var(--theme-grey-dark);
@@ -218,7 +213,7 @@ p {
 }
 
 .brief-insights > .subsection {
-    height:20%;
+    height: 20%;
 }
 
 .brief-insights-stat {
@@ -230,7 +225,7 @@ p {
     padding-top: 20px;
 }
 
-.brief-insights-stat > h3> span {
+.brief-insights-stat > h3 > span {
     color: var(--theme-primary);
 }
 
@@ -242,7 +237,7 @@ p {
 }
 
 .subsection > .divider {
-    width: 75%
+    width: 75%;
 }
 
 .similar-briefs {
@@ -262,13 +257,11 @@ p {
     width: 55%;
 }
 
-.similar-brief > button
-{
+.similar-brief > button {
     margin-top: 0px;
     padding: 6px 12px;
 }
 
 .similar-brief > .title {
     font-weight: bold;
-} 
-
+}

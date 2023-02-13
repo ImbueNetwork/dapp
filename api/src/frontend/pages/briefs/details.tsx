@@ -79,6 +79,20 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="header">
+                    <h3>Project Scope</h3>
+                </div>
+                <span>{brief.scope}</span>
+            </div>
+
+            <div className="subsection">
+                <div className="header">
+                    <h3>Experience Level Required</h3>
+                </div>
+                <span>{brief.experience_level}</span>
+            </div>
+
+            <div className="subsection">
+                <div className="header">
                     <h3>Estimate Project/Contract Length</h3>
                 </div>
                 <span>{brief.duration}</span>

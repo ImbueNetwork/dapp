@@ -96,6 +96,9 @@ export type ProjectProperties = {
     project_id?: string | number;
 };
 
+// created_by: string;
+    // hours_per_week: number,
+    // briefs_submitted_by: number,
 export type Brief = {
     id?: string | number;
     headline: string;
@@ -105,10 +108,7 @@ export type Brief = {
     scope_level: number;
     duration: number;
     budget: bigint;
-    // created_by: string;
     experience_level: string,
-    // hours_per_week: number,
-    // briefs_submitted_by: number,
     user_id: number;
 };
 
@@ -305,7 +305,6 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
 
-// TODO: Use same many to many relationship as freelancers
 export const fetchAllBriefs = () =>
         (tx: Knex.Transaction) =>
             tx.select(
@@ -333,10 +332,40 @@ export const fetchAllBriefs = () =>
             .innerJoin("users", { "briefs.user_id": "users.id" })
             .orderBy("all_briefs.created", "desc")
     
-export const insertBrief = (brief: Brief) => 
+
+
+// Insert a brief and their respective skill and industry_ids.
+export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[]) => 
     async (tx: Knex.Transaction) => (
-        await tx<Brief>("briefs").insert(brief).returning("*")
-    )[0];
+        await tx<Brief>("briefs").insert(brief).returning("briefs.id").then(async(ids) => {
+            if (skill_ids != undefined) {
+                skill_ids.forEach(async(skillId) => {
+                    if (skillId != undefined) {
+                        await tx("breifs_skills")
+                        .insert({
+                            freelancer_id: ids[0],
+                            skill_id: skillId
+                        })
+                    }
+                    
+                })
+            }
+
+            if (industry_ids != undefined) {
+                skill_ids.forEach(async(industry_id) => {
+                    if (industry_id != undefined) {
+                        await tx("breifs_skills")
+                        .insert({
+                            freelancer_id: ids[0],
+                            skill_id: industry_id
+                        })
+                    }
+                    
+                })
+            }
+            return ids[0]
+        })
+    );
 
 export const incrementUserBriefSubmissions = (id: number) =>
     async (tx: Knex.Transaction) => (

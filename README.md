@@ -12,8 +12,6 @@ To go through this guide you will need:
 2. Polkadot-js wallet extention, you can install one from [here](https://polkadot.js.org/extension/)
 3. If launching locally, you need to have the env `GOOGLE_OAUTH2_CLIENT_ID` and `GOOGLE_OAUTH2_CLIENT_SECRET` variables set. You can set an empty value to them if you dont plan to sign in using OAuth
 
-
-
 ## Local deployment quickstart with docker-compose
 
 From the top-level of the repo.
@@ -49,6 +47,19 @@ docker-compose up -d
 
 
 _Please note if you are using a Apple silicon e.g. M1 then you need to replace the Docker files_
+
+
+
+## Local deployment with virtualBox
+
+1. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
+2. Download Ubuntu ISO file from https://ubuntu.com/download 
+3. Boot the VM from the ISO file, a good guide is here: https://www.youtube.com/watch?v=J1Bf8FM8yN8 
+4. Install yarn on the VM: https://linuxize.com/post/how-to-install-yarn-on-ubuntu-20-04/ 
+5. CD into the API directory 
+6. Run make
+7. Run yarn start
+
 
 
 ## Steps to create a new Imbue Network Project

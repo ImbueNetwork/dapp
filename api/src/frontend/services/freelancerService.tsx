@@ -21,13 +21,10 @@ export async function createFreelancingProfile(freelancer: Freelancer) {
 }
 
 export async function getFreelancerProfile(username: string) {
-    
     const resp =  await fetch(`${config.apiBase}/freelancers/${username}`, {
         headers: getAPIHeaders,
         method: "get",
     })
-    console.log("HERE");
-
     if (resp.ok) {
         return await resp.json() as Freelancer
     } else {

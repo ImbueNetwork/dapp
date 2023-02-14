@@ -26,6 +26,7 @@ export type ProfileState = {
     isEditingBio: boolean;
     bioEdit: string;
     userInfo: UserInfo;
+    is_found: boolean;
 };
 
 export type UserInfo = {
@@ -76,17 +77,16 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         super(props);
         this.state = 
             {
+                is_found: false,
                 isEditingBio : false,
                 bioEdit : "",
                 userInfo: {
-                    //todo
-                    profileImageUrl: "",
+                    profileImageUrl: "/public/profile-image.png",
                     rating: {
-                        stars: 3,
-                        level: "default",
+                        stars: 5,
+                        level: "",
                         numReviews: 0
                     },
-                    // todo
                     location: {country: "", address: ""},
                     contact: {username: "", title: "" },
                     name: "",
@@ -100,26 +100,25 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
 
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
-        console.log(username)
-        if(username){
-            const freelancer = await getFreelancerProfile(username || "");
-            if (freelancer) {
-                await this.populateProfile(freelancer)
-            } else {
-            }
+        const freelancer = await getFreelancerProfile(username || "");
+        if (freelancer) {
+            await this.populateProfile(freelancer)
+        } else {
+            //404
         }
     }
 
 
     async populateProfile(freelancer: Freelancer) {
         this.setState({
+            is_found: true,
             isEditingBio : false,
             bioEdit : freelancer.bio,
             userInfo: {
                 //todo
-                profileImageUrl: "",
+                profileImageUrl: "/public/profile-image.png",
                 rating: {
-                    stars: 3,
+                    stars:  5,
                     level: "default",
                     numReviews: 0
                 },
@@ -134,8 +133,13 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         });
     }
 
+    get_stars(num_stars: number) {
+        
+    }
+
     render() {
         const { userInfo } = this.state;
+
         return (
             <div className="profile-container">
                 <div className="banner">
@@ -150,7 +154,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                         <div className="profile-image">
                             <img
                                 src={userInfo.profileImageUrl}
-                                alt="profile image"
+                                alt=""
                             />
                         </div>
                         <div className="profile-summary">
@@ -162,12 +166,11 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 <p>{userInfo.location.address}</p>
                             </div>
                             <div className="rating">
-                                <p>
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                </p>
+                                    {
+                                        Array.from({ length: userInfo.rating.stars}, (_, i) => i).map((i) => (
+                                            <p key={i}><FaStar color="var(--theme-yellow)" /></p> 
+                                        ))
+                                    }
                                 <p>
                                     <span>{userInfo.rating.level}</span>
                                     <span className="review-count">

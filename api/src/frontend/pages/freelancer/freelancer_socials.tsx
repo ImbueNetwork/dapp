@@ -18,7 +18,9 @@ export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
     if (props.link == "") {
         media_icon = <span>"+"</span>
     } else {
-        media_icon = <link href={props.link}><span>{props.icon}</span></link>
+        
+        media_icon = 
+        <a href={props.link} target="_blank" rel="noopener"><span>{props.icon}</span></a>
     }
 
     return (

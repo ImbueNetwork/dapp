@@ -106,7 +106,7 @@ export type Brief = {
     description: string;
     skills: string[];
     scope_level: string;
-    duration: number;
+    duration: string;
     budget: bigint;
     experience_level: string,
     user_id: number;

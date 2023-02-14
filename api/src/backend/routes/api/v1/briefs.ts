@@ -28,7 +28,7 @@ router.post("/", (req, res, next) => {
             const industry_ids = await upsertItems(brief.industries, "industries")(tx);
             const scope_id = await upsertItems([brief.scope_level], "scope")(tx);
             const duration_id = await upsertItems([brief.duration], "duration")(tx);
-            const brief_id = await insertBrief(brief, skill_ids, industry_ids, scope_id, duration_id)(tx);
+            const brief_id = await insertBrief(brief, skill_ids, industry_ids, scope_id[0], duration_id[0])(tx);
     
             if (!brief_id) {
                 return next(new Error(

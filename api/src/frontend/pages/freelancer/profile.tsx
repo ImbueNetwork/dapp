@@ -68,18 +68,45 @@ export type UserInfo = {
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
     onSaveBio = () => {
-        this.setState({
-        });
+        //this.setState({
+        //});
     };
     
+    constructor(props) {
+        super(props);
+        this.state = 
+            {
+                isEditingBio : false,
+                bioEdit : "",
+                userInfo: {
+                    //todo
+                    profileImageUrl: "",
+                    rating: {
+                        stars: 3,
+                        level: "default",
+                        numReviews: 0
+                    },
+                    // todo
+                    location: {country: "", address: ""},
+                    contact: {username: "", title: "" },
+                    name: "",
+                    skills: [],
+                    bio: "",
+                    socials: {facebook: "", discord: "", twitter: "", telegram: ""}
+            }
+        };
+      }
+    
+
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
         console.log(username)
         if(username){
-            const freelancer = await getFreelancerProfile(username);
+            const freelancer = await getFreelancerProfile(username || "");
             if (freelancer) {
                 await this.populateProfile(freelancer)
-            } 
+            } else {
+            }
         }
     }
 
@@ -87,7 +114,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     async populateProfile(freelancer: Freelancer) {
         this.setState({
             isEditingBio : false,
-            bioEdit : "",
+            bioEdit : freelancer.bio,
             userInfo: {
                 //todo
                 profileImageUrl: "",

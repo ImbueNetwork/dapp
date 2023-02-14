@@ -82,7 +82,7 @@ export const Briefs = (): JSX.Element => {
     };
 
     const lengthFilters = {
-        // Should be a field in the database, WILL BE IN DAYS.
+        // Should be a field in the database, in months.
         // Again i need the high and low values.
         filterType: BriefFilterOption.Length,
         label: "Project Length",
@@ -110,6 +110,33 @@ export const Briefs = (): JSX.Element => {
                 search_for: [12],
                 or_max: true,
                 value: "1 year +",
+            },
+            {
+                // years * months
+                interiorIndex: 5,
+                search_for: [12 * 5],
+                or_max: true,
+                value: "5 years +",
+            },
+        ],
+    };
+    const hoursPwFilter = {
+        filterType: BriefFilterOption.HoursPerWeek,
+        label: "Hours Per Week",
+        options: [
+            {
+                interiorIndex: 0,
+                // This will be 0-30 as we actually use this as max value
+                search_for: [30],
+                or_max: false,
+                value: "30hrs/week",
+            },
+            {
+                interiorIndex: 1,
+                // Same goes for this
+                search_for: [50],
+                value: "50hrs/week",
+                or_max: true,
             },
         ],
     };

@@ -68,7 +68,8 @@ export type UserInfo = {
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
     onSaveBio = () => {
-        
+        this.setState({
+        });
     };
     
     async componentDidMount() {
@@ -88,21 +89,20 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             isEditingBio : false,
             bioEdit : "",
             userInfo: {
+                //todo
                 profileImageUrl: "",
-                location: {country: "", address: ""},
                 rating: {
                     stars: 3,
                     level: "default",
                     numReviews: 0
                 },
+                // todo
+                location: {country: "", address: ""},
                 contact: {username: freelancer.username, title: freelancer.title },
                 name: freelancer.display_name,
                 skills: freelancer.skills,
                 bio: freelancer.bio,
-                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link},
-                portfolio: [],
-                projects: [],
-
+                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
             },
         });
     }

@@ -105,7 +105,7 @@ export type Brief = {
     industries: string[];
     description: string;
     skills: string[];
-    scope_level: number;
+    scope_level: string;
     duration: number;
     budget: bigint;
     experience_level: string,
@@ -335,13 +335,20 @@ export const fetchAllBriefs = () =>
 
 
 // Insert a brief and their respective skill and industry_ids.
-export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[]) => 
+export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) => 
     async (tx: Knex.Transaction) => (
-        await tx<Brief>("briefs").insert(brief).returning("briefs.id").then(async(ids) => {
+        await tx("briefs").insert({
+            headline: brief.headline,
+            description: brief.description,
+            duration_id: duration_id,
+            scope_id: scope_id,
+            user_id: brief.user_id,
+        }).returning("briefs.id")
+        .then(async(ids) => {
             if (skill_ids != undefined) {
                 skill_ids.forEach(async(skillId) => {
                     if (skillId != undefined) {
-                        await tx("breifs_skills")
+                        await tx("breif_skills")
                         .insert({
                             freelancer_id: ids[0],
                             skill_id: skillId
@@ -352,12 +359,12 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
             }
 
             if (industry_ids != undefined) {
-                skill_ids.forEach(async(industry_id) => {
+                industry_ids.forEach(async(industry_id) => {
                     if (industry_id != undefined) {
-                        await tx("breifs_skills")
+                        await tx("breif_industries")
                         .insert({
                             freelancer_id: ids[0],
-                            skill_id: industry_id
+                            industry_id: industry_id
                         })
                     }
                     

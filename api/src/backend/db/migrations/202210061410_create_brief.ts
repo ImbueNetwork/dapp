@@ -11,8 +11,8 @@ export async function up(knex: Knex): Promise<void> {
         builder.text("description");
         
         //you can find these in brief_languages and brief_industries tables
-        builder.specificType("skill_ids", "integer[]");
-        builder.specificType("industry_ids", "integer[]");
+        //builder.specificType("skill_ids", "integer[]");
+        //builder.specificType("industry_ids", "integer[]");
 
         builder.integer("scope_id");
         builder.integer("duration_id");

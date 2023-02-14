@@ -4,6 +4,7 @@ import * as config from "../config";
 import { postAPIHeaders, getAPIHeaders } from "../config";
 
 export async function createFreelancingProfile(freelancer: Freelancer) {
+    // Check that this user doesnt already have a freelancer profile.
    const resp = await fetch(`${config.apiBase}/freelancers/`, {
        headers: postAPIHeaders,
        method: "post",
@@ -32,7 +33,22 @@ export async function getFreelancerProfile(username: string) {
     }
 }
 
+
+export async function freelancerExists(username: string): Promise<boolean> {
+    const resp =  await fetch(`${config.apiBase}/freelancers/${username}`, {
+        headers: getAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return true
+    } else {
+        return false
+    }
+}
+
 export async function updateFreelancer(freelancer: Freelancer) {
+    // VALIDATION
     const resp =  await fetch(`${config.apiBase}/freelancers/${freelancer.username}`, {
         headers: getAPIHeaders,
         method: "put",

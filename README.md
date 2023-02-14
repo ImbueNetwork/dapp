@@ -12,6 +12,42 @@ To go through this guide you will need:
 2. Polkadot-js wallet extention, you can install one from [here](https://polkadot.js.org/extension/)
 3. If launching locally, you need to have the env `GOOGLE_OAUTH2_CLIENT_ID` and `GOOGLE_OAUTH2_CLIENT_SECRET` variables set. You can set an empty value to them if you dont plan to sign in using OAuth
 
+## Local deployment quickstart with docker-compose
+
+From the top-level of the repo.
+
+1. Add some env variables to your bash profile and source.
+```bash
+echo 'export IMBUE_NETWORK_WEBSOCK_ADDR="wss://rococo.imbue.network"' >> $HOME/.bashrc;
+echo 'export RELAY_CHAIN_WEBSOCK_ADDR="wss://rococo-rpc.polkadot.io"' >> $HOME/.bashrc;
+source $HOME/.bashrc;
+```
+
+2. Then build the associated images 
+```bash
+docker-compose up -d;
+```
+
+3. Setup DB and install.
+```bash
+cd api;
+make db_up;
+```
+
+4. Finally to start the project, simply
+```bash
+yarn start;
+```
+
+If you face any issues after the databases are created then restart the services from the top level repo. 
+```bash
+docker-compose down;
+docker-compose up -d 
+``` 
+
+
+_Please note if you are using a Apple silicon e.g. M1 then you need to replace the Docker files_
+
 
 
 ## Local deployment with virtualBox

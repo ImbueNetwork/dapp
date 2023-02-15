@@ -133,11 +133,14 @@ export type Brief = {
     industries: string[];
     description: string;
     skills: string[];
-    scope: string;
+    scope_id: number;
+    scope_level: string;
     duration: string;
+    duration_id: number;
     budget: number;
     created_by: string;
     experience_level: string;
+    experience_id: number;
     //hours_per_week: number;
     //briefs_submitted_by: number;
 };

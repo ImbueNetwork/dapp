@@ -2,6 +2,7 @@ import express, { response } from "express";
 import db from "../../../db";
 import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions } from "../../../models";
 import { json } from "stream/consumers";
+import { brotliDecompress } from "zlib";
 
 const router = express.Router();
 
@@ -26,10 +27,11 @@ router.post("/", (req, res, next) => {
         try {
             const skill_ids = await upsertItems(brief.skills, "skills")(tx);
             const industry_ids = await upsertItems(brief.industries, "industries")(tx);
-            const scope_id = await upsertItems([brief.scope_level], "scope")(tx);
-            const duration_id = await upsertItems([brief.duration], "duration")(tx);
-            const brief_id = await insertBrief(brief, skill_ids, industry_ids, scope_id[0], duration_id[0])(tx);
-    
+            const brief_id = await insertBrief(brief, skill_ids, industry_ids, brief.scope_id, brief.duration_id)(tx);
+
+            console.log("duration_id" + brief.duration_id)
+            console.log("scope_id" + brief.scope_id)
+
             if (!brief_id) {
                 return next(new Error(
                     "Failed to create brief."

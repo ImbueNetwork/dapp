@@ -105,10 +105,13 @@ export type Brief = {
     industries: string[];
     description: string;
     skills: string[];
+    scope_id: number;
     scope_level: string;
+    duration_id: number;
     duration: string;
     budget: bigint;
     experience_level: string,
+    experience_id: number
     user_id: number;
 };
 
@@ -312,27 +315,35 @@ export const fetchAllBriefs = () =>
                 "headline",
                 "description",
                 "scope.scope_level",
+                "briefs.scope_id",
                 "duration.duration",
+                "briefs.duration_id",
                 "budget",
                 "users.display_name as created_by",
                 "experience_level",
+                "experience_id",
                 //"users.briefs_submitted as briefs_submitted_by",
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
                 tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text) as industries)"),
-                "users.user_id"
+                "users.id"
             )
             .from("briefs")
             .leftJoin("brief_industries", {"briefs.id": "brief_industries.brief_id"})
-            .leftJoin("industries", {"briefs_industries.industry_id": "industries.id"})
+            .leftJoin("industries", {"brief_industries.industry_id": "industries.id"})
             .leftJoin("brief_skills", {"briefs.id": "brief_skills.brief_id"})
             .leftJoin("skills", {"brief_skills.skill_id": "skills.id"})
             .leftJoin("experience", { 'briefs.experience_id': "experience.id" })
             .leftJoin("scope", { "briefs.scope_id": "scope.id" })
             .leftJoin("duration", { "briefs.duration_id": "duration.id" })
             .innerJoin("users", { "briefs.user_id": "users.id" })
-            .orderBy("all_briefs.created", "desc")
+            .orderBy("briefs.created", "desc")
+            .groupBy("briefs.id")  
+            .groupBy("scope.scope_level")
+            .groupBy("duration.duration")
+            .groupBy("users.display_name")
+            .groupBy("experience.experience_id")
+            .groupBy("users.id")
     
-
 
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) => 
@@ -343,14 +354,16 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
             duration_id: duration_id,
             scope_id: scope_id,
             user_id: brief.user_id,
+            budget: brief.budget,
+            experience_id: brief.experience_id,
         }).returning("briefs.id")
         .then(async(ids) => {
             if (skill_ids != undefined) {
                 skill_ids.forEach(async(skillId) => {
                     if (skillId != undefined) {
-                        await tx("breif_skills")
+                        await tx("brief_skills")
                         .insert({
-                            freelancer_id: ids[0],
+                            brief_id: ids[0],
                             skill_id: skillId
                         })
                     }
@@ -361,9 +374,9 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
             if (industry_ids != undefined) {
                 industry_ids.forEach(async(industry_id) => {
                     if (industry_id != undefined) {
-                        await tx("breif_industries")
+                        await tx("brief_industries")
                         .insert({
-                            freelancer_id: ids[0],
+                            brief_id: ids[0],
                             industry_id: industry_id
                         })
                     }

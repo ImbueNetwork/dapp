@@ -39,6 +39,8 @@ router.get("/briefs", (req, res) => {
     res.render("briefs");
 });
 
+
+
 router.get(
     "/briefs/new",
     passport.authenticate("jwt", {
@@ -49,6 +51,10 @@ router.get(
         res.render("new-brief");
     }
 );
+
+router.get("/briefs/:id", (req, res) => {
+    res.render("brief-details");
+});
 
 router.get("/join", (req, res) => {
     res.render("join");

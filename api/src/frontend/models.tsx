@@ -138,12 +138,11 @@ export type Brief = {
     duration: string;
     duration_id: number;
     budget: number;
+    created: Date;
     created_by: string;
     experience_level: string;
     experience_id: number;
-    //hours_per_week: number;
-    //briefs_submitted_by: number;
-
+    number_of_briefs_submitted: number;
 };
 
 export type BriefSqlFilter = {

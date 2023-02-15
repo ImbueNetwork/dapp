@@ -327,11 +327,9 @@ export const Briefs = (): JSX.Element => {
                                 <span className="proposals-heading">
                                     Proposals Submitted:{" "}
                                 </span>
-                                {/* TODO: */}
-                                {/* <span className="proposals-count">
-                                    {item.briefs_submitted_by}
-                                </span> */}
-
+                                <span className="proposals-count">
+                                    {item.number_of_briefs_submitted}
+                                </span>
                             </div>
                         </div>
                     ))}

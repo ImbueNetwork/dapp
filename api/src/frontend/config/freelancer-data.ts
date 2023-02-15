@@ -85,50 +85,6 @@ export const nameExamples = [
     "Generate Content, e.g. blog, videos",
 ];
 
-export const scopeData = [
-    {
-        label: "Complex",
-        value: "complex",
-        description:
-            "A long term project with complex initiatives,  intersecting tasks and numeroous teams.",
-    },
-    {
-        label: "Large",
-        value: "large",
-        description:
-            "A long term project with multiple tasks and requirements, with well defined milestones and a set plan",
-    },
-    {
-        label: "Medium",
-        value: "medium",
-        description: "A well-defined project, with tasks already mapped out",
-    },
-    {
-        label: "Small",
-        value: "small",
-        description: "A relatively fast and straightforward project",
-    },
-];
-
-export const timeData = [
-    {
-        label: "More than a year",
-        value: "1",
-    },
-    {
-        label: "More than 6 months",
-        value: "2",
-    },
-    {
-        label: "3-6 months",
-        value: "3",
-    },
-    {
-        label: "1 to 3 months",
-        value: "4",
-    },
-];
-
 export const suggestedIndustries = [
     "Web3",
     "DeFi",
@@ -232,7 +188,6 @@ export const suggestedServices = [
     "Mobile (Android/iOS)",
     "Copywriting",
     "Smart Contracts",
-    "Copywriting",
     "Video Editing",
     "NFT",
 ];

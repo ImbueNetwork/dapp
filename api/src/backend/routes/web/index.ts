@@ -39,6 +39,8 @@ router.get("/briefs", (req, res) => {
     res.render("briefs");
 });
 
+
+
 router.get(
     "/briefs/new",
     passport.authenticate("jwt", {
@@ -50,13 +52,16 @@ router.get(
     }
 );
 
+router.get("/briefs/:id", (req, res) => {
+    res.render("brief-details");
+});
+
 router.get("/join", (req, res) => {
     res.render("join");
 });
 
 router.get("/googlelogin", (req, res) => {
     res.render("googlelogin");
-
 });
 
 router.get("/briefs/", (req, res) => {
@@ -73,6 +78,10 @@ router.get(
         res.render("new-freelancer");
     }
 );
+
+router.get("/freelancers/:username", (req, res) => {
+    res.render("freelancer-profile");
+});
 
 router.use((_req, res, next) => {
     res.render("legacy");

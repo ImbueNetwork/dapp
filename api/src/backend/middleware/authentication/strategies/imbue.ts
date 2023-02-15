@@ -24,7 +24,7 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_pay
             next(`No user found with id: ${id}`, false);
         } else {
 
-            return next(null, {id: user.id, display_name: user.display_name});
+            return next(null, {id: user.id, username: user.username,  display_name: user.display_name});
         }
     } catch (e) {
         return next(`Failed to deserialize user with id ${id}`, false);
@@ -41,13 +41,10 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
             const user = await models.fetchUserOrEmail(userOrEmail)(tx);
-            console.log("****** userorEmail is ", userOrEmail.toLowerCase());
-            console.log("****** user is ", user);
 
             if (!user) {
                 return res.status(404).end();
             }
-            console.log("****** user is ", user);
             const loginSuccessful = await bcrypt.compare(password, user.password)
             if (!loginSuccessful) {
                 return res.status(404).end();

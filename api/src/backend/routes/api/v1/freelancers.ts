@@ -2,6 +2,8 @@ import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import passport from "passport";
+import { upsertItems } from "../../../models";
+import {Freelancer} from "../../../models"
 
 const router = express.Router();
 
@@ -12,27 +14,27 @@ router.get("/", (req, res, next) => {
             res.send(freelancers);
         } catch (e) {
             next(new Error(
-                `Failed to fetch all briefs`,
+                `Failed to fetch all freelancers`,
                 {cause: e as Error}
             ));
         }
     });
 });
 
-router.get("/:id", (req, res, next) => {
-    const userId = req.params.id;
 
+
+router.get("/:username", (req, res, next) => {
+    const username = req.params.username;
     db.transaction(async tx => {
         try {
-            const freelancer = await models.fetchFreelancerDetailsByUserID(userId)(tx);
-
+            const freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
             if (!freelancer) {
                 return res.status(404).end();
             }
             res.send(freelancer);
         } catch (e) {
             next(new Error(
-                `Failed to fetch freelancer details by userid: ${userId}`,
+                `Failed to fetch freelancer details by userid: ${username}`,
                 {cause: e as Error}
             ));
         }
@@ -40,39 +42,24 @@ router.get("/:id", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
-
-    const {
-        education,
-        experience,
-        freelancing_goal,
-        freelanced_before,
-        skills,
-        bio,
-        title,
-        languages,
-        work_type,
-        services_offer,
-        user_id
-
-    } = req.body.freelancer as models.Freelancer;
+    // TODO VERIFY user is allowed to edit table
+    const freelancer = req.body.freelancer as Freelancer;
 
     db.transaction(async tx => {
         try {
-            const freelancer = await models.insertFreelancerDetails({
-                education,
-                experience,
-                freelancing_goal,
-                freelanced_before,
-                skills,
-                bio,
-                title,
-                languages,
-                work_type,
-                services_offer,
-                user_id
-            })(tx);
+            const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
+            const language_ids = await upsertItems(freelancer.languages, "languages")(tx);
+            const services_ids = await upsertItems(freelancer.services, "services")(tx);
+            let client_ids: number[] = [] 
 
-            if (!freelancer.id) {
+            if (freelancer.clients) {
+                client_ids = await upsertItems(freelancer.clients, "services")(tx);
+            } 
+            const freelancer_id = await models.insertFreelancerDetails(
+                freelancer, skill_ids, language_ids, client_ids, services_ids
+            )(tx);
+
+            if (!freelancer_id) {
                 return next(new Error(
                     "Failed to insert freelancer details."
                 ));
@@ -81,7 +68,7 @@ router.post("/", (req, res, next) => {
             res.status(201).send(
                 {
                     status: "Successful",
-                    freelancer_id: freelancer.id
+                    freelancer_id: freelancer_id
                 }
             );
         } catch (cause) {
@@ -93,49 +80,22 @@ router.post("/", (req, res, next) => {
     });
 });
 
-
-router.put("/:id", (req, res, next) => {
-    const id = req.params.id;
-    const {
-        education,
-        experience,
-        freelancing_goal,
-        freelanced_before,
-        skills,
-        bio,
-        title,
-        languages,
-        work_type,
-        services_offer,
-        user_id
-    } = req.body.freelancer as models.Freelancer;
-
+router.put("/:username", (req, res, next) => {
+    // TODO VERIFY user is allowed to edit table
+    // Verification happens before we get here.
+    const username = req.params.username;
+    const freelancer = req.body.freelancer as Freelancer;
+    
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const freelancerDetails = await models.fetchFreelancerDetailsByUserID(id)(tx);
+            const freelancerDetails = await models.fetchFreelancerDetailsByUsername(username)(tx);
 
             if (!freelancerDetails) {
                 return res.status(404).end();
             }
 
-            if (freelancerDetails.user_id !== id) {
-                return res.status(403).end();
-            }
-
-            const freelancer = await models.updateFreelancerDetails(id, {
-                education,
-                experience,
-                freelancing_goal,
-                freelanced_before,
-                skills,
-                bio,
-                title,
-                languages,
-                work_type,
-                services_offer,
-                user_id
-            })(tx);
+            const freelancer_id: Freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
 
             if (!freelancer.id) {
                 return next(new Error(

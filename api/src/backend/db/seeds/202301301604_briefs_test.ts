@@ -4,27 +4,25 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("briefs").insert([
     {
         headline: "Amazing Frontend Developer NEEDED!!",
-        industries: ["Something Cool", "Another Weird Thing"],
+        //industry_ids: [1, 2],
         description: "We need some absolute wizard to create an ultra dynamic thing with carosels",
-        duration: 12,
+        duration_id: 2,
         budget: 1000,
         experience_id: 2,
         user_id: 1,
-        scope: "what is this",
-        skills: ["React","Javascript"]
-
+        scope_id: 2,
+        //skill_ids: [3,4]
     },
     {
         headline: "Amazing C++ Developer",
-        industries: ["Something Cool", "Another Weird Thing but on the backend!"],
+        //industry_ids: [2, 3],
         description: "We need some absolute wizard to create an ultra cool, mega thing with spinning balls",
-        duration: 5,
+        duration_id: 1,
         budget: 200,
         experience_id: 3,
         user_id: 2,
-        scope: "what is this",
-        skills: ["C++","C"]
+        scope_id: 1,
+        //skill_ids: [2,6]
     }
-
     ]);
 };

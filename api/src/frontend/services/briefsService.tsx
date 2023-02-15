@@ -1,5 +1,5 @@
 import * as config from "../config";
-import {Brief} from "../models";
+import {Brief, Freelancer} from "../models";
 import { BriefSqlFilter } from "../models";
 
 const getAPIHeaders = {
@@ -13,16 +13,28 @@ const postAPIHeaders = {
 
 
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
-    const resp = await fetch(`${config.apiBase}/briefs/`, {
+    const resp = await fetch(`${config.apiBase}/briefs/search`, {
         headers: postAPIHeaders,
         method: "post",
         body: JSON.stringify(filter),
     });
     if (resp.ok) {
-        
         return await resp.json() as Array<Brief>
     } else {
         throw new Error('Failed to search briefs. status:' + resp.status);
+    }
+  }
+
+export const getBrief = async (briefId: number | string) => {
+    const resp =  await fetch(`${config.apiBase}/briefs/${briefId}`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json() as Brief
+    } else {
+        throw new Error('Failed to get all briefs. status:' + resp.status);
     }
   }
 
@@ -38,3 +50,4 @@ export const getAllBriefs = async () => {
         throw new Error('Failed to get all briefs. status:' + resp.status);
     }
   }
+

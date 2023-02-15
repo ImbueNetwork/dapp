@@ -23,25 +23,25 @@ export const Briefs = (): JSX.Element => {
         options: [
             {
                 interiorIndex: 0,
-                search_for: [0],
+                search_for: [1],
                 value: "Entry Level",
                 or_max: false,
             },
             {
                 interiorIndex: 1,
-                search_for: [1],
+                search_for: [2],
                 value: "Intermediate",
                 or_max: false,
             },
             {
                 interiorIndex: 2,
-                search_for: [2],
+                search_for: [3],
                 value: "Expert",
                 or_max: false,
             },
             {
                 interiorIndex: 3,
-                search_for: [3],
+                search_for: [4],
                 value: "Specialist",
                 or_max: false,
             },
@@ -56,8 +56,8 @@ export const Briefs = (): JSX.Element => {
         options: [
             {
                 interiorIndex: 0,
-                search_for: [0, 1, 2, 3, 4],
-                value: "0-4",
+                search_for: [1, 2, 3, 4],
+                value: "1-4",
                 or_max: false,
             },
             {
@@ -83,6 +83,7 @@ export const Briefs = (): JSX.Element => {
 
     const lengthFilters = {
         // Should be a field in the database, WILL BE IN DAYS.
+
         // Again i need the high and low values.
         filterType: BriefFilterOption.Length,
         label: "Project Length",
@@ -90,35 +91,29 @@ export const Briefs = (): JSX.Element => {
             {
                 interiorIndex: 0,
                 search_for: [1],
-                value: "1 month",
-                or_max: false,
-            },
-            {
-                interiorIndex: 1,
-                search_for: [1, 2, 3],
                 value: "1-3 months",
                 or_max: false,
             },
             {
-                interiorIndex: 2,
-                search_for: [3, 4, 5, 6],
+                interiorIndex: 1,
+                search_for: [2],
                 value: "3-6 months",
                 or_max: false,
             },
             {
-                interiorIndex: 3,
-                search_for: Array.from({ length: 6 }, (_, i) => i + 6 + 1),
+                interiorIndex: 2,
+                search_for: [3],
                 value: "6-12 months",
                 or_max: false,
             },
             {
-                interiorIndex: 4,
+                interiorIndex: 3,
                 search_for: [12],
                 or_max: true,
                 value: "1 year +",
             },
             {
-                // years * months * days
+                // years * months
                 interiorIndex: 5,
                 search_for: [12 * 5],
                 or_max: true,
@@ -185,6 +180,7 @@ export const Briefs = (): JSX.Element => {
         }
 
         for (let i = 0; i < elements.length; i++) {
+
             if (elements[i].checked) {
                 is_search = true;
                 const id = elements[i].getAttribute("id");
@@ -224,16 +220,6 @@ export const Briefs = (): JSX.Element => {
                             length_is_max = o2.or_max;
                             break;
 
-                        case BriefFilterOption.HoursPerWeek:
-                            const o3 =
-                                hoursPwFilter.options[
-                                parseInt(interiorIndex)
-                                ];
-                            if (o3.search_for[0] > hpw_max) {
-                                hpw_max = o3.search_for[0];
-                            }
-                            hpw_is_max = o3.or_max;
-                            break;
 
                         default:
                             console.log(
@@ -252,12 +238,8 @@ export const Briefs = (): JSX.Element => {
                 submitted_is_max,
                 length_range,
                 length_is_max,
-                max_hours_pw: hpw_max,
-                hours_pw_is_max: hpw_is_max,
                 search_input: search_value,
             };
-            console.log(filter);
-
             const briefs_filtered = await callSearchBriefs(filter);
 
             setBriefs(briefs_filtered);
@@ -287,11 +269,6 @@ export const Briefs = (): JSX.Element => {
                     label={lengthFilters.label}
                     filter_type={BriefFilterOption.Length}
                     filter_options={lengthFilters.options}
-                ></BriefFilter>
-                <BriefFilter
-                    label={hoursPwFilter.label}
-                    filter_type={BriefFilterOption.HoursPerWeek}
-                    filter_options={hoursPwFilter.options}
                 ></BriefFilter>
             </div>
             <div className="briefs-section">
@@ -326,7 +303,8 @@ export const Briefs = (): JSX.Element => {
                                 {item.headline}
                             </div>
                             <div className="brief-time-info">
-                                {`${item.experience_level}, ${item.duration} Months, Posted by ${item.created_by}`}
+                                {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+
                             </div>
                             <div className="brief-description">
                                 {item.description}
@@ -350,7 +328,7 @@ export const Briefs = (): JSX.Element => {
                                     Proposals Submitted:{" "}
                                 </span>
                                 <span className="proposals-count">
-                                    {item.briefs_submitted_by}
+                                    {item.number_of_briefs_submitted}
                                 </span>
                             </div>
                         </div>

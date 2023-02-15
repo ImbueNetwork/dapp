@@ -173,8 +173,6 @@ export default class Preview extends HTMLElement {
         if (!this.user) {
             const callback = (state: any) => {
                 this.user = state.user;
-                console.log(state);
-                console.log(state.user);
                 location.reload();
             }
 
@@ -197,7 +195,6 @@ export default class Preview extends HTMLElement {
             return;
         }
         await this.fetchProject(this.project.id.toString());
-        console.log(this.project);
 
         this.toggleSave = false;
         this.renderProject(this.project);
@@ -384,7 +381,6 @@ export default class Preview extends HTMLElement {
                 const account = state?.account as
                     InjectedAccountWithMeta;
                 const injector = await web3FromSource(account.meta.source);
-                console.log(injector);
 
                 const txHash = await extrinsic.signAndSend(
                     account.address,

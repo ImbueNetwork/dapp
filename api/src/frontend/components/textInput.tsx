@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
 export interface TextInputProps
-  extends React.DetailedHTMLProps<
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    HTMLTextAreaElement
-  > {
-  maxLength?: number;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    extends React.DetailedHTMLProps<
+        React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+        HTMLTextAreaElement
+    > {
+    maxLength?: number;
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export const TextInput = (props: TextInputProps): JSX.Element => {

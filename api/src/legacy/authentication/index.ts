@@ -58,7 +58,6 @@ export default class Authentication extends HTMLElement {
         case "done":
         {
             const callback = state?.callback;
-            console.log("STATE", state);
             if (callback instanceof Function) {
                 callback(state);
             }

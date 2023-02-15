@@ -87,7 +87,7 @@ router.get("/:userOrEmail", (req, res, next) => {
     const userOrEmail = req.params.userOrEmail;
     db.transaction(async tx => {
         try {
-            const user = await models.fetchUserOrEmail(userOrEmail)(tx);
+            const user: User = await models.fetchUserOrEmail(userOrEmail)(tx) as User;
             if (!user) {
                 return res.status(404).end();
             }

@@ -66,8 +66,6 @@ export default class MyAccount extends HTMLElement {
     wrapAuthentication(action: CallableFunction) {
         const callback = (state: any) => {
             this.user = state.user;
-            console.log(state);
-            console.log(state.user);
             action();
         }
 

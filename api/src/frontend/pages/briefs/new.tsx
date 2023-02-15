@@ -39,9 +39,9 @@ export type BriefInfo = {
     headline: string;
     industries: string[];
     description: string;
-    scope: string;
+    scope_id: number | undefined;
     experience_id: number | undefined;
-    duration: string;
+    duration_id: number | undefined;
     skills: string[];
     budget: bigint | undefined;
     user_id: number | undefined;
@@ -68,8 +68,8 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
     const [description, setDescription] = useState("");
     const [skills, setSkills] = useState<string[]>([]);
     const [expId, setExpId] = useState<number>();
-    const [scope, setScope] = useState('');
-    const [duration, setDuration] = useState<number>();
+    const [scopeId, setScopeId] = useState<number>();
+    const [durationId, setDurationId] = useState<number>();
     const [budget, setBudget] = useState<number>();
 
     const NamePanel = (
@@ -158,8 +158,9 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     label={label}
                     value={value}
                     key={index}
-                    checked={scope === value}
-                    onSelect={() => setScope(value)}
+
+                    checked={scopeId === value}
+                    onSelect={() => setScopeId(value)}
                 >
                     {description ? (
                         <div className="scope-item-description">
@@ -180,8 +181,9 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     label={label}
                     value={value}
                     key={index}
-                    checked={duration === value}
-                    onSelect={() => setDuration(value)}
+                    checked={durationId === value}
+                    onSelect={() => setDurationId(value)}
+
                 />
             ))}
         </div>
@@ -242,10 +244,11 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
         if (step === 4 && expId === undefined) {
             return false;
         }
-        if (step === 5 && !scope) {
+        if (step === 5 && !scopeId) {
             return false;
         }
-        if (step === 6 && duration === undefined) {
+        if (step === 6 && durationId === undefined) {
+
             return false;
         }
         if (step === 7 && !budget) {
@@ -260,7 +263,7 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
         const resp = await fetch(`${config.apiBase}/briefs/`, {
             headers: postAPIHeaders,
             method: "post",
-            body: JSON.stringify({ headline, industries, description, scope, experience_id: expId, duration, skills, budget, user_id }),
+            body: JSON.stringify({ headline, industries, description, scope_id: scopeId, experience_id: expId, duration_id: durationId, skills, budget, user_id }),
         });
 
         if (resp.ok) {

@@ -265,3 +265,10 @@ p {
 .similar-brief > .title {
     font-weight: bold;
 }
+
+
+.brief-insight-icon {
+    margin-top: 10px;
+    margin-right: 10px;
+    font-size: 35px;
+}

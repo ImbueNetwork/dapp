@@ -9,21 +9,25 @@ import { getBrief } from "../../services/briefsService";
 import "../../../../public/freelancer-profile.css";
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+import { IoMdWallet } from "react-icons/io";
+import { FaHandshake } from "react-icons/fa";
+import { HiUserGroup } from "react-icons/hi";
+
 export type BriefProps = {
     brief: Brief;
 };
 TimeAgo.addDefaultLocale(en)
 
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
-    const timeAgo = new TimeAgo('en-US')
+    const timeAgo = new TimeAgo('en-US');
+    const timePosted = timeAgo.format(new Date(brief.created));
     const BioPanel = (
         <div className="brief-bio">
             <div className="subsection">
                 <div className="header">
                     <h3>{brief.headline}</h3>
                 </div>
-                { /* FIXME: time_posted */}
-                <span className="posted-date">Posted {timeAgo.format(new Date(brief.created))} by {brief.created_by}</span>
+                <span className="time_posted">Posted {timePosted} by {brief.created_by}</span>
             </div>
 
             { /* TODO: Do we use same styles for both buttons? */}
@@ -96,8 +100,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="header">
-                    { /* FIXME: typo here? Estimated */}
-                    <h3>Estimate Project/Contract Length</h3>
+                    <h3>Estimated Length</h3>
                 </div>
                 <span>{brief.duration}</span>
             </div>
@@ -115,69 +118,67 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
             <div className="subsection">
                 <div className="brief-insights-stat">
-                    { /* TODO: what about to use one from `react-icons`? */}
-                    <i className="material-icons" aria-hidden="true" >dynamic_feed</i>
+                    <FaHandshake className="brief-insight-icon" />
                     <h3> <span>{brief.number_of_briefs_submitted}</span> projects posted</h3>
                 </div>
             </div>
 
             <div className="subsection">
                 <div className="brief-insights-stat">
-                    { /* TODO: what about to use one from `react-icons`? */}
-                    <i className="material-icons" aria-hidden="true" >account_balance_wallet</i>
+                    <IoMdWallet className="brief-insight-icon" />
                     <h3>Total Spent <span>$250,000</span></h3>
                 </div>
             </div>
 
             <div className="subsection">
                 <div className="brief-insights-stat">
-                    { /* TODO: what about to use one from `react-icons`? */}
-                    <i className="material-icons" aria-hidden="true" >groups</i>
+                    <HiUserGroup className="brief-insight-icon" />
                     <h3>Applications: <span>10-20</span> </h3>
                 </div>
             </div>
 
         </div>
     );
+
+    const SimilarProjects = (
+        <div className="similar-briefs">
+            <h3>Similar projects on Imbue</h3>
+            <div className="divider"></div>
+
+            {/* TODO: Need an object for the list of similar projects */}
+            {/* FIXME: missing {key} */}
+            <div className="similar-brief">
+                <div className="similar-brief-details">
+                    <p>NFT Minting</p>
+                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                </div>
+                <button className="primary-btn in-dark w-button">View Brief</button>
+            </div>
+
+            <div className="similar-brief">
+                <div className="similar-brief-details">
+                    <p>NFT Minting</p>
+                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                </div>
+                <button className="primary-btn in-dark w-button">View Brief</button>
+            </div>
+
+            <div className="similar-brief">
+                <div className="similar-brief-details">
+                    <p>NFT Minting</p>
+                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                </div>
+                <button className="primary-btn in-dark w-button">View Brief</button>
+            </div>
+        </div>
+    );
     return (
-       
         <div className="brief-details-container">
             <div className="brief-info">
                 {BioPanel}
                 {BioInsights}
             </div>
-
-
-            <div className="similar-briefs">
-                <h3>Similar projects on Imbue</h3>
-                <div className="divider"></div>
-
-                {/* TODO: Need an object for the list of similar projects */}
-                {/* FIXME: missing {key} */}
-                <div className="similar-brief">
-                    <div className="similar-brief-details">
-                        <p>NFT Minting</p>
-                        <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-                    </div>
-                    <button className="primary-btn in-dark w-button">View Brief</button>
-                </div>
-
-                <div className="similar-brief">
-                    <div className="similar-brief-details">
-                        <p>NFT Minting</p>
-                        <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-                    </div>
-                    <button className="primary-btn in-dark w-button">View Brief</button>
-                </div>
-
-                <div className="similar-brief">
-                    <div className="similar-brief-details">
-                        <p>NFT Minting</p>
-                        <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
-                    </div>
-                    <button className="primary-btn in-dark w-button">View Brief</button>
-                </div>
-            </div>
+            {SimilarProjects}
         </div>
     );
 };
@@ -189,10 +190,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
-
-        console.log(new Date(brief.created).toLocaleDateString());
-        console.log(typeof(new Date(brief.created).toLocaleDateString()));
-
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

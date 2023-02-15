@@ -317,24 +317,24 @@ export const fetchBrief = (id: string) =>
 
 
 export const fetchAllBriefs = () =>
-    (tx: Knex.Transaction) =>
-        tx.select(
-            "briefs.id as id",
-            "headline",
-            "description",
-            "scope.scope_level",
-            "briefs.scope_id",
-            "duration.duration",
-            "briefs.duration_id",
-            "budget",
-            "users.display_name as created_by",
-            "experience_level",
-            "briefs.experience_id",
-            //"users.briefs_submitted as briefs_submitted_by",
-            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
-            tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
-            "users.id as user_id"
-        )
+        (tx: Knex.Transaction) =>
+            tx.select(
+                "briefs.id",
+                "headline",
+                "description",
+                "scope.scope_level",
+                "briefs.scope_id",
+                "duration.duration",
+                "briefs.duration_id",
+                "budget",
+                "users.display_name as created_by",
+                "experience_level",
+                "briefs.experience_id",
+                //"users.briefs_submitted as briefs_submitted_by",
+                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
+                "users.id"
+            )
             .from("briefs")
             .leftJoin("brief_industries", { "briefs.id": "brief_industries.brief_id" })
             .leftJoin("industries", { "brief_industries.industry_id": "industries.id" })
@@ -352,8 +352,7 @@ export const fetchAllBriefs = () =>
             .groupBy("briefs.experience_id")
             .groupBy("experience.experience_level")
             .groupBy("users.id")
-
-
+    
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) =>
     async (tx: Knex.Transaction) => (

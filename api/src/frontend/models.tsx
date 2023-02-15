@@ -143,6 +143,7 @@ export type Brief = {
     experience_id: number;
     //hours_per_week: number;
     //briefs_submitted_by: number;
+
 };
 
 export type BriefSqlFilter = {

@@ -162,6 +162,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 {stepData[step].content.split("\n").map((line, index) => (
                     <p key={index}>{line}</p>
                 ))}
+
             </div>
             <div className="skills-container">
                 <TagsInput

@@ -82,7 +82,8 @@ export const Briefs = (): JSX.Element => {
     };
 
     const lengthFilters = {
-        // Should be a field in the database, in months.
+        // Should be a field in the database, WILL BE IN DAYS.
+
         // Again i need the high and low values.
         filterType: BriefFilterOption.Length,
         label: "Project Length",
@@ -219,6 +220,7 @@ export const Briefs = (): JSX.Element => {
                             length_is_max = o2.or_max;
                             break;
 
+
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
@@ -302,6 +304,7 @@ export const Briefs = (): JSX.Element => {
                             </div>
                             <div className="brief-time-info">
                                 {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
+
                             </div>
                             <div className="brief-description">
                                 {item.description}
@@ -328,6 +331,7 @@ export const Briefs = (): JSX.Element => {
                                 {/* <span className="proposals-count">
                                     {item.briefs_submitted_by}
                                 </span> */}
+
                             </div>
                         </div>
                     ))}

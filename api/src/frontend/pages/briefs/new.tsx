@@ -158,6 +158,7 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     label={label}
                     value={value}
                     key={index}
+
                     checked={scopeId === value}
                     onSelect={() => setScopeId(value)}
                 >
@@ -182,6 +183,7 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     key={index}
                     checked={durationId === value}
                     onSelect={() => setDurationId(value)}
+
                 />
             ))}
         </div>
@@ -246,6 +248,7 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
             return false;
         }
         if (step === 6 && durationId === undefined) {
+
             return false;
         }
         if (step === 7 && !budget) {

@@ -124,7 +124,6 @@ export type Freelancer = {
     user_id: number;
     rating?: number;
     num_ratings: number;
-    number_of_briefs_submitted: number;
 };
 
 // The same as backend/briefs
@@ -143,9 +142,7 @@ export type Brief = {
     created_by: string;
     experience_level: string;
     experience_id: number;
-    //hours_per_week: number;
-    //briefs_submitted_by: number;
-
+    number_of_briefs_submitted: number;
 };
 
 export type BriefSqlFilter = {

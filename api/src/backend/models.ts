@@ -330,7 +330,7 @@ export const fetchAllBriefs = () =>
                 "users.display_name as created_by",
                 "experience_level",
                 "briefs.experience_id",
-                //"users.briefs_submitted as briefs_submitted_by",
+                "users.briefs_submitted as number_of_briefs_submitted",
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
                 tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
                 "users.id"

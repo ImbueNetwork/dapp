@@ -309,6 +309,7 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
 
 
 export const fetchAllBriefs = () =>
+<<<<<<< HEAD
         (tx: Knex.Transaction) =>
             tx.select(
                 "briefs.id",
@@ -345,6 +346,26 @@ export const fetchAllBriefs = () =>
             .groupBy("experience.experience_level")
             .groupBy("users.id")
     
+=======
+(tx: Knex.Transaction) =>
+    tx.select(
+        "briefs.id",
+        "headline",
+        "industries",
+        "description",
+        "skills",
+        "scope",
+        "duration",
+        "budget",
+        "users.display_name as created_by",
+        "experience_level",
+        "users.briefs_submitted as briefs_submitted_by",
+        )
+        .from("briefs")
+        .innerJoin("experience", {'briefs.experience_id': "experience.id"})
+        .innerJoin("users", {"briefs.user_id": "users.id"})
+        .orderBy("briefs.created","desc")
+>>>>>>> imbue-enterprise
 
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) => 

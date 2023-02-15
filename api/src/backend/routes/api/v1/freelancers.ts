@@ -3,6 +3,7 @@ import db from "../../../db";
 import * as models from "../../../models";
 import passport from "passport";
 import { upsertItems } from "../../../models";
+import {Freelancer} from "../../../models"
 
 const router = express.Router();
 
@@ -19,6 +20,8 @@ router.get("/", (req, res, next) => {
         }
     });
 });
+
+
 
 router.get("/:username", (req, res, next) => {
     const username = req.params.username;
@@ -40,49 +43,21 @@ router.get("/:username", (req, res, next) => {
 
 router.post("/", (req, res, next) => {
     // TODO VERIFY user is allowed to edit table
-
-    const {
-        client_ids,
-        discord_link,
-        education,
-        experience,
-        facebook_link,
-        freelancing_goal,
-        freelanced_before,
-        skills,
-        bio,
-        title,
-        twitter_link,
-        telegram_link,
-        languages,
-        work_type,
-        services,
-        user_id,
-    } = req.body.freelancer;
+    const freelancer = req.body.freelancer as Freelancer;
 
     db.transaction(async tx => {
         try {
-            const skill_ids = await upsertItems(skills, "skills")(tx);
-            const language_ids = await upsertItems(languages, "languages")(tx);
-            const services_ids = await upsertItems(services, "services")(tx);
-            const freelancer_id = await models.insertFreelancerDetails({
-                education,
-                experience,
-                freelancing_goal,
-                freelanced_before,
-                skill_ids,
-                language_ids,
-                client_ids,
-                bio,
-                title,
-                work_type,
-                services_ids,
-                facebook_link,
-                twitter_link,
-                telegram_link,
-                discord_link,
-                user_id,
-            })(tx);
+            const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
+            const language_ids = await upsertItems(freelancer.languages, "languages")(tx);
+            const services_ids = await upsertItems(freelancer.services, "services")(tx);
+            let client_ids: number[] = [] 
+
+            if (freelancer.clients) {
+                client_ids = await upsertItems(freelancer.clients, "services")(tx);
+            } 
+            const freelancer_id = await models.insertFreelancerDetails(
+                freelancer, skill_ids, language_ids, client_ids, services_ids
+            )(tx);
 
             if (!freelancer_id) {
                 return next(new Error(
@@ -105,54 +80,22 @@ router.post("/", (req, res, next) => {
     });
 });
 
-router.put("/:id", (req, res, next) => {
+router.put("/:username", (req, res, next) => {
     // TODO VERIFY user is allowed to edit table
-    const id = req.params.id;
-    const {
-        client_ids,
-        discord_link,
-        education,
-        experience,
-        facebook_link,
-        freelancing_goal,
-        freelanced_before,
-        skill_ids,
-        bio,
-        title,
-        twitter_link,
-        telegram_link,
-        language_ids,
-        work_type,
-        services_ids,
-    } = req.body.freelancer;
-
+    // Verification happens before we get here.
+    const username = req.params.username;
+    const freelancer = req.body.freelancer as Freelancer;
+    
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const freelancerDetails = await models.fetchFreelancerDetailsByUserID(id)(tx);
+            const freelancerDetails = await models.fetchFreelancerDetailsByUsername(username)(tx);
 
             if (!freelancerDetails) {
                 return res.status(404).end();
             }
 
-
-            const freelancer = await models.updateFreelancerDetails(id, {
-                education,
-                experience,
-                freelancing_goal,
-                freelanced_before,
-                skill_ids,
-                language_ids,
-                client_ids,
-                bio,
-                title,
-                work_type,
-                services_ids,
-                facebook_link,
-                twitter_link,
-                telegram_link,
-                discord_link,
-            })(tx);
+            const freelancer_id: Freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
 
             if (!freelancer.id) {
                 return next(new Error(

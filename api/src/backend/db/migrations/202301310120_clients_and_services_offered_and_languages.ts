@@ -34,6 +34,7 @@ export async function up(knex: Knex): Promise<void> {
             builder.foreign("freelancer_id").references("freelancers.id"); 
             auditFields(knex, builder);
         });
+
     }); 
 
     //builder.specificType("language_ids", "integer[]");

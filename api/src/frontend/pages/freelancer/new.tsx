@@ -12,10 +12,8 @@ import {
 import { Freelancer, User } from "../../models";
 import { TagsInput } from "../../components/tagsInput";
 import * as utils from "../../utils";
-import { FreelancerService, getFreelancerProfile } from "../../services/freelancerService";
+import {getFreelancerProfile, createFreelancingProfile, freelancerExists} from "../../services/freelancerService";
 import "../../../../public/new-freelancer.css";
-
-const freelancerService = new FreelancerService();
 
 export type FreelancerProps = {
     user: User;
@@ -164,6 +162,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 {stepData[step].content.split("\n").map((line, index) => (
                     <p key={index}>{line}</p>
                 ))}
+
             </div>
             <div className="skills-container">
                 <TagsInput
@@ -253,23 +252,31 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
         ConfirmPanel,
     ];
 
-    const createProfile = () => {
+    async function createProfile () {
         setStep(step + 1);
 
-        freelancerService.createFreelancingProfile({
+        await createFreelancingProfile({
+            id: 0,
             bio,
-            education: undefined,
+            education: "",
             experience: freelancingBefore,
             freelanced_before: freelancingBefore,
             freelancing_goal: goal,
-            work_type: undefined,
+            work_type: "",
             skills,
             title,
             languages,
             services,
             user_id: user.id,
             username: user.display_name,
-            display_name: user.display_name
+            display_name: user.display_name,
+            discord_link: "",
+            facebook_link: "",
+            telegram_link: "",
+            twitter_link: "",
+            clients: [],
+            client_images: [],
+            num_ratings: 0
         });
     };
 
@@ -330,7 +337,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
 document.addEventListener("DOMContentLoaded", async (event) => {
     const user: User = await utils.getCurrentUser();
     if(user) {
-        const userHasFreelancerProfile = await getFreelancerProfile(user.username);
+        const userHasFreelancerProfile = await freelancerExists(user.username);
         if(userHasFreelancerProfile) {
             utils.redirect(`freelancers/${user.username}`);
         }

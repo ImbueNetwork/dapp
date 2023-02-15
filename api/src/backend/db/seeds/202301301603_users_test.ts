@@ -27,24 +27,6 @@ export async function seed(knex: Knex): Promise<void> {
             username: "frontenddev",
             email: "frontenddev@gmail.com",
             password: "testpassword",
-        },
-        {
-            display_name: "frontend dev",
-            username: "frontenddev",
-            email: "frontenddev@gmail.com",
-            password: "testpassword",
-        },
-        {
-            display_name: "frontend dev",
-            username: "frontenddev",
-            email: "frontenddev@gmail.com",
-            password: "testpassword",
-        },
-        {
-            display_name: "frontend dev",
-            username: "frontenddev",
-            email: "frontenddev@gmail.com",
-            password: "testpassword",
         }
     ]);
 };

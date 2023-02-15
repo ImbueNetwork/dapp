@@ -321,10 +321,10 @@ export const fetchAllBriefs = () =>
                 "budget",
                 "users.display_name as created_by",
                 "experience_level",
-                "experience_id",
+                "briefs.experience_id",
                 //"users.briefs_submitted as briefs_submitted_by",
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
-                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text) as industries)"),
+                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
                 "users.id"
             )
             .from("briefs")
@@ -341,7 +341,8 @@ export const fetchAllBriefs = () =>
             .groupBy("scope.scope_level")
             .groupBy("duration.duration")
             .groupBy("users.display_name")
-            .groupBy("experience.experience_id")
+            .groupBy("briefs.experience_id")
+            .groupBy("experience.experience_level")
             .groupBy("users.id")
     
 
@@ -627,51 +628,7 @@ export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) 
 export const searchBriefs =
     async (tx: Knex.Transaction, filter: BriefSqlFilter) =>
         // select everything that is associated with brief.
-        await tx.select(
-            "all_briefs.id",
-            "headline",
-            "industries",
-            "description",
-            "skills",
-            "scope_level",
-            "duration",
-            "budget",
-            "users.display_name as created_by",
-            "experience_level",
-            "users.briefs_submitted as briefs_submitted_by",
-        )
-        .from(tx.raw(`\
-    (WITH joined_skills AS ( SELECT briefs.id               as brief_id,
-                            ARRAY_AGG(skills.name) as skills
-                            FROM briefs
-                            LEFT JOIN skills
-                            ON skills.id = ANY (briefs.skill_ids)
-                            GROUP BY briefs.id),
-    joined_industries AS (SELECT briefs.id as brief_id,
-                            ARRAY_AGG(industries.name) as industries
-                            FROM briefs
-                            LEFT JOIN industries ON industries.id = ANY (briefs.industry_ids)
-                            GROUP BY briefs.id)
-    SELECT headline,
-                            id,
-                            description,
-                            budget,
-                            scope_id,
-                            duration_id,
-                            user_id,
-                            briefs.created,
-                            experience_id,
-                            joined_industries.industries,
-                            joined_skills.skills
-                            from briefs
-                            join joined_industries on briefs.id = joined_industries.brief_id
-                            join joined_skills on briefs.id = joined_skills.brief_id) as all_briefs
-                            `))
-                            .innerJoin("experience", { 'all_briefs.experience_id': "experience.id" })
-                            .innerJoin("users", { "all_briefs.user_id": "users.id" })
-                            .innerJoin("scope", { "all_briefs.scope_id": "scope.id" })
-                            .innerJoin("duration", { "all_briefs.duration_id": "duration.id" })
-            .where(function () {
+            fetchAllBriefs()(tx).where(function () {
                 if (filter.submitted_range.length > 0) {
                     this.whereBetween("users.briefs_submitted", [filter.submitted_range[0].toString(), Math.max(...filter.submitted_range).toString()]);
                 }

@@ -71,6 +71,9 @@ export async function seed(knex: Knex): Promise<void> {
                       
                                  if (i == 0) {
                                      await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: a})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: b})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: c})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: d})
                                      await knex("freelancer_clients").insert({freelancer_id: id, client_id: b})
                                      await knex("freelancer_languages").insert({freelancer_id: id,language_id: c})
                                      await knex("freelancer_services").insert({freelancer_id: id, service_id: d})

@@ -32,3 +32,16 @@ export async function getFreelancerProfile(username: string) {
         return null
     }
   }
+
+  export const getAllFreelancers = async () => {
+    const resp =  await fetch(`${config.apiBase}/freelancers/`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json() as Array<Freelancer>
+    } else {
+        throw new Error('Failed to get all briefs. status:' + resp.status);
+    }
+  }

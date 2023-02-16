@@ -89,7 +89,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                 <div className="header">
                     <h3>Project Scope</h3>
                 </div>
-                <span>{brief.scope}</span>
+                <span>{brief.scope_level}</span>
             </div>
 
             <div className="subsection">
@@ -191,6 +191,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
+        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

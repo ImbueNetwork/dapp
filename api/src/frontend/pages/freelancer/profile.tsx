@@ -19,12 +19,14 @@ import { TextInput } from "../../components/textInput";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import { Freelancer } from "../../models";
 import { Freelancers } from "./new";
+import { FreelancerSocial} from "./freelancer_socials";
 
 export type ProfileProps = {};
 export type ProfileState = {
     isEditingBio: boolean;
     bioEdit: string;
     userInfo: UserInfo;
+    is_found: boolean;
 };
 
 export type UserInfo = {
@@ -44,12 +46,12 @@ export type UserInfo = {
         title: string;
     };
     bio: string;
-    socials?: {
-        facebook?: string;
-        twitter?: string;
+    socials: {
+        facebook: string;
+        twitter: string;
         // google: string;
-        telegram?: string;
-        discord?: string;
+        telegram: string;
+        discord: string;
     };
     skills?: Array<string>;
     portfolio?: Array<{
@@ -66,126 +68,62 @@ export type UserInfo = {
 };
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
-    socials = [
-        {
-            label: "Facebook",
-            key: "facebook",
-            icon: <FaFacebook />,
-        },
-        {
-            label: "Twitter",
-            key: "twitter",
-            icon: <FaTwitter />,
-        },
-        // {
-        //     label: "Google",
-        //     key: "google",
-        //     icon: <FaGoogle />,
-        // },
-        {
-            label: "Telegram",
-            key: "telegram",
-            icon: <FaTelegram />,
-        },
-        {
-            label: "Discord",
-            key: "discord",
-            icon: <FaDiscord />,
-        },
-    ];
-    state: ProfileState = {
-        isEditingBio: false,
-        userInfo: {
-            name: "Idris Muhammad",
-            profileImageUrl: "/public/profile-image.png",
-            location: {
-                country: "US",
-                address: "Los Angeles, United State",
-            },
-            bio: `The Blockchain world has never been more exciting than right now.\nBut in this fast-growing space, finding top talent and the perfect project can be tough\n| Cryptocurrency | Blockchain | Ethereum | Web3 | Smart Contract | DApps | DeFi | Solidity |\n| Rust | C | C ++ | C# | Python | Golang | Java | Javascript | Scala | Simplicity | Haskell |`,
-            rating: {
-                level: "Top Rated",
-                numReviews: 1434,
-                stars: 4,
-            },
-            portfolio: [
-                {
-                    category: "NFT",
-                    rate: 64.32,
-                },
-            ],
-            contact: {
-                username: "abbioty",
-                title: "Lead product designer Google",
-            },
-            projects: [
-                {
-                    image: "",
-                    title: "NFT project",
-                    percent: 52,
-                    milestoneComplete: 2,
-                    milestoneCount: 4,
-                },
-                {
-                    image: "",
-                    title: "NFT project",
-                    percent: 52,
-                    milestoneComplete: 2,
-                    milestoneCount: 4,
-                },
-                {
-                    image: "",
-                    title: "NFT project",
-                    percent: 52,
-                    milestoneComplete: 2,
-                    milestoneCount: 4,
-                },
-                {
-                    image: "",
-                    title: "NFT project",
-                    percent: 52,
-                    milestoneComplete: 2,
-                    milestoneCount: 4,
-                },
-                {
-                    image: "",
-                    title: "NFT project",
-                    percent: 52,
-                    milestoneComplete: 2,
-                    milestoneCount: 4,
-                },
-            ],
-        },
-        bioEdit: "",
-    };
-
     onSaveBio = () => {
-        this.setState({
-            ...this.state,
-            isEditingBio: false,
-            userInfo: {
-                ...this.state.userInfo,
-                bio: this.state.bioEdit,
-            },
-        });
+        //this.setState({
+        //});
     };
-
+    
+    constructor(props) {
+        super(props);
+        this.state = 
+            {
+                is_found: false,
+                isEditingBio : false,
+                bioEdit : "",
+                userInfo: {
+                    profileImageUrl: "/public/profile-image.png",
+                    rating: {
+                        stars: 5,
+                        level: "",
+                        numReviews: 0
+                    },
+                    location: {country: "", address: ""},
+                    contact: {username: "", title: "" },
+                    name: "",
+                    skills: [],
+                    bio: "",
+                    socials: {facebook: "", discord: "", twitter: "", telegram: ""}
+            }
+        };
+      }
+    
 
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
-        if(username){
-            const freelancer = await getFreelancerProfile(username);
-            if (freelancer)
-                await this.populateProfile(freelancer)
+        const freelancer = await getFreelancerProfile(username || "");
+        if (freelancer) {
+            await this.populateProfile(freelancer)
+        } else {
+            //404
         }
     }
 
 
     async populateProfile(freelancer: Freelancer) {
         this.setState({
-            ...this.state,
+            is_found: true,
+            isEditingBio : false,
+            bioEdit : freelancer.bio,
             userInfo: {
-                ...this.state.userInfo,
+                //todo
+                profileImageUrl: "/public/profile-image.png",
+                rating: {
+                    stars:  5,
+                    level: "default",
+                    numReviews: 0
+                },
+                // todo
+                location: {country: "", address: ""},
                 contact: {username: freelancer.username, title: freelancer.title },
                 name: freelancer.display_name,
                 skills: freelancer.skills,
@@ -195,8 +133,13 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         });
     }
 
+    get_stars(num_stars: number) {
+        
+    }
+
     render() {
         const { userInfo } = this.state;
+
         return (
             <div className="profile-container">
                 <div className="banner">
@@ -211,7 +154,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                         <div className="profile-image">
                             <img
                                 src={userInfo.profileImageUrl}
-                                alt="profile image"
+                                alt=""
                             />
                         </div>
                         <div className="profile-summary">
@@ -223,12 +166,11 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 <p>{userInfo.location.address}</p>
                             </div>
                             <div className="rating">
-                                <p>
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                    <FaStar color="var(--theme-yellow)" />
-                                </p>
+                                    {
+                                        Array.from({ length: userInfo.rating.stars}, (_, i) => i).map((i) => (
+                                            <p key={i}><FaStar color="var(--theme-yellow)" /></p> 
+                                        ))
+                                    }
                                 <p>
                                     <span>{userInfo.rating.level}</span>
                                     <span className="review-count">
@@ -325,22 +267,35 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 <div className="subsection">
                                     <h5>Linked Account</h5>
                                     <div className="social-links">
-                                        {this.socials.map(
-                                            ({ label, key, icon }, index) => (
-                                                <div
-                                                    className="social-link"
-                                                    key={index}
-                                                >
-                                                    <p>{label}</p>
-                                                    <button className="social-btn">
-                                                        {userInfo.socials &&
-                                                        userInfo.socials[key]
-                                                            ? icon
-                                                            : "+"}
-                                                    </button>
-                                                </div>
-                                            )
-                                        )}
+                                        {
+                                            FreelancerSocial({
+                                                label: "Facebook",
+                                                key: "facebook",
+                                                icon: <FaFacebook/>,
+                                                link: this.state.userInfo.socials.facebook,
+                                            })
+                                        }{
+                                            FreelancerSocial({
+                                                label: "Twitter",
+                                                key: "twitter",
+                                                icon: <FaTwitter/>,
+                                                link: this.state.userInfo.socials.twitter,
+                                            })
+                                        }{                                  
+                                            FreelancerSocial({
+                                                label: "Telegram",
+                                                key: "telegram",
+                                                icon: <FaTelegram/>,
+                                                link: this.state.userInfo.socials.telegram,
+                                            })
+                                        }{
+                                            FreelancerSocial({
+                                                label: "Discord",
+                                                key: "discord",
+                                                icon: <FaDiscord/>,
+                                                link: this.state.userInfo.socials.discord,
+                                            })
+                                        }
                                     </div>
                                 </div>
                                 <div className="divider" />

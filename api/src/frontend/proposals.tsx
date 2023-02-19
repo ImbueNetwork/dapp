@@ -94,7 +94,7 @@ const ProposalItem = ({ projectId, imageSrc, name }: ProposalItemProps): JSX.Ele
   return (
     <div className="imbu-proposal-item">
       <li>
-        <a id="contribute" href={`/dapp/projects/${projectId}`}>
+        <a id="contribute" href={`/dapp/proposals/${projectId}`}>
           <img id="img" src={imageSrc} />
           <div id="name">{name}</div>
         </a>

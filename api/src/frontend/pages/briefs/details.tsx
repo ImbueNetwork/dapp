@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import { Brief, Freelancer, User } from "../../models";
-import { TagsInput } from "../../components/tagsInput";
-import * as utils from "../../utils";
+import { Brief } from "../../models";
 import "../../../../public/brief-details.css";
-import { Briefs } from ".";
 import { getBrief } from "../../services/briefsService";
 import "../../../../public/freelancer-profile.css";
 import TimeAgo from 'javascript-time-ago'

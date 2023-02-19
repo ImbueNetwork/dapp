@@ -219,6 +219,12 @@ ul li {
     color: #000;
 }
 
+.primary-btn.submit {
+    text-align: center;
+    border-radius: 12px;
+    margin-right: 0;
+}
+
 .no-margin {
     margin: 0;
 }

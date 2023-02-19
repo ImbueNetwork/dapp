@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 
@@ -8,18 +8,52 @@ const router = express.Router();
 
 router.get("/", (req, res, next) => {
 
+    const updatedBriefs: any = [];
     db.transaction(async tx => {
         try {
-            const briefs = await fetchAllBriefs()(tx);
-            res.send(briefs);
+            await fetchAllBriefs()(tx).then(async (briefs: any) => {
+                // Populate Skills
+                const updatedBriefs = await enrichData(briefs, tx);
+                console.log(updatedBriefs);
+                res.send(updatedBriefs);
+            });
         } catch (e) {
             next(new Error(
                 `Failed to fetch all briefs`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
 });
+
+async function enrichData(briefs: Brief[], tx: any) {
+    const updatedBriefs:Brief[] = [];
+    briefs.map(async (brief: Brief, index: number) => {
+        await fetchItems(brief.skill_ids, "skills")(tx).then((skills: any) => {
+            brief.skills = skills;
+            brief.headline = "blah";
+            updatedBriefs[index] = brief
+        });
+
+
+        // (async () => {
+        //     await Promise.all([
+        //         await fetchItems(brief.skill_ids,"skills")(tx).then((skills: any)=>{
+        //             briefs[index].skills = skills;
+        //             briefs[index].headline = "blah";
+        //         }),
+        //         await fetchItems(brief.skill_ids,"industries")(tx).then((skills: any)=>{
+        //             briefs[index].industries = skills;
+        //             briefs[index].scope_level = "blah";
+        //         }),
+
+        //     ]); //runs simultaneously
+        //   })();
+
+    });
+
+    return updatedBriefs
+}
 
 router.get("/:id", (req, res, next) => {
     const id = req.params.id;
@@ -30,12 +64,11 @@ router.get("/:id", (req, res, next) => {
         } catch (e) {
             next(new Error(
                 `Failed to fetch brief with id ${id}`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
 });
-
 
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
@@ -65,12 +98,11 @@ router.post("/", (req, res, next) => {
         } catch (cause) {
             next(new Error(
                 `Failed to insert brief .`,
-                {cause: cause as Error}
+                { cause: cause as Error }
             ));
         }
     });
 });
-
 
 router.post("/search", (req, res, next) => {
     db.transaction(async tx => {
@@ -81,7 +113,7 @@ router.post("/search", (req, res, next) => {
         } catch (e) {
             next(new Error(
                 `Failed to search all briefs`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });

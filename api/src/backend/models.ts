@@ -102,8 +102,10 @@ export type ProjectProperties = {
 export type Brief = {
     id?: string | number;
     headline: string;
+    industry_ids: number[];
     industries: string[];
     description: string;
+    skill_ids: number[];
     skills: string[];
     scope_id: number;
     scope_level: string;
@@ -333,6 +335,7 @@ export const fetchAllBriefs = () =>
                 "briefs.created",
                 "users.briefs_submitted as number_of_briefs_submitted",
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
                 tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
                 "users.id"
             )
@@ -353,7 +356,16 @@ export const fetchAllBriefs = () =>
             .groupBy("briefs.experience_id")
             .groupBy("experience.experience_level")
             .groupBy("users.id")
-    
+
+export const fetchItems = (ids: number[], tableName: string) =>
+    async (tx: Knex.Transaction) =>
+        tx(tableName).select("*")
+        .whereIn(`id`,ids);
+
+// export const fetchSkills = (ids: string[]) =>
+//     (tx: Knex.Transaction) =>
+//         tx<Skill>("skills").select("id","name").whereIn('id', ids );
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) =>
     async (tx: Knex.Transaction) => (
@@ -411,17 +423,18 @@ export const insertFederatedCredential = (
     }).returning("*")
 )[0];
 
-export const upsertItems = (items: string[], table_name: string) => async (tx: Knex.Transaction) => {
+export const upsertItems = (items: string[], tableName: string) => async (tx: Knex.Transaction) => {
     var item_ids: number[] = [];
     try {
+        //TODO Convert to map
         for (const item of items) {
             var item_id: number;
-            const existing_item = await tx(table_name).select().where({
+            const existing_item = await tx(tableName).select().where({
                 name: item.toLowerCase()
             }).first();
 
             if (!existing_item) {
-                item_id = await (await insertToTable(item, table_name)(tx)).id;
+                item_id = await (await insertToTable(item, tableName)(tx)).id;
             } else
                 item_id = existing_item.id
 

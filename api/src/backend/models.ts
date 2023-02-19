@@ -336,7 +336,10 @@ export const fetchAllBriefs = () =>
                 "users.briefs_submitted as number_of_briefs_submitted",
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
                 tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
+
                 tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
+                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.id as text)) as industry_ids"),
+
                 "users.id"
             )
             .from("briefs")
@@ -359,7 +362,7 @@ export const fetchAllBriefs = () =>
 
 export const fetchItems = (ids: number[], tableName: string) =>
     async (tx: Knex.Transaction) =>
-        tx(tableName).select("*")
+        tx(tableName).select("id","name")
         .whereIn(`id`,ids);
 
 // export const fetchSkills = (ids: string[]) =>
@@ -527,10 +530,19 @@ export const fetchAllFreelancers = () =>
             "display_name",
             "freelancers.created",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(languages.id as text)) as language_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(services.id as text)) as service_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_image_ids"),
             tx.raw("(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating"),
             tx.raw("COUNT(freelancer_ratings.rating) as num_ratings"),
 
@@ -669,5 +681,6 @@ export const searchBriefs =
                 }
             })
             .where("headline", "ilike", "%" + filter.search_input + "%")
+
 
 

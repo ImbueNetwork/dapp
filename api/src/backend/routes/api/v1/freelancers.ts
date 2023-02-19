@@ -2,20 +2,30 @@ import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import passport from "passport";
-import { upsertItems } from "../../../models";
-import {Freelancer} from "../../../models"
+import { upsertItems, fetchAllFreelancers, fetchItems } from "../../../models";
+import { Freelancer } from "../../../models"
 
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
-            const freelancers = await models.fetchAllFreelancers()(tx);
-            res.send(freelancers);
+            await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
+                await Promise.all([
+                    ...freelancers.map(async (freelancer: any) => {
+                        freelancer.skills = await models.fetchItems(freelancer.skill_ids, "skills")(tx);
+                        freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx);
+                        freelancer.languages = await fetchItems(freelancer.language_ids, "languages")(tx);
+                        freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx);
+                    })
+                ]);
+                res.send(freelancers);
+            });
+
         } catch (e) {
             next(new Error(
                 `Failed to fetch all freelancers`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
@@ -35,7 +45,7 @@ router.get("/:username", (req, res, next) => {
         } catch (e) {
             next(new Error(
                 `Failed to fetch freelancer details by userid: ${username}`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
@@ -50,11 +60,11 @@ router.post("/", (req, res, next) => {
             const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
             const language_ids = await upsertItems(freelancer.languages, "languages")(tx);
             const services_ids = await upsertItems(freelancer.services, "services")(tx);
-            let client_ids: number[] = [] 
+            let client_ids: number[] = []
 
             if (freelancer.clients) {
                 client_ids = await upsertItems(freelancer.clients, "services")(tx);
-            } 
+            }
             const freelancer_id = await models.insertFreelancerDetails(
                 freelancer, skill_ids, language_ids, client_ids, services_ids
             )(tx);
@@ -74,7 +84,7 @@ router.post("/", (req, res, next) => {
         } catch (cause) {
             next(new Error(
                 `Failed to insert freelancer details .`,
-                {cause: cause as Error}
+                { cause: cause as Error }
             ));
         }
     });
@@ -85,7 +95,7 @@ router.put("/:username", (req, res, next) => {
     // Verification happens before we get here.
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
-    
+
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
@@ -106,7 +116,7 @@ router.put("/:username", (req, res, next) => {
         } catch (cause) {
             next(new Error(
                 `Failed to update freelancer details.`,
-                {cause: cause as Error}
+                { cause: cause as Error }
             ));
         }
     });

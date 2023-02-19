@@ -6,16 +6,18 @@ import { brotliDecompress } from "zlib";
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-
-    const updatedBriefs: any = [];
-    db.transaction(async tx => {
+router.get("/", async (req, res, next) => {
+    db.transaction(async (tx) => {
         try {
             await fetchAllBriefs()(tx).then(async (briefs: any) => {
-                // Populate Skills
-                const updatedBriefs = await enrichData(briefs, tx);
-                console.log(updatedBriefs);
-                res.send(updatedBriefs);
+                await Promise.all([
+                    briefs,
+                    ...briefs.map(async (brief: any) => {
+                        brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+                        brief.industries = await fetchItems(brief.industry_ids, "skills")(tx);
+                    })
+                ]);
+                res.send(briefs);
             });
         } catch (e) {
             next(new Error(
@@ -26,34 +28,6 @@ router.get("/", (req, res, next) => {
     });
 });
 
-async function enrichData(briefs: Brief[], tx: any) {
-    const updatedBriefs:Brief[] = [];
-    briefs.map(async (brief: Brief, index: number) => {
-        await fetchItems(brief.skill_ids, "skills")(tx).then((skills: any) => {
-            brief.skills = skills;
-            brief.headline = "blah";
-            updatedBriefs[index] = brief
-        });
-
-
-        // (async () => {
-        //     await Promise.all([
-        //         await fetchItems(brief.skill_ids,"skills")(tx).then((skills: any)=>{
-        //             briefs[index].skills = skills;
-        //             briefs[index].headline = "blah";
-        //         }),
-        //         await fetchItems(brief.skill_ids,"industries")(tx).then((skills: any)=>{
-        //             briefs[index].industries = skills;
-        //             briefs[index].scope_level = "blah";
-        //         }),
-
-        //     ]); //runs simultaneously
-        //   })();
-
-    });
-
-    return updatedBriefs
-}
 
 router.get("/:id", (req, res, next) => {
     const id = req.params.id;

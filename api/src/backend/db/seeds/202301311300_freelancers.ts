@@ -49,7 +49,7 @@ export async function seed(knex: Knex): Promise<void> {
                     await knex("users").insert(
                         [{
                             display_name: skills[a] + "_" + clients[b] + "_" + services[d],
-                            username: skills[a] + "_" + clients[b] + "_" + services[d] + rbig,
+                            username: skills[a].replace(" ","_") + "_" + clients[b].replace(" ","_") + "_" + services[d].replace(" ","_") + rbig,
                             email: skills[a] + languages[c] + rbig + "@gmail.com",
                             password: "testpassword",
                         }]

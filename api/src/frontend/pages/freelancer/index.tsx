@@ -43,6 +43,7 @@ export const Freelancers = (): JSX.Element => {
     }
 
     useEffect(() => {
+        // TODO, show spinning loading wheel while we retreive data
         void fetchAndSetFreelancers();
     }, []);
 

@@ -574,7 +574,8 @@ export const fetchAllFreelancers = () =>
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
-            .orderBy("freelancers.id")
+            .orderBy("freelancers.id","desc")
+            // TODO Add limit until we have spinning loading icon in freelancers page
             .limit(100)
 
 
@@ -695,22 +696,25 @@ export const searchBriefs =
 export const searchFreelancers =
     async (tx: Knex.Transaction, filter: FreelancerSqlFilter) =>
         fetchAllFreelancers()(tx)
-        .where(function () {
+        .orWhere(function () {
             if (filter.skills_range.length > 0) {
                 const subquery = tx.select('freelancer_id').from('freelancer_skills').whereIn("skill_id", filter.skills_range);
                 this.whereIn('freelancers.id', subquery)
             }
         })
-        .where(function () {
+        .orWhere(function () {
             if (filter.services_range.length > 0) {
                 const subquery = tx.select('freelancer_id').from('freelancer_services').whereIn("service_id", filter.services_range);
                 this.whereIn('freelancers.id', subquery)
             }
         })
-        .where(function () {
+        .orWhere(function () {
             if (filter.languages_range.length > 0) {
                 const subquery = tx.select('freelancer_id').from('freelancer_languages').whereIn("language_id", filter.languages_range);
                 console.log(subquery);
                 this.whereIn('freelancers.id', subquery)
             }
         })
+        .orWhere("username", "ilike", "%" + filter.search_input + "%")
+        .orWhere("title", "ilike", "%" + filter.search_input + "%")
+        .orWhere("bio", "ilike", "%" + filter.search_input + "%")

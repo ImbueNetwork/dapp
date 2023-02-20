@@ -1,20 +1,35 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import { Freelancer } from "../../models";
+import { Freelancer, Item } from "../../models";
 import * as utils from "../../utils";
 import "../../../../public/freelancers.css";
 import { getAllFreelancers } from "../../services/freelancerService";
-import { FreelancerFilterOption } from "../../types/freelancers";
+import { FreelancerFilterOption, FilterOption } from "../../types/freelancers";
 import FreelancerFilter from "../../components/freelancerFilter";
 
 export const Freelancers = (): JSX.Element => {
 
     const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
-
+    const [skills, setSkills] = useState<Item[]>([]);
+    const [services, setServices] = useState<Item[]>([]);
+    const [languages, setLanguages] = useState<Item[]>([]);
 
     const fetchAndSetFreelancers = async () => {
         const data = await getAllFreelancers();
+
+        var combinedSkills = [].concat.apply([], ...data.map(x => x.skills));
+        const dedupedSkills = [...new Set([...combinedSkills])]
+
+        var combinedServices = [].concat.apply([], ...data.map(x => x.services));
+        const dedupedServices = [...new Set([...combinedServices])]
+
+        var combinedLanguages = [].concat.apply([], ...data.map(x => x.languages));
+        const dedupedLanguages = [...new Set([...combinedLanguages])]
+
         setFreelancers(data);
+        setSkills(dedupedSkills);
+        setServices(dedupedServices);
+        setLanguages(dedupedLanguages);
     };
 
 
@@ -30,24 +45,13 @@ export const Freelancers = (): JSX.Element => {
     const skillsFilter = {
         filterType: FreelancerFilterOption.Services,
         label: "Skills",
-        options: [
-            {
-                interiorIndex: 0,
-                value: "React",
-            },
-            {
-                interiorIndex: 1,
-                value: "Figma",
-            },
-            {
-                interiorIndex: 2,
-                value: "Solidity",
-            },
-            {
-                interiorIndex: 3,
-                value: "Rust",
-            },
-        ],
+        options: skills.map(item => {
+            let filter = {
+                interiorIndex: item.id,
+                value: item.name,
+            }
+            return filter
+        }),
     };
 
     const servicesFilter = {
@@ -55,74 +59,27 @@ export const Freelancers = (): JSX.Element => {
         // since its a range i need the
         filterType: FreelancerFilterOption.Services,
         label: "Services",
-        options: [
-            {
-                interiorIndex: 0,
-                value: "Web Development",
-            },
-            {
-                interiorIndex: 1,
-                value: "Web Design",
-            },
-            {
-                interiorIndex: 2,
-                value: "Mobile (Android/iOS)",
-            },
-            {
-                interiorIndex: 3,
-                value: "Smart Contract",
-            },
-            {
-                interiorIndex: 4,
-                value: "Copy Writing",
-            },
-            {
-                interiorIndex: 5,
-                value: "Video Editing",
-            },
-            {
-                interiorIndex: 6,
-                value: "NFT",
-            },
-        ],
+        options: services.map(item => {
+            let filter = {
+                interiorIndex: item.id,
+                value: item.name,
+            }
+            return filter
+        }),
     };
 
     const languagesFilter = {
         // Should be a field in the database, WILL BE IN DAYS.
         // Again i need the high and low values.
         filterType: FreelancerFilterOption.Languages,
-        label: "Lanugages",
-        options: [
-            {
-                interiorIndex: 0,
-                value: "English",
-            },
-            {
-                interiorIndex: 1,
-                search_for: [2],
-                value: "French",
-            },
-            {
-                interiorIndex: 2,
-                value: "German",
-            },
-            {
-                interiorIndex: 3,
-                value: "Spanish",
-            },
-            {
-                interiorIndex: 4,
-                value: "Arabic",
-            },
-            {
-                interiorIndex: 5,
-                value: "Hindi",
-            },
-            {
-                interiorIndex: 6,
-                value: "Urdu",
-            },
-        ],
+        label: "Languages",
+        options: languages.map(item => {
+            let filter = {
+                interiorIndex: item.id,
+                value: item.name,
+            }
+            return filter
+        }),
     };
 
     const onSearch = async () => {
@@ -201,7 +158,7 @@ export const Freelancers = (): JSX.Element => {
                                                         className="skill"
                                                         key={index}
                                                     >
-                                                        {skill}
+                                                        {skill.name}
                                                     </p>
                                                 )
                                             )}

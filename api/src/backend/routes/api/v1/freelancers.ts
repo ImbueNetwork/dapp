@@ -32,7 +32,6 @@ router.get("/", (req, res, next) => {
 });
 
 
-
 router.get("/:username", (req, res, next) => {
     const username = req.params.username;
     db.transaction(async tx => {

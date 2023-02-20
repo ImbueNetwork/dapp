@@ -567,6 +567,7 @@ export const fetchAllFreelancers = () =>
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
+            .limit(100)
 
 
 export const insertFreelancerDetails = (

@@ -24,7 +24,7 @@ export const FreelancerFilter = ({ label, filter_options, filter_type }: Freelan
                                     interiorIndex
                                 }
                             />
-                            <label>{value}</label>
+                            <label className="capitalize">{value}</label>
                         </div>
                     )
                 )}

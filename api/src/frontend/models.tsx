@@ -114,10 +114,10 @@ export type Freelancer = {
     freelancing_goal: string;
     work_type: string;
     title: string;
-    skills: string[];
-    languages: string[];
-    services: string[];
-    clients: string[];
+    skills: Item[];
+    languages: Item[];
+    services: Item[];
+    clients: Item[];
     client_images: string[];
     display_name: string;
     username: string;
@@ -125,6 +125,11 @@ export type Freelancer = {
     rating?: number;
     num_ratings: number;
 };
+
+export type Item = {
+    id: number;
+    name: string;
+}
 
 // The same as backend/briefs
 export type Brief = {

@@ -31,15 +31,13 @@ router.get("/proposals/new-details", (req, res) => {
     res.render("details");
 });
 
-router.get("/projects/:projectId", (req, res) => {
+router.get("/proposals/:projectId", (req, res) => {
     res.render("details");
 });
 
 router.get("/briefs", (req, res) => {
     res.render("briefs");
 });
-
-
 
 router.get(
     "/briefs/new",

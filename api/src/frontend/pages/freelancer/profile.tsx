@@ -16,7 +16,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 
 import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
-import { getFreelancerProfile } from "../../services/freelancerService";
+import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
 import { Freelancer } from "../../models";
 import { Freelancers } from "./new";
 import { FreelancerSocial} from "./freelancer_socials";
@@ -48,10 +48,23 @@ export type UserInfo = {
 };
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
-    onSaveBio = () => {
-        //this.setState({
-        //});
+    onSaveBio = async() => {
+        let freelancer = this.state.userInfo.freelancer;
+        let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
+        freelancer.bio = input.textContent || "";
+        let updated_freelancer = await updateFreelancer(
+            freelancer
+        );
+        this.setState({
+            userInfo: {
+                ...this.state.userInfo,
+                freelancer: updated_freelancer,
+            },
+            isEditingBio: false,
+            bioEdit: freelancer.bio 
+        });
     };
+
     constructor(props) {
         super(props);
         this.state = 
@@ -97,7 +110,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         const freelancer = await getFreelancerProfile(username || "");
 
         if (freelancer) {
-            if (freelancer.profileImageUrl.trim() == "" || undefined) {
+            if (freelancer.profileImageUrl == undefined || "") {
                 freelancer.profileImageUrl = "/public/profile-image.png";
             }
             await this.populateProfile({
@@ -111,6 +124,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                 
             })
         } else {
+            console.log("404")
             //404
         }
     }
@@ -220,6 +234,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         })
                                     }
                                     className="bio-input"
+                                    id="bio-input-id"
                                 />
                                 <div className="edit-bio-buttons">
                                     <button

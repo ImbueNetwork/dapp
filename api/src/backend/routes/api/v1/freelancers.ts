@@ -89,20 +89,18 @@ router.put("/:username", (req, res, next) => {
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const freelancerDetails = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            const exists = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            console.log(freelancer);
 
-            if (!freelancerDetails) {
-                return res.status(404).end();
-            }
-
-            const freelancer_id: Freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
-
-            if (!freelancer.id) {
+            if (!exists) {
                 return next(new Error(
                     "Cannot update freelancer details: `id` missing."
                 ));
             }
-            res.status(200).send(freelancer);
+            const fl_id = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
+            const updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
+
+            res.status(200).send(updated_freelancer_details);
         } catch (cause) {
             next(new Error(
                 `Failed to update freelancer details.`,

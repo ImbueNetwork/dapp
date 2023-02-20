@@ -7,8 +7,8 @@ import "../../../../public/brief-details.css";
 import { Briefs } from ".";
 import { getBrief } from "../../services/briefsService";
 import "../../../../public/freelancer-profile.css";
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";

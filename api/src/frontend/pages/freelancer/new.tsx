@@ -276,7 +276,8 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
             twitter_link: "",
             clients: [],
             client_images: [],
-            num_ratings: 0
+            num_ratings: 0,
+            profileImageUrl: "/public/profile-image.png",
         });
     };
 

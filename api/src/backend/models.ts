@@ -485,14 +485,14 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
         fetchAllFreelancers()(tx)
             .where({ user_id })
             .first()
-            .debug(true)
+            .debug(false)
 
 export const fetchFreelancerDetailsByUsername = (username: string) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
             .where({ username: username })
             .first()
-            .debug(true)
+            .debug(false)
 
 
 export const fetchAllFreelancers = () =>
@@ -622,11 +622,26 @@ export const insertFreelancerDetails = (
             })
 
 
-// TODO.
-export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) =>
+export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
     async (tx: Knex.Transaction) => (
-        await tx<Freelancer>("freelancers").update(freelancer).returning("*")
-    )[0];
+        await tx<Freelancer>("freelancers").update({
+            freelanced_before: f.freelanced_before.toString(),
+            freelancing_goal: f.freelancing_goal,
+            work_type: f.work_type,
+            education: f.education,
+            experience: f.experience,
+            title: f.title,
+            bio: f.bio,
+            facebook_link: f.facebook_link,
+            twitter_link: f.twitter_link,
+            telegram_link: f.telegram_link,
+            discord_link: f.discord_link,
+            user_id: f.user_id
+        }).where(f.username).returning("id")        
+        //.then(async() => {
+        //    //todo update many to many tables
+        //})
+)
 
 
 

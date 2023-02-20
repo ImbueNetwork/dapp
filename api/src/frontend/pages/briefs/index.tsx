@@ -317,7 +317,7 @@ export const Briefs = (): JSX.Element => {
                                             className="tag-item"
                                             key={skillIndex}
                                         >
-                                            {skill}
+                                            {skill.name}
                                         </div>
                                     )
                                 )}

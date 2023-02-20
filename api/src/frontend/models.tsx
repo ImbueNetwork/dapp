@@ -135,9 +135,9 @@ export type Item = {
 export type Brief = {
     id?: string | number;
     headline: string;
-    industries: string[];
+    industries: Item[];
     description: string;
-    skills: string[];
+    skills: Item[];
     scope_id: number;
     scope_level: string;
     duration: string;

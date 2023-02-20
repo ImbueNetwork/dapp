@@ -33,8 +33,12 @@ router.get("/:id", (req, res, next) => {
     const id = req.params.id;
     db.transaction(async tx => {
         try {
-            const briefs = await fetchBrief(id)(tx);
-            res.send(briefs);
+            const brief = await fetchBrief(id)(tx);
+            await Promise.all([
+                brief.skills = await fetchItems(brief.skill_ids, "skills")(tx),
+                brief.industries = await fetchItems(brief.industry_ids, "skills")(tx),
+            ]);
+            res.send(brief);
         } catch (e) {
             next(new Error(
                 `Failed to fetch brief with id ${id}`,
@@ -83,6 +87,15 @@ router.post("/search", (req, res, next) => {
         try {
             const data: BriefSqlFilter = req.body;
             const briefs: Array<Brief> = await searchBriefs(tx, data);
+
+            await Promise.all([
+                briefs,
+                ...briefs.map(async (brief: any) => {
+                    brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+                    brief.industries = await fetchItems(brief.industry_ids, "skills")(tx);
+                })
+            ]);
+
             res.send(briefs);
         } catch (e) {
             next(new Error(

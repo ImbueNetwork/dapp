@@ -37,7 +37,7 @@ export const Freelancers = (): JSX.Element => {
     const dedupeArray = async (input) => {
         return input.filter((thing, i, arr) => {
             return (arr.indexOf(arr.find(t => t.id === thing.id)) === i)
-        }).sort(function(a ,b){
+        }).sort(function (a, b) {
             return a.name.localeCompare(b.name);
         })
     }

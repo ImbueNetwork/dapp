@@ -321,34 +321,34 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
 export const fetchBrief = (id: string) =>
     (tx: Knex.Transaction) =>
         fetchAllBriefs()(tx)
-            .where({ "briefs.id" : id })
+            .where({ "briefs.id": id })
             .first()
 
 
 export const fetchAllBriefs = () =>
-        (tx: Knex.Transaction) =>
-            tx.select(
-                "briefs.id",
-                "headline",
-                "description",
-                "scope.scope_level",
-                "briefs.scope_id",
-                "duration.duration",
-                "briefs.duration_id",
-                "budget",
-                "users.display_name as created_by",
-                "experience_level",
-                "briefs.experience_id",
-                "briefs.created",
-                "users.briefs_submitted as number_of_briefs_submitted",
-                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
-                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
+    (tx: Knex.Transaction) =>
+        tx.select(
+            "briefs.id",
+            "headline",
+            "description",
+            "scope.scope_level",
+            "briefs.scope_id",
+            "duration.duration",
+            "briefs.duration_id",
+            "budget",
+            "users.display_name as created_by",
+            "experience_level",
+            "briefs.experience_id",
+            "briefs.created",
+            "users.briefs_submitted as number_of_briefs_submitted",
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
 
-                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
-                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.id as text)) as industry_ids"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(industries.id as text)) as industry_ids"),
 
-                "users.id"
-            )
+            "users.id"
+        )
             .from("briefs")
             .leftJoin("brief_industries", { "briefs.id": "brief_industries.brief_id" })
             .leftJoin("industries", { "brief_industries.industry_id": "industries.id" })
@@ -369,8 +369,8 @@ export const fetchAllBriefs = () =>
 
 export const fetchItems = (ids: number[], tableName: string) =>
     async (tx: Knex.Transaction) =>
-        tx(tableName).select("id","name")
-        .whereIn(`id`,ids);
+        tx(tableName).select("id", "name")
+            .whereIn(`id`, ids);
 
 // export const fetchSkills = (ids: string[]) =>
 //     (tx: Knex.Transaction) =>
@@ -574,7 +574,7 @@ export const fetchAllFreelancers = () =>
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
-            .orderBy("freelancers.id","desc")
+            .orderBy("freelancers.id", "desc")
             // TODO Add limit until we have spinning loading icon in freelancers page
             .limit(100)
 
@@ -696,25 +696,25 @@ export const searchBriefs =
 export const searchFreelancers =
     async (tx: Knex.Transaction, filter: FreelancerSqlFilter) =>
         fetchAllFreelancers()(tx)
-        .orWhere(function () {
-            if (filter.skills_range.length > 0) {
-                const subquery = tx.select('freelancer_id').from('freelancer_skills').whereIn("skill_id", filter.skills_range);
-                this.whereIn('freelancers.id', subquery)
-            }
-        })
-        .orWhere(function () {
-            if (filter.services_range.length > 0) {
-                const subquery = tx.select('freelancer_id').from('freelancer_services').whereIn("service_id", filter.services_range);
-                this.whereIn('freelancers.id', subquery)
-            }
-        })
-        .orWhere(function () {
-            if (filter.languages_range.length > 0) {
-                const subquery = tx.select('freelancer_id').from('freelancer_languages').whereIn("language_id", filter.languages_range);
-                console.log(subquery);
-                this.whereIn('freelancers.id', subquery)
-            }
-        })
-        .orWhere("username", "ilike", "%" + filter.search_input + "%")
-        .orWhere("title", "ilike", "%" + filter.search_input + "%")
-        .orWhere("bio", "ilike", "%" + filter.search_input + "%")
+            .orWhere(function () {
+                if (filter.skills_range.length > 0) {
+                    const subquery = tx.select('freelancer_id').from('freelancer_skills').whereIn("skill_id", filter.skills_range);
+                    this.whereIn('freelancers.id', subquery)
+                }
+            })
+            .orWhere(function () {
+                if (filter.services_range.length > 0) {
+                    const subquery = tx.select('freelancer_id').from('freelancer_services').whereIn("service_id", filter.services_range);
+                    this.whereIn('freelancers.id', subquery)
+                }
+            })
+            .orWhere(function () {
+                if (filter.languages_range.length > 0) {
+                    const subquery = tx.select('freelancer_id').from('freelancer_languages').whereIn("language_id", filter.languages_range);
+                    console.log(subquery);
+                    this.whereIn('freelancers.id', subquery)
+                }
+            })
+            .orWhere("username", "ilike", "%" + filter.search_input + "%")
+            .orWhere("title", "ilike", "%" + filter.search_input + "%")
+            .orWhere("bio", "ilike", "%" + filter.search_input + "%")

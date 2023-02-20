@@ -158,3 +158,10 @@ export type BriefSqlFilter = {
     length_is_max: boolean;
     search_input: string;
 };
+
+export type FreelancerSqlFilter = {
+    skills_range: Array<number>;
+    services_range: Array<number>;
+    languages_range: Array<number>;
+    search_input: string;
+};

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import { Freelancer, Item } from "../../models";
+import { Freelancer, FreelancerSqlFilter, Item } from "../../models";
 import * as utils from "../../utils";
 import "../../../../public/freelancers.css";
-import { getAllFreelancers } from "../../services/freelancerService";
+import { callSearchFreelancers, getAllFreelancers } from "../../services/freelancerService";
 import { FreelancerFilterOption, FilterOption } from "../../types/freelancers";
 import FreelancerFilter from "../../components/freelancerFilter";
 
@@ -17,26 +17,34 @@ export const Freelancers = (): JSX.Element => {
     const fetchAndSetFreelancers = async () => {
         const data = await getAllFreelancers();
 
-        var combinedSkills = [].concat.apply([], ...data.map(x => x.skills));
-        const dedupedSkills = [...new Set([...combinedSkills])]
+        let combinedSkills = (Array.prototype.concat.apply([], data.map(x => x.skills))) as Item[];
+        const dedupedSkills = await dedupeArray(combinedSkills);
 
-        var combinedServices = [].concat.apply([], ...data.map(x => x.services));
-        const dedupedServices = [...new Set([...combinedServices])]
+        var combinedServices = (Array.prototype.concat.apply([], data.map(x => x.services))) as Item[];
+        const dedupedServices = await dedupeArray(combinedServices);
 
-        var combinedLanguages = [].concat.apply([], ...data.map(x => x.languages));
-        const dedupedLanguages = [...new Set([...combinedLanguages])]
+        var combinedLanguages = (Array.prototype.concat.apply([], data.map(x => x.languages))) as Item[];
+        const dedupedLanguages = await dedupeArray(combinedLanguages);
 
-        setFreelancers(data);
         setSkills(dedupedSkills);
         setServices(dedupedServices);
         setLanguages(dedupedLanguages);
+        setFreelancers(data);
+
     };
 
+
+    const dedupeArray = async (input) => {
+        return input.filter((thing, i, arr) => {
+            return (arr.indexOf(arr.find(t => t.id === thing.id)) === i)
+        }).sort(function(a ,b){
+            return a.name.localeCompare(b.name);
+        })
+    }
 
     useEffect(() => {
         void fetchAndSetFreelancers();
     }, []);
-
 
     const redirectToProfile = (username) => {
         utils.redirect(`freelancers/${username}`);
@@ -83,8 +91,77 @@ export const Freelancers = (): JSX.Element => {
     };
 
     const onSearch = async () => {
-        // TODO implement search
+        const elements = document.getElementsByClassName(
+            "filtercheckbox"
+        ) as HTMLCollectionOf<HTMLInputElement>;
+
+        // The filter initially should return all values
+        let is_search: boolean = false;
+
+        let skillsRange: number[] = [];
+        let servicesRange: number[] = [];
+        let languagesRange: number[] = [];
+
+        let submitted_range: number[] = [];
+        let submitted_is_max: boolean = false;
+
+        let length_range: number[] = [];
+        let length_is_max: boolean = false;
+
+        let search_input = document.getElementById(
+            "search-input"
+        ) as HTMLInputElement;
+        let search_value = search_input.value;
+        if (search_value !== "") {
+            is_search = true;
+        }
+
+        for (let i = 0; i < elements.length; i++) {
+
+            if (elements[i].checked) {
+                is_search = true;
+                const id = elements[i].getAttribute("id");
+                if (id != null) {
+                    const [filterType, interiorIndex] = id.split("-");
+                    // Here we are trying to build teh paramaters required to build the query
+                    // We build an array for each to get the values we want through concat.
+                    // and also specify if we want more than using the is_max field.
+                    switch (parseInt(filterType) as FreelancerFilterOption) {
+                        case FreelancerFilterOption.Skills:
+                            skillsRange = [...skillsRange, parseInt(interiorIndex)];
+                            break;
+                        case FreelancerFilterOption.Services:
+                            servicesRange = [...servicesRange, parseInt(interiorIndex)];
+                            break;
+                        case FreelancerFilterOption.Languages:
+                            languagesRange = [...languagesRange, parseInt(interiorIndex)];
+                            break;
+                        default:
+                            console.log(
+                                "Invalid filter option selected or unimplemented. type:" +
+                                filterType
+                            );
+                    }
+                }
+            }
+        }
+
+        if (is_search) {
+            const filter: FreelancerSqlFilter = {
+                skills_range: skillsRange,
+                services_range: servicesRange,
+                languages_range: languagesRange,
+                search_input: search_value,
+            };
+
+            const filteredFreelancers = await callSearchFreelancers(filter);
+            setFreelancers(filteredFreelancers);
+        } else {
+            const allFreelancers = await getAllFreelancers();
+            setFreelancers(allFreelancers);
+        }
     };
+
 
 
     return (

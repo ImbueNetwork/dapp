@@ -2,7 +2,7 @@ import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
 import passport from "passport";
-import { upsertItems, fetchAllFreelancers, fetchItems } from "../../../models";
+import { upsertItems, fetchAllFreelancers, fetchItems, FreelancerSqlFilter, fetchFreelancerDetailsByUsername, updateFreelancerDetails, insertFreelancerDetails, searchFreelancers } from "../../../models";
 import { Freelancer } from "../../../models"
 
 const router = express.Router();
@@ -13,7 +13,7 @@ router.get("/", (req, res, next) => {
             await fetchAllFreelancers()(tx).then(async (freelancers: any) => {
                 await Promise.all([
                     ...freelancers.map(async (freelancer: any) => {
-                        freelancer.skills = await models.fetchItems(freelancer.skill_ids, "skills")(tx);
+                        freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx);
                         freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx);
                         freelancer.languages = await fetchItems(freelancer.language_ids, "languages")(tx);
                         freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx);
@@ -36,7 +36,14 @@ router.get("/:username", (req, res, next) => {
     const username = req.params.username;
     db.transaction(async tx => {
         try {
-            const freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+            await Promise.all([
+                freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx),
+                freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx),
+                freelancer.languages = await fetchItems(freelancer.language_ids, "languages")(tx),
+                freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx),
+            ]);
+
             if (!freelancer) {
                 return res.status(404).end();
             }
@@ -64,7 +71,7 @@ router.post("/", (req, res, next) => {
             if (freelancer.clients) {
                 client_ids = await upsertItems(freelancer.clients, "services")(tx);
             }
-            const freelancer_id = await models.insertFreelancerDetails(
+            const freelancer_id = await insertFreelancerDetails(
                 freelancer, skill_ids, language_ids, client_ids, services_ids
             )(tx);
 
@@ -98,13 +105,13 @@ router.put("/:username", (req, res, next) => {
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const freelancerDetails = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            const freelancerDetails = await fetchFreelancerDetailsByUsername(username)(tx);
 
             if (!freelancerDetails) {
                 return res.status(404).end();
             }
 
-            const freelancer_id: Freelancer = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
+            const freelancer_id: Freelancer = await updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
 
             if (!freelancer.id) {
                 return next(new Error(
@@ -116,6 +123,31 @@ router.put("/:username", (req, res, next) => {
             next(new Error(
                 `Failed to update freelancer details.`,
                 { cause: cause as Error }
+            ));
+        }
+    });
+});
+
+router.post("/search", (req, res, next) => {
+    db.transaction(async tx => {
+        try {
+            const filter: FreelancerSqlFilter = req.body;
+            console.log(filter);
+            const freelancers: Array<Freelancer> = await searchFreelancers(tx, filter);
+            await Promise.all([
+                ...freelancers.map(async (freelancer: any) => {
+                    freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx);
+                    freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx);
+                    freelancer.languages = await fetchItems(freelancer.language_ids, "languages")(tx);
+                    freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx);
+                })
+            ]);
+
+            res.send(freelancers);
+        } catch (e) {
+            next(new Error(
+                `Failed to search all freelancers`,
+                { cause: e as Error }
             ));
         }
     });

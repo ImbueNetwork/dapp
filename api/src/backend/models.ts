@@ -150,7 +150,14 @@ export type BriefSqlFilter = {
     length_range: number[];
     length_is_max: boolean;
     search_input: string;
-}
+};
+
+export type FreelancerSqlFilter = {
+    skills_range: Array<number>;
+    services_range: Array<number>;
+    languages_range: Array<number>;
+    search_input: string;
+};
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
@@ -567,6 +574,7 @@ export const fetchAllFreelancers = () =>
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
+            .orderBy("freelancers.id")
             .limit(100)
 
 
@@ -645,7 +653,6 @@ export const insertFreelancerDetails = (
                 return ids[0]
             })
 
-
 // TODO.
 export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) =>
     async (tx: Knex.Transaction) => (
@@ -685,3 +692,25 @@ export const searchBriefs =
 
 
 
+export const searchFreelancers =
+    async (tx: Knex.Transaction, filter: FreelancerSqlFilter) =>
+        fetchAllFreelancers()(tx)
+        .where(function () {
+            if (filter.skills_range.length > 0) {
+                const subquery = tx.select('freelancer_id').from('freelancer_skills').whereIn("skill_id", filter.skills_range);
+                this.whereIn('freelancers.id', subquery)
+            }
+        })
+        .where(function () {
+            if (filter.services_range.length > 0) {
+                const subquery = tx.select('freelancer_id').from('freelancer_services').whereIn("service_id", filter.services_range);
+                this.whereIn('freelancers.id', subquery)
+            }
+        })
+        .where(function () {
+            if (filter.languages_range.length > 0) {
+                const subquery = tx.select('freelancer_id').from('freelancer_languages').whereIn("language_id", filter.languages_range);
+                console.log(subquery);
+                this.whereIn('freelancers.id', subquery)
+            }
+        })

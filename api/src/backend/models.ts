@@ -696,22 +696,22 @@ export const searchBriefs =
 export const searchFreelancers =
     async (tx: Knex.Transaction, filter: FreelancerSqlFilter) =>
         fetchAllFreelancers()(tx)
-            .orWhere(function () {
+            .where(function () {
                 if (filter.skills_range.length > 0) {
                     this.whereIn('freelancer_skills.skill_id', filter.skills_range)
                 }
             })
-            .orWhere(function () {
+            .where(function () {
                 if (filter.services_range.length > 0) {
                     this.whereIn('freelancer_services.service_id', filter.services_range)
                 }
             })
-            .orWhere(function () {
+            .where(function () {
                 if (filter.languages_range.length > 0) {
                     this.whereIn('freelancer_languages.language_id', filter.languages_range)
                 }
             })
-            .orWhere("username", "ilike", "%" + filter.search_input + "%")
-            .orWhere("title", "ilike", "%" + filter.search_input + "%")
-            .orWhere("bio", "ilike", "%" + filter.search_input + "%")
+            .where("username", "ilike", "%" + filter.search_input + "%")
+            .where("title", "ilike", "%" + filter.search_input + "%")
+            .where("bio", "ilike", "%" + filter.search_input + "%")
             .debug(true)

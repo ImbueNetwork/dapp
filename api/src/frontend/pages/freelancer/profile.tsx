@@ -24,36 +24,16 @@ import { FreelancerSocial} from "./freelancer_socials";
 export type ProfileProps = {};
 export type ProfileState = {
     isEditingBio: boolean;
-    bioEdit: string;
     userInfo: UserInfo;
-    is_found: boolean;
+    bioEdit: string;
 };
 
 export type UserInfo = {
-    name: string;
-    profileImageUrl: string;
+    freelancer: Freelancer;
     location: {
         country: string;
         address: string;
     };
-    rating: {
-        stars: number;
-        level: string;
-        numReviews: number;
-    };
-    contact: {
-        username: string;
-        title: string;
-    };
-    bio: string;
-    socials: {
-        facebook: string;
-        twitter: string;
-        // google: string;
-        telegram: string;
-        discord: string;
-    };
-    skills?: Array<string>;
     portfolio?: Array<{
         category: string;
         rate: number;
@@ -72,27 +52,41 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         //this.setState({
         //});
     };
-    
     constructor(props) {
         super(props);
         this.state = 
             {
-                is_found: false,
                 isEditingBio : false,
                 bioEdit : "",
                 userInfo: {
-                    profileImageUrl: "/public/profile-image.png",
-                    rating: {
-                        stars: 5,
-                        level: "",
-                        numReviews: 0
+                    freelancer: {
+                        id: 0,
+                        bio: "",
+                        education: "",
+                        experience: "",
+                        facebook_link: "",
+                        twitter_link: "",
+                        telegram_link: "",
+                        discord_link: "",
+                        freelanced_before: "",
+                        freelancing_goal: "",
+                        work_type: "",
+                        title: "",
+                        skills: [],
+                        languages: [],
+                        services: [],
+                        clients: [],
+                        client_images: [],
+                        display_name: "",
+                        username: "",
+                        user_id: 0,
+                        rating: 0,
+                        num_ratings: 0,
+                        profileImageUrl: "/public/profile-image.png",
                     },
                     location: {country: "", address: ""},
-                    contact: {username: "", title: "" },
-                    name: "",
-                    skills: [],
-                    bio: "",
-                    socials: {facebook: "", discord: "", twitter: "", telegram: ""}
+                    portfolio: [],
+                    projects: []
             }
         };
       }
@@ -101,40 +95,35 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
         const freelancer = await getFreelancerProfile(username || "");
+
         if (freelancer) {
-            await this.populateProfile(freelancer)
+            if (freelancer.profileImageUrl.trim() == "" || undefined) {
+                freelancer.profileImageUrl = "/public/profile-image.png";
+            }
+            await this.populateProfile({
+                freelancer: freelancer,
+                location: {
+                    country: "",
+                    address: "",
+                },
+                portfolio: [],
+                projects: [],
+                
+            })
         } else {
             //404
         }
     }
 
 
-    async populateProfile(freelancer: Freelancer) {
-        this.setState({
-            is_found: true,
-            isEditingBio : false,
-            bioEdit : freelancer.bio,
-            userInfo: {
-                //todo
-                profileImageUrl: "/public/profile-image.png",
-                rating: {
-                    stars:  5,
-                    level: "default",
-                    numReviews: 0
-                },
-                // todo
-                location: {country: "", address: ""},
-                contact: {username: freelancer.username, title: freelancer.title },
-                name: freelancer.display_name,
-                skills: freelancer.skills,
-                bio: freelancer.bio,
-                socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
-            },
-        });
-    }
+    
 
-    get_stars(num_stars: number) {
-        
+    async populateProfile(info: UserInfo) {
+        this.setState({
+            isEditingBio: false,
+            bioEdit: info.freelancer.bio,
+            userInfo: info,            
+        });
     }
 
     render() {
@@ -153,12 +142,12 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                     <div className="section summary">
                         <div className="profile-image">
                             <img
-                                src={userInfo.profileImageUrl}
+                                src={userInfo.freelancer.profileImageUrl}
                                 alt=""
                             />
                         </div>
                         <div className="profile-summary">
-                            <h5>{userInfo.name}</h5>
+                            <h5>{userInfo.freelancer.display_name}</h5>
                             <div className="location">
                                 <ReactCountryFlag
                                     countryCode={userInfo.location.country}
@@ -167,24 +156,25 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                             </div>
                             <div className="rating">
                                     {
-                                        Array.from({ length: userInfo.rating.stars}, (_, i) => i).map((i) => (
+                                        Array.from({ length: userInfo.freelancer.rating || 0}, (_, i) => i).map((i) => (
                                             <p key={i}><FaStar color="var(--theme-yellow)" /></p> 
                                         ))
                                     }
                                 <p>
-                                    <span>{userInfo.rating.level}</span>
+                                    {/* todo? */}
+                                    {/* <span>{userInfo.rating.level}</span> */}
                                     <span className="review-count">
-                                        {`(${userInfo.rating.numReviews} reviews)`}
+                                        {`(${userInfo.freelancer.num_ratings} reviews)`}
                                     </span>
                                 </p>
                             </div>
                             <div className="contact">
-                                <p>@{userInfo.contact.username}</p>
+                                <p>@{userInfo.freelancer.username}</p>
                                 <IoPeople
                                     color="var(--theme-secondary)"
                                     size="24px"
                                 />
-                                <p>{userInfo.contact.title}</p>
+                                <p>{userInfo.freelancer.title}</p>
                             </div>
                             <div className="connect-buttons">
                                 <button className="message">Message</button>
@@ -210,7 +200,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         this.setState({
                                             ...this.state,
                                             isEditingBio: true,
-                                            bioEdit: userInfo.bio,
+                                            bioEdit: userInfo.freelancer.bio,
                                         })
                                     }
                                 >
@@ -253,7 +243,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                             </>
                         ) : (
                             <div className="bio">
-                                {this.state.userInfo.bio
+                                {this.state.userInfo.freelancer.bio
                                     .split("\n")
                                     .map((line, index) => (
                                         <p key={index}>{line}</p>
@@ -272,28 +262,28 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                                 label: "Facebook",
                                                 key: "facebook",
                                                 icon: <FaFacebook/>,
-                                                link: this.state.userInfo.socials.facebook,
+                                                link: this.state.userInfo.freelancer.facebook_link,
                                             })
                                         }{
                                             FreelancerSocial({
                                                 label: "Twitter",
                                                 key: "twitter",
                                                 icon: <FaTwitter/>,
-                                                link: this.state.userInfo.socials.twitter,
+                                                link: this.state.userInfo.freelancer.twitter_link,
                                             })
                                         }{                                  
                                             FreelancerSocial({
                                                 label: "Telegram",
                                                 key: "telegram",
                                                 icon: <FaTelegram/>,
-                                                link: this.state.userInfo.socials.telegram,
+                                                link: this.state.userInfo.freelancer.telegram_link,
                                             })
                                         }{
                                             FreelancerSocial({
                                                 label: "Discord",
                                                 key: "discord",
                                                 icon: <FaDiscord/>,
-                                                link: this.state.userInfo.socials.discord,
+                                                link: this.state.userInfo.freelancer.discord_link,
                                             })
                                         }
                                     </div>
@@ -305,7 +295,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         <div className="btn-add">Add Now</div>
                                     </div>
                                     <div className="skills">
-                                        {userInfo.skills?.map(
+                                        {userInfo.freelancer.skills?.map(
                                             (skill, index) => (
                                                 <p
                                                     className="skill"

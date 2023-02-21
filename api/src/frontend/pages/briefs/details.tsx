@@ -56,7 +56,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                                 className="skill"
                                 key={index}
                             >
-                                {skill}
+                                {skill.name}
                             </p>
                         )
                     )}

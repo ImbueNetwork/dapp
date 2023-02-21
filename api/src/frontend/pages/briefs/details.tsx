@@ -21,6 +21,7 @@ TimeAgo.addDefaultLocale(en)
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const timeAgo = new TimeAgo('en-US');
     const timePosted = timeAgo.format(new Date(brief.created));
+    
     const BioPanel = (
         <div className="brief-bio">
             <div className="subsection">

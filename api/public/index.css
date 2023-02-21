@@ -845,3 +845,7 @@ nav i.material-icons {
 .tag-suggest-button:active {
     transform: scale(1.5);
 }
+
+.capitalize {
+    text-transform: capitalize;
+}

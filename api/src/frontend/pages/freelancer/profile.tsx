@@ -17,7 +17,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
 import { getFreelancerProfile } from "../../services/freelancerService";
-import { Freelancer } from "../../models";
+import { Freelancer, Item } from "../../models";
 import { Freelancers } from "./new";
 import { FreelancerSocial} from "./freelancer_socials";
 
@@ -53,7 +53,7 @@ export type UserInfo = {
         telegram: string;
         discord: string;
     };
-    skills?: Array<string>;
+    skills?: Array<Item>;
     portfolio?: Array<{
         category: string;
         rate: number;
@@ -311,7 +311,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                                     className="skill"
                                                     key={index}
                                                 >
-                                                    {skill}
+                                                    {skill.name}
                                                 </p>
                                             )
                                         )}

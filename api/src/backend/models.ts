@@ -102,8 +102,10 @@ export type ProjectProperties = {
 export type Brief = {
     id?: string | number;
     headline: string;
+    industry_ids: number[];
     industries: string[];
     description: string;
+    skill_ids: number[];
     skills: string[];
     scope_id: number;
     scope_level: string;
@@ -148,7 +150,14 @@ export type BriefSqlFilter = {
     length_range: number[];
     length_is_max: boolean;
     search_input: string;
-}
+};
+
+export type FreelancerSqlFilter = {
+    skills_range: Array<number>;
+    services_range: Array<number>;
+    languages_range: Array<number>;
+    search_input: string;
+};
 
 export const fetchWeb3Account = (address: string) =>
     (tx: Knex.Transaction) =>
@@ -312,30 +321,34 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
 export const fetchBrief = (id: string) =>
     (tx: Knex.Transaction) =>
         fetchAllBriefs()(tx)
-            .where({ "briefs.id" : id })
+            .where({ "briefs.id": id })
             .first()
 
 
 export const fetchAllBriefs = () =>
-        (tx: Knex.Transaction) =>
-            tx.select(
-                "briefs.id",
-                "headline",
-                "description",
-                "scope.scope_level",
-                "briefs.scope_id",
-                "duration.duration",
-                "briefs.duration_id",
-                "budget",
-                "users.display_name as created_by",
-                "experience_level",
-                "briefs.experience_id",
-                "briefs.created",
-                "users.briefs_submitted as number_of_briefs_submitted",
-                tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
-                tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
-                "users.id"
-            )
+    (tx: Knex.Transaction) =>
+        tx.select(
+            "briefs.id",
+            "headline",
+            "description",
+            "scope.scope_level",
+            "briefs.scope_id",
+            "duration.duration",
+            "briefs.duration_id",
+            "budget",
+            "users.display_name as created_by",
+            "experience_level",
+            "briefs.experience_id",
+            "briefs.created",
+            "users.briefs_submitted as number_of_briefs_submitted",
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
+
+            tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(industries.id as text)) as industry_ids"),
+
+            "users.id"
+        )
             .from("briefs")
             .leftJoin("brief_industries", { "briefs.id": "brief_industries.brief_id" })
             .leftJoin("industries", { "brief_industries.industry_id": "industries.id" })
@@ -353,7 +366,16 @@ export const fetchAllBriefs = () =>
             .groupBy("briefs.experience_id")
             .groupBy("experience.experience_level")
             .groupBy("users.id")
-    
+
+export const fetchItems = (ids: number[], tableName: string) =>
+    async (tx: Knex.Transaction) =>
+        tx(tableName).select("id", "name")
+            .whereIn(`id`, ids);
+
+// export const fetchSkills = (ids: string[]) =>
+//     (tx: Knex.Transaction) =>
+//         tx<Skill>("skills").select("id","name").whereIn('id', ids );
+
 // Insert a brief and their respective skill and industry_ids.
 export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: number[], scope_id: number, duration_id: number) =>
     async (tx: Knex.Transaction) => (
@@ -411,17 +433,18 @@ export const insertFederatedCredential = (
     }).returning("*")
 )[0];
 
-export const upsertItems = (items: string[], table_name: string) => async (tx: Knex.Transaction) => {
+export const upsertItems = (items: string[], tableName: string) => async (tx: Knex.Transaction) => {
     var item_ids: number[] = [];
     try {
+        //TODO Convert to map
         for (const item of items) {
             var item_id: number;
-            const existing_item = await tx(table_name).select().where({
+            const existing_item = await tx(tableName).select().where({
                 name: item.toLowerCase()
             }).first();
 
             if (!existing_item) {
-                item_id = await (await insertToTable(item, table_name)(tx)).id;
+                item_id = await (await insertToTable(item, tableName)(tx)).id;
             } else
                 item_id = existing_item.id
 
@@ -485,14 +508,12 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
         fetchAllFreelancers()(tx)
             .where({ user_id })
             .first()
-            .debug(true)
 
 export const fetchFreelancerDetailsByUsername = (username: string) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
             .where({ username: username })
             .first()
-            .debug(true)
 
 
 export const fetchAllFreelancers = () =>
@@ -516,10 +537,19 @@ export const fetchAllFreelancers = () =>
             "display_name",
             "freelancers.created",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(languages.name as text)) as languages"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(languages.id as text)) as language_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(services.name as text)) as services"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(services.id as text)) as service_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(clients.name as text)) as clients"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_ids"),
+
             tx.raw("ARRAY_AGG(DISTINCT CAST(clients.img as text)) as client_images"),
+            tx.raw("ARRAY_AGG(DISTINCT CAST(clients.id as text)) as client_image_ids"),
             tx.raw("(SUM(freelancer_ratings.rating) / COUNT(freelancer_ratings.rating)) as rating"),
             tx.raw("COUNT(freelancer_ratings.rating) as num_ratings"),
 
@@ -544,6 +574,9 @@ export const fetchAllFreelancers = () =>
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
+            .orderBy("freelancers.id", "desc")
+            // TODO Add limit until we have spinning loading icon in freelancers page
+            .limit(100)
 
 
 export const insertFreelancerDetails = (
@@ -621,7 +654,6 @@ export const insertFreelancerDetails = (
                 return ids[0]
             })
 
-
 // TODO.
 export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) =>
     async (tx: Knex.Transaction) => (
@@ -660,3 +692,26 @@ export const searchBriefs =
             .where("headline", "ilike", "%" + filter.search_input + "%")
 
 
+
+export const searchFreelancers =
+    async (tx: Knex.Transaction, filter: FreelancerSqlFilter) =>
+        fetchAllFreelancers()(tx)
+            .where(function () {
+                if (filter.skills_range.length > 0) {
+                    this.whereIn('freelancer_skills.skill_id', filter.skills_range)
+                }
+            })
+            .where(function () {
+                if (filter.services_range.length > 0) {
+                    this.whereIn('freelancer_services.service_id', filter.services_range)
+                }
+            })
+            .where(function () {
+                if (filter.languages_range.length > 0) {
+                    this.whereIn('freelancer_languages.language_id', filter.languages_range)
+                }
+            })
+            .where("username", "ilike", "%" + filter.search_input + "%")
+            .where("title", "ilike", "%" + filter.search_input + "%")
+            .where("bio", "ilike", "%" + filter.search_input + "%")
+            .debug(true)

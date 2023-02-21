@@ -73,42 +73,44 @@ type MessageFormProps = {
     onClose: () => void;
 };
 
-// const [showMessageForm, setShowMessageForm] = useState(false);
 
 
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
-  
+
     const handleSubmit = (event: React.FormEvent) => {
-      event.preventDefault();
-      // Send the message to the backend
-      // ...
-      // Close the pop-up box
-      onClose();
+        event.preventDefault();
+        // Send the message to the backend
+        // ...
+        // Close the pop-up box
+        onClose();
     }
-  
+
     return (
-      <div className="message-form-container">
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="subject">Subject</label>
-          <input
-            type="text"
-            id="subject"
-            value={subject}
-            onChange={(event) => setSubject(event.target.value)}
-          />
-          <label htmlFor="body">Message</label>
-          <textarea
-            id="body"
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-          />
-          <button type="submit">Send</button>
-        </form>
-      </div>
+        <div className="message-form-container">
+            <form onSubmit={handleSubmit}>
+                <label htmlFor="subject">Subject</label>
+                <input
+                    type="text"
+                    id="subject"
+                    value={subject}
+                    onChange={(event) => setSubject(event.target.value)}
+                    style={{ marginBottom: '10px' }} 
+                />
+                <label htmlFor="body">Message</label>
+                <textarea
+                    id="body"
+                    value={body}
+                    onChange={(event) => setBody(event.target.value)}
+                    style={{ marginBottom: '20px' }} 
+                />
+                <button type="submit" value="submit" style={{ marginTop: '10px' }}>Submit</button> 
+            </form> 
+        </div>
     );
 };
+
   
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
@@ -171,7 +173,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                 location: {country: "", address: ""},
                 contact: {username: freelancer.username, title: freelancer.title },
                 name: freelancer.display_name,
-                skills: freelancer.skills,
+                // skills: freelancer.skills,
                 bio: freelancer.bio,
                 socials: {facebook: freelancer.facebook_link, discord: freelancer.discord_link, twitter: freelancer.twitter_link, telegram: freelancer.telegram_link}
             },

@@ -103,12 +103,6 @@ export const Freelancers = (): JSX.Element => {
         let servicesRange: number[] = [];
         let languagesRange: number[] = [];
 
-        let submitted_range: number[] = [];
-        let submitted_is_max: boolean = false;
-
-        let length_range: number[] = [];
-        let length_is_max: boolean = false;
-
         let search_input = document.getElementById(
             "search-input"
         ) as HTMLInputElement;
@@ -214,6 +208,7 @@ export const Freelancers = (): JSX.Element => {
                                 {
                                     title,
                                     username,
+                                    display_name,
                                     skills,
                                 },
                                 index
@@ -228,7 +223,8 @@ export const Freelancers = (): JSX.Element => {
                                         <div className="dark-layer" />
                                     </div>
                                     <div className="freelancer-info">
-                                        <h3>{title}</h3>
+                                        <h3>{display_name}</h3>
+                                        <h5>{title}</h5>
                                         <div className="skills">
                                             {skills?.slice(0, 3).map(
                                                 (skill, index) => (

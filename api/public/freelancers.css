@@ -14,10 +14,12 @@
 }
 
 .freelancer {
-    height: min-content;
     background: #0f0f0f;
     border: 1px solid #2c2c2c;
     border-radius: 0px 0px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
 .freelancer-profile-pic {
@@ -73,9 +75,9 @@
 
 .skills {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 24px;
+    /* flex-wrap: wrap; */
+    /* gap: 20px; */
+    /* margin-top: 24px; */
 }
 
 .skill {

@@ -30,6 +30,9 @@ router.get("/proposals", (req, res) => {
 router.get("/proposals/new-details", (req, res) => {
     res.render("details");
 });
+router.get("/projects/new", (req, res) => {
+    res.render("new-project");
+});
 
 router.get("/proposals/:projectId", (req, res) => {
     res.render("details");

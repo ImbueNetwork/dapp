@@ -1,0 +1,78 @@
+.new-project-container {
+    display: flex;
+    flex-direction: row;
+    background: black;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 1200px;
+    color: var(--theme-ink-color);
+    padding: 2rem 3rem;
+}
+
+.left-container {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    padding-right: 10%;
+}
+
+.left-container .title {
+    margin: 0;
+}
+
+.links-container {
+    margin-top: 10rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.link {
+    font-size: 30px;
+    line-height: 2;
+    text-decoration: none;
+    color: var(--theme-ink-color);
+}
+
+.form-container {
+    flex: 1 0 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section-header {
+    font-size: 30px;
+    line-height: 1;
+    color: var(--theme-ink-color);
+    margin: 32px 0 10px 0;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(235, 234, 226, 0.11);
+    backdrop-filter: blur(7.5px);
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 30px;
+    color: rgba(235, 234, 226, 0.34);
+    padding: 10px 25px;
+    border: none;
+}
+
+.form-input:focus {
+    outline: none;
+}
+
+.form-input.multiline {
+    min-height: 200px;
+}
+
+.submit-container {
+    margin-top: 10px;
+}

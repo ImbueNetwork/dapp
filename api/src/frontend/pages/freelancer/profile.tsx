@@ -78,38 +78,71 @@ type MessageFormProps = {
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
-
+  
     const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        // Send the message to the backend
-        // ...
-        // Close the pop-up box
-        onClose();
+      event.preventDefault();
+      // Send the message to the backend
+      // ...
+      // Close the pop-up box
+      onClose();
     }
-
+  
     return (
-        <div className="message-form-container">
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="subject">Subject</label>
-                <input
-                    type="text"
-                    id="subject"
-                    value={subject}
-                    onChange={(event) => setSubject(event.target.value)}
-                    style={{ marginBottom: '10px' }} 
-                />
-                <label htmlFor="body">Message</label>
-                <textarea
-                    id="body"
-                    value={body}
-                    onChange={(event) => setBody(event.target.value)}
-                    style={{ marginBottom: '20px' }} 
-                />
-                <button type="submit" value="submit" style={{ marginTop: '10px' }}>Submit</button> 
-            </form> 
-        </div>
+      <div className="message-form-container" style={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        alignItems: "center", 
+        padding: "16px",
+        backgroundColor: "white",
+        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.2)",
+        borderRadius: "4px",
+        }}>
+        <h3 style={{ marginBottom: "16px", color: "black" }}>New Message</h3>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
+          <label htmlFor="subject" style={{ marginBottom: "8px", color: "black" }}>Subject</label>
+          <input
+            type="text"
+            id="subject"
+            value={subject}
+            onChange={(event) => setSubject(event.target.value)}
+            style={{ 
+              border: "none",
+              backgroundColor: "#F7F7F7",
+              borderRadius: "4px",
+              padding: "8px",
+              marginBottom: "16px",
+              width: "100%",
+            }}
+          />
+          <label htmlFor="body" style={{ marginBottom: "8px", color: "black" }}>Message</label>
+          <textarea
+            id="body"
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            style={{
+              border: "none",
+              backgroundColor: "#F7F7F7",
+              borderRadius: "4px",
+              padding: "8px",
+              height: "200px",
+              marginBottom: "16px",
+              width: "100%",
+            }}
+          />
+          <button type="submit" style={{ 
+            backgroundColor: "#4CAF50", 
+            color: "white", 
+            border: "none", 
+            padding: "8px 16px",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}>Send</button>
+        </form>
+      </div>
     );
 };
+  
+  
 
   
 

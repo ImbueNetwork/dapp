@@ -11,6 +11,7 @@ module.exports = {
         "new-freelancer": path.resolve(__dirname, "pages", "freelancer", "new.tsx"),
         "freelancer-profile": path.resolve(__dirname, "pages", "freelancer", "profile.tsx"),
         "new-project": path.resolve(__dirname, "pages", "projects", "new.tsx"),
+        "freelancers": path.resolve(__dirname, "pages", "freelancer", "index.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
     },

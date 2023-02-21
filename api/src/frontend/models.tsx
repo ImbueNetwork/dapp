@@ -114,10 +114,10 @@ export type Freelancer = {
     freelancing_goal: string;
     work_type: string;
     title: string;
-    skills: string[];
-    languages: string[];
-    services: string[];
-    clients: string[];
+    skills: Item[];
+    languages: Item[];
+    services: Item[];
+    clients: Item[];
     client_images: string[];
     display_name: string;
     username: string;
@@ -126,13 +126,18 @@ export type Freelancer = {
     num_ratings: number;
 };
 
+export type Item = {
+    id: number;
+    name: string;
+}
+
 // The same as backend/briefs
 export type Brief = {
     id?: string | number;
     headline: string;
-    industries: string[];
+    industries: Item[];
     description: string;
-    skills: string[];
+    skills: Item[];
     scope_id: number;
     scope_level: string;
     duration: string;
@@ -151,5 +156,12 @@ export type BriefSqlFilter = {
     submitted_is_max: boolean;
     length_range: Array<number>;
     length_is_max: boolean;
+    search_input: string;
+};
+
+export type FreelancerSqlFilter = {
+    skills_range: Array<number>;
+    services_range: Array<number>;
+    languages_range: Array<number>;
     search_input: string;
 };

@@ -4,6 +4,7 @@ import BriefFilter from "../../components/briefFilter";
 import { Brief, BriefSqlFilter } from "../../models";
 import { callSearchBriefs, getAllBriefs } from "../../services/briefsService";
 import { BriefFilterOption } from "../../types/briefs";
+import { redirect } from "../../utils";
 
 export type BriefProps = {};
 
@@ -150,6 +151,10 @@ export const Briefs = (): JSX.Element => {
     useEffect(() => {
         void fetchAndSetBriefs();
     }, []);
+
+    const redirectToBrief = (id) => {
+        redirect(`briefs/${id}`);
+    }
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
     const onSearch = async () => {
@@ -298,13 +303,12 @@ export const Briefs = (): JSX.Element => {
                 </div>
                 <div className="briefs-list">
                     {briefs.map((item, itemIndex) => (
-                        <div className="brief-item" key={itemIndex}>
+                        <div className="brief-item" key={itemIndex} onClick={() => redirectToBrief(item.id)}>
                             <div className="brief-title">
                                 {item.headline}
                             </div>
                             <div className="brief-time-info">
                                 {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
-
                             </div>
                             <div className="brief-description">
                                 {item.description}
@@ -317,7 +321,7 @@ export const Briefs = (): JSX.Element => {
                                             className="tag-item"
                                             key={skillIndex}
                                         >
-                                            {skill}
+                                            {skill.name}
                                         </div>
                                     )
                                 )}

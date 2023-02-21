@@ -1,41 +1,52 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-
-    db.transaction(async tx => {
+router.get("/", async (req, res, next) => {
+    db.transaction(async (tx) => {
         try {
-            const briefs = await fetchAllBriefs()(tx);
-            res.send(briefs);
+            await fetchAllBriefs()(tx).then(async (briefs: any) => {
+                await Promise.all([
+                    briefs,
+                    ...briefs.map(async (brief: any) => {
+                        brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+                        brief.industries = await fetchItems(brief.industry_ids, "skills")(tx);
+                    })
+                ]);
+                res.send(briefs);
+            });
         } catch (e) {
             next(new Error(
                 `Failed to fetch all briefs`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
 });
+
 
 router.get("/:id", (req, res, next) => {
     const id = req.params.id;
     db.transaction(async tx => {
         try {
-            const briefs = await fetchBrief(id)(tx);
-            res.send(briefs);
+            const brief = await fetchBrief(id)(tx);
+            await Promise.all([
+                brief.skills = await fetchItems(brief.skill_ids, "skills")(tx),
+                brief.industries = await fetchItems(brief.industry_ids, "skills")(tx),
+            ]);
+            res.send(brief);
         } catch (e) {
             next(new Error(
                 `Failed to fetch brief with id ${id}`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });
 });
-
 
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
@@ -65,23 +76,31 @@ router.post("/", (req, res, next) => {
         } catch (cause) {
             next(new Error(
                 `Failed to insert brief .`,
-                {cause: cause as Error}
+                { cause: cause as Error }
             ));
         }
     });
 });
-
 
 router.post("/search", (req, res, next) => {
     db.transaction(async tx => {
         try {
             const data: BriefSqlFilter = req.body;
             const briefs: Array<Brief> = await searchBriefs(tx, data);
+
+            await Promise.all([
+                briefs,
+                ...briefs.map(async (brief: any) => {
+                    brief.skills = await fetchItems(brief.skill_ids, "skills")(tx);
+                    brief.industries = await fetchItems(brief.industry_ids, "skills")(tx);
+                })
+            ]);
+
             res.send(briefs);
         } catch (e) {
             next(new Error(
                 `Failed to search all briefs`,
-                {cause: e as Error}
+                { cause: e as Error }
             ));
         }
     });

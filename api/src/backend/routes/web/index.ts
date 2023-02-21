@@ -11,7 +11,7 @@ router.get(
         failureRedirect: "/dapp/login?redirect=/dapp",
     }),
     (req, res) => {
-        res.render("dashboard");
+        res.render("/");
     }
 );
 
@@ -34,7 +34,7 @@ router.get("/projects/new", (req, res) => {
     res.render("new-project");
 });
 
-router.get("/projects/:projectId", (req, res) => {
+router.get("/proposals/:projectId", (req, res) => {
     res.render("details");
 });
 
@@ -67,6 +67,10 @@ router.get("/googlelogin", (req, res) => {
 
 router.get("/briefs/", (req, res) => {
     res.render("briefs");
+});
+
+router.get("/freelancers/", (req, res) => {
+    res.render("freelancers");
 });
 
 router.get(

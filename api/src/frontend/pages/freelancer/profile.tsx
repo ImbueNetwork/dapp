@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import ReactDOMClient from "react-dom/client";
 import ReactCountryFlag from "react-country-flag";
 import {
@@ -17,7 +17,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
 import { getFreelancerProfile } from "../../services/freelancerService";
-import { Freelancer } from "../../models";
+import { Freelancer, Item } from "../../models";
 import { Freelancers } from "./new";
 import { FreelancerSocial} from "./freelancer_socials";
 
@@ -26,6 +26,7 @@ export type ProfileState = {
     isEditingBio: boolean;
     bioEdit: string;
     userInfo: UserInfo;
+    showMessageForm: boolean,
     is_found: boolean;
 };
 
@@ -53,7 +54,7 @@ export type UserInfo = {
         telegram: string;
         discord: string;
     };
-    skills?: Array<string>;
+    skills?: Array<Item>;
     portfolio?: Array<{
         category: string;
         rate: number;
@@ -67,6 +68,51 @@ export type UserInfo = {
     }>;
 };
 
+type MessageFormProps = {
+    recipient: string;
+    onClose: () => void;
+};
+
+
+
+const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
+    const [subject, setSubject] = useState('');
+    const [body, setBody] = useState('');
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        // Send the message to the backend
+        // ...
+        // Close the pop-up box
+        onClose();
+    }
+
+    return (
+        <div className="message-form-container">
+            <form onSubmit={handleSubmit}>
+                <label htmlFor="subject">Subject</label>
+                <input
+                    type="text"
+                    id="subject"
+                    value={subject}
+                    onChange={(event) => setSubject(event.target.value)}
+                    style={{ marginBottom: '10px' }} 
+                />
+                <label htmlFor="body">Message</label>
+                <textarea
+                    id="body"
+                    value={body}
+                    onChange={(event) => setBody(event.target.value)}
+                    style={{ marginBottom: '20px' }} 
+                />
+                <button type="submit" value="submit" style={{ marginTop: '10px' }}>Submit</button> 
+            </form> 
+        </div>
+    );
+};
+
+  
+
 export class Profile extends React.Component<ProfileProps, ProfileState> {
     onSaveBio = () => {
         //this.setState({
@@ -78,6 +124,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         this.state = 
             {
                 is_found: false,
+                showMessageForm: false,
                 isEditingBio : false,
                 bioEdit : "",
                 userInfo: {
@@ -98,6 +145,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
       }
     
 
+
     async componentDidMount() {
         let username = window.location.pathname.split('/').pop();
         const freelancer = await getFreelancerProfile(username || "");
@@ -107,7 +155,6 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             //404
         }
     }
-
 
     async populateProfile(freelancer: Freelancer) {
         this.setState({
@@ -187,7 +234,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                 <p>{userInfo.contact.title}</p>
                             </div>
                             <div className="connect-buttons">
-                                <button className="message">Message</button>
+                                <button onClick={() => this.setState({ showMessageForm: true })} className="message">Message</button>
+                                {this.state.showMessageForm && (<MessageForm recipient={userInfo.name} onClose={() => this.setState({ showMessageForm: false })} /> )}
                                 <button className="share">
                                     <FaRegShareSquare color="white" /> {"  "}
                                     Share Profile
@@ -311,7 +359,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                                     className="skill"
                                                     key={index}
                                                 >
-                                                    {skill}
+                                                    {skill.name}
                                                 </p>
                                             )
                                         )}

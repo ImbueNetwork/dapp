@@ -1,9 +1,9 @@
 import { Component } from "react";
-import { Freelancer } from "../models";
+import { Freelancer, FreelancerSqlFilter } from "../models";
 import * as config from "../config";
 import { postAPIHeaders, getAPIHeaders } from "../config";
 
-export async function createFreelancingProfile(freelancer: Freelancer) {
+export async function createFreelancingProfile(freelancer: any) {
     // Check that this user doesnt already have a freelancer profile.
    const resp = await fetch(`${config.apiBase}/freelancers/`, {
        headers: postAPIHeaders,
@@ -20,6 +20,19 @@ export async function createFreelancingProfile(freelancer: Freelancer) {
    }
 }
 
+ export const getAllFreelancers = async () => {
+    const resp =  await fetch(`${config.apiBase}/freelancers/`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json() as Array<Freelancer>
+    } else {
+        throw new Error('Failed to get all briefs. status:' + resp.status);
+    }
+  }
+  
 export async function getFreelancerProfile(username: string) {
     const resp =  await fetch(`${config.apiBase}/freelancers/${username}`, {
         headers: getAPIHeaders,
@@ -65,13 +78,15 @@ export async function updateFreelancer(freelancer: Freelancer) {
 
 }
 
-export async function delete_freelancer(freelancer: Freelancer) {
-    // TODO!
-    // const resp =  await fetch(`${config.apiBase}/freelancers/${freelancer.username}`, {
-    //     headers: getAPIHeaders,
-    //     method: "put",
-    //     body: JSON.stringify({freelancer})
-    // })
-// 
-    // console.log("Freelancer updated successfully.");
-}
+export const callSearchFreelancers = async (filter: FreelancerSqlFilter) => {
+    const resp = await fetch(`${config.apiBase}/freelancers/search`, {
+        headers: postAPIHeaders,
+        method: "post",
+        body: JSON.stringify(filter),
+    });
+    if (resp.ok) {
+        return await resp.json() as Array<Freelancer>
+    } else {
+        throw new Error('Failed to search freelancers. status:' + resp.status);
+    }
+  }

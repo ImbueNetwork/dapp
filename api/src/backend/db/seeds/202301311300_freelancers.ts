@@ -49,21 +49,21 @@ export async function seed(knex: Knex): Promise<void> {
                     await knex("users").insert(
                         [{
                             display_name: skills[a] + "_" + clients[b] + "_" + services[d],
-                            username: skills[a] + "_" + clients[b] + "_" + services[d] + rbig,
-                            email: skills[a]+languages[c] + rbig + "@gmail.com",
+                            username: skills[a].replace(" ","_") + "_" + clients[b].replace(" ","_") + "_" + services[d].replace(" ","_") + rbig,
+                            email: skills[a] + languages[c] + rbig + "@gmail.com",
                             password: "testpassword",
                         }]
                      ).then(async () => {
                          await knex("freelancers").insert({
                              freelanced_before: "I've freelanced before however, i may need some extra help.",
                              freelancing_goal: "To make a little extra money on the side",
-                             title: "A " + languages[c] + " speaking " + skills[a]  + " professional",
+                             title: "Mega cool " + skills[a]  + " professional " + rbig,
                              bio: "I also have experience in " + services[d] + " and have many clients including " + clients[b],
                              work_type: "To make a little extra money on the side",
-                             facebook_link: "www.facebook.com/pro" + languages[c] + skills[a],
-                             twitter_link: "www.twitter.com/pro" + languages[c] + skills[a],
-                             telegram_link: "www.telegram.com/pro" + languages[c] + skills[a],
-                             discord_link: "www.discord.com/pro" + languages[c] + skills[a],
+                             facebook_link: "www.facebook.com/pro" + skills[a],
+                             twitter_link: "www.twitter.com/pro" + skills[a],
+                             telegram_link: "www.telegram.com/pro" + skills[a],
+                             discord_link: "www.discord.com/pro" + skills[a],
                              user_id: id + 3,
                          }).then(async () => {
                       
@@ -71,6 +71,9 @@ export async function seed(knex: Knex): Promise<void> {
                       
                                  if (i == 0) {
                                      await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: a})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: b})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: c})
+                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: d})
                                      await knex("freelancer_clients").insert({freelancer_id: id, client_id: b})
                                      await knex("freelancer_languages").insert({freelancer_id: id,language_id: c})
                                      await knex("freelancer_services").insert({freelancer_id: id, service_id: d})

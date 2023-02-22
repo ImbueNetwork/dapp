@@ -82,22 +82,21 @@ router.post("/", (req, res, next) => {
 
 router.put("/:username", (req, res, next) => {
     // TODO VERIFY user is allowed to edit table
-    // Verification happens before we get here.
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
     
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const exists = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            // Is this needed? surely it will just fail as its an update.
+            const exists: Freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
             console.log(freelancer);
-
             if (!exists) {
                 return next(new Error(
-                    "Cannot update freelancer details: `id` missing."
+                    "Freelancer does not exist."
                 ));
             }
-            const fl_id = await models.updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
+            const fl_id = await models.updateFreelancerDetails(exists.user_id, freelancer)(tx);
             const updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
 
             res.status(200).send(updated_freelancer_details);

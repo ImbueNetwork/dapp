@@ -367,9 +367,9 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
             experience_id: brief.experience_id,
         }).returning("briefs.id")
             .then(async (ids) => {
-                if (skill_ids != undefined) {
+                if (skill_ids) {
                     skill_ids.forEach(async (skillId) => {
-                        if (skillId != undefined) {
+                        if (skillId) {
                             await tx("brief_skills")
                                 .insert({
                                     brief_id: ids[0],
@@ -380,9 +380,9 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
                     })
                 }
 
-                if (industry_ids != undefined) {
+                if (industry_ids) {
                     industry_ids.forEach(async (industry_id) => {
-                        if (industry_id != undefined) {
+                        if (industry_id) {
                             await tx("brief_industries")
                                 .insert({
                                     brief_id: ids[0],
@@ -569,9 +569,9 @@ export const insertFreelancerDetails = (
 
             .returning("id")
             .then(ids => {
-                if (skill_ids != undefined) {
+                if (skill_ids) {
                     skill_ids.forEach(async (skillId) => {
-                        if (skillId != undefined) {
+                        if (skillId) {
                             await tx("freelancer_skills")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -582,9 +582,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (language_ids != undefined) {
+                if (language_ids) {
                     language_ids.forEach(async (langId) => {
-                        if (langId != undefined) {
+                        if (langId) {
                             await tx("freelancer_languages")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -594,9 +594,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (client_ids != undefined) {
+                if (client_ids) {
                     client_ids.forEach(async (clientId) => {
-                        if (clientId != undefined) {
+                        if (clientId) {
                             await tx("freelancer_clients")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -606,9 +606,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (service_ids != undefined) {
+                if (service_ids) {
                     service_ids.forEach(async (serviceId) => {
-                        if (serviceId != undefined) {
+                        if (serviceId) {
                             await tx("freelancer_services")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -637,7 +637,8 @@ export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
             telegram_link: f.telegram_link,
             discord_link: f.discord_link,
             user_id: f.user_id
-        }).where(f.username).returning("id")        
+        })
+        .where({"user_id": userId}).returning("id")        
         //.then(async() => {
         //    //todo update many to many tables
         //})

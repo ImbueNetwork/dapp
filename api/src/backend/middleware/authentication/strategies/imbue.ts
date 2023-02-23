@@ -41,12 +41,13 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
     db.transaction(async tx => {
         try {
             const user = await models.fetchUserOrEmail(userOrEmail)(tx);
-
             if (!user) {
+                console.log("there")
                 return res.status(404).end();
             }
             const loginSuccessful = await bcrypt.compare(password, user.password)
             if (!loginSuccessful) {
+                console.log("here")
                 return res.status(404).end();
             }
 

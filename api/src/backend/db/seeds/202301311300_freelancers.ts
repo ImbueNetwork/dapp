@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import bcrypt from 'bcryptjs'
 
 export async function seed(knex: Knex): Promise<void> {
     let skills = [
@@ -45,13 +46,16 @@ export async function seed(knex: Knex): Promise<void> {
                     id = id + 1;
                     let rsmall =  Math.floor(Math.random() * (5));
                     let rbig =  Math.floor(Math.random() * (100000));
+
+                    const salt = bcrypt.genSaltSync(10);
+
                     // new user associated
                     await knex("users").insert(
                         [{
                             display_name: skills[a] + "_" + clients[b] + "_" + services[d] + rbig,
                             username: skills[a].replace(" ","_") + "_" + clients[b].replace(" ","_") + "_" + services[d].replace(" ","_") + rbig,
                             email: skills[a] + languages[c] + rbig + "@gmail.com",
-                            password: "testpassword",
+                            password: bcrypt.hashSync("testpassword", salt),
                         }]
                      ).then(async () => {
                          await knex("freelancers").insert({

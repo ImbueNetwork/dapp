@@ -70,7 +70,7 @@ async function authorise(
   });
 
   if (resp.ok) {
-    await utils.redirectBack();
+            await utils.redirectBack();
   } else {
     // TODO: UX for 401
   }
@@ -98,7 +98,7 @@ export const Login = ({ }: LoginProps): JSX.Element => {
     });
 
     if (resp.ok) {
-      await utils.redirectBack();
+            await utils.redirectBack();
     } else {
       setErrorMessage("incorrect username or password");
     }

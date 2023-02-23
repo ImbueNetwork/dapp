@@ -25,7 +25,7 @@ export const cookieExtractor = function(req: any) {
     return token;
 };
 
-function VerifyUserIdFromJwt(req: any, res: any, next: any) {
+export function verifyUserIdFromJwt(req: any, res: any, next: any) { (user_id: number) => {
     const token = req.cookies.access_token;
   
     if (!token) {
@@ -34,7 +34,7 @@ function VerifyUserIdFromJwt(req: any, res: any, next: any) {
   
     try {
       const decoded = jwt.verify(token, jwtOptions.secretOrKey);
-      if (req.user_id == decoded.id) {
+      if (user_id == decoded.id) {
         next();
       } else {
           return res.status(401).send("You are not authorized to access this resource.");
@@ -43,6 +43,7 @@ function VerifyUserIdFromJwt(req: any, res: any, next: any) {
       return res.status(401).send("Invalid token.");
     }
   }
+}
 
 export const jwtOptions = {
     jwtFromRequest: cookieExtractor,

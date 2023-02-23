@@ -60,5 +60,4 @@ server.on("listening", () => {
     const addr = server.address() as AddressInfo;
     console.log(`Service started on port ${addr.port}`);
 });
-
 server.listen(port);

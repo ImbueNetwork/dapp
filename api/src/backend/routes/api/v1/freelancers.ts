@@ -4,6 +4,7 @@ import * as models from "../../../models";
 import passport from "passport";
 import { upsertItems, fetchAllFreelancers, fetchItems, FreelancerSqlFilter, fetchFreelancerDetailsByUsername, updateFreelancerDetails, insertFreelancerDetails, searchFreelancers } from "../../../models";
 import { Freelancer } from "../../../models"
+import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.get("/", (req, res, next) => {
 });
 
 
-router.get("/:username", (req, res, next) => {
+router.get("/:username",(req, res, next) => {
     const username = req.params.username;
     db.transaction(async tx => {
         try {
@@ -57,8 +58,7 @@ router.get("/:username", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
-    // TODO VERIFY user is allowed to edit table
+router.post("/", verifyUserIdFromJwt, (req, res, next) => {
     const freelancer = req.body.freelancer as Freelancer;
 
     db.transaction(async tx => {
@@ -96,9 +96,7 @@ router.post("/", (req, res, next) => {
     });
 });
 
-router.put("/:username", (req, res, next) => {
-    // TODO VERIFY user is allowed to edit table
-    // Verification happens before we get here.
+router.put("/:username", verifyUserIdFromJwt, (req, res, next) => {
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
 

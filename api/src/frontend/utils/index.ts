@@ -11,8 +11,11 @@ export function redirect(path: string, returnUrl?: string) {
         let redirect = new URL(
             `${window.location.origin}/dapp/${path}?redirect=${returnUrl}`
         );
+        console.log("handlesubmit")
+
         window.location.replace(redirect);
     } else {
+        console.log("handlesubmit")
         let redirect = new URL(`${window.location.origin}/dapp/${path}`);
         redirect.search = window.location.search;
         window.location.replace(redirect);

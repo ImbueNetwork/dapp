@@ -301,6 +301,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         onClick={() =>
                                             this.setState({
                                                 ...this.state,
+                                                bioEdit: this.state.userInfo.freelancer.bio,
                                                 isEditingBio: false,
                                             })
                                         }

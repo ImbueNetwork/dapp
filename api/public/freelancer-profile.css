@@ -407,6 +407,50 @@ button:active {
     width: 100%;
 }
 
+.message-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background-color: white;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.message-form-container h3 {
+    margin-bottom: 16px;
+    color: black;
+}
+
+.message-form-container form label {
+    margin-bottom: 8px;
+    color: black;
+}
+
+.message-form-container form input,
+.message-form-container form textarea {
+    border: none;
+    background-color: #F7F7F7;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.message-form-container form textarea {
+    height: 200px;
+}
+
+.message-form-container form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+  
+
 @media (max-width: 767px) {
     .projects {
         display: flex;

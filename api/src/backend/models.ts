@@ -172,9 +172,10 @@ export const fetchUser = (id: number) =>
 
 export const fetchUserOrEmail = (userOrEmail: string) =>
     (tx: Knex.Transaction) =>
-        tx<User>("users").where({ username: userOrEmail.toLowerCase() })
+        tx<User>("users").where({ username: userOrEmail })
             .orWhere({ email: userOrEmail.toLowerCase() })
-            .first();
+            .first()
+            .debug(true);
 
 export const upsertWeb3Challenge = (
     user: User,

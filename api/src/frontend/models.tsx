@@ -124,6 +124,7 @@ export type Freelancer = {
     user_id: number;
     rating?: number;
     num_ratings: number;
+    profileImageUrl: string;
 };
 
 export type Item = {

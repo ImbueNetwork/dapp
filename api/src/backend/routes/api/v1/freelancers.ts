@@ -103,20 +103,18 @@ router.put("/:username", verifyUserIdFromJwt, (req, res, next) => {
     db.transaction(async tx => {
         try {
             // ensure the freelancer exists first
-            const freelancerDetails = await fetchFreelancerDetailsByUsername(username)(tx);
-
-            if (!freelancerDetails) {
-                return res.status(404).end();
-            }
-
-            const freelancer_id: Freelancer = await updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
-
-            if (!freelancer.id) {
+            // Is this needed? surely it will just fail as its an update.
+            const exists: Freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            console.log(freelancer);
+            if (!exists) {
                 return next(new Error(
-                    "Cannot update freelancer details: `id` missing."
+                    "Freelancer does not exist."
                 ));
             }
-            res.status(200).send(freelancer);
+            const fl_id = await models.updateFreelancerDetails(exists.user_id, freelancer)(tx);
+            const updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
+
+            res.status(200).send(updated_freelancer_details);
         } catch (cause) {
             next(new Error(
                 `Failed to update freelancer details.`,

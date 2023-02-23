@@ -389,9 +389,9 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
             experience_id: brief.experience_id,
         }).returning("briefs.id")
             .then(async (ids) => {
-                if (skill_ids != undefined) {
+                if (skill_ids) {
                     skill_ids.forEach(async (skillId) => {
-                        if (skillId != undefined) {
+                        if (skillId) {
                             await tx("brief_skills")
                                 .insert({
                                     brief_id: ids[0],
@@ -402,9 +402,9 @@ export const insertBrief = (brief: Brief, skill_ids: number[], industry_ids: num
                     })
                 }
 
-                if (industry_ids != undefined) {
+                if (industry_ids) {
                     industry_ids.forEach(async (industry_id) => {
-                        if (industry_id != undefined) {
+                        if (industry_id) {
                             await tx("brief_industries")
                                 .insert({
                                     brief_id: ids[0],
@@ -508,12 +508,14 @@ export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
         fetchAllFreelancers()(tx)
             .where({ user_id })
             .first()
+            .debug(false)
 
 export const fetchFreelancerDetailsByUsername = (username: string) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
             .where({ username: username })
             .first()
+            .debug(false)
 
 
 export const fetchAllFreelancers = () =>
@@ -602,9 +604,9 @@ export const insertFreelancerDetails = (
 
             .returning("id")
             .then(ids => {
-                if (skill_ids != undefined) {
+                if (skill_ids) {
                     skill_ids.forEach(async (skillId) => {
-                        if (skillId != undefined) {
+                        if (skillId) {
                             await tx("freelancer_skills")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -615,9 +617,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (language_ids != undefined) {
+                if (language_ids) {
                     language_ids.forEach(async (langId) => {
-                        if (langId != undefined) {
+                        if (langId) {
                             await tx("freelancer_languages")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -627,9 +629,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (client_ids != undefined) {
+                if (client_ids) {
                     client_ids.forEach(async (clientId) => {
-                        if (clientId != undefined) {
+                        if (clientId) {
                             await tx("freelancer_clients")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -639,9 +641,9 @@ export const insertFreelancerDetails = (
                     })
                 }
 
-                if (service_ids != undefined) {
+                if (service_ids) {
                     service_ids.forEach(async (serviceId) => {
-                        if (serviceId != undefined) {
+                        if (serviceId) {
                             await tx("freelancer_services")
                                 .insert({
                                     freelancer_id: ids[0],
@@ -654,11 +656,28 @@ export const insertFreelancerDetails = (
                 return ids[0]
             })
 
-// TODO.
-export const updateFreelancerDetails = (userId: number, freelancer: Freelancer) =>
+
+export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
     async (tx: Knex.Transaction) => (
-        await tx<Freelancer>("freelancers").update(freelancer).returning("*")
-    )[0];
+        await tx<Freelancer>("freelancers").update({
+            freelanced_before: f.freelanced_before.toString(),
+            freelancing_goal: f.freelancing_goal,
+            work_type: f.work_type,
+            education: f.education,
+            experience: f.experience,
+            title: f.title,
+            bio: f.bio,
+            facebook_link: f.facebook_link,
+            twitter_link: f.twitter_link,
+            telegram_link: f.telegram_link,
+            discord_link: f.discord_link,
+            user_id: f.user_id
+        })
+        .where({"user_id": userId}).returning("id")        
+        //.then(async() => {
+        //    //todo update many to many tables
+        //})
+)
 
 
 

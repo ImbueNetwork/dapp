@@ -60,7 +60,6 @@ export async function freelancerExists(username: string): Promise<boolean> {
 }
 
 export async function updateFreelancer(freelancer: Freelancer) {
-    // VALIDATION needed
     const resp =  await fetch(`${config.apiBase}/freelancers/${freelancer.username}`, {
         headers: postAPIHeaders,
         method: "put",

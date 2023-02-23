@@ -3,6 +3,7 @@ import db from "../../../db";
 import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
+import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
 
 const router = express.Router();
 
@@ -51,6 +52,8 @@ router.get("/:id", (req, res, next) => {
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         const brief: Brief = req.body as Brief;
+        verifyUserIdFromJwt(req, res, next, brief.user_id)
+
         try {
             const skill_ids = await upsertItems(brief.skills, "skills")(tx);
             const industry_ids = await upsertItems(brief.industries, "industries")(tx);

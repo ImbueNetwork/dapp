@@ -58,11 +58,13 @@ router.get("/:username",(req, res, next) => {
     });
 });
 
-router.post("/", verifyUserIdFromJwt, (req, res, next) => {
+router.post("/", (req, res, next) => {
     const freelancer = req.body.freelancer as Freelancer;
+    verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
     db.transaction(async tx => {
         try {
+
             const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
             const language_ids = await upsertItems(freelancer.languages, "languages")(tx);
             const services_ids = await upsertItems(freelancer.services, "services")(tx);
@@ -96,14 +98,13 @@ router.post("/", verifyUserIdFromJwt, (req, res, next) => {
     });
 });
 
-router.put("/:username", verifyUserIdFromJwt, (req, res, next) => {
+router.put("/:username", (req, res, next) => {
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
+    verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
     db.transaction(async tx => {
         try {
-            // ensure the freelancer exists first
-            // Is this needed? surely it will just fail as its an update.
             const exists: Freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
             console.log(freelancer);
             if (!exists) {

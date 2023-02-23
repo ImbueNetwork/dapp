@@ -98,17 +98,24 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         let freelancer = this.state.userInfo.freelancer;
         let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
         freelancer.bio = input.textContent || "";
-        let updated_freelancer = await updateFreelancer(
-            freelancer
-        );
-        this.setState({
-            userInfo: {
-                ...this.state.userInfo,
-                freelancer: updated_freelancer,
-            },
-            isEditingBio: false,
-            bioEdit: freelancer.bio 
-        });
+        try {
+            let updated_freelancer = await updateFreelancer(
+                freelancer
+            );
+            this.setState({
+                userInfo: {
+                    ...this.state.userInfo,
+                    freelancer: updated_freelancer,
+                },
+                isEditingBio: false,
+                bioEdit: freelancer.bio 
+            });    
+
+        } catch (error) {
+            console.log(error);
+        }
+        
+        
     };
 
     constructor(props) {

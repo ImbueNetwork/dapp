@@ -1,6 +1,8 @@
 import { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
+    await knex("brief_skills").del();
+    await knex("brief_industries").del();
     await knex("briefs").del();
     await knex("freelancer_services").del();
     await knex("freelancer_clients").del();

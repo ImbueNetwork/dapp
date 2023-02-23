@@ -44,11 +44,11 @@ export async function seed(knex: Knex): Promise<void> {
                 for (let d = 1; d < services.length; d++) {
                     id = id + 1;
                     let rsmall =  Math.floor(Math.random() * (5));
-                    let rbig =  Math.floor(Math.random() * (10000));
+                    let rbig =  Math.floor(Math.random() * (100000));
                     // new user associated
                     await knex("users").insert(
                         [{
-                            display_name: skills[a] + "_" + clients[b] + "_" + services[d],
+                            display_name: skills[a] + "_" + clients[b] + "_" + services[d] + rbig,
                             username: skills[a].replace(" ","_") + "_" + clients[b].replace(" ","_") + "_" + services[d].replace(" ","_") + rbig,
                             email: skills[a] + languages[c] + rbig + "@gmail.com",
                             password: "testpassword",
@@ -73,7 +73,6 @@ export async function seed(knex: Knex): Promise<void> {
                                      await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: a})
                                      await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: b})
                                      await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: c})
-                                     await knex("freelancer_skills").insert({ freelancer_id: id, skill_id: d})
                                      await knex("freelancer_clients").insert({freelancer_id: id, client_id: b})
                                      await knex("freelancer_languages").insert({freelancer_id: id,language_id: c})
                                      await knex("freelancer_services").insert({freelancer_id: id, service_id: d})

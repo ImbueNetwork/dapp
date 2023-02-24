@@ -4,7 +4,9 @@ import * as models from "../../../models";
 import passport from "passport";
 import { upsertItems, fetchAllFreelancers, fetchItems, FreelancerSqlFilter, fetchFreelancerDetailsByUsername, updateFreelancerDetails, insertFreelancerDetails, searchFreelancers } from "../../../models";
 import { Freelancer } from "../../../models"
+// import the history module
 
+// create a new history object
 const router = express.Router();
 
 router.get("/", (req, res, next) => {

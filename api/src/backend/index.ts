@@ -14,7 +14,7 @@ import authenticationMiddleware from "./middleware/authentication";
 import v1routes from "./routes/api/v1";
 import webRoutes from "./routes/web";
 import path from "path";
-import { createBrowserHistory } from "history";
+//import { createBrowserHistory } from "history";
 
 declare global {
     interface ErrorConstructor {
@@ -55,14 +55,14 @@ app.get("/", (req, res) => {
 // uncaught error
 app.use(errorHandler(environment));
 
-const history = createBrowserHistory();
+//const history = createBrowserHistory();
 
-history.listen(({ action, location }) => {
-    console.log(
-      `The current URL is ${location.pathname}${location.search}${location.hash}`
-    );
-    console.log(`The last navigation action was ${action}`);
-  });
+//history.listen(({ action, location }) => {
+//    //console.log(
+//    //  `The current URL is ${location.pathname}${location.search}${location.hash}`
+//    //);
+//    //console.log(`The last navigation action was ${action}`);
+//  });
 
 const server = http.createServer(app);
 

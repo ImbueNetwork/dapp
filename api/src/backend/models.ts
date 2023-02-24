@@ -215,10 +215,11 @@ export const upsertWeb3Challenge = (
         ];
     };
 
-export const insertUserByDisplayName = (displayName: string) =>
+export const insertUserByDisplayName = (displayName: string,userName: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
-            display_name: displayName
+            display_name: displayName,
+            username: userName
         }).returning("*")
     )[0];
 
@@ -478,7 +479,7 @@ export const getOrCreateFederatedUser = (
              * If not, create the `usr`, then the `federated_credential`
              */
             if (!federated) {
-                user = await insertUserByDisplayName(displayName)(tx);
+                user = await insertUserByDisplayName(displayName,subject)(tx);
                 await insertFederatedCredential(user.id, issuer, subject)(tx);
             } else {
                 const user_ = await db.select().from<User>("users").where({

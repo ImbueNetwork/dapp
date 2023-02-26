@@ -14,6 +14,7 @@ module.exports = {
         "freelancers": path.resolve(__dirname, "pages", "freelancer", "index.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
+        "submit-proposal": path.resolve(__dirname, "pages", "briefs", "submit.tsx"),
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

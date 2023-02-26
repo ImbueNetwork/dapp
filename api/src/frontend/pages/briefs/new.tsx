@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Option } from "../../components/option";
@@ -16,7 +15,6 @@ import {
     suggestedSkills,
 } from "../../config/briefs-data";
 import * as config from "../../config";
-import { User } from "../../models";
 import "../../../../public/new-brief.css";
 
 const getAPIHeaders = {
@@ -158,7 +156,6 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     label={label}
                     value={value}
                     key={index}
-
                     checked={scopeId === value}
                     onSelect={() => setScopeId(value)}
                 >
@@ -183,7 +180,6 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
                     key={index}
                     checked={durationId === value}
                     onSelect={() => setDurationId(value)}
-
                 />
             ))}
         </div>
@@ -248,7 +244,6 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
             return false;
         }
         if (step === 6 && durationId === undefined) {
-
             return false;
         }
         if (step === 7 && !budget) {
@@ -263,15 +258,24 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
         const resp = await fetch(`${config.apiBase}/briefs/`, {
             headers: postAPIHeaders,
             method: "post",
-            body: JSON.stringify({ headline, industries, description, scope_id: scopeId, experience_id: expId, duration_id: durationId, skills, budget, user_id }),
+            body: JSON.stringify({
+                headline,
+                industries,
+                description,
+                scope_id: scopeId,
+                experience_id: expId,
+                duration_id: durationId,
+                skills,
+                budget,
+                user_id,
+            }),
         });
 
         if (resp.ok) {
             // could be 200 or 201
             // Brief API successfully invoked
             console.log("Brief created successfully via Brief REST API");
-        }
-        else {
+        } else {
             console.log("Failed to submit the brief");
         }
         setStep(step + 1);
@@ -281,22 +285,15 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
         <div className="brief-details-container">
             <div className="left-panel">
                 <ProgressBar
-                    titleArray={[
-                        "Description",
-                        "Skills",
-                        "Scope",
-                        "Budget",
-                    ]}
+                    titleArray={["Description", "Skills", "Scope", "Budget"]}
                     currentValue={stepData[step].progress}
                 />
                 <h1 className="heading">{stepData[step].heading}</h1>
-                {stepData[step].content
-                    .split("\n")
-                    .map((content, index) => (
-                        <p className="help" key={index}>
-                            {content}
-                        </p>
-                    ))}
+                {stepData[step].content.split("\n").map((content, index) => (
+                    <p className="help" key={index}>
+                        {content}
+                    </p>
+                ))}
             </div>
             <div className="right-panel">
                 <div className="contents">{panels[step] ?? <></>}</div>
@@ -340,7 +337,6 @@ export const NewBrief = (props: BriefProps): JSX.Element => {
             </div>
         </div>
     );
-
 };
 
 document.addEventListener("DOMContentLoaded", async (event) => {

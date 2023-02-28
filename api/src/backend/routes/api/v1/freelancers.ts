@@ -4,7 +4,7 @@ import * as models from "../../../models";
 import passport from "passport";
 import { upsertItems, fetchAllFreelancers, fetchItems, FreelancerSqlFilter, fetchFreelancerDetailsByUsername, updateFreelancerDetails, insertFreelancerDetails, searchFreelancers } from "../../../models";
 import { Freelancer } from "../../../models"
-import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
+import { validateUserFromJwt, verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common";
 
 const router = express.Router();
 
@@ -35,9 +35,12 @@ router.get("/", (req, res, next) => {
 
 router.get("/:username",(req, res, next) => {
     const username = req.params.username;
+
     db.transaction(async tx => {
         try {
             const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+
+
             await Promise.all([
                 freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx),
                 freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx),
@@ -48,6 +51,15 @@ router.get("/:username",(req, res, next) => {
             if (!freelancer) {
                 return res.status(404).end();
             }
+
+                if(validateUserFromJwt(req, res, next, freelancer.user_id))
+                { res.cookie("isUser",true)
+                 }
+            else
+            {
+                res.cookie("isUser",false)
+            }
+
             res.send(freelancer);
         } catch (e) {
             next(new Error(

@@ -44,6 +44,25 @@ export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: numb
     }
   }
 
+export function validateUserFromJwt(req: any, res: any, next: any, user_id: number) {
+    const token = req.cookies.access_token;
+    if (!token) {
+        return false;
+    }
+
+    try {
+        const decoded = jwt.verify(token, jwtOptions.secretOrKey);
+        console.log(decoded);
+        if (user_id == decoded.id) {
+           return true
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
 
 export const jwtOptions = {
     jwtFromRequest: cookieExtractor,

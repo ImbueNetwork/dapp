@@ -59,6 +59,7 @@ const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
 
+
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         // Send the message to the backend
@@ -94,6 +95,7 @@ const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
   
 
 export class Profile extends React.Component<ProfileProps, ProfileState> {
+
     onSaveBio = async() => {
         let freelancer = this.state.userInfo.freelancer;
         let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
@@ -117,6 +119,8 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         
         
     };
+
+
 
     constructor(props) {
         super(props);
@@ -164,6 +168,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         let username = window.location.pathname.split('/').pop();
         const freelancer = await getFreelancerProfile(username || "");
 
+
         if (freelancer) {
             if (freelancer.profileImageUrl == undefined || "") {
                 freelancer.profileImageUrl = "/public/profile-image.png";
@@ -192,8 +197,20 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         });
     }
 
+
+
     render() {
         const { userInfo } = this.state;
+
+        function getCookie() {
+            const isUser = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("isUser="))
+                ?.split("=")[1];
+            if(isUser === "false")
+                return false;
+            return true;
+        }
 
         return (
             <div className="profile-container">
@@ -257,11 +274,11 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                             </div>
                         </div>
                     </div>
-                    <div className="section about">
+                     <div className="section about">
                         <div className="header-editable">
                             <h5>About</h5>
-                            {!this.state.isEditingBio && (
-                                <div
+                            {!this.state.isEditingBio &&  (
+                                 <div style={{display: getCookie()  ? 'block' : 'none'}}
                                     className="edit-icon"
                                     onClick={() =>
                                         this.setState({
@@ -270,8 +287,7 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                             bioEdit: userInfo.freelancer.bio,
                                         })
                                     }
-                                >
-                                    <FiEdit />
+                                ><FiEdit />
                                 </div>
                             )}
                         </div>

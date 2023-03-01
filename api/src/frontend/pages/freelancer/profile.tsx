@@ -58,39 +58,46 @@ type MessageFormProps = {
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
+<<<<<<< HEAD
 
 
+=======
+  
+>>>>>>> 311dfc51ecf3393387887de0cb49cc26190ca2a0
     const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        // Send the message to the backend
-        // ...
-        // Close the pop-up box
-        onClose();
+      event.preventDefault();
+      // Send the message to the backend
+      // ...
+      // Close the pop-up box
+      onClose();
     }
-
+  
     return (
-        <div className="message-form-container">
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="subject">Subject</label>
-                <input
-                    type="text"
-                    id="subject"
-                    value={subject}
-                    onChange={(event) => setSubject(event.target.value)}
-                    style={{ marginBottom: '10px' }} 
-                />
-                <label htmlFor="body">Message</label>
-                <textarea
-                    id="body"
-                    value={body}
-                    onChange={(event) => setBody(event.target.value)}
-                    style={{ marginBottom: '20px' }} 
-                />
-                <button type="submit" value="submit" style={{ marginTop: '10px' }}>Submit</button> 
-            </form> 
-        </div>
+      <div className="message-form-container">
+        <h3>New Message</h3>
+        <form onSubmit={handleSubmit} className="message-form">
+          <label htmlFor="subject">Subject</label>
+          <input
+            type="text"
+            id="subject"
+            value={subject}
+            onChange={(event) => setSubject(event.target.value)}
+            className="message-form-input"
+          />
+          <label htmlFor="body">Message</label>
+          <textarea
+            id="body"
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            className="message-form-textarea"
+          />
+          <button type="submit" className="message-form-submit-button">Send</button>
+        </form>
+      </div>
     );
 };
+  
+  
 
   
 

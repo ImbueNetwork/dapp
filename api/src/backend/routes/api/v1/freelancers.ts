@@ -52,11 +52,10 @@ router.get("/:username",(req, res, next) => {
                 return res.status(404).end();
             }
 
-                if(validateUserFromJwt(req, res, next, freelancer.user_id))
-                { res.cookie("isUser",true)
-                 }
-            else
-            {
+            // Used to show/hide edit buttons if the correct user.
+            if (validateUserFromJwt(req, res, next, freelancer.user_id)) {
+                res.cookie("isUser",true)
+            } else {
                 res.cookie("isUser",false)
             }
 

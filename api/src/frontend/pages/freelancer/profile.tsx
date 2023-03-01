@@ -58,12 +58,7 @@ type MessageFormProps = {
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
-<<<<<<< HEAD
-
-
-=======
   
->>>>>>> 311dfc51ecf3393387887de0cb49cc26190ca2a0
     const handleSubmit = (event: React.FormEvent) => {
       event.preventDefault();
       // Send the message to the backend

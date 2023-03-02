@@ -1,7 +1,7 @@
 .application-container {
     display: flex;
     flex-direction: column;
-    gap: 80px;
+    gap: 2.5rem;
     font-size: 16px;
     line-height: 1.5;
 }
@@ -101,7 +101,7 @@
 .milestone-row {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: flex-start;
     width: 100%;
 }
 
@@ -112,18 +112,27 @@
 .input-wrappers {
     display: flex;
     flex-direction: row;
-    gap: 80px;
-    flex-grow: 1;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.value-input {
+.input-wrappers h3 {
+    margin-bottom: 1.25rem;
+}
+
+.description-wrapper {
+    width: 50%;
+}
+
+.budget-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 65%;
+    width: 30%;
 }
 
-input {
+input,
+textarea,
+select {
     background: var(--theme-background);
     border: 1px solid var(--theme-white);
     border-radius: 5px;
@@ -131,6 +140,10 @@ input {
     font-size: 16px;
     line-height: 20px;
     padding: 10px 4px;
+}
+
+.input-description {
+    height: 8rem;
 }
 
 .value-input .input-budget {
@@ -142,11 +155,28 @@ input {
     content: "$";
 }
 
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: auto;
+    gap: 8px;
+}
+
+.progress-value {
+    color: var(--theme-light-grey);
+    border: 1px solid var(--theme-white);
+    border-radius: 5px;
+    background: var(--theme-background);
+    padding: 6px;
+    width: min-content;
+    user-select: none;
+}
+
 .progress-bar {
-    flex-grow: 1;
-    margin-left: 40px;
     background: var(--theme-white);
     border-radius: 10px;
+    width: 80%;
     height: 10px;
     position: relative;
 }
@@ -217,21 +247,11 @@ input {
 
 .buttons-container {
     display: flex;
-    flex-direction: column;
-    gap: 64px;
-    border: 1px dashed #baff36;
-    background: transparent;
+    flex-direction: row;
+    gap: 1rem;
 }
 
-.btn-submit {
-    display: flex;
-    background: var(--theme-grey-dark);
-    border: 1px solid var(--theme-white);
-    border-radius: 20px;
-    width: 100%;
-    height: 200px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
+.section .section-title {
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSXElementConstructor, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import "../../../../public/submit-proposal.css";
 import { RiShieldUserLine } from "react-icons/ri";
@@ -7,13 +7,28 @@ import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import { Milestones } from "../../components/milestones";
+import * as config from "../../config";
+import { Brief } from "../../models";
+import { getBrief } from "../../services/briefsService";
 
 interface MilestoneItem {
     description: string;
     amount: number | undefined;
 }
 
-export const SubmitProposal = () => {
+export type BriefProps = {
+    brief: Brief;
+};
+
+export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
+    const [headline, setHeadline] = useState(brief.headline);
+    const [description, setDescription] = useState(brief.description);
+    const [budget, setDBudget] = useState(brief.budget);
+    const [logo, setLogo] = useState("test");
+    const [website, setWebsite] = useState("test2");
+    const [category, setCategory] = useState("finance");
+    const [currency_id, setCurrencyId] = useState("DOT");
+    const [owner, setOwner] = useState("Hari");
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
         { description: "", amount: undefined },
     ]);
@@ -48,6 +63,43 @@ export const SubmitProposal = () => {
 
     const onAddMilestone = () => {
         setMilestones([...milestones, { description: "", amount: undefined }]);
+    };
+
+    const getAPIHeaders = {
+        accept: "application/json",
+    };
+    
+    const postAPIHeaders = {
+        ...getAPIHeaders,
+        "content-type": "application/json",
+    };
+
+    async function insertProject () {
+
+        const resp = await fetch(`${config.apiBase}/projects/`, {
+            headers: postAPIHeaders,
+            method: "post",
+            body: JSON.stringify({
+                headline,
+                logo,
+                description,
+                website,
+                category,
+                budget,
+                currency_id,
+                owner,
+                milestones,
+            }),
+        });
+
+        if (resp.ok) {
+            // could be 200 or 201
+            // Brief API successfully invoked
+            console.log("Brief created successfully via Brief REST API");
+        } else {
+            console.log("Failed to submit the brief");
+        }
+
     };
 
     return (
@@ -282,14 +334,26 @@ export const SubmitProposal = () => {
                 </div>
             </div>
             <div className="buttons-container">
-                <button className="primary-btn in-dark w-button">Submit</button>
+            <button
+                            className="primary-btn in-dark w-button"
+                            onClick={() => insertProject()}
+                        >
+                            Submit
+                        </button>
                 <button className="secondary-btn">Save draft</button>
             </div>
         </div>
     );
 };
 document.addEventListener("DOMContentLoaded", async (event) => {
-    ReactDOMClient.createRoot(
-        document.getElementById("submit-proposal")!
-    ).render(<SubmitProposal />);
+    let briefId = window.location.pathname.split("/").pop();
+
+    if (briefId) {
+        const brief: Brief = await getBrief(briefId);
+        console.log(brief);
+        ReactDOMClient.createRoot(
+            document.getElementById("submit-proposal")!
+        ).render(<SubmitProposal brief={brief} />);
+    }
+
 });

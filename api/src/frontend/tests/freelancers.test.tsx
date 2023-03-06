@@ -4,11 +4,9 @@ import { User } from "../models";
 describe('freelancer', () => {
     it('test the freelancer component', () => {
 
-        const userInfo: User = {"id":1,"username":"test","display_name":"test","password":"test","web3Accounts":[]};
+        const userInfo = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [] };
 
-        let freelancer: JSX.Element;
-        const freelancerProps= {user: userInfo};
-        freelancer = Freelancers(freelancerProps);
+        const freelancer = Freelancers({user: userInfo});
         expect(freelancer).toBeTruthy();
     });
 });

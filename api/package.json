@@ -6,6 +6,9 @@
   "repository": "git@github.com:ImbueNetwork/dapp.git",
   "author": "Tom Brennan <tjb1982@gmail.com>",
   "license": "MIT",
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
   "scripts": {
     "test": "jest",
     "start": "NODE_ENV=development webpack watch --config ./src/frontend/webpack.config.js --mode development & NODE_ENV=development webpack watch --config ./src/legacy/webpack.config.js --mode development & TS_NODE_PROJECT=./src/backend/tsconfig.json nodemon -L --watch src/backend --ext 'js,ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register src/backend/index.ts'",
@@ -46,6 +49,7 @@
     "express": "^5.0.0-alpha.8",
     "express-session": "^1.17.2",
     "javascript-time-ago": "^2.5.9",
+    "jest-environment-jsdom": "^29.5.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.15",
     "marked": "^4.0.10",
@@ -56,6 +60,7 @@
     "passport-jwt": "^4.0.0",
     "passport-openidconnect": "^0.1.1",
     "pg": "^8.7.1",
+    "preset-env": "^8.0.11",
     "pug": "^3.0.2",
     "react": "^18.3.0-next-4fcc9184a-20230217",
     "react-country-flag": "^3.0.2",
@@ -69,6 +74,8 @@
     "uuidv4": "^6.2.12"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
     "@testing-library/react": "^14.0.0",
     "@types/bcryptjs": "^2.4.2",

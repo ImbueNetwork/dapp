@@ -4,8 +4,8 @@ import { Brief } from "../../models";
 import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
 import "../../../../public/freelancer-profile.css";
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
@@ -13,33 +13,37 @@ import { HiUserGroup } from "react-icons/hi";
 export type BriefProps = {
     brief: Brief;
 };
-TimeAgo.addDefaultLocale(en)
+TimeAgo.addDefaultLocale(en);
 
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
-    const timeAgo = new TimeAgo('en-US');
+    const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
-    
+
     const BioPanel = (
         <div className="brief-bio">
             <div className="subsection">
                 <div className="header">
                     <h3>{brief.headline}</h3>
                 </div>
-                <span className="time_posted">Posted {timePosted} by {brief.created_by}</span>
+                <span className="time_posted">
+                    Posted {timePosted} by {brief.created_by}
+                </span>
             </div>
 
-            { /* TODO: Do we use same styles for both buttons? */}
+            {/* TODO: Do we use same styles for both buttons? */}
             <div className="subsection">
                 <div className="action-buttons">
-                    <button className="primary-btn in-dark w-button">Apply</button>
-                    <button className="primary-btn in-dark w-button">Save</button>
+                    <button className="primary-btn in-dark w-button">
+                        Apply
+                    </button>
+                    <button className="primary-btn in-dark w-button">
+                        Save
+                    </button>
                 </div>
             </div>
             <div className="subsection">
                 <h3>Project Description</h3>
-                <p>
-                    {brief.description}
-                </p>
+                <p>{brief.description}</p>
             </div>
 
             <div className="subsection">
@@ -47,16 +51,11 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     <h3>Project Category</h3>
                 </div>
                 <div className="skills">
-                    {brief.skills?.map(
-                        (skill, index) => (
-                            <p
-                                className="skill"
-                                key={index}
-                            >
-                                {skill.name}
-                            </p>
-                        )
-                    )}
+                    {brief.skills?.map((skill, index) => (
+                        <p className="skill" key={index}>
+                            {skill.name}
+                        </p>
+                    ))}
                 </div>
             </div>
 
@@ -74,11 +73,26 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                 <ul>
                     {/* TODO: better have a field in brief object? */}
                     {/* FIXME: missing {key} */}
-                    <li>Create user interface designs for desktop based applications and cloud services for a technical audience.</li>
+                    <li>
+                        Create user interface designs for desktop based
+                        applications and cloud services for a technical
+                        audience.
+                    </li>
                     <li>Develop design prototypes for testing with users.</li>
-                    <li>Work with Product and Engineering to create new products or improve existing products based on user research and customer feedback.</li>
-                    <li>Conduct usability surveys and research to identify areas of improvement for existing products or new product ideas.</li>
-                    <li>Collaborate with engineering to ensure designs can be effectively implemented in code.</li>
+                    <li>
+                        Work with Product and Engineering to create new products
+                        or improve existing products based on user research and
+                        customer feedback.
+                    </li>
+                    <li>
+                        Conduct usability surveys and research to identify areas
+                        of improvement for existing products or new product
+                        ideas.
+                    </li>
+                    <li>
+                        Collaborate with engineering to ensure designs can be
+                        effectively implemented in code.
+                    </li>
                 </ul>
             </div>
 
@@ -102,39 +116,37 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                 </div>
                 <span>{brief.duration}</span>
             </div>
-
         </div>
     );
 
     const BioInsights = (
         <div className="brief-insights">
-            <div className="subsection">
-                <div className="brief-insights-stat">
-                    <h3>Brief Insights</h3>
-                </div>
+            <div className="brief-insights-stat">
+                <h3>Brief Insights</h3>
             </div>
 
-            <div className="subsection">
-                <div className="brief-insights-stat">
-                    <FaHandshake className="brief-insight-icon" />
-                    <h3> <span>{brief.number_of_briefs_submitted}</span> projects posted</h3>
-                </div>
+            <div className="brief-insights-stat">
+                <FaHandshake className="brief-insight-icon" />
+                <h3>
+                    {" "}
+                    <span>{brief.number_of_briefs_submitted}</span> projects
+                    posted
+                </h3>
             </div>
 
-            <div className="subsection">
-                <div className="brief-insights-stat">
-                    <IoMdWallet className="brief-insight-icon" />
-                    <h3>Total Spent <span>$250,000</span></h3>
-                </div>
+            <div className="brief-insights-stat">
+                <IoMdWallet className="brief-insight-icon" />
+                <h3>
+                    Total Spent <span>$250,000</span>
+                </h3>
             </div>
 
-            <div className="subsection">
-                <div className="brief-insights-stat">
-                    <HiUserGroup className="brief-insight-icon" />
-                    <h3>Applications: <span>10-20</span> </h3>
-                </div>
+            <div className="brief-insights-stat">
+                <HiUserGroup className="brief-insight-icon" />
+                <h3>
+                    Applications: <span>10-20</span>{" "}
+                </h3>
             </div>
-
         </div>
     );
 
@@ -148,25 +160,40 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             <div className="similar-brief">
                 <div className="similar-brief-details">
                     <p>NFT Minting</p>
-                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                    <span>
+                        Hi guys, I have an NFT I would like to design. The NFT
+                        has to have a picture of......
+                    </span>
                 </div>
-                <button className="primary-btn in-dark w-button">View Brief</button>
+                <button className="primary-btn in-dark w-button">
+                    View Brief
+                </button>
             </div>
 
             <div className="similar-brief">
                 <div className="similar-brief-details">
                     <p>NFT Minting</p>
-                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                    <span>
+                        Hi guys, I have an NFT I would like to design. The NFT
+                        has to have a picture of......
+                    </span>
                 </div>
-                <button className="primary-btn in-dark w-button">View Brief</button>
+                <button className="primary-btn in-dark w-button">
+                    View Brief
+                </button>
             </div>
 
             <div className="similar-brief">
                 <div className="similar-brief-details">
                     <p>NFT Minting</p>
-                    <span>Hi guys, I have an NFT I would like to design. The NFT has to have a picture of......</span>
+                    <span>
+                        Hi guys, I have an NFT I would like to design. The NFT
+                        has to have a picture of......
+                    </span>
                 </div>
-                <button className="primary-btn in-dark w-button">View Brief</button>
+                <button className="primary-btn in-dark w-button">
+                    View Brief
+                </button>
             </div>
         </div>
     );
@@ -181,10 +208,8 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     );
 };
 
-
-
 document.addEventListener("DOMContentLoaded", async (event) => {
-    let briefId = window.location.pathname.split('/').pop();
+    let briefId = window.location.pathname.split("/").pop();
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);

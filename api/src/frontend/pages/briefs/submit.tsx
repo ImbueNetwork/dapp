@@ -68,14 +68,13 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
     const getAPIHeaders = {
         accept: "application/json",
     };
-    
+
     const postAPIHeaders = {
         ...getAPIHeaders,
         "content-type": "application/json",
     };
 
-    async function insertProject () {
-
+    async function insertProject() {
         const resp = await fetch(`${config.apiBase}/projects/`, {
             headers: postAPIHeaders,
             method: "post",
@@ -99,8 +98,7 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
         } else {
             console.log("Failed to submit the brief");
         }
-
-    };
+    }
 
     return (
         <div className="application-container">
@@ -334,19 +332,20 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                 </div>
             </div>
             <div className="buttons-container">
-            <button
-                            className="primary-btn in-dark w-button"
-                            onClick={() => insertProject()}
-                        >
-                            Submit
-                        </button>
+                <button
+                    className="primary-btn in-dark w-button"
+                    onClick={() => insertProject()}
+                >
+                    Submit
+                </button>
                 <button className="secondary-btn">Save draft</button>
             </div>
         </div>
     );
 };
 document.addEventListener("DOMContentLoaded", async (event) => {
-    let briefId = window.location.pathname.split("/").pop();
+    let paths = window.location.pathname.split("/");
+    let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
@@ -355,5 +354,4 @@ document.addEventListener("DOMContentLoaded", async (event) => {
             document.getElementById("submit-proposal")!
         ).render(<SubmitProposal brief={brief} />);
     }
-
 });

@@ -154,7 +154,7 @@ export const Briefs = (): JSX.Element => {
 
     const redirectToBrief = (id) => {
         redirect(`briefs/${id}`);
-    }
+    };
 
     // Here we have to get all the checked boxes and try and construct a query out of it...
     const onSearch = async () => {
@@ -185,7 +185,6 @@ export const Briefs = (): JSX.Element => {
         }
 
         for (let i = 0; i < elements.length; i++) {
-
             if (elements[i].checked) {
                 is_search = true;
                 const id = elements[i].getAttribute("id");
@@ -204,7 +203,7 @@ export const Briefs = (): JSX.Element => {
                         case BriefFilterOption.AmountSubmitted:
                             const o1 =
                                 submittedFilters.options[
-                                parseInt(interiorIndex)
+                                    parseInt(interiorIndex)
                                 ];
                             submitted_range = [
                                 ...submitted_range,
@@ -215,9 +214,7 @@ export const Briefs = (): JSX.Element => {
 
                         case BriefFilterOption.Length:
                             const o2 =
-                                lengthFilters.options[
-                                parseInt(interiorIndex)
-                                ];
+                                lengthFilters.options[parseInt(interiorIndex)];
                             length_range = [
                                 ...length_range,
                                 ...o2.search_for.slice(),
@@ -225,11 +222,10 @@ export const Briefs = (): JSX.Element => {
                             length_is_max = o2.or_max;
                             break;
 
-
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
-                                filterType
+                                    filterType
                             );
                     }
                 }
@@ -254,7 +250,7 @@ export const Briefs = (): JSX.Element => {
         }
     };
 
-    const onSavedBriefs = () => { };
+    const onSavedBriefs = () => {};
 
     return (
         <div className="search-briefs-container">
@@ -282,10 +278,7 @@ export const Briefs = (): JSX.Element => {
                         <div className="tab-item" onClick={onSearch}>
                             Search
                         </div>
-                        <div
-                            className="tab-item"
-                            onClick={onSavedBriefs}
-                        >
+                        <div className="tab-item" onClick={onSavedBriefs}>
                             Saved Briefs
                         </div>
                     </div>
@@ -295,18 +288,18 @@ export const Briefs = (): JSX.Element => {
                         placeholder="Search"
                     />
                     <div className="search-result">
-                        <span className="result-count">
-                            {briefs.length}
-                        </span>
+                        <span className="result-count">{briefs.length}</span>
                         <span> briefs found</span>
                     </div>
                 </div>
                 <div className="briefs-list">
                     {briefs.map((item, itemIndex) => (
-                        <div className="brief-item" key={itemIndex} onClick={() => redirectToBrief(item.id)}>
-                            <div className="brief-title">
-                                {item.headline}
-                            </div>
+                        <div
+                            className="brief-item"
+                            key={itemIndex}
+                            onClick={() => redirectToBrief(item.id)}
+                        >
+                            <div className="brief-title">{item.headline}</div>
                             <div className="brief-time-info">
                                 {`${item.experience_level}, ${item.duration}, Posted by ${item.created_by}`}
                             </div>
@@ -341,7 +334,7 @@ export const Briefs = (): JSX.Element => {
             </div>
         </div>
     );
-}
+};
 
 document.addEventListener("DOMContentLoaded", (event) => {
     ReactDOMClient.createRoot(document.getElementById("briefs")!).render(

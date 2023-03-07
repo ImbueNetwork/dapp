@@ -61,6 +61,10 @@ router.get("/briefs/:id/apply", (req, res) => {
     res.render("submit-proposal");
 });
 
+router.get("/briefs/:id/applications", (req, res) => {
+    res.render("brief-applications");
+});
+
 router.get("/join", (req, res) => {
     res.render("join");
 });

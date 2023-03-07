@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import "../../../../public/submit-proposal.css";
 import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
@@ -8,6 +7,7 @@ import * as config from "../../config";
 import { Brief } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
+import "../../../../public/submit-proposal.css";
 
 interface MilestoneItem {
     description: string;

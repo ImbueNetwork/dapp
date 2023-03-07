@@ -1,0 +1,131 @@
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    line-height: 1.5;
+    gap: 3rem;
+}
+
+h3 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+}
+
+.section .section-title {
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.applicants-list {
+}
+
+.applicant-wrapper {
+    display: flex;
+    flex-direction: row;
+    padding: 60px 120px 100px 60px;
+    background: var(--theme-grey-dark);
+    border: 1px solid var(--theme-imbue-white);
+    border-bottom: none;
+    gap: 50px;
+}
+.applicant-wrapper:first-child {
+    border-radius: 20px 20px 0 0;
+}
+
+.applicant-wrapper:last-child {
+    border-bottom: 1px solid var(--theme-imbue-white);
+    border-radius: 0 0 20px 20px;
+}
+
+.freelancer-profile-pic {
+    width: 45px;
+    height: 45px;
+}
+
+.application-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.freelancer-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.text-primary {
+    color: #baff36;
+}
+
+.text-small {
+    font-size: 16px;
+}
+
+.text-grey {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.freelancer-info .user-id {
+    width: 160px;
+}
+
+.freelancer-info .country {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.country .country-flag {
+}
+
+.country .country-name {
+    font-size: 16px;
+}
+
+.select-freelancer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.freelancer-title {
+    font-weight: 700;
+    color: var(--theme-imbue-white);
+    flex-grow: 1;
+}
+
+.freelancer-earn {
+    margin-right: 20px;
+}
+
+.ctas-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.cta-votes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.cta-vote {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
+
+.ctas-container button {
+    margin: 0;
+}

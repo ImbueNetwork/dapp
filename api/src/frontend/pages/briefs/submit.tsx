@@ -1,15 +1,13 @@
-import React, { JSXElementConstructor, useState } from "react";
+import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import "../../../../public/submit-proposal.css";
-import { RiShieldUserLine } from "react-icons/ri";
-import { FaDollarSign, FaRegCalendarAlt } from "react-icons/fa";
 import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
-import { Milestones } from "../../components/milestones";
 import * as config from "../../config";
 import { Brief } from "../../models";
 import { getBrief } from "../../services/briefsService";
+import { BriefInsights } from "../../components";
 
 interface MilestoneItem {
     description: string;
@@ -104,63 +102,7 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
         <div className="application-container">
             <div className="section">
                 <h3 className="section-title">Job description</h3>
-                <div className="container brief-info">
-                    <div className="description">
-                        <div className="brief-title">
-                            <h3>
-                                {/*brief title */}Product Development Engineer
-                            </h3>
-                            <h3 className="clickable-text">View job posting</h3>
-                        </div>
-                        <div className="text-inactive">
-                            How can you help a potential buyer can't 'hold' your
-                            products online? Help your reader imagine what it
-                            would be like to own your NFT. Use words that
-                            describe what what your NFT is about and how owning
-                            it will elicit a certain feeling..........How can
-                            you help a potential buyer can't 'hold' your
-                            products online? Help your reader imagine what it
-                            would be like to own your NFT. U
-                        </div>
-                        <div className="text-inactive">Posted Feb 21, 2023</div>
-                    </div>
-                    <div className="insights">
-                        <div className="insight-item">
-                            <RiShieldUserLine
-                                color="var(--theme-white)"
-                                size={24}
-                            />
-                            <div className="insight-value">
-                                <h3>Expert</h3>
-                                <div className="text-inactive">
-                                    Experience Level
-                                </div>
-                            </div>
-                        </div>
-                        <div className="insight-item">
-                            <FaDollarSign
-                                color="var(--theme-white)"
-                                size={24}
-                            />
-                            <div className="insight-value">
-                                <h3>Proposed your terms</h3>
-                                <div className="text-inactive">Fixed Price</div>
-                            </div>
-                        </div>
-                        <div className="insight-item">
-                            <FaRegCalendarAlt
-                                color="var(--theme-white)"
-                                size={24}
-                            />
-                            <div className="insight-value">
-                                <h3>1 to 3 months</h3>
-                                <div className="text-inactive">
-                                    Project length
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <BriefInsights brief={brief} />
             </div>
             <div className="section">
                 <h3 className="section-title">Milestones</h3>

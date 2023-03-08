@@ -33,7 +33,7 @@ function VerifyUserIdFromJwt(req: any, res: any, next: any) {
     }
   
     try {
-      const decoded = jwt.verify(token, jwtOptions.secretOrKey);
+      const decoded: any = jwt.verify(token, jwtOptions.secretOrKey);
       if (req.user_id == decoded.id) {
         next();
       } else {

@@ -1,14 +1,4 @@
 extends layout.pug
 block content
-    h1 My Project
-    ol(id="projects-list")
-        p You haven't created a proposal yet
-        div
-            a(href="/dapp/proposals/draft" class="primary-btn in-dark w-button" id="create-a-proposal") Submit a proposal
-
-    h1 My Contributions
-    ol(id="contributions-list")
-        li
-            h2 Coming Soon!
-            div
-                a(href="/dapp/proposals" class="primary-btn in-dark w-button" id="discover-projects") Discover projects
+    div(id="dashboard" name="dashboard")
+        script(src="/public/lib/dashboard.js" type="text/javascript")

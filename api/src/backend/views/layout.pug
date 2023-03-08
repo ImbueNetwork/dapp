@@ -31,7 +31,7 @@ html
                         div(class="context-menu-item")
                             a(id="main-menu" class="material-icons" tabindex="0" onclick=`openDrawer()`) &#xe5d2;
 
-            div(class="modal" id="modal" onclick=`closeDrawer()`)
+            div(class="menu-modal" id="menu-modal" onclick=`closeDrawer()`)
 
 
             <div name="loading" id="loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);" hidden=true>
@@ -105,7 +105,7 @@ html
             }
 
             const drawer =  document.getElementById("right-drawer")
-            const modal =  document.getElementById("modal")
+            const modal =  document.getElementById("menu-modal")
 
             function openDrawer() {
                 drawer.classList.add("open")

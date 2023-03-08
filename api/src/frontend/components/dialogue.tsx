@@ -12,8 +12,8 @@ export const Dialogue = ({ title, content, actionList }: DialogueProps): JSX.Ele
         <div className="mdc-dialog mdc-dialog--open" id="dialog">
             <div className="mdc-dialog__container">
                 <div className="mdc-dialog__surface" role="alertdialog" aria-modal="true"
-                    aria-labelledby="dialog-title" aria-describedby="dialog-content"><h2
-                        className="mdc-dialog__title" id="dialog-title">{title}</h2>
+                    aria-labelledby="dialog-title" aria-describedby="dialog-content">
+                        <h2 className="mdc-dialog__title" id="dialog-title">{title}</h2>
                     <div className="mdc-dialog__content" id="dialog-content">
                         {content}
                         <ul className="mdc-deprecated-list mdc-deprecated-list--avatar-list">

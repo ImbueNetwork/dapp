@@ -1,5 +1,6 @@
 body {
     color: var(--main-text-color);
+    background: black !important;
     width: 100%;
     font-family: var(--theme-font-family);
 }
@@ -397,7 +398,7 @@ div#layout {
     transform: translateX(100%);
     z-index: 1;
 }
-.modal {
+.menu-modal {
     /*height: 100vh;*/
     width: 100vw;
     max-width: 100%;
@@ -413,7 +414,7 @@ div#layout {
     background: rgba(200, 200, 200, 0.1);
     opacity: 0;
 }
-.modal.show {
+.menu-modal.show {
     transform: translateX(0);
     opacity: 1;
 }
@@ -534,6 +535,7 @@ div#layout {
 
 #main-menu {
     cursor: pointer;
+    text-decoration: auto;
 }
 
 /* #pages > * {

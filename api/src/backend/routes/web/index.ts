@@ -8,10 +8,10 @@ router.get(
     "/dashboard",
     passport.authenticate("jwt", {
         session: false,
-        failureRedirect: "/dapp/login?redirect=/dapp",
+        failureRedirect: "/dapp/login?redirect=/dapp/dashboard",
     }),
     (req, res) => {
-        res.render("/");
+        res.render("dashboard");
     }
 );
 

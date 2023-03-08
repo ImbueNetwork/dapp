@@ -13,7 +13,7 @@ export type DashboardProps = {
 
 const client = getStreamChat();
 
-export const DashboardChat = ({ user: user }: DashboardProps): JSX.Element => {
+export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const filters = { members: { $in: [user.username] } }
 
     if(client) {
@@ -28,6 +28,7 @@ export const DashboardChat = ({ user: user }: DashboardProps): JSX.Element => {
 
 
     useEffect(() => {
+        // TODO: Implement
         const fetchData = async () => {
         }
 

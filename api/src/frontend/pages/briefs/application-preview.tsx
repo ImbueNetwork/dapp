@@ -60,11 +60,12 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                         </div>
                                         <div className="budget-wrapper">
                                             <h3>Amount</h3>
-                                            <p
+                                            <input
                                                 type="number"
                                                 className="input-budget"
                                                 // value={percentage_to_unlock * Number(application.total_cost_without_fee)}
                                                 value={amount}
+                                                disabled
                                             />
                                                 <div className="progress-container">
                                                     <div className="progress-value">

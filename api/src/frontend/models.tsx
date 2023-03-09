@@ -96,6 +96,7 @@ export type User = {
     web3Accounts: Web3Account[];
     username: string;
     password?: string;
+    getstream_token: string;
 };
 
 export interface BasicTxResponse {

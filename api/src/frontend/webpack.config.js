@@ -1,4 +1,5 @@
 const path = require("path");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     entry: {
@@ -10,6 +11,7 @@ module.exports = {
         "brief-details": path.resolve(__dirname, "pages", "briefs", "details.tsx"),
         "brief-applications": path.resolve(__dirname, "pages", "briefs", "applications.tsx"),
         "new-freelancer": path.resolve(__dirname, "pages", "freelancer", "new.tsx"),
+        "dashboard": path.resolve(__dirname, "pages", "dashboard", "index.tsx"),
         "freelancer-profile": path.resolve(__dirname, "pages", "freelancer", "profile.tsx"),
         "new-project": path.resolve(__dirname, "pages", "projects", "new.tsx"),
         "freelancers": path.resolve(__dirname, "pages", "freelancer", "index.tsx"),
@@ -66,5 +68,8 @@ module.exports = {
     },
     watchOptions: {
         poll: true
-    }
+    },
+    plugins: [
+        new Dotenv()
+      ]
 };

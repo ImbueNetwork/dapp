@@ -32,8 +32,9 @@ export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: numb
     }
   
     try {
-      const decoded = jwt.verify(token, jwtOptions.secretOrKey);
+      const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
       console.log(decoded);
+
       if (user_id == decoded.id) {
        // next();
       } else {
@@ -51,7 +52,7 @@ export function validateUserFromJwt(req: any, res: any, next: any, user_id: numb
     }
 
     try {
-        const decoded = jwt.verify(token, jwtOptions.secretOrKey);
+        const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
         console.log(decoded);
         if (user_id == decoded.id) {
            return true

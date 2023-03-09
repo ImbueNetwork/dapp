@@ -9,6 +9,7 @@ module.exports = {
         "briefs": path.resolve(__dirname, "pages", "briefs", "index.tsx"),
         "new-brief": path.resolve(__dirname, "pages", "briefs", "new.tsx"),
         "brief-details": path.resolve(__dirname, "pages", "briefs", "details.tsx"),
+        "brief-applications": path.resolve(__dirname, "pages", "briefs", "applications.tsx"),
         "new-freelancer": path.resolve(__dirname, "pages", "freelancer", "new.tsx"),
         "dashboard": path.resolve(__dirname, "pages", "dashboard", "index.tsx"),
         "freelancer-profile": path.resolve(__dirname, "pages", "freelancer", "profile.tsx"),
@@ -16,6 +17,8 @@ module.exports = {
         "freelancers": path.resolve(__dirname, "pages", "freelancer", "index.tsx"),
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
+        "submit-proposal": path.resolve(__dirname, "pages", "briefs", "submit.tsx"),
+        "application-preview": path.resolve(__dirname, "pages", "briefs", "application-preview.tsx"),
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

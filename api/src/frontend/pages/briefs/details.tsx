@@ -9,6 +9,7 @@ import en from "javascript-time-ago/locale/en";
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
+import { redirect } from "../../utils";
 
 export type BriefProps = {
     brief: Brief;
@@ -18,6 +19,10 @@ TimeAgo.addDefaultLocale(en);
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
+
+    const redirectToApply = () => {
+        redirect(`briefs/${brief.id}/apply`);
+    }
 
     const BioPanel = (
         <div className="brief-bio">
@@ -33,7 +38,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             {/* TODO: Do we use same styles for both buttons? */}
             <div className="subsection">
                 <div className="action-buttons">
-                    <button className="primary-btn in-dark w-button">
+                    <button className="primary-btn in-dark w-button" onClick={() => redirectToApply()}>
                         Apply
                     </button>
                     <button className="primary-btn in-dark w-button">
@@ -121,31 +126,39 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 
     const BioInsights = (
         <div className="brief-insights">
-            <div className="brief-insights-stat">
-                <h3>Brief Insights</h3>
+            <div className="subsection">
+                <div className="brief-insights-stat">
+                    <h3>Brief Insights</h3>
+                </div>
             </div>
 
-            <div className="brief-insights-stat">
-                <FaHandshake className="brief-insight-icon" />
-                <h3>
-                    {" "}
-                    <span>{brief.number_of_briefs_submitted}</span> projects
-                    posted
-                </h3>
+            <div className="subsection">
+                <div className="brief-insights-stat">
+                    <FaHandshake className="brief-insight-icon" />
+                    <h3>
+                        {" "}
+                        <span>{brief.number_of_briefs_submitted}</span> projects
+                        posted
+                    </h3>
+                </div>
             </div>
 
-            <div className="brief-insights-stat">
-                <IoMdWallet className="brief-insight-icon" />
-                <h3>
-                    Total Spent <span>$250,000</span>
-                </h3>
+            <div className="subsection">
+                <div className="brief-insights-stat">
+                    <IoMdWallet className="brief-insight-icon" />
+                    <h3>
+                        Total Spent <span>$250,000</span>
+                    </h3>
+                </div>
             </div>
 
-            <div className="brief-insights-stat">
-                <HiUserGroup className="brief-insight-icon" />
-                <h3>
-                    Applications: <span>10-20</span>{" "}
-                </h3>
+            <div className="subsection">
+                <div className="brief-insights-stat">
+                    <HiUserGroup className="brief-insight-icon" />
+                    <h3>
+                        Applications: <span>10-20</span>{" "}
+                    </h3>
+                </div>
             </div>
         </div>
     );
@@ -197,6 +210,8 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             </div>
         </div>
     );
+
+
     return (
         <div className="brief-details-container">
             <div className="brief-info">
@@ -213,7 +228,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
-        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

@@ -210,7 +210,10 @@ p {
     background-color: var(--theme-grey-dark);
     border: 1px solid var(--theme-ink-color);
     border-radius: 20px;
-    padding-left: 30px;
+}
+
+.brief-insights > .subsection {
+    height: 20%;
 }
 
 .brief-insights-stat {
@@ -262,6 +265,7 @@ p {
 .similar-brief > .title {
     font-weight: bold;
 }
+
 
 .brief-insight-icon {
     margin-top: 10px;

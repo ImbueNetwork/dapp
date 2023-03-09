@@ -18,7 +18,7 @@ const MilestoneItem = ({ milestone, projectOnChain, toggleActive, toggleMileston
 
   useEffect(() => {
     if (milestone) {
-      const milestoneValue = Number((milestone.percentageToUnlock / 100) * projectOnChain.requiredFundsFormatted);
+      const milestoneValue = Number((milestone.percentage_to_unlock / 100) * projectOnChain.requiredFundsFormatted);
       setFormattedMilestoneValue(milestoneValue.toLocaleString());
     }
   }, []);
@@ -54,7 +54,7 @@ const MilestoneItem = ({ milestone, projectOnChain, toggleActive, toggleMileston
       <div
         className="milestone-row"
         onClick={() => {
-          toggleMilestone(milestone.milestoneKey);
+          toggleMilestone(milestone.milestone_key);
         }}
       >
         <span>{milestone.name}</span>
@@ -64,7 +64,7 @@ const MilestoneItem = ({ milestone, projectOnChain, toggleActive, toggleMileston
         <div className="milestone-details-info">
           <div>
             <span className="detail-label">Percentage of funds released</span>
-            <span className="funds-required">{milestone.percentageToUnlock}%</span>
+            <span className="funds-required">{milestone.percentage_to_unlock}%</span>
           </div>
 
           <div>

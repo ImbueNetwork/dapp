@@ -40,6 +40,31 @@ router.get("/:id/project", (req, res, next) => {
     });
 });
 
+router.get("/:id/briefs/:briefId", (req, res, next) => {
+    const id = req.params.id;
+    const briefId = req.params.briefId;
+    db.transaction(async tx => {
+        try {
+            const project = await models.fetchUserBriefs(id,briefId)(tx);
+            
+            if (!project) {
+                return res.status(404).end();
+            }
+
+            const pkg: ProjectPkg = {
+                ...project,
+                milestones: await models.fetchProjectMilestones(Number(project.id))(tx)
+            };
+
+            res.send(pkg);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch project by id: ${id}`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
 
 router.post("/", (req, res, next) => {
     const {

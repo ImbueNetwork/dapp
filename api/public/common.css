@@ -150,3 +150,14 @@ body {
 .mdc-dialog__content {
     color: var(--mdc-text-field-ink-color) !important;
 }
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.justify-between {
+    justify-content: space-between;
+}

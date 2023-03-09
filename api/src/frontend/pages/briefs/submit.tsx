@@ -108,7 +108,7 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                 <h3 className="section-title">Milestones</h3>
                 <div className="container milestones">
                     <div className="milestone-header">
-                        <h3>Client's budget: $35,000</h3>
+                        <h3>Client's budget: ${brief.budget}</h3>
                     </div>
                     <h3>How many milestone do you want to include?</h3>
                     <div className="milestone-list">

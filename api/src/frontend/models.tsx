@@ -1,9 +1,9 @@
 export enum Currency {
-    IMBU = "IMBU",
-    KSM = "KSM",
-    AUSD = "AUSD",
-    KAR = "KAR",
-    MGX = "MGX",
+    IMBU = 0,
+    KSM = 1,
+    AUSD = 2,
+    KAR = 3,
+    MGX = 4,
 }
 
 export enum RoundType {

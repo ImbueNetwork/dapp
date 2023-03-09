@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import "../../../../public/submit-proposal.css";
 import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
-import { Brief } from "../../models";
+import { Brief, Currency } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 
@@ -27,28 +27,13 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
     const [category, setCategory] = useState("finance");
     const [currency_id, setCurrencyId] = useState("DOT");
     const [owner, setOwner] = useState("Hari");
+    const imbueFee = 5;
+
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
         { description: "", amount: undefined },
     ]);
 
-    const networks = [
-        {
-            label: "Ethereum",
-            value: "ethereum",
-        },
-        {
-            label: "Binance",
-            value: "binance",
-        },
-        {
-            label: "Polkadot",
-            value: "polkadot",
-        },
-        {
-            label: "Kusama",
-            value: "kusama",
-        },
-    ];
+    const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
 
     const durationOptions = timeData.sort((a, b) =>
         a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -59,6 +44,8 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
         0
     );
 
+    const imbueCost = (totalBudget * imbueFee) / 100;
+    const totalCost = imbueCost + totalBudget;
     const onAddMilestone = () => {
         setMilestones([...milestones, { description: "", amount: undefined }]);
     };
@@ -136,7 +123,7 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                                                         ),
                                                         {
                                                             ...milestones[
-                                                                index
+                                                            index
                                                             ],
                                                             description:
                                                                 e.target.value,
@@ -162,7 +149,7 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                                                         ),
                                                         {
                                                             ...milestones[
-                                                                index
+                                                            index
                                                             ],
                                                             amount: Number(
                                                                 e.target.value
@@ -224,7 +211,17 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                             </h3>
                         </div>
                         <div className="budget-value text-inactive">
-                            ${((totalBudget * 5) / 100).toFixed(2)}
+                            ${(imbueCost).toFixed(2)}
+                        </div>
+                    </div>
+
+                    <hr className="separator" />
+                    <div className="budget-info">
+                        <div className="budget-description">
+                            <h3>Total</h3>
+                        </div>
+                        <div className="budget-value text-inactive">
+                            ${(totalCost).toFixed(2)}
                         </div>
                     </div>
                 </div>
@@ -251,25 +248,25 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                         </select>
                     </div>
                     <div className="payment-options">
+                        <h3>Currency</h3>
+
                         <div className="network-amount">
                             <select
-                                name="network"
-                                placeholder="Select a network"
+                                name="currencyId"
+                                placeholder="Select a currency"
                                 required
                             >
-                                {networks.map(({ label, value }, index) => (
+                                {currencies.map((currency) => (
                                     <option
-                                        value={value}
-                                        key={index}
+                                        value={Currency[currency]}
+                                        key={Currency[currency]}
                                         className="duration-option"
                                     >
-                                        {label}
+                                        {currency}
                                     </option>
                                 ))}
                             </select>
-                            <input type="text" placeholder="Fund Required" />
                         </div>
-                        <input type="text" className="wallet-address" />
                     </div>
                 </div>
             </div>
@@ -280,7 +277,8 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                 >
                     Submit
                 </button>
-                <button className="secondary-btn">Save draft</button>
+                {/* TODO: Add Drafts Functionality */}
+                {/* <button className="secondary-btn">Save draft</button> */}
             </div>
         </div>
     );
@@ -291,7 +289,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
-        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("submit-proposal")!
         ).render(<SubmitProposal brief={brief} />);

@@ -20,11 +20,9 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
 
-
     const redirectToApply = () => {
         redirect(`briefs/${brief.id}/apply`);
     }
-
 
     const BioPanel = (
         <div className="brief-bio">
@@ -230,7 +228,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
-        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

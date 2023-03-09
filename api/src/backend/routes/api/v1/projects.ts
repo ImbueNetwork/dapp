@@ -77,10 +77,7 @@ const validateProposal = (proposal: models.GrantProposal) => {
     }
 }
 
-
 router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-    console.log("***** body is");
-    console.log(req.body);
     const {
         name,
         logo,
@@ -91,6 +88,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
         currency_id,
         owner,
         milestones,
+        brief_id,
     } = req.body;
     db.transaction(async tx => {
         try {
@@ -104,6 +102,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
                 currency_id,
                 owner,
                 user_id: (req.user as any).id,
+                brief_id
             })(tx);
     
             if (!project.id) {
@@ -120,7 +119,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
                 )(tx)
             }
     
-            res.status(201).send(pkg);    
+            res.status(201).send(pkg);
         } catch (cause) {
             next(new Error(
                 `Failed to insert project.`,

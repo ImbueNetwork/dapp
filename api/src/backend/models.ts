@@ -88,6 +88,7 @@ export type Project = {
     currency_id: number;
     owner?: string;
     user_id?: string | number;
+    brief_id?: string | number;
 };
 
 export type ProjectProperties = {

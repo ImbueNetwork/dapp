@@ -67,6 +67,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
             body: JSON.stringify({
                 user_id: user.id,
                 name: `Brief Application: ${brief.headline}`,
+                brief_id: brief.id,
                 currency_id: currencyId,
                 milestones: milestones.map(m =>  { return {name:m.name, percentage_to_unlock: (100 * (m.amount/totalBudget)).toFixed(0)}}),
                 required_funds: totalCost

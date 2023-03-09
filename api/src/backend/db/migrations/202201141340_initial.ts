@@ -62,21 +62,6 @@ export async function up(knex: Knex): Promise<void> {
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, projectStatusTableName));
 
-    /**
-     *  pub struct Project<AccountId, Balance, BlockNumber> {
-     *      name: Vec<u8>,
-     *      logo: Vec<u8>,
-     *      description: Vec<u8>,
-     *      website: Vec<u8>,
-     *      milestones: Vec<Milestone>,
-     *      contributions: Vec<Contribution<AccountId, Balance>>,
-     *      required_funds: Balance,
-     *      withdrawn_funds: Balance,
-     *      /// The account that will receive the funds if the campaign is successful
-     *      owner: AccountId,
-     *      create_block_number: BlockNumber,
-     *  }
-     */
 
     const projectsTableName = "projects";
     await knex.schema.createTable(projectsTableName, (builder: Knex.CreateTableBuilder) => {
@@ -88,7 +73,8 @@ export async function up(knex: Knex): Promise<void> {
         builder.integer("category");
         builder.integer("currency_id");
         builder.integer("chain_project_id");
-
+        builder.decimal("total_cost_without_fee");
+        builder.decimal("imbue_fee");
         builder.text("status").notNullable().defaultTo("draft");
         builder.foreign("status")
             .references("project_status.status")
@@ -170,6 +156,8 @@ export async function up(knex: Knex): Promise<void> {
         builder.integer("milestone_index");
         builder.integer("project_id").notNullable();
         builder.primary(["project_id","milestone_index"]);
+        builder.decimal("amount");
+
         builder.foreign("project_id")
             .references("projects.id")
             .onDelete("CASCADE")

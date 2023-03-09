@@ -55,8 +55,6 @@ router.get("/:id", (req, res, next) => {
     });
 });
 
-
-
 /**
  * TODO: json schema or something better instead.
  */
@@ -89,6 +87,8 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
         owner,
         milestones,
         brief_id,
+        total_cost_without_fee,
+        imbue_fee,
     } = req.body;
     db.transaction(async tx => {
         try {
@@ -102,7 +102,9 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
                 currency_id,
                 owner,
                 user_id: (req.user as any).id,
-                brief_id
+                brief_id,
+                total_cost_without_fee,
+                imbue_fee,
             })(tx);
     
             if (!project.id) {
@@ -128,7 +130,6 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
         }
     });
 });
-
 
 router.put("/:id", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;

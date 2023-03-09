@@ -48,6 +48,7 @@ export type User = {
 export type ProposedMilestone = {
     name: string;
     percentage_to_unlock: number;
+    amount: number;
 };
 
 export type GrantProposal = {
@@ -89,6 +90,8 @@ export type Project = {
     owner?: string;
     user_id?: string | number;
     brief_id?: string | number;
+    total_cost_without_fee?:  number;
+    imbue_fee?:  number;
 };
 
 export type ProjectProperties = {
@@ -262,6 +265,12 @@ export const updateProjectProperties = (id: string | number, properties: Project
             .where({ 'project_id': id })
             .returning("*")
     )[0];
+
+
+export const fetchUserBriefs = (user_id: string | number, brief_id: string | number) =>
+(tx: Knex.Transaction) =>
+    tx<Project>("projects").select().where({ user_id, brief_id }).first();
+
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>

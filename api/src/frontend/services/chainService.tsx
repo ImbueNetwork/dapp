@@ -448,10 +448,10 @@ class ChainService {
         let milestones: Milestone[] = Object.keys(projectOnChain.milestones).map((milestoneItem: any) => projectOnChain.milestones[milestoneItem]).map(
             (milestone: any) =>
             ({
-                projectKey: Number(milestone.projectKey),
-                milestoneKey: Number(milestone.milestoneKey),
+                project_id: Number(milestone.projectKey),
+                milestone_key: Number(milestone.milestoneKey),
                 name: milestone.name,
-                percentageToUnlock: Number(
+                percentage_to_unlock: Number(
                     milestone.percentageToUnlock
                 ),
                 isApproved: milestone.isApproved,
@@ -482,7 +482,7 @@ class ChainService {
             (milestone) => !milestone.isApproved
         );
         if (firstmilestone) {
-            return firstmilestone.milestoneKey;
+            return firstmilestone.milestone_key;
         }
         return -1;
     }
@@ -493,7 +493,7 @@ class ChainService {
             .reverse()
             .find((milestone) => milestone.isApproved);
         if (firstmilestone) {
-            return firstmilestone.milestoneKey;
+            return firstmilestone.milestone_key;
         }
         return -1;
     }

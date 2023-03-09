@@ -15,6 +15,7 @@ module.exports = {
         "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
         "submit-proposal": path.resolve(__dirname, "pages", "briefs", "submit.tsx"),
+        "application-preview": path.resolve(__dirname, "pages", "briefs", "application-preview.tsx"),
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

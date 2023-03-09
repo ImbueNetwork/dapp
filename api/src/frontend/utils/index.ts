@@ -45,6 +45,15 @@ export const getCurrentUser = async () => {
     return null;
 };
 
+
+export const getUserBriefs = async (userId, briefId) => {
+    const resp = await fetch(`${config.apiBase}/users/${userId}/briefs/${briefId}`);
+    if (resp.ok) {
+        return resp.json();
+    }
+    return null;
+};
+
 export const getProjectId = async () => {
     const candidate = window.location.pathname.split("/").pop();
 

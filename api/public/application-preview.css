@@ -1,0 +1,258 @@
+.application-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.application-container h2 {
+    font-size: 32px;
+    line-height: 1.5;
+    font-weight: 700;
+    margin: 16px 0;
+    padding: 0;
+}
+
+.application-container h3 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background: var(--theme-grey-dark);
+    border: 1px solid var(--theme-white);
+    border-radius: 20px;
+    padding: 50px;
+}
+
+.brief-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.brief-info .description {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1 0 75%;
+    margin-right: 5%;
+}
+
+.brief-title {
+    display: flex;
+    flex-direction: row;
+    gap: 36px;
+}
+
+.clickable-text {
+    color: var(--theme-primary);
+    cursor: pointer;
+}
+
+.text-inactive {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.brief-info .insights {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    flex: 1 0 20%;
+}
+
+.insight-item {
+    display: flex;
+    flex-direction: row;
+    gap: 28px;
+}
+
+.insight-value {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: -5px;
+}
+
+.no-margin {
+    margin: 0;
+}
+
+.milestones {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.milestone-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.milestone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+.milestone-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.milestone-no {
+    margin-right: 36px;
+}
+
+.input-wrappers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input-wrappers h3 {
+    margin-bottom: 1.25rem;
+}
+
+.description-wrapper {
+    width: 50%;
+}
+
+.budget-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+}
+
+input,
+textarea,
+select {
+    background: var(--theme-background);
+    border: 1px solid var(--theme-white);
+    border-radius: 5px;
+    color: rgba(235, 234, 226, 0.7);
+    font-size: 16px;
+    line-height: 20px;
+    padding: 10px 20px;
+}
+
+.input-description {
+    height: 8rem;
+}
+
+.value-input .input-budget {
+    position: relative;
+    text-align: right;
+}
+
+.value-input .input-budget:before {
+    content: "$";
+}
+
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: auto;
+    gap: 8px;
+}
+
+.progress-value {
+    color: var(--theme-light-grey);
+    border: 1px solid var(--theme-white);
+    border-radius: 5px;
+    background: var(--theme-background);
+    padding: 6px;
+    width: min-content;
+    user-select: none;
+}
+
+.progress-bar {
+    background: var(--theme-white);
+    border-radius: 10px;
+    width: 80%;
+    height: 10px;
+    position: relative;
+}
+
+.progress {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--theme-secondary);
+    border-radius: 10px;
+}
+
+.btn-add-milestone {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.separator {
+    width: 100%;
+    height: 1px;
+    background: var(--theme-white);
+    margin: 12px 0;
+}
+
+.budget-info {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.budget-description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.payment-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.duration-selector {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.network-amount {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.wallet-address {
+    width: 100%;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.section .section-title {
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
+}

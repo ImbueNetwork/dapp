@@ -18,7 +18,7 @@ export type BriefProps = {
     brief: Brief;
 };
 
-export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
+export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
     const [headline, setHeadline] = useState(brief.headline);
     const [description, setDescription] = useState(brief.description);
     const [budget, setDBudget] = useState(brief.budget);

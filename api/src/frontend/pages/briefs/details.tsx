@@ -224,7 +224,8 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
 };
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    let briefId = window.location.pathname.split("/").pop();
+    let paths = window.location.pathname.split("/");
+    let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);

@@ -9,6 +9,7 @@ import en from "javascript-time-ago/locale/en";
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
+import { redirect } from "../../utils";
 
 export type BriefProps = {
     brief: Brief;
@@ -18,6 +19,10 @@ TimeAgo.addDefaultLocale(en);
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
+
+    const redirectToApply = () => {
+        redirect(`briefs/${brief.id}/apply`);
+    }
 
     const BioPanel = (
         <div className="brief-bio">
@@ -33,7 +38,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             {/* TODO: Do we use same styles for both buttons? */}
             <div className="subsection">
                 <div className="action-buttons">
-                    <button className="primary-btn in-dark w-button">
+                    <button className="primary-btn in-dark w-button" onClick={() => redirectToApply()}>
                         Apply
                     </button>
                     <button className="primary-btn in-dark w-button">
@@ -205,6 +210,8 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             </div>
         </div>
     );
+
+
     return (
         <div className="brief-details-container">
             <div className="brief-info">
@@ -221,7 +228,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
-        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("brief-details")!
         ).render(<BriefDetails brief={brief} />);

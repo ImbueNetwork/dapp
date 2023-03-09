@@ -57,12 +57,22 @@ router.get("/briefs/:id", (req, res) => {
     res.render("brief-details");
 });
 
-router.get("/briefs/:id/apply", (req, res) => {
+router.get("/briefs/:id/apply", function (req, res, next) {
+    passport.authenticate("jwt", {
+        session: false,
+        failureRedirect: `/dapp/login?redirect=/dapp/briefs/${req.params.id}/apply`,
+    })(req, res, next)
+}, (req, res) => {
     res.render("submit-proposal");
 });
 
+
 router.get("/briefs/:id/applications", (req, res) => {
     res.render("brief-applications");
+});
+    
+router.get("/briefs/:id/applications/:application_id", (req, res) => {
+    res.render("application-preview");
 });
 
 router.get("/join", (req, res) => {

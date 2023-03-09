@@ -1,66 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
-import { Brief } from "../../models";
+import { Brief, Currency, Project, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
-import "../../../../public/submit-proposal.css";
+import { getCurrentUser, getUserBriefs, redirect } from "../../utils";
 
 interface MilestoneItem {
-    description: string;
+    name: string;
     amount: number | undefined;
 }
 
 export type BriefProps = {
     brief: Brief;
+    user: User;
 };
 
-export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
-    const [headline, setHeadline] = useState(brief.headline);
-    const [description, setDescription] = useState(brief.description);
-    const [budget, setDBudget] = useState(brief.budget);
-    const [logo, setLogo] = useState("test");
-    const [website, setWebsite] = useState("test2");
-    const [category, setCategory] = useState("finance");
-    const [currency_id, setCurrencyId] = useState("DOT");
-    const [owner, setOwner] = useState("Hari");
+export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
+    const [currencyId, setCurrencyId] = useState(0);
+    const imbueFeePercentage = 5;
+
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
-        { description: "", amount: undefined },
+        { name: "", amount: undefined },
     ]);
 
-    const networks = [
-        {
-            label: "Ethereum",
-            value: "ethereum",
-        },
-        {
-            label: "Binance",
-            value: "binance",
-        },
-        {
-            label: "Polkadot",
-            value: "polkadot",
-        },
-        {
-            label: "Kusama",
-            value: "kusama",
-        },
-    ];
+    const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
 
     const durationOptions = timeData.sort((a, b) =>
         a.value > b.value ? 1 : a.value < b.value ? -1 : 0
     );
 
-    const totalBudget = milestones.reduce(
+    const totalCostWithoutFee = milestones.reduce(
         (acc, { amount }) => acc + (amount ?? 0),
         0
     );
 
+    const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
+    const totalCost = imbueFee + totalCostWithoutFee;
     const onAddMilestone = () => {
-        setMilestones([...milestones, { description: "", amount: undefined }]);
+        setMilestones([...milestones, { name: "", amount: undefined }]);
     };
 
     const getAPIHeaders = {
@@ -72,27 +53,29 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
         "content-type": "application/json",
     };
 
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCurrencyId(Number(event.target.value))
+    };
+
     async function insertProject() {
         const resp = await fetch(`${config.apiBase}/projects/`, {
             headers: postAPIHeaders,
             method: "post",
             body: JSON.stringify({
-                headline,
-                logo,
-                description,
-                website,
-                category,
-                budget,
-                currency_id,
-                owner,
-                milestones,
+                user_id: user.id,
+                name: `Brief Application: ${brief.headline}`,
+                brief_id: brief.id,
+                total_cost_without_fee: totalCostWithoutFee,
+                imbue_fee: imbueFee,
+                currency_id: currencyId,
+                milestones: milestones.filter(m => m.amount !== undefined).map(m =>  { return {name:m.name, amount: m.amount, percentage_to_unlock: (( (m.amount ?? 0)  / totalCostWithoutFee) * 100).toFixed(0)}}),
+                required_funds: totalCost
             }),
         });
 
         if (resp.ok) {
-            // could be 200 or 201
-            // Brief API successfully invoked
-            console.log("Brief created successfully via Brief REST API");
+            const applicationId = (await resp.json()).id;
+            redirect(`briefs/${brief.id}/applications/${applicationId}/`)
         } else {
             console.log("Failed to submit the brief");
         }
@@ -108,15 +91,15 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                 <h3 className="section-title">Milestones</h3>
                 <div className="container milestones">
                     <div className="milestone-header">
-                        <h3>Client's budget: $35,000</h3>
+                        <h3>Client's budget: ${Number(brief.budget).toLocaleString()}</h3>
                     </div>
                     <h3>How many milestone do you want to include?</h3>
                     <div className="milestone-list">
-                        {milestones.map(({ description, amount }, index) => {
-                            const percent = `${(
+                        {milestones.map(({ name, amount }, index) => {
+                            const percent = Number((
                                 (100 * (amount ?? 0)) /
-                                totalBudget
-                            ).toFixed(0)}%`;
+                                totalCostWithoutFee
+                            ).toFixed(0));
                             return (
                                 <div className="milestone-row" key={index}>
                                     <div className="milestone-no">
@@ -127,7 +110,7 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                                             <h3>Description</h3>
                                             <textarea
                                                 className="input-description"
-                                                value={description}
+                                                value={name}
                                                 onChange={(e) =>
                                                     setMilestones([
                                                         ...milestones.slice(
@@ -136,14 +119,14 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                                                         ),
                                                         {
                                                             ...milestones[
-                                                                index
+                                                            index
                                                             ],
-                                                            description:
-                                                                e.target.value,
+                                                            name: e.target.value,
                                                         },
                                                         ...milestones.slice(
                                                             index + 1
                                                         ),
+
                                                     ])
                                                 }
                                             />
@@ -162,11 +145,9 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                                                         ),
                                                         {
                                                             ...milestones[
-                                                                index
+                                                            index
                                                             ],
-                                                            amount: Number(
-                                                                e.target.value
-                                                            ),
+                                                            amount:  Number(e.target.value),
                                                         },
                                                         ...milestones.slice(
                                                             index + 1
@@ -174,16 +155,16 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                                                     ])
                                                 }
                                             />
-                                            {totalBudget !== 0 && (
+                                            {totalCostWithoutFee !== 0 && (
                                                 <div className="progress-container">
                                                     <div className="progress-value">
-                                                        {percent}
+                                                        {percent}%
                                                     </div>
                                                     <div className="progress-bar">
                                                         <div
                                                             className="progress"
                                                             style={{
-                                                                width: percent,
+                                                                width: `${percent}%`,
                                                             }}
                                                         ></div>
                                                     </div>
@@ -212,7 +193,7 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                             </div>
                         </div>
                         <div className="budget-value">
-                            ${totalBudget.toFixed(2)}
+                            ${totalCostWithoutFee.toFixed(2)}
                         </div>
                     </div>
                     <hr className="separator" />
@@ -224,7 +205,17 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                             </h3>
                         </div>
                         <div className="budget-value text-inactive">
-                            ${((totalBudget * 5) / 100).toFixed(2)}
+                            ${(imbueFee).toFixed(2)}
+                        </div>
+                    </div>
+
+                    <hr className="separator" />
+                    <div className="budget-info">
+                        <div className="budget-description">
+                            <h3>Total</h3>
+                        </div>
+                        <div className="budget-value text-inactive">
+                            ${(totalCost).toFixed(2)}
                         </div>
                     </div>
                 </div>
@@ -251,25 +242,26 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                         </select>
                     </div>
                     <div className="payment-options">
+                        <h3>Currency</h3>
+
                         <div className="network-amount">
                             <select
-                                name="network"
-                                placeholder="Select a network"
+                                name="currencyId"
+                                onChange={handleChange}
+                                placeholder="Select a currency"
                                 required
                             >
-                                {networks.map(({ label, value }, index) => (
+                                {currencies.map((currency) => (
                                     <option
-                                        value={value}
-                                        key={index}
+                                        value={Currency[currency]}
+                                        key={Currency[currency]}
                                         className="duration-option"
                                     >
-                                        {label}
+                                        {currency}
                                     </option>
                                 ))}
                             </select>
-                            <input type="text" placeholder="Fund Required" />
                         </div>
-                        <input type="text" className="wallet-address" />
                     </div>
                 </div>
             </div>
@@ -280,7 +272,8 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
                 >
                     Submit
                 </button>
-                <button className="secondary-btn">Save draft</button>
+                {/* TODO: Add Drafts Functionality */}
+                {/* <button className="secondary-btn">Save draft</button> */}
             </div>
         </div>
     );
@@ -288,12 +281,15 @@ export const SubmitProposal = ({ brief: brief }: BriefProps): JSX.Element => {
 document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
-
     if (briefId) {
+        const user = await getCurrentUser();
+        const userApplication :Project = await getUserBriefs(user.id, briefId);
+        if(userApplication) {
+            redirect(`briefs/${briefId}/applications/${userApplication.id}/`)
+        }
         const brief: Brief = await getBrief(briefId);
-        console.log(brief);
         ReactDOMClient.createRoot(
             document.getElementById("submit-proposal")!
-        ).render(<SubmitProposal brief={brief} />);
+        ).render(<SubmitProposal brief={brief} user={user} />);
     }
 });

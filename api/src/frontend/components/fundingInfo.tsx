@@ -44,7 +44,7 @@ export const FundingInfo = ({ projectOnChain, lastApprovedMilestoneIndex }: Fund
                                 <Step
                                     position={100 * (index / arr.length)}
                                     transition="scale"
-                                    key={milestone.milestoneKey}
+                                    key={milestone.milestone_key}
                                     children={({ }) => (
                                         <div className={milestone.isApproved ? "progress-dot completed" : "progress-dot"} title={milestone.name}>
                                         </div>

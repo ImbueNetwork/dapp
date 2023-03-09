@@ -19,11 +19,11 @@ export const Milestones = ({ projectOnChain, firstPendingMilestoneIndex }: Miles
         <div className="container accordion">
             {projectOnChain.milestones.map((milestone, index) => (
                 <MilestoneItem
-                    key={milestone.milestoneKey}
+                    key={milestone.milestone_key}
                     projectOnChain={projectOnChain}
                     milestone={milestone}
-                    isInVotingRound={milestone.milestoneKey === firstPendingMilestoneIndex && projectOnChain.projectState === ProjectState.OpenForVoting}
-                    toggleActive={activeMilestone === (milestone.milestoneKey)}
+                    isInVotingRound={milestone.milestone_key === firstPendingMilestoneIndex && projectOnChain.projectState === ProjectState.OpenForVoting}
+                    toggleActive={activeMilestone === (milestone.milestone_key)}
                     toggleMilestone={toggleMilestone}
                 />
             ))}

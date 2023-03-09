@@ -420,7 +420,7 @@ class ChainService {
             ),
             currencyId:
                 projectOnChain.currencyId == "Native"
-                    ? ("IMBU" as Currency)
+                    ? (Currency.IMBU)
                     : (projectOnChain.currencyId as Currency),
             milestones: milestones,
             contributions: Object.keys(projectOnChain.contributions).map(

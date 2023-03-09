@@ -11,7 +11,7 @@ import { BriefInsights } from "../../components";
 import { getCurrentUser } from "../../utils";
 
 interface MilestoneItem {
-    description: string;
+    name: string;
     amount: number | undefined;
 }
 
@@ -26,7 +26,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
     const imbueFee = 5;
 
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
-        { description: "", amount: undefined },
+        { name: "", amount: undefined },
     ]);
 
     const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
@@ -43,7 +43,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
     const imbueCost = (totalBudget * imbueFee) / 100;
     const totalCost = imbueCost + totalBudget;
     const onAddMilestone = () => {
-        setMilestones([...milestones, { description: "", amount: undefined }]);
+        setMilestones([...milestones, { name: "", amount: undefined }]);
     };
 
     const getAPIHeaders = {
@@ -55,11 +55,9 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
         "content-type": "application/json",
     };
 
-
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrencyId(Number(event.target.value))
-        console.log(currencyId);
-      };
+    };
 
     async function insertProject() {
 
@@ -67,14 +65,16 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
             headers: postAPIHeaders,
             method: "post",
             body: JSON.stringify({
-                currencyId,
-                milestones,
+                user_id: user.id,
+                name: `Brief Application: ${brief.headline}`,
+                currency_id: currencyId,
+                milestones: milestones.map(m =>  { return {name:m.name, percentage_to_unlock: (100 * (m.amount/totalBudget)).toFixed(0)}}),
+                required_funds: totalCost
             }),
         });
 
         if (resp.ok) {
-            // could be 200 or 201
-            // Brief API successfully invoked
+            // TODO: Redirect to the preview page
             console.log("Brief created successfully via Brief REST API");
         } else {
             console.log("Failed to submit the brief");
@@ -95,11 +95,11 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                     </div>
                     <h3>How many milestone do you want to include?</h3>
                     <div className="milestone-list">
-                        {milestones.map(({ description, amount }, index) => {
-                            const percent = `${(
+                        {milestones.map(({ name, amount }, index) => {
+                            const percent = Number((
                                 (100 * (amount ?? 0)) /
                                 totalBudget
-                            ).toFixed(0)}%`;
+                            ).toFixed(0));
                             return (
                                 <div className="milestone-row" key={index}>
                                     <div className="milestone-no">
@@ -110,7 +110,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                             <h3>Description</h3>
                                             <textarea
                                                 className="input-description"
-                                                value={description}
+                                                value={name}
                                                 onChange={(e) =>
                                                     setMilestones([
                                                         ...milestones.slice(
@@ -121,12 +121,12 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                                             ...milestones[
                                                             index
                                                             ],
-                                                            description:
-                                                                e.target.value,
+                                                            name: e.target.value,
                                                         },
                                                         ...milestones.slice(
                                                             index + 1
                                                         ),
+
                                                     ])
                                                 }
                                             />
@@ -147,9 +147,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                                             ...milestones[
                                                             index
                                                             ],
-                                                            amount: Number(
-                                                                e.target.value
-                                                            ),
+                                                            amount:  Number(e.target.value),
                                                         },
                                                         ...milestones.slice(
                                                             index + 1
@@ -160,13 +158,13 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                             {totalBudget !== 0 && (
                                                 <div className="progress-container">
                                                     <div className="progress-value">
-                                                        {percent}
+                                                        {percent}%
                                                     </div>
                                                     <div className="progress-bar">
                                                         <div
                                                             className="progress"
                                                             style={{
-                                                                width: percent,
+                                                                width: `${percent}%`,
                                                             }}
                                                         ></div>
                                                     </div>

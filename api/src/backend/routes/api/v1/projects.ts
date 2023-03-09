@@ -79,14 +79,8 @@ const validateProposal = (proposal: models.GrantProposal) => {
 
 
 router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-    try {
-        validateProposal(req.body.proposal);
-    } catch (e) {
-        res.status(400).send(
-            {message: (e as Error).message}
-        );
-    }
-
+    console.log("***** body is");
+    console.log(req.body);
     const {
         name,
         logo,
@@ -97,8 +91,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
         currency_id,
         owner,
         milestones,
-    } = req.body.proposal as models.GrantProposal;
-
+    } = req.body;
     db.transaction(async tx => {
         try {
             const project = await models.insertProject({

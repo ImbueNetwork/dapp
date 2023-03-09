@@ -23,11 +23,12 @@ import { FreelancerSocial} from "./freelancer_socials";
 
 export type ProfileProps = {};
 export type ProfileState = {
-    isEditingBio: boolean;
     userInfo: UserInfo;
     showMessageForm: boolean,
-    bioEdit: string;
-};
+    editBitMap: EditBitMap;
+    edits: EditMaps;
+}
+
 
 export type UserInfo = {
     freelancer: Freelancer;
@@ -47,6 +48,20 @@ export type UserInfo = {
         milestoneComplete: number;
     }>;
 };
+
+type EditBitMap = {
+    isBio: boolean;
+    isSkills: boolean;
+    isSocials: boolean;
+    isServices: boolean;
+    isLanguages: boolean;
+}
+
+type EditMaps = {
+    BioEdit?: string;
+    SkillsEdits?: {add?: number[], remove?: number[]};
+    SocialEdits?: {facebook?: string, discord?: string, telegram?: string, twitter?: string};
+}
 
 type MessageFormProps = {
     recipient: string;
@@ -111,15 +126,19 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                     ...this.state.userInfo,
                     freelancer: updated_freelancer,
                 },
-                isEditingBio: false,
-                bioEdit: freelancer.bio 
+                editBitMap: {
+                    ...this.state.editBitMap,
+                    isBio: false,
+                },
+                edits: {
+                    ...this.state.edits,
+                    BioEdit: updated_freelancer.bio,
+                },
             });    
 
         } catch (error) {
             console.log(error);
         }
-        
-        
     };
 
 
@@ -129,8 +148,18 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
         this.state = 
             {
                 showMessageForm: false,
-                isEditingBio : false,
-                bioEdit : "",
+                editBitMap: {
+                    isBio: false,
+                    isSocials: false,
+                    isServices: false,
+                    isSkills: false,
+                    isLanguages: false,
+                },
+                edits: {
+                    BioEdit: "",
+                    SkillsEdits: {},
+                    SocialEdits: {},
+                },
                 userInfo: {
                     freelancer: {
                         id: 0,
@@ -187,19 +216,26 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
             })
         } else {
             console.log("404")
-            //404
         }
     }
 
     async populateProfile(info: UserInfo) {
         this.setState({
-            isEditingBio: false,
-            bioEdit: info.freelancer.bio,
+            editBitMap: {
+                isBio: false,
+                isSocials: false,
+                isServices: false,
+                isSkills: false,
+                isLanguages: false,
+            },
+            edits: {
+                BioEdit: "",
+                SkillsEdits: {},
+                SocialEdits: {},
+            },
             userInfo: info,            
         });
     }
-
-
 
     render() {
         const { userInfo } = this.state;
@@ -279,29 +315,38 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                      <div className="section about">
                         <div className="header-editable">
                             <h5>About</h5>
-                            {!this.state.isEditingBio &&  (
+                            {!this.state.editBitMap.isBio &&  (
                                  <div style={{display: getCookie()  ? 'block' : 'none'}}
                                     className="edit-icon"
                                     onClick={() =>
                                         this.setState({
                                             ...this.state,
-                                            isEditingBio: true,
-                                            bioEdit: userInfo.freelancer.bio,
+                                            editBitMap: {
+                                                ...this.state.editBitMap,
+                                                isBio: true
+                                            },
+                                            edits: {
+                                                ...this.state.edits,
+                                                BioEdit: userInfo.freelancer.bio
+                                            }
                                         })
                                     }
                                 ><FiEdit />
                                 </div>
                             )}
                         </div>
-                        {this.state.isEditingBio ? (
+                        {this.state.editBitMap.isBio ? (
                             <>
                                 <TextInput
                                     maxLength={1000}
-                                    value={this.state.bioEdit}
+                                    value={this.state.edits.BioEdit}
                                     onChange={(e) =>
                                         this.setState({
                                             ...this.state,
-                                            bioEdit: e.target.value,
+                                            edits: {
+                                                ...this.state.edits,
+                                                BioEdit: e.target.value
+                                            } 
                                         })
                                     }
                                     className="bio-input"
@@ -319,8 +364,14 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         onClick={() =>
                                             this.setState({
                                                 ...this.state,
-                                                bioEdit: this.state.userInfo.freelancer.bio,
-                                                isEditingBio: false,
+                                                edits: {
+                                                    ...this.state.edits,
+                                                    BioEdit: this.state.userInfo.freelancer.bio,
+                                                },
+                                                editBitMap: {
+                                                    ...this.state.editBitMap,
+                                                    isBio: true
+                                                },
                                             })
                                         }
                                     >
@@ -383,10 +434,10 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                     </div>
                                     <div className="skills">
                                         {userInfo.freelancer.skills?.map(
-                                            (skill, index) => (
+                                            (skill) => (
                                                 <p
                                                     className="skill"
-                                                    key={index}
+                                                    key={skill.id}
                                                 >
                                                     {skill.name}
                                                 </p>

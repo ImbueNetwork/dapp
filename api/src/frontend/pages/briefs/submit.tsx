@@ -5,9 +5,10 @@ import { FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
-import { Brief, Currency } from "../../models";
+import { Brief, Currency, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
+import { getCurrentUser } from "../../utils";
 
 interface MilestoneItem {
     description: string;
@@ -16,17 +17,12 @@ interface MilestoneItem {
 
 export type BriefProps = {
     brief: Brief;
+    user: User;
 };
 
-export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
+export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
     const [headline, setHeadline] = useState(brief.headline);
-    const [description, setDescription] = useState(brief.description);
-    const [budget, setDBudget] = useState(brief.budget);
-    const [logo, setLogo] = useState("test");
-    const [website, setWebsite] = useState("test2");
-    const [category, setCategory] = useState("finance");
-    const [currency_id, setCurrencyId] = useState("DOT");
-    const [owner, setOwner] = useState("Hari");
+    const [currencyId, setCurrencyId] = useState(0);
     const imbueFee = 5;
 
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
@@ -59,19 +55,19 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
         "content-type": "application/json",
     };
 
+
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCurrencyId(Number(event.target.value))
+        console.log(currencyId);
+      };
+
     async function insertProject() {
+
         const resp = await fetch(`${config.apiBase}/projects/`, {
             headers: postAPIHeaders,
             method: "post",
             body: JSON.stringify({
-                headline,
-                logo,
-                description,
-                website,
-                category,
-                budget,
-                currency_id,
-                owner,
+                currencyId,
                 milestones,
             }),
         });
@@ -253,6 +249,7 @@ export const SubmitProposal = ({ brief }: BriefProps): JSX.Element => {
                         <div className="network-amount">
                             <select
                                 name="currencyId"
+                                onChange={handleChange}
                                 placeholder="Select a currency"
                                 required
                             >
@@ -289,8 +286,9 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (briefId) {
         const brief: Brief = await getBrief(briefId);
+        const user = await getCurrentUser();
         ReactDOMClient.createRoot(
             document.getElementById("submit-proposal")!
-        ).render(<SubmitProposal brief={brief} />);
+        ).render(<SubmitProposal brief={brief} user={user} />);
     }
 });

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import ReactCountryFlag from "react-country-flag";
+import { useParams } from "react-router-dom";
+
 import {
     FaFacebook,
     FaStar,
@@ -15,13 +17,8 @@ import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 import { TextInput } from "../../components/textInput";
-<<<<<<< HEAD
-import { Freelancer, Item } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
-=======
-import { getFreelancerProfile } from "../../services/freelancerService";
 import { Freelancer, Item, User } from "../../models";
->>>>>>> real_time_messaging
 import { Freelancers } from "./new";
 import { FreelancerSocial } from "./freelancer_socials";
 import { getCurrentUser, getStreamChat, redirect } from "../../utils";
@@ -41,17 +38,18 @@ export type ProfileProps = {
 
 
 export type ProfileState = {
-browsingUser: User;
-userInfo: UserInfo;
     showMessageForm: boolean,
+    browsingUser: User;
+    freelancer: Freelancer
+    userInfo: FreelancerInfo;
     editBitMap: EditBitMap;
     edits: EditMaps;
 }
 
 
-export type UserInfo = {
+export type FreelancerInfo = {
     freelancer: Freelancer;
-    location: {
+    location?: {
         country: string;
         address: string;
     };
@@ -67,7 +65,6 @@ export type UserInfo = {
         milestoneComplete: number;
     }>;
 };
-
 
 type EditBitMap = {
     isBio: boolean;
@@ -92,7 +89,6 @@ type MessageFormProps = {
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
-  
     const handleSubmit = (event: React.FormEvent) => {
       event.preventDefault();
       // Send the message to the backend
@@ -126,12 +122,21 @@ const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
     );
 };
 
-export const Profile = ({ freelancer: freelancer }: ProfileProps): JSX.Element => {
+export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Element => {
+    const { username } = useParams();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-    const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [browsingUser, setBrowsingUser] = useState<User| null>(null);
-    const profileImageUrl = "/public/profile-image.png";
+    const [getFreelancerInfo, setFreelancerInfo] = useState<FreelancerInfo>();
+    const [getEditBitMap, setEditBitMap] = useState<EditBitMap>({
+        isBio: false,
+        isLanguages: false,
+        isServices: false,
+        isSkills: false,
+        isSocials: false,
+    });
+    const [getEditMaps, setEditMaps] = useState<EditMaps>();
 
+    const profileImageUrl = "/public/profile-image.png";
 
     const onSaveBio = () => {
         let freelancer = this.state.userInfo.freelancer;
@@ -152,17 +157,16 @@ export const Profile = ({ freelancer: freelancer }: ProfileProps): JSX.Element =
     }
 
     useEffect(() => {
-
         const fetchData = async () => {
-            await populateProfile(freelancer)
+            const browsingUser = await getCurrentUser();
+            setBrowsingUser(browsingUser);
+            const freelancer = await getFreelancerProfile(username || "")
+            setFreelancerInfo({
+                freelancer,
+            })
         }
         fetchData();
     }, [])
-
-    const populateProfile = async (freelancer: Freelancer) => {
-        const browsingUser = await getCurrentUser();
-        setBrowsingUser(browsingUser);
-    }
 
 
     const renderChat = (

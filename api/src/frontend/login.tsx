@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import { useRef, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 import { Dialogue } from "./components/dialogue";
 import { AccountChoice } from "./components/accountChoice";
@@ -78,6 +79,7 @@ async function authorise(
 
 export const Login = ({ }: LoginProps): JSX.Element => {
 
+  const { id } = useParams();
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [userOrEmail, setUserOrEmail] = useState<string>();
   const [password, setPassword] = useState<string>();

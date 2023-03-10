@@ -18,7 +18,7 @@ export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
     
     useEffect(() => {
         setIsEdit(props.isEdit);
-
+        setLink(props.link);
       }, [props.isEdit]);
     
 

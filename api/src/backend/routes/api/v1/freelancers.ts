@@ -109,32 +109,29 @@ router.post("/", (req, res, next) => {
     });
 });
 
-router.put("/:username", (req, res, next) => {
+router.put("/:username", async (req, res, next) => {
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
     verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
-    db.transaction(async tx => {
-        try {
-            const exists: Freelancer = await models.fetchFreelancerDetailsByUsername(username)(tx);
-            console.log(freelancer);
-            if (!exists) {
-                return next(new Error(
-                    "Freelancer does not exist."
-                ));
-            }
-            const fl_id = await models.updateFreelancerDetails(exists.user_id, freelancer)(tx);
-            const updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
-
-            res.status(200).send(updated_freelancer_details);
-        } catch (cause) {
-            next(new Error(
-                `Failed to update freelancer details.`,
-                { cause: cause as Error }
+    try {
+        const exists: any = await models.fetchFreelancerDetailsByUsername(username);
+        if (!exists) {
+            return next(new Error(
+                "Freelancer does not exist."
             ));
         }
-    });
+        const fl_id = await models.updateFreelancerDetails(exists.user_id, freelancer);
+        let updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username);
+
+        return res.status(200).send(updated_freelancer_details);
+    } catch (e: any) {
+        return next(new Error(
+            `Failed to update freelancer details: ${e.message}`,
+        ));
+    }
 });
+
 
 router.post("/search", (req, res, next) => {
     db.transaction(async tx => {

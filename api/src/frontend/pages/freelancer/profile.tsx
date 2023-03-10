@@ -149,11 +149,12 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
             // update socials
             updateFreelancer(freelancer);
         }
+
+        flipEdit()
     };
 
     const flipEdit = () => {
         setIsEditMode(!isEditMode)
-        console.log(isEditMode)
     }
 
     function getCookie() {

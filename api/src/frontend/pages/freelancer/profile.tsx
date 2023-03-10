@@ -136,10 +136,13 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
     //The fields must be pre populated correctly.
     const onSave = () => {
         let freelancer = getFreelancerInfo?.freelancer;
-        let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
+        let bioInput = document.getElementById("bio-input-id") as HTMLTextAreaElement;
         if (freelancer) {
-            freelancer.bio = input.textContent || freelancer.bio;
-
+            freelancer.bio = bioInput.textContent || freelancer.bio;
+            freelancer.discord_link = (document.getElementById("discord-input") as HTMLTextAreaElement).textContent || freelancer.discord_link;
+            freelancer.facebook_link = (document.getElementById("facebook-input") as HTMLTextAreaElement).textContent || freelancer.facebook_link;
+            freelancer.twitter_link = (document.getElementById("twitter-input") as HTMLTextAreaElement).textContent || freelancer.twitter_link;
+            freelancer.telegram_link = (document.getElementById("telegram-input") as HTMLTextAreaElement).textContent || freelancer.telegram_link;
             // update languages
             // update services
             //update skills
@@ -288,21 +291,9 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                     )
                                 }}
                                 className="bio-input"
+                                id="bio-input-id"
                             />
-                            <div className="edit-bio-buttons">
-                                <button
-                                    className="primary-btn in-dark w-full"
-                                    onClick={onSave}
-                                >
-                                    Save
-                                </button>
-                                <button
-                                    className="secondary-btn in-dark w-full"
-                                    onClick={flipEdit}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
+                            
                         </>
                     ) : (
                         <div className="bio">
@@ -355,6 +346,22 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                     }
                                 </div>
                             </div>
+                            {isEditMode ?  
+                            <div className="edit-bio-buttons">
+                                <button
+                                    className="primary-btn in-dark w-full"
+                                    onClick={onSave}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    className="secondary-btn in-dark w-full"
+                                    onClick={flipEdit}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                            : <></>}
                             <div className="divider" />
                             <div className="subsection">
                                 <div className="header-editable">

@@ -144,7 +144,7 @@ button:active {
 
 .edit-bio-buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .header-editable {

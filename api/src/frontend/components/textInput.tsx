@@ -21,7 +21,7 @@ export const TextInput = (props: TextInputProps): JSX.Element => {
     if (title) {
       return <span>{title}</span>
     }
-  }
+  } 
 
   return (
     <>

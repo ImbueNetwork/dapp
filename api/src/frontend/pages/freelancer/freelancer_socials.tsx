@@ -35,13 +35,13 @@ export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
         return (
         
         <TextInput
-                    maxLength={200}
                     value={getLink}
                     onChange={(e)=>{
                         setLink(e.target.value)
                     }}
                     className="bio-input"
-                    title={props.key}
+                    title={props.label}
+                    id={props.key + "-input"}
             />
         
         )

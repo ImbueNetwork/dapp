@@ -124,7 +124,6 @@ const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
 };
 
 export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Element => {
-    const { username } = useParams();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [browsingUser, setBrowsingUser] = useState<User| null>(null);
     const [getFreelancerInfo, setFreelancerInfo] = useState<FreelancerInfo>({
@@ -152,6 +151,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
 
     const flipEdit = () => {
         setIsEditMode(!isEditMode)
+        console.log(isEditMode)
     }
 
     function getCookie() {
@@ -168,7 +168,10 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
         const fetchData = async () => {
             const browsingUser = await getCurrentUser();
             setBrowsingUser(browsingUser);
-            const freelancer = await getFreelancerProfile(username || "")
+            let username = window.location.pathname.split("/").pop() || "";
+            console.log(username);
+            const freelancer = await getFreelancerProfile(username)
+
             setFreelancerInfo({
                 freelancer,
             })
@@ -223,21 +226,11 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                 ))
                             }
                         </div>                                
-                        {!isEditMode &&  (
-                                 <div style={{display: getCookie()  ? 'block' : 'none'}}
-                                    className="edit-icon"
-                                    onClick={() =>
-                                        flipEdit()
-                                    }
-                                ><FiEdit />
-                                </div>
-                            )}
-                        </div>
                                     {/* <span>{userInfo.rating.level}</span> */}
                                     <span className="review-count">
                                         {`(${getFreelancerInfo.freelancer.num_ratings} reviews)`}
                                     </span>
-                    </div> 
+                        
                         <div className="contact">
                             <p>@{getFreelancerInfo.freelancer.username}</p>
                             <IoPeople
@@ -246,6 +239,10 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                             />
                             <p>{getFreelancerInfo.freelancer.display_name}</p>
                         </div>
+                        
+
+                    </div>
+                    </div> 
                         <div className="connect-buttons">
                             <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
                             {/* {this.state.showMessageForm && this.state.browsingUser && (<ChatBox user={this.state.browsingUser} freelancerUsername={this.state.userInfo.contact.username} ></ChatBox>)} */}
@@ -254,6 +251,16 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                 <FaRegShareSquare color="white" /> {"  "}
                                 Share Profile
                             </button>
+                            {!isEditMode &&  (
+                                <div onClick={() => flipEdit()} style={{display: getCookie()  ? 'block' : 'none'}}>
+                                    <div className="primary-button">
+                                    <span>Edit Profile </span>
+                                     <span className="edit-icon"> 
+                                        <FiEdit />
+                                    </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="divider"></div>
                         <div className="show-more">
@@ -271,7 +278,16 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                             <TextInput
                                 maxLength={1000}
                                 value={getFreelancerInfo.freelancer.bio}
-                                onChange={onSave}
+                                onChange={(e)=>{
+                                    setFreelancerInfo(
+                                        {
+                                            freelancer: {
+                                                ...getFreelancerInfo.freelancer,
+                                                bio: e.target.value,
+                                            }
+                                        }
+                                    )
+                                }}
                                 className="bio-input"
                             />
                             <div className="edit-bio-buttons">
@@ -283,7 +299,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                 </button>
                                 <button
                                     className="secondary-btn in-dark w-full"
-
+                                    onClick={flipEdit}
                                 >
                                     Cancel
                                 </button>

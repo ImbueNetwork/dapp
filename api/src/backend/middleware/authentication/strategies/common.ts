@@ -32,17 +32,9 @@ export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: numb
     }
   
     try {
-<<<<<<< HEAD
-      const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
-      console.log(decoded);
-
-      if (user_id == decoded.id) {
-       // next();
-=======
       const decoded: any = jwt.verify(token, jwtOptions.secretOrKey);
       if (req.user_id == decoded.id) {
         next();
->>>>>>> real_time_messaging
       } else {
           return res.status(401).send("You are not authorized to access this resource.");
       }

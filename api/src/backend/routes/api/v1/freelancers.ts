@@ -40,6 +40,9 @@ router.get("/:username",(req, res, next) => {
         try {
             const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
 
+            if (!freelancer) {
+                return res.status(404).end();
+            }
 
             await Promise.all([
                 freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx),
@@ -48,9 +51,6 @@ router.get("/:username",(req, res, next) => {
                 freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx),
             ]);
 
-            if (!freelancer) {
-                return res.status(404).end();
-            }
 
             // Used to show/hide edit buttons if the correct user.
             if (validateUserFromJwt(req, res, next, freelancer.user_id)) {

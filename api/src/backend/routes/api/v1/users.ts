@@ -40,6 +40,31 @@ router.get("/:id/project", (req, res, next) => {
     });
 });
 
+router.get("/:id/briefs/:briefId", (req, res, next) => {
+    const id = req.params.id;
+    const briefId = req.params.briefId;
+    db.transaction(async tx => {
+        try {
+            const project = await models.fetchUserBriefs(id,briefId)(tx);
+            
+            if (!project) {
+                return res.status(404).end();
+            }
+
+            const pkg: ProjectPkg = {
+                ...project,
+                milestones: await models.fetchProjectMilestones(Number(project.id))(tx)
+            };
+
+            res.send(pkg);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch project by id: ${id}`,
+                {cause: e as Error}
+            ));
+        }
+    });
+});
 
 router.post("/", (req, res, next) => {
     const {
@@ -91,7 +116,7 @@ router.get("/:userOrEmail", (req, res, next) => {
             if (!user) {
                 return res.status(404).end();
             }
-            res.send(user);
+            res.send({id: user.id, display_name: user.display_name, username: user.username});
         } catch (e) {
             next(new Error(
                 `Failed to fetch user ${userOrEmail}`,
@@ -101,5 +126,23 @@ router.get("/:userOrEmail", (req, res, next) => {
     });
 });
 
+
+router.get("/byid/:id", (req, res, next) => {
+    const id = Number(req.params.id);
+    db.transaction(async tx => {
+        try {
+            const user: User = await models.fetchUser(id)(tx) as User;
+            if (!user) {
+                return res.status(404).end();
+            }
+            res.send({id: user.id, display_name: user.display_name, username: user.username});
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch user ${id}`,
+                { cause: e as Error }
+            ));
+        }
+    });
+});
 
 export default router;

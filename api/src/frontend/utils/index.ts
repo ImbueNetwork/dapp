@@ -49,6 +49,22 @@ export const getCurrentUser = async () => {
     return null;
 };
 
+export const getUser = async (user_id) => {
+    const resp = await fetch(`${config.apiBase}/users/${user_id}`);
+    if (resp.ok) {
+        return resp.json();
+    }
+    return null;
+};
+
+export const getUserBriefs = async (userId, briefId) => {
+    const resp = await fetch(`${config.apiBase}/users/${userId}/briefs/${briefId}`);
+    if (resp.ok) {
+        return resp.json();
+    }
+    return null;
+};
+
 export const getProjectId = async () => {
     const candidate = window.location.pathname.split("/").pop();
 
@@ -79,6 +95,16 @@ export const fetchUserOrEmail = async (userOrEmail: string) => {
     }
 };
 
+export const fetchUser = async (id: number) => {
+    const resp = await fetch(`${config.apiBase}/users/byid/${id}`, {
+        headers: config.getAPIHeaders,
+    });
+    if (resp.ok) {
+        const user = await resp.json();
+        return user;
+    }
+};
+
 export const badRouteEvent = (type: BadRoute) =>
     new CustomEvent(config.event.badRoute, {
         bubbles: true,
@@ -96,7 +122,7 @@ export function validateForm(form: HTMLFormElement): boolean {
     return valid;
 }
 
-export const getStreamChat = () => {
+export const getStreamChat = async () => {
     if(process.env.REACT_APP_GETSTREAM_API_KEY) {
         return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
     }

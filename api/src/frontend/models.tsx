@@ -1,9 +1,9 @@
 export enum Currency {
-    IMBU = "IMBU",
-    KSM = "KSM",
-    AUSD = "AUSD",
-    KAR = "KAR",
-    MGX = "MGX",
+    IMBU = 0,
+    KSM = 1,
+    AUSD = 2,
+    KAR = 3,
+    MGX = 4,
 }
 
 export enum RoundType {
@@ -27,8 +27,12 @@ export type Project = {
     chain_project_id?: number;
     required_funds: number;
     currency_id: number;
+    milestones: Milestone[];
     owner?: string;
     user_id?: string | number;
+    brief_id?: string | number;
+    total_cost_without_fee?:  number;
+    imbue_fee?:  number;
 };
 
 export enum ProjectState {
@@ -65,11 +69,12 @@ export type ProjectOnChain = {
 };
 
 export type Milestone = {
-    projectKey: number;
-    milestoneKey: number;
+    project_id: number;
+    milestone_key: number;
     name: string;
-    percentageToUnlock: number;
+    percentage_to_unlock: number;
     isApproved: boolean;
+    amount: number;
 };
 
 export type Contribution = {
@@ -178,6 +183,7 @@ export type Brief = {
     experience_level: string;
     experience_id: number;
     number_of_briefs_submitted: number;
+    user_id: number;
 };
 
 export type BriefSqlFilter = {

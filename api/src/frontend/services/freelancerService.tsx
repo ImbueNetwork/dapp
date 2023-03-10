@@ -9,7 +9,7 @@ export async function createFreelancingProfile(freelancer: any) {
        headers: postAPIHeaders,
        method: "post",
        body: JSON.stringify({ freelancer }),
-   });   
+   });
    if (resp.ok) {
        // could be 200 or 201
        // Freelancer API successfully invoked
@@ -40,9 +40,7 @@ export async function getFreelancerProfile(username: string) {
     })
     if (resp.ok) {
         return await resp.json() as Freelancer
-    } else {
-        throw new Error('Failed to get freelancer profile. status:' + resp.status);
-    }
+    } 
 }
 
 

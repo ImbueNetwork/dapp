@@ -50,10 +50,7 @@ button:active {
 }
 
 .subsection {
-    margin-left: 80px;
-}
-
-.summary {
+    margin-left: 40px;
 }
 
 .profile-image {
@@ -286,42 +283,6 @@ button:active {
     align-items: center;
 }
 
-.primary-button {
-    padding: 12px 24px;
-    -webkit-align-self: center;
-    -ms-flex-item-align: center;
-    -ms-grid-row-align: center;
-    align-self: center;
-    border: 2px solid transparent;
-
-    -webkit-transition: color 0.3s, background-color 0.3s;
-    transition: color 0.3s, background-color 0.3s;
-
-    color: #fff;
-    font-size: 16px;
-    font-family: Aeoniktrial, sans-serif;
-    font-weight: 400;
-    line-height: 22px;
-    letter-spacing: 0.6px;
-
-    text-align: center;
-    text-decoration: none;
-    text-transform: capitalize;
-    border-radius: 12px;
-    background-color: #411dc9;
-
-    cursor: pointer;
-}
-
-.primary-button:hover {
-    background-color: #a4ff00;
-    color: #000;
-}
-
-.primary-button:active {
-    transform: scale(1.05);
-}
-
 .projects {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -399,12 +360,10 @@ button:active {
 } 
 
 
-
 .str-chat__message .str-chat__message-bubble,
 .str-chat__message-input .str-chat__quoted-message-preview .str-chat__quoted-message-bubble {
     background: dimgray !important;
 } 
-
 
 .str-chat__message-input,
 .str-chat__message-attachment-card--title,

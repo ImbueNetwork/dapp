@@ -4,38 +4,32 @@ import ReactCountryFlag from "react-country-flag";
 
 import {
     FaFacebook,
-    FaStar,
     FaRegShareSquare,
     FaTwitter,
-    FaGoogle,
     FaTelegram,
     FaDiscord,
 } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
-
 import { TextInput } from "../../components/textInput";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
 import { Freelancer, Item, User, getDefaultFreelancer } from "../../models";
 import { Freelancers } from "./new";
-import { FreelancerSocial } from "./freelancer_socials";
-import { getCurrentUser, getStreamChat, redirect } from "../../utils";
-import { ChatBox } from "../../components/chat";
-import { Dialogue } from "../../components/dialogue";
-import Modal from 'react-bootstrap/Modal';
 
+import { FreelancerSocial } from "./freelancer_socials";
+import { fetchUser, getCurrentUser, getStreamChat, redirect } from "../../utils";
+import { ChatBox } from "../../components/chat";
+import Modal from 'react-bootstrap/Modal';
 
 import "../../../../public/freelancer-profile.css";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { isGeneratorFunction } from "util/types";
 
-
 export type ProfileProps = {
     freelancer: Freelancer;
 };
-
 
 export type ProfileState = {
     showMessageForm: boolean,
@@ -130,6 +124,8 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
     });
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [getEditMaps, setEditMaps] = useState<EditMaps>();
+    const [targetUser, setTargetUser] = useState<User | null>(null);
+    const isCurrentFreelancer = (browsingUser && browsingUser.id == freelancer.user_id);
 
     const profileImageUrl = "/public/profile-image.png";
 
@@ -171,22 +167,24 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
         const fetchData = async () => {
             const browsingUser = await getCurrentUser();
             setBrowsingUser(browsingUser);
+            setTargetUser(await fetchUser(freelancer.user_id));
             let username = window.location.pathname.split("/").pop() || "";
             console.log(username);
             const freelancer = await getFreelancerProfile(username)
-
+            
             setFreelancerInfo({
                 freelancer,
             })
-        }
-        fetchData();
-    }, [])
 
+        }
+        setup();
+    }, [])
 
     const renderChat = (
         <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
             <Modal.Body>
-                {browsingUser ? <ChatBox user={browsingUser} freelancer={getFreelancerInfo?.freelancer} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+
             </Modal.Body>
             <Modal.Footer>
                 <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
@@ -199,6 +197,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
             setShowMessageBox(true);
         } else {
             redirect("login", `/dapp/freelancers/${getFreelancerInfo.freelancer.username}`)
+
         }
     }
 
@@ -247,9 +246,13 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                     </div>
                     </div> 
                         <div className="connect-buttons">
-                            <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
-                            {/* {this.state.showMessageForm && this.state.browsingUser && (<ChatBox user={this.state.browsingUser} freelancerUsername={this.state.userInfo.contact.username} ></ChatBox>)} */}
-                            {browsingUser && showMessageBox && renderChat}
+
+                            {!isCurrentFreelancer &&
+                                <>
+                                    <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
+                                    {browsingUser && showMessageBox && renderChat}
+                                </>
+                            }
                             <button className="primary-button full-width">
                                 <FaRegShareSquare color="white" /> {"  "}
                                 Share Profile
@@ -445,11 +448,16 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
+    let paths = window.location.pathname.split("/");
+    let username = paths.length >= 2 && paths[paths.length - 2];
 
-    let username = window.location.pathname.split('/').pop();
-    const freelancer = await getFreelancerProfile(username || "");
-
-    ReactDOMClient.createRoot(
-        document.getElementById("freelancer-profile")!
-    ).render(<Profile freelancer={freelancer} />);
+    if (username) {
+        const freelancer = await getFreelancerProfile(username);
+        if(freelancer) {
+            ReactDOMClient.createRoot(
+                document.getElementById("freelancer-profile")!
+            ).render(<Profile freelancer={freelancer} />);
+        }
+        // TODO redirect to 404 if no freelancer found
+    }
 });

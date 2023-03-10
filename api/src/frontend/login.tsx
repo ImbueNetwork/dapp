@@ -166,10 +166,12 @@ export const Login = ({ }: LoginProps): JSX.Element => {
               tabIndex={0}
               data-mdc-dialog-action="web3"
             >
-              <span className="mdc-deprecated-list-item__graphic">
+              <span onClick={() => showPolkadotAccounts(true)}
+                className="mdc-deprecated-list-item__graphic">
                 <img
                   src="https://avatars.githubusercontent.com/u/33775474?s=200&amp;amp;v=4"
                   style={{ maxWidth: "100%" }}
+
                 />
               </span>
               <span

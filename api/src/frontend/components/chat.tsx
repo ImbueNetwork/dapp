@@ -8,14 +8,22 @@ import { getStreamChat } from "../utils";
 
 export type ChatProps = {
     user: User;
-    freelancer: Freelancer;
+    targetUser: User;
 };
 
-export const ChatBox = ({ user: user, freelancer: freelancer }: ChatProps): JSX.Element => {
-    const client = getStreamChat();
+export const ChatBox = ({ user, targetUser }: ChatProps): JSX.Element => {
+    const [client, setClient] = useState<StreamChat>();
+
+    useEffect(() => {
+        async function setup() {
+            setClient(await getStreamChat());
+        }
+        setup();
+     }, [])
 
     if (client) {
-        const currentChannel = `${user.display_name} (${user.username}) <> ${freelancer.display_name} ${freelancer.username}`;
+        const currentChannel = `${user.display_name} (${user.username}) <> ${targetUser.display_name} ${targetUser.username}`;
+
         client.connectUser(
             {
                 id: user.username,
@@ -27,7 +35,7 @@ export const ChatBox = ({ user: user, freelancer: freelancer }: ChatProps): JSX.
         const channel = client.channel('messaging', {
             image: 'https://www.drupal.org/files/project-images/react.png',
             name: currentChannel,
-            members: [user.username, freelancer.username],
+            members: [user.username, targetUser.username],
         });
 
         return (

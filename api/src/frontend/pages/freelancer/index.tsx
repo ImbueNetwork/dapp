@@ -3,12 +3,14 @@ import ReactDOMClient from "react-dom/client";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../models";
 import * as utils from "../../utils";
 import "../../../../public/freelancers.css";
-import { callSearchFreelancers, getAllFreelancers } from "../../services/freelancerService";
+import {
+    callSearchFreelancers,
+    getAllFreelancers,
+} from "../../services/freelancerService";
 import { FreelancerFilterOption, FilterOption } from "../../types/freelancers";
 import FreelancerFilter from "../../components/freelancerFilter";
 
 export const Freelancers = (): JSX.Element => {
-
     const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
     const [skills, setSkills] = useState<Item[]>([]);
     const [services, setServices] = useState<Item[]>([]);
@@ -17,30 +19,39 @@ export const Freelancers = (): JSX.Element => {
     const fetchAndSetFreelancers = async () => {
         const data = await getAllFreelancers();
 
-        let combinedSkills = (Array.prototype.concat.apply([], data.map(x => x.skills))) as Item[];
+        let combinedSkills = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.skills)
+        ) as Item[];
         const dedupedSkills = await dedupeArray(combinedSkills);
 
-        var combinedServices = (Array.prototype.concat.apply([], data.map(x => x.services))) as Item[];
+        var combinedServices = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.services)
+        ) as Item[];
         const dedupedServices = await dedupeArray(combinedServices);
 
-        var combinedLanguages = (Array.prototype.concat.apply([], data.map(x => x.languages))) as Item[];
+        var combinedLanguages = Array.prototype.concat.apply(
+            [],
+            data.map((x) => x.languages)
+        ) as Item[];
         const dedupedLanguages = await dedupeArray(combinedLanguages);
 
         setSkills(dedupedSkills);
         setServices(dedupedServices);
         setLanguages(dedupedLanguages);
         setFreelancers(data);
-
     };
 
-
     const dedupeArray = async (input) => {
-        return input.filter((thing, i, arr) => {
-            return (arr.indexOf(arr.find(t => t.id === thing.id)) === i)
-        }).sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        })
-    }
+        return input
+            .filter((thing, i, arr) => {
+                return arr.indexOf(arr.find((t) => t.id === thing.id)) === i;
+            })
+            .sort(function (a, b) {
+                return a.name.localeCompare(b.name);
+            });
+    };
 
     useEffect(() => {
         // TODO, show spinning loading wheel while we retreive data
@@ -48,18 +59,18 @@ export const Freelancers = (): JSX.Element => {
     }, []);
 
     const redirectToProfile = (username) => {
-        utils.redirect(`freelancers/${username}`);
-    }
+        utils.redirect(`freelancers/${username}/`);
+    };
 
     const skillsFilter = {
         filterType: FreelancerFilterOption.Services,
         label: "Skills",
-        options: skills.map(item => {
+        options: skills.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
-            }
-            return filter
+            };
+            return filter;
         }),
     };
 
@@ -68,12 +79,12 @@ export const Freelancers = (): JSX.Element => {
         // since its a range i need the
         filterType: FreelancerFilterOption.Services,
         label: "Services",
-        options: services.map(item => {
+        options: services.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
-            }
-            return filter
+            };
+            return filter;
         }),
     };
 
@@ -82,12 +93,12 @@ export const Freelancers = (): JSX.Element => {
         // Again i need the high and low values.
         filterType: FreelancerFilterOption.Languages,
         label: "Languages",
-        options: languages.map(item => {
+        options: languages.map((item) => {
             let filter = {
                 interiorIndex: item.id,
                 value: item.name,
-            }
-            return filter
+            };
+            return filter;
         }),
     };
 
@@ -112,7 +123,6 @@ export const Freelancers = (): JSX.Element => {
         }
 
         for (let i = 0; i < elements.length; i++) {
-
             if (elements[i].checked) {
                 is_search = true;
                 const id = elements[i].getAttribute("id");
@@ -123,18 +133,27 @@ export const Freelancers = (): JSX.Element => {
                     // and also specify if we want more than using the is_max field.
                     switch (parseInt(filterType) as FreelancerFilterOption) {
                         case FreelancerFilterOption.Skills:
-                            skillsRange = [...skillsRange, parseInt(interiorIndex)];
+                            skillsRange = [
+                                ...skillsRange,
+                                parseInt(interiorIndex),
+                            ];
                             break;
                         case FreelancerFilterOption.Services:
-                            servicesRange = [...servicesRange, parseInt(interiorIndex)];
+                            servicesRange = [
+                                ...servicesRange,
+                                parseInt(interiorIndex),
+                            ];
                             break;
                         case FreelancerFilterOption.Languages:
-                            languagesRange = [...languagesRange, parseInt(interiorIndex)];
+                            languagesRange = [
+                                ...languagesRange,
+                                parseInt(interiorIndex),
+                            ];
                             break;
                         default:
                             console.log(
                                 "Invalid filter option selected or unimplemented. type:" +
-                                filterType
+                                    filterType
                             );
                     }
                 }
@@ -156,8 +175,6 @@ export const Freelancers = (): JSX.Element => {
             setFreelancers(allFreelancers);
         }
     };
-
-
 
     return (
         <div>
@@ -202,59 +219,57 @@ export const Freelancers = (): JSX.Element => {
                         </div>
                     </div>
                     <div className="freelancers">
-
-                        {freelancers.slice(0, 10).map(
-                            (
-                                {
-                                    title,
-                                    username,
-                                    display_name,
-                                    skills,
-                                },
-                                index
-                            ) => (
-                                <div className="freelancer" key={index}>
-                                    <div className="freelancer-image-container">
-                                        <img
-                                            src="/public/profile-image.png"
-                                            className="freelancer-profile-pic"
-
-                                        />
-                                        <div className="dark-layer" />
-                                    </div>
-                                    <div className="freelancer-info">
-                                        <h3>{display_name}</h3>
-                                        <h5>{title}</h5>
-                                        <div className="skills">
-                                            {skills?.slice(0, 3).map(
-                                                (skill, index) => (
-                                                    <p
-                                                        className="skill"
-                                                        key={index}
-                                                    >
-                                                        {skill.name}
-                                                    </p>
-                                                )
-                                            )}
+                        {freelancers
+                            .slice(0, 10)
+                            .map(
+                                (
+                                    { title, username, display_name, skills },
+                                    index
+                                ) => (
+                                    <div className="freelancer" key={index}>
+                                        <div className="freelancer-image-container">
+                                            <img
+                                                src="/public/profile-image.png"
+                                                className="freelancer-profile-pic"
+                                            />
+                                            <div className="dark-layer" />
                                         </div>
+                                        <div className="freelancer-info">
+                                            <h3>{display_name}</h3>
+                                            <h5>{title}</h5>
+                                            <div className="skills">
+                                                {skills
+                                                    ?.slice(0, 3)
+                                                    .map((skill, index) => (
+                                                        <p
+                                                            className="skill"
+                                                            key={index}
+                                                        >
+                                                            {skill.name}
+                                                        </p>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="primary-button full-width"
+                                            onClick={() =>
+                                                redirectToProfile(username)
+                                            }
+                                        >
+                                            View
+                                        </button>
                                     </div>
-                                    <button className="primary-button full-width" onClick={() => redirectToProfile(username)}>
-                                        View
-                                    </button>
-                                </div>
-                            )
-                        )}
+                                )
+                            )}
                     </div>
                 </div>
-
             </div>
         </div>
-
     );
 };
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    ReactDOMClient.createRoot(
-        document.getElementById("freelancers")!
-    ).render(<Freelancers />);
+    ReactDOMClient.createRoot(document.getElementById("freelancers")!).render(
+        <Freelancers />
+    );
 });

@@ -11,6 +11,10 @@ p {
     line-height: 1.2;
 }
 
+.header {
+    margin-top: 20px;
+}
+
 .field-input {
     background-color: var(--theme-ink-color);
     /* opacity: 0.11; */
@@ -206,14 +210,14 @@ p {
 }
 
 .brief-insights {
-    width: 25%;
+    width: 28%;
     background-color: var(--theme-grey-dark);
     border: 1px solid var(--theme-ink-color);
     border-radius: 20px;
 }
 
 .brief-insights > .subsection {
-    height: 20%;
+    height: 18%;
 }
 
 .brief-insights-stat {
@@ -230,6 +234,7 @@ p {
 }
 
 .subsection {
+    margin-left: 20px;
     margin-bottom: 25px;
 }
 .subsection > ul > li {
@@ -266,9 +271,72 @@ p {
     font-weight: bold;
 }
 
-
 .brief-insight-icon {
-    margin-top: 10px;
     margin-right: 10px;
-    font-size: 35px;
+    font-size: 23px;
+}
+
+.meet-hiring-team {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--theme-grey-dark);
+    border-radius: 10px;
+    padding-bottom: 30px;
+}
+
+.skill {
+    padding: 12px 24px;
+    border: 1px solid white;
+    border-radius: 8px;
+}
+
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+
+.meet-hiring-team > button {
+    margin-top: 0px;
+    font-size: 14px;
+}
+
+.modal-body,
+.modal-footer,
+.str-chat,
+.str-chat__list,
+.str-chat__message-input,
+.str-chat__message-input-inner,
+.mdc-dialog__surface,
+.str-chat__channel-header {
+    background: #262626 !important;
+} 
+
+
+.str-chat__message .str-chat__message-bubble,
+.str-chat__message-input .str-chat__quoted-message-preview .str-chat__quoted-message-bubble {
+    background: dimgray !important;
+} 
+
+.str-chat__message-input,
+.str-chat__message-attachment-card--title,
+.str-chat__message-input .str-chat__message-textarea-container .str-chat__message-textarea {
+    color: var(--theme-ink-color) !important;
+}
+
+.h3, h3 {
+    font-size: 1.17em !important;
+}
+
+.meet-hiring-team > h3 {
+    margin-top: 10px
 }

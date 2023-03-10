@@ -1,7 +1,7 @@
 import express from "express";
 import type { Session } from "express-session";
 import passport, { use } from "passport";
-import { getOrCreateFederatedUser, updateFederatedLoginUser, User } from "../../../models";
+import { generateGetStreamToken, getOrCreateFederatedUser, updateFederatedLoginUser, updateUserGetStreamToken, User } from "../../../models";
 import config from "../../../config";
 import db from "../../../db";
 import * as models from "../../../models";
@@ -38,7 +38,6 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
         password
     } = req.body;
 
-
     db.transaction(async tx => {
         try {
             const user = await models.fetchUserOrEmail(userOrEmail)(tx);
@@ -46,6 +45,12 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
                 console.log("there")
                 return res.status(404).end();
             }
+
+            if(!user.getstream_token) {
+                const token = await generateGetStreamToken(user);
+                await updateUserGetStreamToken(user?.id, token)(tx);
+            }
+
             const loginSuccessful = await bcrypt.compare(password, user.password)
             if (!loginSuccessful) {
                 console.log("here")
@@ -67,9 +72,6 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
             ));
         }
     });
-
-
-
 });
 
 imbueJsAuthRouter.post("/register", (req, res, next) => {
@@ -79,9 +81,7 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
         password
     } = req.body;
 
-
     ensureParams(req.body, next, ["username", "email", "password"]);
-
 
     db.transaction(async tx => {
         const usernameExists = await models.fetchUserOrEmail(username)(tx);
@@ -129,7 +129,5 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
                 username.toLowerCase(),
                 updateUserDetails);
         }
-
     });
-
 });

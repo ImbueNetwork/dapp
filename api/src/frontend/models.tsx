@@ -154,6 +154,7 @@ export type Brief = {
     experience_level: string;
     experience_id: number;
     number_of_briefs_submitted: number;
+    user_id: number;
 };
 
 export type BriefSqlFilter = {

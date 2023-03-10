@@ -220,11 +220,26 @@ export const upsertWeb3Challenge = (
         ];
     };
 
-export const insertUserByDisplayName = (displayName: string, username: string, token?: string) =>
+export const insertUserByDisplayName = (displayName: string, username: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
             display_name: displayName,
             username: username,
+        }).returning("*")
+    )[0];
+
+export const generateGetStreamToken = (user: User) => {
+    if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
+        const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
+        const token = client.createToken(user.username);
+        return token;
+    }
+    return ""
+}
+
+export const updateUserGetStreamToken = (id: number, token: string ) =>
+    async (tx: Knex.Transaction) => (
+        await tx<User>("users").where({id}).update({
             getstream_token: token
         }).returning("*")
     )[0];
@@ -353,14 +368,12 @@ export const fetchAllBriefs = () =>
             "experience_level",
             "briefs.experience_id",
             "briefs.created",
+            "briefs.user_id",
             "users.briefs_submitted as number_of_briefs_submitted",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
-
             tx.raw("ARRAY_AGG(DISTINCT CAST(industries.name as text)) as industries"),
             tx.raw("ARRAY_AGG(DISTINCT CAST(industries.id as text)) as industry_ids"),
-
-            "users.id"
         )
             .from("briefs")
             .leftJoin("brief_industries", { "briefs.id": "brief_industries.brief_id" })
@@ -498,14 +511,9 @@ export const getOrCreateFederatedUser = (
              * If not, create the `usr`, then the `federated_credential`
              */
             if (!federated) {
-
-                if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
-                    const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
-                    const token = client.createToken(username);
-                    user = await insertUserByDisplayName(displayName, username, token)(tx);
-                } else {
-                    user = await insertUserByDisplayName(displayName, username)(tx);
-                }
+                user = await insertUserByDisplayName(displayName, username)(tx);
+                const token = await generateGetStreamToken(user);
+                await updateUserGetStreamToken(user.id, token)(tx);
                 await insertFederatedCredential(user.id, issuer, username)(tx);
             } else {
                 const user_ = await db.select().from<User>("users").where({

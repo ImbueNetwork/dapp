@@ -59,7 +59,7 @@ export const Freelancers = (): JSX.Element => {
     }, []);
 
     const redirectToProfile = (username) => {
-        utils.redirect(`freelancers/${username}`);
+        utils.redirect(`freelancers/${username}/`);
     };
 
     const skillsFilter = {

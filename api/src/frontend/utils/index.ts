@@ -1,4 +1,5 @@
 import * as config from "../config";
+import { StreamChat } from 'stream-chat';
 
 export type BadRoute =
     | "not-found"
@@ -93,6 +94,12 @@ export function validateForm(form: HTMLFormElement): boolean {
 
     const valid = fields.every(($input) => $input.checkValidity());
     return valid;
+}
+
+export const getStreamChat = () => {
+    if(process.env.REACT_APP_GETSTREAM_API_KEY) {
+        return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
+    }
 }
 
 function reportValidity(input: HTMLInputElement, submitting: boolean = false) {

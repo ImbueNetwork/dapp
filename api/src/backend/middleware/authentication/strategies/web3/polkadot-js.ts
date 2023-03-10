@@ -22,6 +22,7 @@ import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import config from "../../../../config";
+import { StreamChat } from 'stream-chat';
 
 const JwtStrategy = passportJwt.Strategy;
 
@@ -76,6 +77,9 @@ polkadotJsAuthRouter.post("/", (req, res, next) => {
         (err as any).status = 400;
         next(err);
     }
+
+
+
 
     // If no address can be found, create a `users` and then a
     // `federated_credential`

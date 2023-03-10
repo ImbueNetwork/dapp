@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import ReactCountryFlag from "react-country-flag";
 import {
@@ -14,16 +14,35 @@ import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
-import "../../../../public/freelancer-profile.css";
 import { TextInput } from "../../components/textInput";
+<<<<<<< HEAD
 import { Freelancer, Item } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
+=======
+import { getFreelancerProfile } from "../../services/freelancerService";
+import { Freelancer, Item, User } from "../../models";
+>>>>>>> real_time_messaging
 import { Freelancers } from "./new";
-import { FreelancerSocial} from "./freelancer_socials";
+import { FreelancerSocial } from "./freelancer_socials";
+import { getCurrentUser, getStreamChat, redirect } from "../../utils";
+import { ChatBox } from "../../components/chat";
+import { Dialogue } from "../../components/dialogue";
+import Modal from 'react-bootstrap/Modal';
 
-export type ProfileProps = {};
+
+import "../../../../public/freelancer-profile.css";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+export type ProfileProps = {
+    freelancer: Freelancer;
+};
+
+
 export type ProfileState = {
-    userInfo: UserInfo;
+browsingUser: User;
+userInfo: UserInfo;
     showMessageForm: boolean,
     editBitMap: EditBitMap;
     edits: EditMaps;
@@ -49,6 +68,7 @@ export type UserInfo = {
     }>;
 };
 
+
 type EditBitMap = {
     isBio: boolean;
     isSkills: boolean;
@@ -67,7 +87,6 @@ type MessageFormProps = {
     recipient: string;
     onClose: () => void;
 };
-
 
 
 const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
@@ -106,181 +125,91 @@ const MessageForm = ({ recipient, onClose }: MessageFormProps) => {
       </div>
     );
 };
-  
-  
 
-  
+export const Profile = ({ freelancer: freelancer }: ProfileProps): JSX.Element => {
+    const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+    const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
+    const [browsingUser, setBrowsingUser] = useState<User| null>(null);
+    const profileImageUrl = "/public/profile-image.png";
 
-export class Profile extends React.Component<ProfileProps, ProfileState> {
 
-    onSaveBio = async() => {
+    const onSaveBio = () => {
         let freelancer = this.state.userInfo.freelancer;
         let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
         freelancer.bio = input.textContent || "";
-        try {
-            let updated_freelancer = await updateFreelancer(
-                freelancer
-            );
-            this.setState({
-                userInfo: {
-                    ...this.state.userInfo,
-                    freelancer: updated_freelancer,
-                },
-                editBitMap: {
-                    ...this.state.editBitMap,
-                    isBio: false,
-                },
-                edits: {
-                    ...this.state.edits,
-                    BioEdit: updated_freelancer.bio,
-                },
-            });    
-
-        } catch (error) {
-            console.log(error);
-        }
+        //this.setState({
+        //});
     };
 
+    function getCookie() {
+        const isUser = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("isUser="))
+            ?.split("=")[1];
+        if(isUser === "false")
+            return false;
+        return true;
+    }
+
+    useEffect(() => {
+
+        const fetchData = async () => {
+            await populateProfile(freelancer)
+        }
+        fetchData();
+    }, [])
+
+    const populateProfile = async (freelancer: Freelancer) => {
+        const browsingUser = await getCurrentUser();
+        setBrowsingUser(browsingUser);
+    }
 
 
-    constructor(props) {
-        super(props);
-        this.state = 
-            {
-                showMessageForm: false,
-                editBitMap: {
-                    isBio: false,
-                    isSocials: false,
-                    isServices: false,
-                    isSkills: false,
-                    isLanguages: false,
-                },
-                edits: {
-                    BioEdit: "",
-                    SkillsEdits: {},
-                    SocialEdits: {},
-                },
-                userInfo: {
-                    freelancer: {
-                        id: 0,
-                        bio: "",
-                        education: "",
-                        experience: "",
-                        facebook_link: "",
-                        twitter_link: "",
-                        telegram_link: "",
-                        discord_link: "",
-                        freelanced_before: "",
-                        freelancing_goal: "",
-                        work_type: "",
-                        title: "",
-                        skills: [],
-                        languages: [],
-                        services: [],
-                        clients: [],
-                        client_images: [],
-                        display_name: "",
-                        username: "",
-                        user_id: 0,
-                        rating: 0,
-                        num_ratings: 0,
-                        profileImageUrl: "/public/profile-image.png",
-                    },
-                    location: {country: "", address: ""},
-                    portfolio: [],
-                    projects: []
-            }
-        };
-      }
-    
+    const renderChat = (
+        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
+            <Modal.Body>
+                {browsingUser ? <ChatBox user={browsingUser} freelancer={freelancer} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+            </Modal.Body>
+            <Modal.Footer>
+                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
+            </Modal.Footer>
+        </Modal>
+    );
 
-
-    async componentDidMount() {
-        let username = window.location.pathname.split('/').pop();
-        const freelancer = await getFreelancerProfile(username || "");
-
-
-        if (freelancer) {
-            if (freelancer.profileImageUrl == undefined || "") {
-                freelancer.profileImageUrl = "/public/profile-image.png";
-            }
-            await this.populateProfile({
-                freelancer: freelancer,
-                location: {
-                    country: "",
-                    address: "",
-                },
-                portfolio: [],
-                projects: [],
-                
-            })
+    const handleMessageBoxClick = () => {
+        if (browsingUser) {
+            setShowMessageBox(true);
         } else {
-            console.log("404")
+            redirect("login", `/dapp/freelancers/${freelancer.username}`)
         }
     }
 
-    async populateProfile(info: UserInfo) {
-        this.setState({
-            editBitMap: {
-                isBio: false,
-                isSocials: false,
-                isServices: false,
-                isSkills: false,
-                isLanguages: false,
-            },
-            edits: {
-                BioEdit: "",
-                SkillsEdits: {},
-                SocialEdits: {},
-            },
-            userInfo: info,            
-        });
-    }
-
-    render() {
-        const { userInfo } = this.state;
-
-        function getCookie() {
-            const isUser = document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("isUser="))
-                ?.split("=")[1];
-            if(isUser === "false")
-                return false;
-            return true;
-        }
-
-        return (
-            <div className="profile-container">
-                <div className="banner">
-                    <img
-                        src="/public/profile-banner.png"
-                        alt="profile banner"
-                        className="banner-image"
-                    />
-                </div>
-                <div className="info-container">
-                    <div className="section summary">
-                        <div className="profile-image">
-                            <img
-                                src={userInfo.freelancer.profileImageUrl}
-                                alt=""
-                            />
-                        </div>
-                        <div className="profile-summary">
-                            <h5>{userInfo.freelancer.display_name}</h5>
-                            <div className="location">
-                                <ReactCountryFlag
-                                    countryCode={userInfo.location.country}
-                                />
-                                <p>{userInfo.location.address}</p>
-                            </div>
-                            <div className="rating">
-                                    {
-                                        Array.from({ length: userInfo.freelancer.rating || 0}, (_, i) => i).map((i) => (
-                                            <p key={i}><FaStar color="var(--theme-yellow)" /></p> 
-                                        ))
-                                    }
+    return (
+        <div>
+        <div className="profile-container">
+            <div className="banner">
+                <img
+                    src="/public/profile-banner.png"
+                    alt="profile banner"
+                    className="banner-image"
+                />
+            </div>
+            <div className="info-container">
+                <div className="section summary">
+                    <div className="profile-image">
+                        <img
+                            src={profileImageUrl}
+                            alt=""
+                        />
+                    </div>
+                    <div className="profile-summary">
+                        <h5>{freelancer.display_name}</h5>
+                        {/* <div className="rating">
+                                {
+                                    Array.from({ length: userInfo.rating.stars }, (_, i) => i).map((i) => (
+                                        <p key={i}><FaStar color="var(--theme-yellow)" /></p>
+                                    ))
+                                }
                                 <p>
                                     {/* todo? */}
                                     {/* <span>{userInfo.rating.level}</span> */}
@@ -288,181 +217,151 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         {`(${userInfo.freelancer.num_ratings} reviews)`}
                                     </span>
                                 </p>
-                            </div>
-                            <div className="contact">
-                                <p>@{userInfo.freelancer.username}</p>
-                                <IoPeople
-                                    color="var(--theme-secondary)"
-                                    size="24px"
-                                />
-                                <p>{userInfo.freelancer.title}</p>
-                            </div>
-                            <div className="connect-buttons">
-                                <button onClick={() => this.setState({ showMessageForm: true })} className="message">Message</button>
-                                {this.state.showMessageForm && (<MessageForm recipient={userInfo.freelancer.display_name} onClose={() => this.setState({ showMessageForm: false })} /> )}
-                                <button className="share">
-                                    <FaRegShareSquare color="white" /> {"  "}
-                                    Share Profile
-                                </button>
-                            </div>
-                            <div className="divider"></div>
-                            <div className="show-more">
-                                Show more{"  "}
-                                <MdKeyboardArrowDown size="20" />
-                            </div>
+                            </div> */}
+                        <div className="contact">
+                            <p>@{freelancer.username}</p>
+                            <IoPeople
+                                color="var(--theme-secondary)"
+                                size="24px"
+                            />
+                            <p>{freelancer.display_name}</p>
+                        </div>
+                        <div className="connect-buttons">
+                            <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
+                            {/* {this.state.showMessageForm && this.state.browsingUser && (<ChatBox user={this.state.browsingUser} freelancerUsername={this.state.userInfo.contact.username} ></ChatBox>)} */}
+                            {browsingUser && showMessageBox && renderChat}
+                            <button className="primary-button full-width">
+                                <FaRegShareSquare color="white" /> {"  "}
+                                Share Profile
+                            </button>
+                        </div>
+                        <div className="divider"></div>
+                        <div className="show-more">
+                            Show more{"  "}
+                            <MdKeyboardArrowDown size="20" />
                         </div>
                     </div>
-                     <div className="section about">
-                        <div className="header-editable">
-                            <h5>About</h5>
-                            {!this.state.editBitMap.isBio &&  (
+                </div>
+                <div className="section about">
+                    <div className="header-editable">
+                        <h5>About</h5>
+                        {!this.state.editBitMap.isBio &&  (
                                  <div style={{display: getCookie()  ? 'block' : 'none'}}
                                     className="edit-icon"
                                     onClick={() =>
-                                        this.setState({
-                                            ...this.state,
-                                            editBitMap: {
-                                                ...this.state.editBitMap,
-                                                isBio: true
-                                            },
-                                            edits: {
-                                                ...this.state.edits,
-                                                BioEdit: userInfo.freelancer.bio
-                                            }
-                                        })
+                                        // setIsEditingBio, set edit bio
                                     }
                                 ><FiEdit />
                                 </div>
                             )}
+                    </div>
+                    {isEditingBio ? (
+                        <>
+                            <TextInput
+                                maxLength={1000}
+                                value={freelancer.bio}
+                                onChange={onSaveBio}
+                                className="bio-input"
+                            />
+                            <div className="edit-bio-buttons">
+                                <button
+                                    className="primary-btn in-dark w-full"
+                                    onClick={onSaveBio}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    className="secondary-btn in-dark w-full"
+
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="bio">
+                            {freelancer.bio
+                                .split("\n")
+                                .map((line, index) => (
+                                    <p key={index}>{line}</p>
+                                ))}
                         </div>
-                        {this.state.editBitMap.isBio ? (
-                            <>
-                                <TextInput
-                                    maxLength={1000}
-                                    value={this.state.edits.BioEdit}
-                                    onChange={(e) =>
-                                        this.setState({
-                                            ...this.state,
-                                            edits: {
-                                                ...this.state.edits,
-                                                BioEdit: e.target.value
-                                            } 
+                    )}
+                </div>
+                <div className="portfolio">
+                    <div className="detailed-info">
+                        <div className="section user-info">
+                            <div className="subsection">
+                                <h5>Linked Account</h5>
+                                <div className="social-links">
+                                    {
+                                        FreelancerSocial({
+                                            label: "Facebook",
+                                            key: "facebook",
+                                            icon: <FaFacebook />,
+                                            link: freelancer.facebook_link,
+                                        })
+                                    }{
+                                        FreelancerSocial({
+                                            label: "Twitter",
+                                            key: "twitter",
+                                            icon: <FaTwitter />,
+                                            link: freelancer.twitter_link,
+                                        })
+                                    }{
+                                        FreelancerSocial({
+                                            label: "Telegram",
+                                            key: "telegram",
+                                            icon: <FaTelegram />,
+                                            link: freelancer.telegram_link,
+                                        })
+                                    }{
+                                        FreelancerSocial({
+                                            label: "Discord",
+                                            key: "discord",
+                                            icon: <FaDiscord />,
+                                            link: freelancer.discord_link,
                                         })
                                     }
-                                    className="bio-input"
-                                    id="bio-input-id"
-                                />
-                                <div className="edit-bio-buttons">
-                                    <button
-                                        className="primary-btn in-dark w-full"
-                                        onClick={this.onSaveBio}
-                                    >
-                                        Save
-                                    </button>
-                                    <button
-                                        className="secondary-btn in-dark w-full"
-                                        onClick={() =>
-                                            this.setState({
-                                                ...this.state,
-                                                edits: {
-                                                    ...this.state.edits,
-                                                    BioEdit: this.state.userInfo.freelancer.bio,
-                                                },
-                                                editBitMap: {
-                                                    ...this.state.editBitMap,
-                                                    isBio: true
-                                                },
-                                            })
-                                        }
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="bio">
-                                {this.state.userInfo.freelancer.bio
-                                    .split("\n")
-                                    .map((line, index) => (
-                                        <p key={index}>{line}</p>
-                                    ))}
-                            </div>
-                        )}
-                    </div>
-                    <div className="portfolio">
-                        <div className="detailed-info">
-                            <div className="section user-info">
-                                <div className="subsection">
-                                    <h5>Linked Account</h5>
-                                    <div className="social-links">
-                                        {
-                                            FreelancerSocial({
-                                                label: "Facebook",
-                                                key: "facebook",
-                                                icon: <FaFacebook/>,
-                                                link: this.state.userInfo.freelancer.facebook_link,
-                                            })
-                                        }{
-                                            FreelancerSocial({
-                                                label: "Twitter",
-                                                key: "twitter",
-                                                icon: <FaTwitter/>,
-                                                link: this.state.userInfo.freelancer.twitter_link,
-                                            })
-                                        }{                                  
-                                            FreelancerSocial({
-                                                label: "Telegram",
-                                                key: "telegram",
-                                                icon: <FaTelegram/>,
-                                                link: this.state.userInfo.freelancer.telegram_link,
-                                            })
-                                        }{
-                                            FreelancerSocial({
-                                                label: "Discord",
-                                                key: "discord",
-                                                icon: <FaDiscord/>,
-                                                link: this.state.userInfo.freelancer.discord_link,
-                                            })
-                                        }
-                                    </div>
-                                </div>
-                                <div className="divider" />
-                                <div className="subsection">
-                                    <div className="header-editable">
-                                        <h5>Skills</h5>
-                                        <div className="btn-add">Add Now</div>
-                                    </div>
-                                    <div className="skills">
-                                        {userInfo.freelancer.skills?.map(
-                                            (skill) => (
-                                                <p
-                                                    className="skill"
-                                                    key={skill.id}
-                                                >
-                                                    {skill.name}
-                                                </p>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="divider" />
-                                <div className="subsection">
-                                    <div className="header-editable">
-                                        <h5>Certification</h5>
-                                        <div className="btn-add">Add Now</div>
-                                    </div>
-                                    <p className="text-grey">
-                                        Add your certification
-                                    </p>
                                 </div>
                             </div>
-                            <div className="section portfolio-breakdown">
+                            <div className="divider" />
+                            <div className="subsection">
+                                <div className="header-editable">
+                                    <h5>Skills</h5>
+                                    <div className="btn-add">Add Now</div>
+                                </div>
+                                <div className="skills">
+                                    {freelancer.skills?.map(
+                                        (skill, index) => (
+                                            <p
+                                                className="skill"
+                                                key={index}
+                                            >
+                                                {skill.name}
+                                            </p>
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                            <div className="divider" />
+                            <div className="subsection">
+                                <div className="header-editable">
+                                    <h5>Certification</h5>
+                                    <div className="btn-add">Add Now</div>
+                                </div>
+                                <p className="text-grey">
+                                    Add your certification
+                                </p>
+                            </div>
+                        </div>
+                        {/* <div className="section portfolio-breakdown">
                                 <div className="subsection">
                                     <h5>Portfolio Breakdown</h5>
                                 </div>
                                 <div className="divider" />
                                 <div className="subsection">
-                                    {userInfo.portfolio?.map(
+                                    {freelancer.portfolio?.map(
                                         ({ category, rate }, index) => (
                                             <div
                                                 className="breakdown-item"
@@ -484,78 +383,35 @@ export class Profile extends React.Component<ProfileProps, ProfileState> {
                                         )
                                     )}
                                 </div>
+                            </div> */}
+                        <div className="section activities">
+                            <div className="subsection">
+                                <h5>Account Activities</h5>
                             </div>
-                            <div className="section activities">
-                                <div className="subsection">
-                                    <h5>Account Activities</h5>
-                                </div>
-                                <div className="divider" />
-                                <div className="activity-list">
-                                    <div className="activity-record">
-                                        {/* TODO: */}
-                                        <p>Trusted Device Management</p>
-                                        <button className="primary-button">
-                                            Management
-                                        </button>
-                                    </div>
+                            <div className="divider" />
+                            <div className="activity-list">
+                                <div className="activity-record">
+                                    {/* TODO: */}
+                                    <p>Trusted Device Management</p>
+                                    <button className="primary-button">
+                                        Management
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div className="projects">
-                            {userInfo.projects?.map(
-                                (
-                                    {
-                                        image,
-                                        milestoneComplete,
-                                        milestoneCount,
-                                        percent,
-                                        title,
-                                    },
-                                    index
-                                ) => (
-                                    <div className="project" key={index}>
-                                        <div className="project-image-container">
-                                            {/* TODO: */}
-                                            <img
-                                                src="/public/project.png"
-                                                width="100%"
-                                                height="100%"
-                                            />
-                                            <div className="dark-layer" />
-                                        </div>
-                                        <div className="project-info">
-                                            <h5>{title}</h5>
-                                            <div className="project-progress">
-                                                <div
-                                                    className="project-progress-indicator"
-                                                    style={{
-                                                        width: `${percent}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="milestone-progress">
-                                                <p>{percent}%</p>
-                                                <p>{`Milestone ${
-                                                    milestoneComplete ?? 0
-                                                }/${milestoneCount}`}</p>
-                                            </div>
-                                        </div>
-                                        <button className="primary-button full-width">
-                                            Read More
-                                        </button>
-                                    </div>
-                                )
-                            )}
                         </div>
                     </div>
+
                 </div>
             </div>
-        );
-    }
+    );
 }
 
 document.addEventListener("DOMContentLoaded", async (event) => {
+
+    let username = window.location.pathname.split('/').pop();
+    const freelancer = await getFreelancerProfile(username || "");
+
     ReactDOMClient.createRoot(
         document.getElementById("freelancer-profile")!
-    ).render(<Profile />);
+    ).render(<Profile freelancer={freelancer} />);
 });

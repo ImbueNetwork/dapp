@@ -1,6 +1,6 @@
 import { knex, Knex } from "knex";
 import db from "./db/index";
-
+import { StreamChat } from 'stream-chat';
 
 export type FederatedCredential = {
     id: number,
@@ -43,6 +43,7 @@ export type User = {
     email: string;
     password: string;
     briefs_submitted: number;
+    getstream_token: string;
 };
 
 export type ProposedMilestone = {
@@ -216,11 +217,12 @@ export const upsertWeb3Challenge = (
         ];
     };
 
-export const insertUserByDisplayName = (displayName: string,userName: string) =>
+export const insertUserByDisplayName = (displayName: string, username: string, token?: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
             display_name: displayName,
-            username: userName
+            username: username,
+            getstream_token: token
         }).returning("*")
     )[0];
 
@@ -460,28 +462,42 @@ export const upsertItems = (items: string[], tableName: string) => async (tx: Kn
 
 export const getOrCreateFederatedUser = (
     issuer: string,
-    subject: string,
+    username: string,
     displayName: string,
     done: CallableFunction
 ) => {
     db.transaction(async tx => {
         let user: User;
 
+
+
         try {
             /**
              * Do we already have a federated_credential ?
              */
+
+            console.log(`Issuer is `, issuer);
+            console.log(`Subject is `, username);
             const federated = await tx<FederatedCredential>("federated_credentials").select().where({
                 issuer,
-                subject,
+                subject: username,
             }).first();
+
+            console.log(`federated is `, federated);
 
             /**
              * If not, create the `usr`, then the `federated_credential`
              */
             if (!federated) {
-                user = await insertUserByDisplayName(displayName,subject)(tx);
-                await insertFederatedCredential(user.id, issuer, subject)(tx);
+
+                if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
+                    const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
+                    const token = client.createToken(username);
+                    user = await insertUserByDisplayName(displayName, username, token)(tx);
+                } else {
+                    user = await insertUserByDisplayName(displayName, username)(tx);
+                }
+                await insertFederatedCredential(user.id, issuer, username)(tx);
             } else {
                 const user_ = await db.select().from<User>("users").where({
                     id: federated.id
@@ -495,6 +511,7 @@ export const getOrCreateFederatedUser = (
                 }
                 user = user_;
             }
+
 
             done(null, user);
         } catch (err) {

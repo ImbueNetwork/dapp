@@ -11,6 +11,8 @@ import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs'
+import { StreamChat } from 'stream-chat';
+
 
 const JwtStrategy = passportJwt.Strategy;
 export const imbueJsAuthRouter = express.Router();
@@ -23,8 +25,7 @@ export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_pay
         if (!user) {
             next(`No user found with id: ${id}`, false);
         } else {
-
-            return next(null, {id: user.id, username: user.username,  display_name: user.display_name});
+            return next(null, { id: user.id, username: user.username, getstream_token: user.getstream_token, display_name: user.display_name });
         }
     } catch (e) {
         return next(`Failed to deserialize user with id ${id}`, false);
@@ -58,7 +59,7 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
                 httpOnly: true
             });
 
-            res.send({id: user.id, display_name: user.display_name});
+            res.send({ id: user.id, display_name: user.display_name });
         } catch (e) {
             next(new Error(
                 `Failed to fetch user ${userOrEmail}`,
@@ -124,7 +125,7 @@ imbueJsAuthRouter.post("/register", (req, res, next) => {
 
             getOrCreateFederatedUser(
                 "Imbue Network",
-                email.toLowerCase(),
+                username.toLowerCase(),
                 username.toLowerCase(),
                 updateUserDetails);
         }

@@ -23,7 +23,7 @@ export type ApplicationPreviewProps = {
 };
 
 export const ApplicationPreview = ({ brief, user, application }: ApplicationPreviewProps): JSX.Element => {
-    const [currencyId, setCurrencyId] = useState(0);
+    const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
 
     const viewFullBrief = () => {

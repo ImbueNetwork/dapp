@@ -90,6 +90,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
         total_cost_without_fee,
         imbue_fee,
     } = req.body;
+    
     db.transaction(async tx => {
         try {
             const project = await models.insertProject({
@@ -133,27 +134,21 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
 
 router.put("/:id", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const id = req.params.id;
-
-    try {
-        validateProposal(req.body.proposal);
-    } catch (e) {
-        res.status(400).send(
-            {message: (e as Error).message}
-        );
-    }
-
     const {
         name,
         logo,
         description,
         website,
         category,
-        chain_project_id,
         required_funds,
         currency_id,
+        chain_project_id,
         owner,
         milestones,
-    } = req.body.proposal as models.GrantProposal;
+        total_cost_without_fee,
+        imbue_fee,
+    } = req.body;
+
 
     const user_id = (req.user as any).id;
 
@@ -180,7 +175,8 @@ router.put("/:id", passport.authenticate('jwt', { session: false }), (req, res, 
                 required_funds,
                 currency_id,
                 owner,
-                // user_id,
+                total_cost_without_fee,
+                imbue_fee
             })(tx);
     
             if (!project.id) {

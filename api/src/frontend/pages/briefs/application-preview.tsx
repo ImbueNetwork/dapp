@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import "../../../../public/application-preview.css";
-import { FiPlusCircle } from "react-icons/fi";
+import { FiEdit, FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Project, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
-import { fetchProject, getCurrentUser, getProjectId, redirect } from "../../utils";
+import { fetchProject, getCurrentUser, getUserBriefs, redirect } from "../../utils";
+import { getFreelancerProfile } from "../../services/freelancerService";
+import "../../../../public/application-preview.css";
 
 interface MilestoneItem {
     name: string;
@@ -22,11 +23,62 @@ export type ApplicationPreviewProps = {
 };
 
 export const ApplicationPreview = ({ brief, user, application }: ApplicationPreviewProps): JSX.Element => {
-    const imbueFee = application.imbue_fee?.toLocaleString();
-    const totalCostWithoutFee = application.total_cost_without_fee?.toLocaleString();
-    const totalCost = application.required_funds.toLocaleString();
+    const [currencyId, setCurrencyId] = useState(0);
+    const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
+
     const viewFullBrief = () => {
-        redirect(`briefs/${brief.id}`);
+        redirect(`briefs/${brief.id}/`);
+    };
+
+    const updateProject = async () => {
+        await fetch(`${config.apiBase}/projects/${application.id}`, {
+            headers: postAPIHeaders,
+            method: "put",
+            body: JSON.stringify({
+                user_id: user.id,
+                name: `Brief Application: ${brief.headline}`,
+                total_cost_without_fee: totalCostWithoutFee,
+                imbue_fee: imbueFee,
+                currency_id: currencyId,
+                milestones: milestones.filter(m => m.amount !== undefined).map(m =>  { return {name:m.name, amount: m.amount, percentage_to_unlock: (( (m.amount ?? 0)  / totalCostWithoutFee) * 100).toFixed(0)}}),
+                required_funds: totalCost
+            }),
+        });
+        setIsEditingBio(false)
+    };
+
+    const imbueFeePercentage = 5;
+    const applicationMilestones = application.milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: Number(m.amount) } });
+    const [milestones, setMilestones] = useState<MilestoneItem[]>(applicationMilestones);
+
+    const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
+
+    const durationOptions = timeData.sort((a, b) =>
+        a.value > b.value ? 1 : a.value < b.value ? -1 : 0
+    );
+
+    const totalCostWithoutFee = milestones.reduce(
+        (acc, { amount }) => acc + (amount ?? 0),
+        0
+    );
+
+    const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
+    const totalCost = imbueFee + totalCostWithoutFee;
+    const onAddMilestone = () => {
+        setMilestones([...milestones, { name: "", amount: undefined }]);
+    };
+
+    const getAPIHeaders = {
+        accept: "application/json",
+    };
+
+    const postAPIHeaders = {
+        ...getAPIHeaders,
+        "content-type": "application/json",
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCurrencyId(Number(event.target.value))
     };
 
     return (
@@ -36,14 +88,27 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 <BriefInsights brief={brief} />
             </div>
             <div className="section">
-                <h3 className="section-title">Milestones</h3>
+                <h3 className="section-title">Milestones
+                    {!isEditingBio && (
+                        <div
+                            className="edit-icon"
+                            onClick={() => setIsEditingBio(true)}
+                        >
+                            <FiEdit />
+                        </div>
+                    )}
+                </h3>
                 <div className="container milestones">
                     <div className="milestone-header">
                         <h3>Client's budget: ${Number(brief.budget).toLocaleString()}</h3>
                     </div>
                     <h3>How many milestone do you want to include?</h3>
                     <div className="milestone-list">
-                        {application.milestones.map(({ name, percentage_to_unlock, amount }, index) => {
+                        {milestones.map(({ name, amount }, index) => {
+                            const percent = Number((
+                                (100 * (amount ?? 0)) /
+                                totalCostWithoutFee
+                            ).toFixed(0));
                             return (
                                 <div className="milestone-row" key={index}>
                                     <div className="milestone-no">
@@ -55,7 +120,25 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                             <textarea
                                                 className="input-description"
                                                 value={name}
-                                                disabled
+                                                disabled={!isEditingBio}
+                                                onChange={(e) =>
+                                                    setMilestones([
+                                                        ...milestones.slice(
+                                                            0,
+                                                            index
+                                                        ),
+                                                        {
+                                                            ...milestones[
+                                                            index
+                                                            ],
+                                                            name: e.target.value,
+                                                        },
+                                                        ...milestones.slice(
+                                                            index + 1
+                                                        ),
+
+                                                    ])
+                                                }
                                             />
                                         </div>
                                         <div className="budget-wrapper">
@@ -63,29 +146,54 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                             <input
                                                 type="number"
                                                 className="input-budget"
-                                                // value={percentage_to_unlock * Number(application.total_cost_without_fee)}
-                                                value={amount}
-                                                disabled
+                                                disabled={!isEditingBio}
+                                                value={amount || ""}
+                                                onChange={(e) =>
+                                                    setMilestones([
+                                                        ...milestones.slice(
+                                                            0,
+                                                            index
+                                                        ),
+                                                        {
+                                                            ...milestones[
+                                                            index
+                                                            ],
+                                                            amount: Number(e.target.value),
+                                                        },
+                                                        ...milestones.slice(
+                                                            index + 1
+                                                        ),
+                                                    ])
+                                                }
                                             />
+                                            {totalCostWithoutFee !== 0 && (
                                                 <div className="progress-container">
                                                     <div className="progress-value">
-                                                        {percentage_to_unlock}%
+                                                        {percent}%
                                                     </div>
                                                     <div className="progress-bar">
                                                         <div
                                                             className="progress"
                                                             style={{
-                                                                width: `${percentage_to_unlock}%`,
+                                                                width: `${percent}%`,
                                                             }}
                                                         ></div>
                                                     </div>
                                                 </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
+                    <h3
+                        className="clickable-text btn-add-milestone"
+                        onClick={onAddMilestone}
+                    >
+                        <FiPlusCircle color="var(--theme-primary)" />
+                        Add milestone
+                    </h3>
                     <hr className="separator" />
                     <div className="budget-info">
                         <div className="budget-description">
@@ -96,7 +204,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                             </div>
                         </div>
                         <div className="budget-value">
-                            ${totalCostWithoutFee}
+                            ${totalCostWithoutFee.toFixed(2)}
                         </div>
                     </div>
                     <hr className="separator" />
@@ -108,7 +216,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                             </h3>
                         </div>
                         <div className="budget-value text-inactive">
-                            ${imbueFee}
+                            ${(imbueFee).toFixed(2)}
                         </div>
                     </div>
 
@@ -118,7 +226,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                             <h3>Total</h3>
                         </div>
                         <div className="budget-value text-inactive">
-                            ${totalCost}
+                            ${(totalCost).toFixed(2)}
                         </div>
                     </div>
                 </div>
@@ -128,13 +236,44 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 <div className="container payment-details">
                     <div className="duration-selector">
                         <h3>How long will this project take?</h3>
-                        <p>{brief.duration}</p>
+                        <select
+                            name="duration"
+                            placeholder="Select a duration"
+                            required
+                        >
+                            {durationOptions.map(({ label, value }, index) => (
+                                <option
+                                    value={value}
+                                    key={index}
+                                    className="duration-option"
+                                >
+                                    {label}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="payment-options">
                         <h3>Currency</h3>
 
                         <div className="network-amount">
-                            <p>${Currency[application.currency_id]}</p>
+                            <select
+                                name="currencyId"
+                                onChange={handleChange}
+                                placeholder="Select a currency"
+                                disabled={!isEditingBio}
+                                defaultValue={Number(application.currency_id)}
+                                required
+                            >
+                                {currencies.map((currency,index) => (
+                                    <option
+                                        value={index}
+                                        key={index}
+                                        className="duration-option"
+                                    >
+                                        {currency}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -146,10 +285,21 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 >
                     Back To Brief
                 </button>
+                {isEditingBio &&
+                    <button
+                        className="primary-btn in-dark w-button"
+                        onClick={() => updateProject()}
+                    >
+                        Update
+                    </button>}
+
+                {/* TODO: Add Drafts Functionality */}
+                {/* <button className="secondary-btn">Save draft</button> */}
             </div>
         </div>
     );
 };
+
 document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 4]);

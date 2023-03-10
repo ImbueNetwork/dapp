@@ -156,7 +156,7 @@ export const Profile = ({ freelancer: freelancer }: ProfileProps): JSX.Element =
                         </div>
                         <div className="connect-buttons">
 
-                            { !isCurrentFreelancer &&
+                            {!isCurrentFreelancer &&
                                 <>
                                     <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
                                     {browsingUser && showMessageBox && renderChat}
@@ -344,9 +344,11 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
     if (username) {
         const freelancer = await getFreelancerProfile(username);
-        ReactDOMClient.createRoot(
-            document.getElementById("freelancer-profile")!
-        ).render(<Profile freelancer={freelancer} />);
+        if(freelancer) {
+            ReactDOMClient.createRoot(
+                document.getElementById("freelancer-profile")!
+            ).render(<Profile freelancer={freelancer} />);
+        }
+        // TODO redirect to 404 if no freelancer found
     }
-    // TODO redirect to 404 if no freelancer found
 });

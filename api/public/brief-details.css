@@ -11,6 +11,10 @@ p {
     line-height: 1.2;
 }
 
+.header {
+    margin-top: 20px;
+}
+
 .field-input {
     background-color: var(--theme-ink-color);
     /* opacity: 0.11; */

@@ -133,6 +133,11 @@ button:active {
     min-height: 300px;
 }
 
+.social-input {
+    height: 5%;
+    width: 50%;
+}
+
 .about .textarea-remaining {
     color: var(--theme-ink-color);
 }

@@ -1,18 +1,26 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { IconType } from 'react-icons/lib';
+import { TextInput } from "../../components/textInput";
 
 type FreelancerSocialProps = {
     label: string,
     key: string,
     icon: JSX.Element,
     link: string,
-}
-
-type FreelancerState = {
-    is_edit: boolean;
+    isEdit: boolean
+    
 }
 
 export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
+    const [getIsEdit, setIsEdit] = useState(false);
+    const [getLink, setLink] = useState(props.link);
+
+    
+    useEffect(() => {
+        setIsEdit(props.isEdit);
+
+      }, [props.isEdit]);
+    
 
     let media_icon: JSX.Element;
     if (props.link == "") {
@@ -23,17 +31,33 @@ export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
         <a href={props.link} target="_blank" rel="noopener"><span>{props.icon}</span></a>
     }
 
-    return (
-        <div
-            className="social-link"
-            key={props.key}
-        >
-            <p>{props.label}</p>
-            <button className="social-btn">
-                    {media_icon}
-            </button>
-        </div>
-    );
+    if (getIsEdit) {
+        return (
+        
+        <TextInput
+                    maxLength={200}
+                    value={getLink}
+                    onChange={(e)=>{
+                        setLink(e.target.value)
+                    }}
+                    className="bio-input"
+                    title={props.key}
+            />
+        
+        )
+    } else {
+        return (
+            <div
+                className="social-link"
+                key={props.key}
+            >
+                <p>{props.label}</p>
+                <button className="social-btn">
+                        {media_icon}
+                </button>
+            </div>
+        );
+    }
 };
 
 export default alert;

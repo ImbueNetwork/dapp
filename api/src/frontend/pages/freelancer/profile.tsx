@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import ReactCountryFlag from "react-country-flag";
-import { useParams } from "react-router-dom";
 
 import {
     FaFacebook,
@@ -327,6 +326,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                             key: "facebook",
                                             icon: <FaFacebook />,
                                             link: getFreelancerInfo.freelancer.facebook_link,
+                                            isEdit: isEditMode
                                         })
                                     }{
                                         FreelancerSocial({
@@ -334,6 +334,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                             key: "twitter",
                                             icon: <FaTwitter />,
                                             link: getFreelancerInfo.freelancer.twitter_link,
+                                            isEdit: isEditMode,
                                         })
                                     }{
                                         FreelancerSocial({
@@ -341,6 +342,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                             key: "telegram",
                                             icon: <FaTelegram />,
                                             link: getFreelancerInfo.freelancer.telegram_link,
+                                            isEdit: isEditMode,
                                         })
                                     }{
                                         FreelancerSocial({
@@ -348,6 +350,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                             key: "discord",
                                             icon: <FaDiscord />,
                                             link: getFreelancerInfo.freelancer.discord_link,
+                                            isEdit: isEditMode,
                                         })
                                     }
                                 </div>

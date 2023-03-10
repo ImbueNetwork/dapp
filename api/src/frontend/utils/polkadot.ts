@@ -57,7 +57,6 @@ function hideLoading(): void {
 
 }
 
-
 async function initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo> {
     const provider = new WsProvider(webSockAddr);
     provider.on("error", e => {

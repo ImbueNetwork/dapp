@@ -1,28 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import { Brief } from "../../models";
+import { Brief, User } from "../../models";
 import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
-import "../../../../public/freelancer-profile.css";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
-import { redirect } from "../../utils";
+import { fetchUser, fetchUserOrEmail, getCurrentUser, redirect } from "../../utils";
+import { ChatBox } from "../../components/chat";
+import Modal from 'react-bootstrap/Modal';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export type BriefProps = {
     brief: Brief;
 };
 TimeAgo.addDefaultLocale(en);
 
-export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
+export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
+    const [browsingUser, setBrowsingUser] = useState<User| null>();
+    const [targetUser, setTargetUser] = useState<User| null>(null);
+    const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
+    const isOwnerOfBrief = (browsingUser && browsingUser.id == brief.user_id);
+
+    useEffect(() => {
+        async function setup() {
+            setBrowsingUser(await getCurrentUser());
+            setTargetUser(await fetchUser(brief.user_id));
+        }
+        setup();
+     }, [])
+
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
 
     const redirectToApply = () => {
         redirect(`briefs/${brief.id}/apply`);
     }
+
+    const handleMessageBoxClick = async () => {
+        if (browsingUser) {
+            setShowMessageBox(true);
+        } else {
+            redirect("login", `/dapp/briefs/${brief.id}/`)
+        }
+    }
+
+    const renderChat = (
+        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
+            <Modal.Body>
+                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+            </Modal.Body>
+            <Modal.Footer>
+                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
+            </Modal.Footer>
+        </Modal>
+    );
 
     const BioPanel = (
         <div className="brief-bio">
@@ -160,6 +194,22 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     </h3>
                 </div>
             </div>
+
+            <hr className="separator" />
+
+            { !isOwnerOfBrief &&
+                <>
+                <div className="subsection">
+                    <div className="meet-hiring-team">
+                        <h3>
+                            Meet the hiring team:
+                        </h3>
+                        <button onClick={() => handleMessageBoxClick()}  className="primary-btn in-dark w-button">Message</button>
+                    </div>
+                </div>
+                { browsingUser && showMessageBox && renderChat}
+                </>
+            }
         </div>
     );
 
@@ -210,7 +260,6 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             </div>
         </div>
     );
-
 
     return (
         <div className="brief-details-container">

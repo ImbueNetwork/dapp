@@ -11,10 +11,17 @@ export type DashboardProps = {
     user: User;
 };
 
-const client = getStreamChat();
-
 export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
+    const [client, setClient] = useState<StreamChat>();
     const filters = { members: { $in: [user.username] } }
+
+    useEffect(() => {
+        async function setup() {
+            setClient(await getStreamChat());
+        }
+        setup();
+     }, []);
+
 
     if(client) {
         client.connectUser(
@@ -25,15 +32,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             user.getstream_token,
         );
     }
-
-
-    useEffect(() => {
-        // TODO: Implement
-        const fetchData = async () => {
-        }
-
-        fetchData();
-    }, [])
 
     return (
         client ?

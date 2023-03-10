@@ -116,7 +116,7 @@ router.get("/:userOrEmail", (req, res, next) => {
             if (!user) {
                 return res.status(404).end();
             }
-            res.send(user);
+            res.send({id: user.id, display_name: user.display_name, username: user.username});
         } catch (e) {
             next(new Error(
                 `Failed to fetch user ${userOrEmail}`,
@@ -126,5 +126,23 @@ router.get("/:userOrEmail", (req, res, next) => {
     });
 });
 
+
+router.get("/byid/:id", (req, res, next) => {
+    const id = Number(req.params.id);
+    db.transaction(async tx => {
+        try {
+            const user: User = await models.fetchUser(id)(tx) as User;
+            if (!user) {
+                return res.status(404).end();
+            }
+            res.send({id: user.id, display_name: user.display_name, username: user.username});
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch user ${id}`,
+                { cause: e as Error }
+            ));
+        }
+    });
+});
 
 export default router;

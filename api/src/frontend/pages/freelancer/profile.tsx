@@ -18,7 +18,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 
 import { TextInput } from "../../components/textInput";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
-import { Freelancer, Item, User } from "../../models";
+import { Freelancer, Item, User, getDefaultFreelancer } from "../../models";
 import { Freelancers } from "./new";
 import { FreelancerSocial } from "./freelancer_socials";
 import { getCurrentUser, getStreamChat, redirect } from "../../utils";
@@ -30,6 +30,7 @@ import Modal from 'react-bootstrap/Modal';
 import "../../../../public/freelancer-profile.css";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { isGeneratorFunction } from "util/types";
 
 
 export type ProfileProps = {
@@ -126,25 +127,32 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
     const { username } = useParams();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [browsingUser, setBrowsingUser] = useState<User| null>(null);
-    const [getFreelancerInfo, setFreelancerInfo] = useState<FreelancerInfo>();
-    const [getEditBitMap, setEditBitMap] = useState<EditBitMap>({
-        isBio: false,
-        isLanguages: false,
-        isServices: false,
-        isSkills: false,
-        isSocials: false,
+    const [getFreelancerInfo, setFreelancerInfo] = useState<FreelancerInfo>({
+        freelancer: getDefaultFreelancer()
     });
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [getEditMaps, setEditMaps] = useState<EditMaps>();
 
     const profileImageUrl = "/public/profile-image.png";
 
-    const onSaveBio = () => {
-        let freelancer = this.state.userInfo.freelancer;
+    //The fields must be pre populated correctly.
+    const onSave = () => {
+        let freelancer = getFreelancerInfo?.freelancer;
         let input = document.getElementById("bio-input-id") as HTMLTextAreaElement;
-        freelancer.bio = input.textContent || "";
-        //this.setState({
-        //});
+        if (freelancer) {
+            freelancer.bio = input.textContent || freelancer.bio;
+
+            // update languages
+            // update services
+            //update skills
+            // update socials
+            updateFreelancer(freelancer);
+        }
     };
+
+    const flipEdit = () => {
+        setIsEditMode(!isEditMode)
+    }
 
     function getCookie() {
         const isUser = document.cookie
@@ -172,7 +180,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
     const renderChat = (
         <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
             <Modal.Body>
-                {browsingUser ? <ChatBox user={browsingUser} freelancer={freelancer} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+                {browsingUser ? <ChatBox user={browsingUser} freelancer={getFreelancerInfo?.freelancer} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
             </Modal.Body>
             <Modal.Footer>
                 <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
@@ -184,7 +192,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
         if (browsingUser) {
             setShowMessageBox(true);
         } else {
-            redirect("login", `/dapp/freelancers/${freelancer.username}`)
+            redirect("login", `/dapp/freelancers/${getFreelancerInfo.freelancer.username}`)
         }
     }
 
@@ -207,28 +215,36 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                         />
                     </div>
                     <div className="profile-summary">
-                        <h5>{freelancer.display_name}</h5>
-                        {/* <div className="rating">
-                                {
-                                    Array.from({ length: userInfo.rating.stars }, (_, i) => i).map((i) => (
-                                        <p key={i}><FaStar color="var(--theme-yellow)" /></p>
-                                    ))
-                                }
-                                <p>
-                                    {/* todo? */}
+                        <h5>{getFreelancerInfo.freelancer.display_name}</h5>
+                        <div className="rating">
+                            {
+                                Array.from({ length: getFreelancerInfo.freelancer.rating || 0 }, (_, i) => i).map((i) => (
+                                    <p key={i}><FaStar color="var(--theme-yellow)" /></p>
+                                ))
+                            }
+                        </div>                                
+                        {!isEditMode &&  (
+                                 <div style={{display: getCookie()  ? 'block' : 'none'}}
+                                    className="edit-icon"
+                                    onClick={() =>
+                                        flipEdit()
+                                    }
+                                ><FiEdit />
+                                </div>
+                            )}
+                        </div>
                                     {/* <span>{userInfo.rating.level}</span> */}
                                     <span className="review-count">
-                                        {`(${userInfo.freelancer.num_ratings} reviews)`}
+                                        {`(${getFreelancerInfo.freelancer.num_ratings} reviews)`}
                                     </span>
-                                </p>
-                            </div> */}
+                    </div> 
                         <div className="contact">
-                            <p>@{freelancer.username}</p>
+                            <p>@{getFreelancerInfo.freelancer.username}</p>
                             <IoPeople
                                 color="var(--theme-secondary)"
                                 size="24px"
                             />
-                            <p>{freelancer.display_name}</p>
+                            <p>{getFreelancerInfo.freelancer.display_name}</p>
                         </div>
                         <div className="connect-buttons">
                             <button onClick={() => handleMessageBoxClick()} className="primary-button full-width">Message</button>
@@ -249,28 +265,19 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                 <div className="section about">
                     <div className="header-editable">
                         <h5>About</h5>
-                        {!this.state.editBitMap.isBio &&  (
-                                 <div style={{display: getCookie()  ? 'block' : 'none'}}
-                                    className="edit-icon"
-                                    onClick={() =>
-                                        // setIsEditingBio, set edit bio
-                                    }
-                                ><FiEdit />
-                                </div>
-                            )}
                     </div>
-                    {isEditingBio ? (
+                    {isEditMode ? (
                         <>
                             <TextInput
                                 maxLength={1000}
-                                value={freelancer.bio}
-                                onChange={onSaveBio}
+                                value={getFreelancerInfo.freelancer.bio}
+                                onChange={onSave}
                                 className="bio-input"
                             />
                             <div className="edit-bio-buttons">
                                 <button
                                     className="primary-btn in-dark w-full"
-                                    onClick={onSaveBio}
+                                    onClick={onSave}
                                 >
                                     Save
                                 </button>
@@ -284,7 +291,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                         </>
                     ) : (
                         <div className="bio">
-                            {freelancer.bio
+                            {getFreelancerInfo.freelancer.bio
                                 .split("\n")
                                 .map((line, index) => (
                                     <p key={index}>{line}</p>
@@ -303,28 +310,28 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                             label: "Facebook",
                                             key: "facebook",
                                             icon: <FaFacebook />,
-                                            link: freelancer.facebook_link,
+                                            link: getFreelancerInfo.freelancer.facebook_link,
                                         })
                                     }{
                                         FreelancerSocial({
                                             label: "Twitter",
                                             key: "twitter",
                                             icon: <FaTwitter />,
-                                            link: freelancer.twitter_link,
+                                            link: getFreelancerInfo.freelancer.twitter_link,
                                         })
                                     }{
                                         FreelancerSocial({
                                             label: "Telegram",
                                             key: "telegram",
                                             icon: <FaTelegram />,
-                                            link: freelancer.telegram_link,
+                                            link: getFreelancerInfo.freelancer.telegram_link,
                                         })
                                     }{
                                         FreelancerSocial({
                                             label: "Discord",
                                             key: "discord",
                                             icon: <FaDiscord />,
-                                            link: freelancer.discord_link,
+                                            link: getFreelancerInfo.freelancer.discord_link,
                                         })
                                     }
                                 </div>
@@ -336,7 +343,7 @@ export const Profile = ({ freelancer: FreelancerInfo }: ProfileProps): JSX.Eleme
                                     <div className="btn-add">Add Now</div>
                                 </div>
                                 <div className="skills">
-                                    {freelancer.skills?.map(
+                                    {getFreelancerInfo.freelancer.skills?.map(
                                         (skill, index) => (
                                             <p
                                                 className="skill"

@@ -17,7 +17,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
     const timePosted = timeAgo.format(new Date(brief.created));
 
     const viewFullBrief = () => {
-        redirect(`briefs/${brief.id}`);
+        redirect(`briefs/${brief.id}/`);
     };
 
     return (

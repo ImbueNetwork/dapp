@@ -6,6 +6,7 @@
     line-height: 1.5;
 }
 
+
 .application-container h2 {
     font-size: 32px;
     line-height: 1.5;
@@ -252,7 +253,16 @@ select {
     gap: 1rem;
 }
 
+.section-title {
+    display: flex;
+}
+
 .section .section-title {
     margin-left: 2rem;
     margin-bottom: 0.5rem;
+}
+
+.edit-icon {
+    margin-top: 5px;
+    margin-left: 10px;
 }

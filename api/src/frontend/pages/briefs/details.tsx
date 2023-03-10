@@ -161,7 +161,7 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
     const BioInsights = (
         <div className="brief-insights">
             <div className="subsection">
-                <div className="brief-insights-stat">
+                <div className="header">
                     <h3>Brief Insights</h3>
                 </div>
             </div>

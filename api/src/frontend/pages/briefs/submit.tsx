@@ -8,6 +8,8 @@ import { Brief, Currency, Project, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 import { getCurrentUser, getUserBriefs, redirect } from "../../utils";
+import { getFreelancerProfile } from "../../services/freelancerService";
+import "../../../../public/application-preview.css";
 
 interface MilestoneItem {
     name: string;
@@ -281,9 +283,15 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
 document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
+    const user = await getCurrentUser();
+    const freelancer = await getFreelancerProfile(user.username);
+
+    if(!freelancer) {
+        redirect(`freelancers/new`);
+    }
+
     if (briefId) {
-        const user = await getCurrentUser();
-        const userApplication :Project = await getUserBriefs(user.id, briefId);
+        const userApplication = await getUserBriefs(user.id, briefId);
         if(userApplication) {
             redirect(`briefs/${briefId}/applications/${userApplication.id}/`)
         }

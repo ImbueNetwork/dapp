@@ -12,8 +12,15 @@ export function redirect(path: string, returnUrl?: string) {
         let redirect = new URL(
             `${window.location.origin}/dapp/${path}?redirect=${returnUrl}`
         );
+        console.log("handlesubmit")
+
         window.location.replace(redirect);
-    } else {
+    } else if (path.startsWith("http")) {
+        let redirect = new URL(path);
+        window.location.replace(redirect);
+    }
+    else {
+        console.log("handlesubmit")
         let redirect = new URL(`${window.location.origin}/dapp/${path}`);
         redirect.search = window.location.search;
         window.location.replace(redirect);
@@ -120,7 +127,7 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-    if(process.env.REACT_APP_GETSTREAM_API_KEY) {
+    if (process.env.REACT_APP_GETSTREAM_API_KEY) {
         return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
     }
 }

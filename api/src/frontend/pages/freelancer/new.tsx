@@ -276,7 +276,8 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
             twitter_link: "",
             clients: [],
             client_images: [],
-            num_ratings: 0
+            num_ratings: 0,
+            profileImageUrl: "/public/profile-image.png",
         });
     };
 
@@ -339,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     if(user) {
         const userHasFreelancerProfile = await freelancerExists(user.username);
         if(userHasFreelancerProfile) {
-            utils.redirect(`freelancers/${user.username}`);
+            utils.redirect(`freelancers/${user.username}/`);
         }
     }
 

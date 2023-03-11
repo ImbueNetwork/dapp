@@ -4,9 +4,8 @@ import * as models from "../../../models";
 import passport from "passport";
 import { upsertItems, fetchAllFreelancers, fetchItems, FreelancerSqlFilter, fetchFreelancerDetailsByUsername, updateFreelancerDetails, insertFreelancerDetails, searchFreelancers } from "../../../models";
 import { Freelancer } from "../../../models"
-// import the history module
+import { validateUserFromJwt, verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common";
 
-// create a new history object
 const router = express.Router();
 
 router.get("/", (req, res, next) => {
@@ -36,9 +35,15 @@ router.get("/", (req, res, next) => {
 
 router.get("/:username", (req, res, next) => {
     const username = req.params.username;
+
     db.transaction(async tx => {
         try {
             const freelancer = await fetchFreelancerDetailsByUsername(username)(tx);
+
+            if (!freelancer) {
+                return res.status(404).end();
+            }
+
             await Promise.all([
                 freelancer.skills = await fetchItems(freelancer.skill_ids, "skills")(tx),
                 freelancer.client_images = await fetchItems(freelancer.client_ids, "clients")(tx),
@@ -46,9 +51,14 @@ router.get("/:username", (req, res, next) => {
                 freelancer.services = await fetchItems(freelancer.service_ids, "services")(tx),
             ]);
 
-            if (!freelancer) {
-                return res.status(404).end();
+
+            // Used to show/hide edit buttons if the correct user.
+            if (validateUserFromJwt(req, res, next, freelancer.user_id)) {
+                res.cookie("isUser", true)
+            } else {
+                res.cookie("isUser", false)
             }
+
             res.send(freelancer);
         } catch (e) {
             next(new Error(
@@ -60,11 +70,12 @@ router.get("/:username", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
-    // TODO VERIFY user is allowed to edit table
     const freelancer = req.body.freelancer as Freelancer;
+    verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
     db.transaction(async tx => {
         try {
+
             const skill_ids = await upsertItems(freelancer.skills, "skills")(tx);
             const language_ids = await upsertItems(freelancer.languages, "languages")(tx);
             const services_ids = await upsertItems(freelancer.services, "services")(tx);
@@ -98,33 +109,26 @@ router.post("/", (req, res, next) => {
     });
 });
 
-router.put("/:username", (req, res, next) => {
-    // TODO VERIFY user is allowed to edit table
-    // Verification happens before we get here.
+router.put("/:username", async (req, res, next) => {
     const username = req.params.username;
     const freelancer = req.body.freelancer as Freelancer;
+    verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
     db.transaction(async tx => {
+
         try {
-            // ensure the freelancer exists first
-            const freelancerDetails = await fetchFreelancerDetailsByUsername(username)(tx);
-
-            if (!freelancerDetails) {
-                return res.status(404).end();
-            }
-
-            const freelancer_id: Freelancer = await updateFreelancerDetails(freelancer.user_id, freelancer)(tx);
-
-            if (!freelancer.id) {
+            const exists: any = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            if (!exists) {
                 return next(new Error(
-                    "Cannot update freelancer details: `id` missing."
+                    "Freelancer does not exist."
                 ));
             }
-            res.status(200).send(freelancer);
-        } catch (cause) {
-            next(new Error(
-                `Failed to update freelancer details.`,
-                { cause: cause as Error }
+            await models.updateFreelancerDetails(exists.user_id, freelancer)(tx);
+            let updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            return res.send(updated_freelancer_details);
+        } catch (e: any) {
+            return next(new Error(
+                `Failed to update freelancer details: ${e.message}`,
             ));
         }
     });

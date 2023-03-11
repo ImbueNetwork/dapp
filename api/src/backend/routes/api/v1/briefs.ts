@@ -3,6 +3,7 @@ import db from "../../../db";
 import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
+import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
 
 const router = express.Router();
 
@@ -51,14 +52,12 @@ router.get("/:id", (req, res, next) => {
 router.post("/", (req, res, next) => {
     db.transaction(async tx => {
         const brief: Brief = req.body as Brief;
+        verifyUserIdFromJwt(req, res, next, brief.user_id)
+
         try {
             const skill_ids = await upsertItems(brief.skills, "skills")(tx);
             const industry_ids = await upsertItems(brief.industries, "industries")(tx);
             const brief_id = await insertBrief(brief, skill_ids, industry_ids, brief.scope_id, brief.duration_id)(tx);
-
-            console.log("duration_id" + brief.duration_id)
-            console.log("scope_id" + brief.scope_id)
-
             if (!brief_id) {
                 return next(new Error(
                     "Failed to create brief."

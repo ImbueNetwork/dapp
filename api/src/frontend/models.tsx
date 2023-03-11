@@ -130,7 +130,36 @@ export type Freelancer = {
     user_id: number;
     rating?: number;
     num_ratings: number;
+    profileImageUrl: string;
 };
+
+export function getDefaultFreelancer(): Freelancer {
+    return {
+        id: 0,
+        bio: "",
+        education: "",
+        experience: "",
+        facebook_link: "",
+        twitter_link: "",
+        telegram_link: "",
+        discord_link: "",
+        freelanced_before: "",
+        freelancing_goal: "",
+        work_type: "",
+        title: "",
+        skills: [],
+        languages: [],
+        services: [],
+        clients: [],
+        client_images: [],
+        display_name: "default_name",
+        username: "default",
+        user_id:0,
+        rating: 3,
+        num_ratings:0,
+        profileImageUrl:"default",
+    }
+}
 
 export type Item = {
     id: number;

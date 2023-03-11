@@ -25,17 +25,16 @@ export const cookieExtractor = function(req: any) {
     return token;
 };
 
-function VerifyUserIdFromJwt(req: any, res: any, next: any) {
+export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: number) {
     const token = req.cookies.access_token;
-  
     if (!token) {
       return res.status(401).send("You are not authorized to access this resource.");
     }
   
     try {
       const decoded: any = jwt.verify(token, jwtOptions.secretOrKey);
-      if (req.user_id == decoded.id) {
-        next();
+      if (user_id == decoded.id) {
+        return res;
       } else {
           return res.status(401).send("You are not authorized to access this resource.");
       }
@@ -43,6 +42,26 @@ function VerifyUserIdFromJwt(req: any, res: any, next: any) {
       return res.status(401).send("Invalid token.");
     }
   }
+
+export function validateUserFromJwt(req: any, res: any, next: any, user_id: number) {
+    const token = req.cookies.access_token;
+    if (!token) {
+        return false;
+    }
+
+    try {
+        const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
+        console.log(decoded);
+        if (user_id == decoded.id) {
+           return true
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
 
 export const jwtOptions = {
     jwtFromRequest: cookieExtractor,

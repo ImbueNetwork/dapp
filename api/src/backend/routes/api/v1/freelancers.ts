@@ -33,7 +33,7 @@ router.get("/", (req, res, next) => {
 });
 
 
-router.get("/:username",(req, res, next) => {
+router.get("/:username", (req, res, next) => {
     const username = req.params.username;
 
     db.transaction(async tx => {
@@ -54,9 +54,9 @@ router.get("/:username",(req, res, next) => {
 
             // Used to show/hide edit buttons if the correct user.
             if (validateUserFromJwt(req, res, next, freelancer.user_id)) {
-                res.cookie("isUser",true)
+                res.cookie("isUser", true)
             } else {
-                res.cookie("isUser",false)
+                res.cookie("isUser", false)
             }
 
             res.send(freelancer);
@@ -114,24 +114,25 @@ router.put("/:username", async (req, res, next) => {
     const freelancer = req.body.freelancer as Freelancer;
     verifyUserIdFromJwt(req, res, next, freelancer.user_id)
 
-    try {
-        const exists: any = await models.fetchFreelancerDetailsByUsername(username);
-        if (!exists) {
+    db.transaction(async tx => {
+
+        try {
+            const exists: any = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            if (!exists) {
+                return next(new Error(
+                    "Freelancer does not exist."
+                ));
+            }
+            await models.updateFreelancerDetails(exists.user_id, freelancer)(tx);
+            let updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username)(tx);
+            return res.send(updated_freelancer_details);
+        } catch (e: any) {
             return next(new Error(
-                "Freelancer does not exist."
+                `Failed to update freelancer details: ${e.message}`,
             ));
         }
-        const fl_id = await models.updateFreelancerDetails(exists.user_id, freelancer);
-        let updated_freelancer_details = await models.fetchFreelancerDetailsByUsername(username);
-
-        return res.status(200).send(updated_freelancer_details);
-    } catch (e: any) {
-        return next(new Error(
-            `Failed to update freelancer details: ${e.message}`,
-        ));
-    }
+    });
 });
-
 
 router.post("/search", (req, res, next) => {
     db.transaction(async tx => {

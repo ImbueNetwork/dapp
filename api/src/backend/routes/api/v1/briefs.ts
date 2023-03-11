@@ -58,10 +58,6 @@ router.post("/", (req, res, next) => {
             const skill_ids = await upsertItems(brief.skills, "skills")(tx);
             const industry_ids = await upsertItems(brief.industries, "industries")(tx);
             const brief_id = await insertBrief(brief, skill_ids, industry_ids, brief.scope_id, brief.duration_id)(tx);
-
-            console.log("duration_id" + brief.duration_id)
-            console.log("scope_id" + brief.scope_id)
-
             if (!brief_id) {
                 return next(new Error(
                     "Failed to create brief."

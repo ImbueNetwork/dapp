@@ -33,8 +33,8 @@ export function verifyUserIdFromJwt(req: any, res: any, next: any, user_id: numb
   
     try {
       const decoded: any = jwt.verify(token, jwtOptions.secretOrKey);
-      if (req.user_id == decoded.id) {
-        next();
+      if (user_id == decoded.id) {
+        return res;
       } else {
           return res.status(401).send("You are not authorized to access this resource.");
       }

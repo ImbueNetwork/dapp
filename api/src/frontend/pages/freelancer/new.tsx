@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     if(user) {
         const userHasFreelancerProfile = await freelancerExists(user.username);
         if(userHasFreelancerProfile) {
-            utils.redirect(`freelancers/${user.username}`);
+            utils.redirect(`freelancers/${user.username}/`);
         }
     }
 

@@ -697,7 +697,7 @@ export const insertFreelancerDetails = (
 export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
     async (tx: Knex.Transaction) => (
         await tx<Freelancer>("freelancers").update({
-            freelanced_before: f.freelanced_before.toString(),
+            freelanced_before: f.freelanced_before,
             freelancing_goal: f.freelancing_goal,
             work_type: f.work_type,
             education: f.education,
@@ -711,9 +711,6 @@ export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
             user_id: f.user_id
         })
         .where({"user_id": userId}).returning("id")        
-        //.then(async() => {
-        //    //todo update many to many tables
-        //})
 )
 
 

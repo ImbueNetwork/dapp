@@ -8,25 +8,21 @@ type FreelancerSocialProps = {
     icon: JSX.Element,
     link: string,
     isEdit: boolean
-    
 }
 
 export const FreelancerSocial = (props: FreelancerSocialProps): JSX.Element => {
     const [getIsEdit, setIsEdit] = useState(false);
     const [getLink, setLink] = useState(props.link);
 
-    
     useEffect(() => {
         setIsEdit(props.isEdit);
         setLink(props.link);
       }, [props.isEdit]);
     
-
     let media_icon: JSX.Element;
     if (props.link == "") {
         media_icon = <span>+</span>
     } else {
-        
         media_icon = 
         <a href={props.link} target="_blank" rel="noopener"><span>{props.icon}</span></a>
     }

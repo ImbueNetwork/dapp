@@ -50,7 +50,10 @@ button:active {
 }
 
 .subsection {
-    margin-left: 40px;
+    margin-left: 80px;
+}
+
+.summary {
 }
 
 .profile-image {
@@ -94,9 +97,36 @@ button:active {
 
 .connect-buttons {
     display: flex;
-    flex-direction: column;
     gap: 24px;
     margin-bottom: 20px;
+}
+
+.connect-buttons button {
+    padding: 12px 18px;
+    font-size: 16px;
+    color: var(--theme-ink-color);
+    border-radius: 8px;
+}
+
+.connect-buttons .message {
+    background: #262626;
+    border: 1px solid #262626;
+}
+
+.connect-buttons .message:hover {
+    border: 1px solid var(--theme-ink-color);
+}
+
+.connect-buttons button:active {
+    transform: scale(1.05);
+}
+
+.connect-buttons .share {
+    background: var(--theme-secondary);
+    border: 1px solid var(--theme-secondary);
+}
+.connect-buttons .share:hover {
+    background: var(--theme-secondary-hover);
 }
 
 .divider {
@@ -118,30 +148,6 @@ button:active {
 
 .about {
     padding: 30px 50px 80px 100px;
-}
-
-.about .bio {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.about .bio-input {
-    min-height: 300px;
-}
-
-.social-input {
-    height: 5%;
-    width: 50%;
-}
-
-.about .textarea-remaining {
-    color: var(--theme-ink-color);
-}
-
-.edit-bio-buttons {
-    display: flex;
-    justify-content: center;
 }
 
 .header-editable {
@@ -183,7 +189,8 @@ button:active {
 }
 
 .social-link {
-    width: 150px;
+    width: 300px;
+    height: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -283,6 +290,42 @@ button:active {
     align-items: center;
 }
 
+.primary-button {
+    padding: 12px 24px;
+    -webkit-align-self: center;
+    -ms-flex-item-align: center;
+    -ms-grid-row-align: center;
+    align-self: center;
+    border: 2px solid transparent;
+
+    -webkit-transition: color 0.3s, background-color 0.3s;
+    transition: color 0.3s, background-color 0.3s;
+
+    color: #fff;
+    font-size: 16px;
+    font-family: Aeoniktrial, sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0.6px;
+
+    text-align: center;
+    text-decoration: none;
+    text-transform: capitalize;
+    border-radius: 12px;
+    background-color: #411dc9;
+
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background-color: #a4ff00;
+    color: #000;
+}
+
+.primary-button:active {
+    transform: scale(1.05);
+}
+
 .projects {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -347,7 +390,6 @@ button:active {
     width: 100%;
 }
 
-
 .modal-body,
 .modal-footer,
 .str-chat,
@@ -357,13 +399,12 @@ button:active {
 .mdc-dialog__surface,
 .str-chat__channel-header {
     background: #262626 !important;
-} 
-
+}
 
 .str-chat__message .str-chat__message-bubble,
 .str-chat__message-input .str-chat__quoted-message-preview .str-chat__quoted-message-bubble {
     background: dimgray !important;
-} 
+}
 
 .str-chat__message-input,
 .str-chat__message-attachment-card--title,
@@ -381,4 +422,3 @@ button:active {
         width: 100%;
     }
 }
-

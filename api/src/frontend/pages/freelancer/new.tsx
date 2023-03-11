@@ -128,6 +128,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 <input
                     className="field-input"
                     placeholder="Enter your title"
+                    data-testid="title"
                     name="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -167,6 +168,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
             <div className="skills-container">
                 <TagsInput
                     suggestData={suggestedLanguages}
+                    data-testid="languages"
                     tags={languages}
                     onChange={(tags: string[]) => setLanguages(tags)}
                 />
@@ -206,7 +208,8 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 <textarea
                     className="field-input large"
                     placeholder="Enter your bio"
-                    name="title"
+                    data-testid="bio"
+                    name="bio"
                     maxLength={5000}
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
@@ -303,6 +306,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                         <button
                             className="primary-btn in-dark w-button"
                             onClick={() => setStep(1)}
+                            data-testid="get-started-button"
                         >
                             Get Started!
                         </button>
@@ -316,13 +320,16 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                     ) : step === stepData.length - 2 ? (
                         <button
                             className="primary-btn in-dark w-button"
+                            data-testid="submit-button"
                             onClick={() => createProfile()}
+
                         >
                             Submit
                         </button>
                     ) : (
                         <button
                             className="primary-btn in-dark w-button"
+                            data-testid="next-button"
                             onClick={() => setStep(step + 1)}
                         >
                             Next

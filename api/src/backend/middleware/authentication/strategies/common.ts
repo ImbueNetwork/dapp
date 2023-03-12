@@ -51,7 +51,6 @@ export function validateUserFromJwt(req: any, res: any, next: any, user_id: numb
 
     try {
         const decoded = jwt.verify(token, jwtOptions.secretOrKey) as jwt.JwtPayload;
-        console.log(decoded);
         if (user_id == decoded.id) {
            return true
         } else {

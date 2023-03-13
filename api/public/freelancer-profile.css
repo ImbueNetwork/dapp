@@ -372,7 +372,7 @@ button:active {
 }
 
 .project-progress-indicator {
-    background: #baff36;
+    background: var(--theme-primary);
     position: absolute;
     top: 0;
     bottom: 0;
@@ -388,28 +388,6 @@ button:active {
 
 .full-width {
     width: 100%;
-}
-
-.modal-body,
-.modal-footer,
-.str-chat,
-.str-chat__list,
-.str-chat__message-input,
-.str-chat__message-input-inner,
-.mdc-dialog__surface,
-.str-chat__channel-header {
-    background: #262626 !important;
-}
-
-.str-chat__message .str-chat__message-bubble,
-.str-chat__message-input .str-chat__quoted-message-preview .str-chat__quoted-message-bubble {
-    background: dimgray !important;
-}
-
-.str-chat__message-input,
-.str-chat__message-attachment-card--title,
-.str-chat__message-input .str-chat__message-textarea-container .str-chat__message-textarea {
-    color: var(--theme-ink-color) !important;
 }
 
 @media (max-width: 767px) {

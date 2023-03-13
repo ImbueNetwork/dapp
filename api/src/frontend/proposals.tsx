@@ -64,7 +64,7 @@ export const Proposals = (): JSX.Element => {
 
   useEffect(() => {
     fetchProjects().then((projects) => {
-      setProjectsList(projects);
+      // setProjectsList(projects);
     });
   }, []);
 

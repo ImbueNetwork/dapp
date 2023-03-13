@@ -57,9 +57,8 @@ export async function up(knex: Knex): Promise<void> {
 
     const projectStatusTableName = "project_status";
     await knex.schema.createTable(projectStatusTableName, builder => {
+        builder.increments("id", { primaryKey: true });
         builder.text("status");
-        builder.primary(["status"]);
-
         auditFields(knex, builder);
     }).then(onUpdateTrigger(knex, projectStatusTableName));
 
@@ -76,9 +75,9 @@ export async function up(knex: Knex): Promise<void> {
         builder.integer("chain_project_id");
         builder.decimal("total_cost_without_fee");
         builder.decimal("imbue_fee");
-        builder.text("status").notNullable().defaultTo("draft");
-        builder.foreign("status")
-            .references("project_status.status")
+        builder.integer("status_id").notNullable().defaultTo(1);
+        builder.foreign("status_id")
+            .references("project_status.id")
             .onDelete("SET NULL")
             .onUpdate("CASCADE");
 

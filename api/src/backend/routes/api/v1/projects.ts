@@ -55,26 +55,6 @@ router.get("/:id", (req, res, next) => {
     });
 });
 
-/**
- * TODO: json schema or something better instead.
- */
-const validateProposal = (proposal: models.GrantProposal) => {
-    if (!proposal) {
-        throw new Error("Missing `proposal` entry.");
-    }
-
-    const entries = Object.entries(proposal);
-    if (entries.filter(([_,v]) => {
-            // undefined not allowed
-            return v === void 0;
-        }).length
-    ) {
-        throw new Error(
-            `Proposal entries can't have a value of \`undefined\`.`
-        );
-    }
-}
-
 router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {
     const {
         name,

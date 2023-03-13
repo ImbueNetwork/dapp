@@ -6,6 +6,14 @@ export enum Currency {
     MGX = 4,
 }
 
+export enum ProjectStatus {
+    Draft = 0,
+    PendingReview = 1,
+    ChangesRequested = 2,
+    Rejected = 3,
+    Accepted = 4,
+}
+
 export enum RoundType {
     ContributionRound,
     VotingRound,

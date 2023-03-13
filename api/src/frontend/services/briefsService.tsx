@@ -1,5 +1,5 @@
 import * as config from "../config";
-import {Brief, Freelancer} from "../models";
+import {Brief, Freelancer, Project} from "../models";
 import { BriefSqlFilter } from "../models";
 
 const getAPIHeaders = {
@@ -10,7 +10,6 @@ const postAPIHeaders = {
     ...getAPIHeaders,
     "content-type": "application/json",
 };
-
 
 export const callSearchBriefs = async (filter: BriefSqlFilter) => {
     const resp = await fetch(`${config.apiBase}/briefs/search`, {
@@ -51,3 +50,16 @@ export const getAllBriefs = async () => {
     }
   }
 
+export const getBriefApplications = async (brifId: string | number) => {
+    const resp =  await fetch(`${config.apiBase}/briefs/${brifId}/applications`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json()
+    } else {
+        throw new Error('Failed to get all brief applications. status:' + resp.status);
+    }
+
+}

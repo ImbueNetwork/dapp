@@ -3,7 +3,7 @@ import ReactDOMClient from "react-dom/client";
 import { Brief, User } from "../../models";
 import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
-import "../../../../public/freelancer-profile.css";
+// import "../../../../public/freelancer-profile.css";
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
@@ -11,7 +11,7 @@ import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
 import { fetchUser, fetchUserOrEmail, getCurrentUser, redirect } from "../../utils";
-import { ChatBox } from "../../components/chat";
+import { ChatBox } from "../../components";
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -77,9 +77,10 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
                     <button className="primary-btn in-dark w-button" onClick={() => redirectToApply()}>
                         Apply
                     </button>
-                    <button className="primary-btn in-dark w-button">
+                    {/* TODO: Implement */}
+                    {/* <button className="primary-btn in-dark w-button">
                         Save
-                    </button>
+                    </button> */}
                 </div>
             </div>
             <div className="subsection">
@@ -269,7 +270,8 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
                 {BioPanel}
                 {BioInsights}
             </div>
-            {SimilarProjects}
+            {/* TODO: Implement */}
+            {/* {SimilarProjects} */}
         </div>
     );
 };

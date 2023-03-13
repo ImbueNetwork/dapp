@@ -42,7 +42,6 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
         try {
             const user = await models.fetchUserOrEmail(userOrEmail)(tx);
             if (!user) {
-                console.log("there")
                 return res.status(404).end();
             }
 
@@ -53,7 +52,6 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
 
             const loginSuccessful = await bcrypt.compare(password, user.password)
             if (!loginSuccessful) {
-                console.log("here")
                 return res.status(404).end();
             }
 

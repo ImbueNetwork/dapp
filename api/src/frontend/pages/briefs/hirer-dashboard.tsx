@@ -18,7 +18,6 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
     const [briefsUnderReview, setBriefsUnderReview] = useState<any[]>([]);
     const [acceptedBriefs, setAcceptedBriefs] = useState<any[]>([]);
 
-
     const redirectToApplications = (brief_id) => {
         redirect(`briefs/${brief_id}/applications/`);
     };
@@ -53,7 +52,6 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
                     <hr className="separator" />
                     {briefsUnderReview.map((brief) => {
                         const timePosted = timeAgo.format(new Date(brief.created));
-
 
                         return (
                             <>

@@ -50,7 +50,6 @@ export const getAllBriefs = async () => {
     }
 }
 
-
 export const getUserBriefs = async (user_id) => {
     const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
         headers: postAPIHeaders,
@@ -62,7 +61,6 @@ export const getUserBriefs = async (user_id) => {
         throw new Error(`Failed to get all briefs for user ${user_id}. status: ${resp.status}`);
     }
 }
-
 
 export const getBriefApplications = async (brifId: string | number) => {
     const resp = await fetch(`${config.apiBase}/briefs/${brifId}/applications`, {

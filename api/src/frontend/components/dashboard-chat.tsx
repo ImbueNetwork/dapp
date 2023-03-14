@@ -22,7 +22,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         setup();
      }, []);
 
-
     if(client) {
         client.connectUser(
             {
@@ -49,5 +48,4 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         : <p>REACT_APP_GETSTREAM_API_KEY not found</p>
     );
 };
-
 

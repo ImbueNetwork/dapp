@@ -9,7 +9,6 @@ test("test Freelancer rendering", () => {
     expect(freelancerComponent).toBeTruthy();
 });
 
-
 test("test Freelancer rendering and matching the snapshot", () => {
     const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
     render(<Freelancers user={user}/>);
@@ -45,7 +44,6 @@ test("test freelancer capturing the multiselect languages", () => {
     expect((screen.getByTestId('tag-input') as HTMLInputElement).value).toEqual('German,hkh');
 });
 
-
 test("test freelancer the bio length ", () => {
     const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
     render(<Freelancers user={user}/>);
@@ -58,22 +56,3 @@ test("test freelancer the bio length ", () => {
     fireEvent.change(screen.getByTestId('bio'), {target: {value: "this is my bio" }})
     expect((screen.getByTestId('bio') as HTMLInputElement).value.length).toEqual(14);
 });
-
-// test("test freelancer submit method ", async () => {
-//     const createProfile = jest.fn();
-//     const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
-//     render(<Freelancers user={user} />);
-//     fireEvent.click(screen.getByTestId('get-started-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     fireEvent.click(screen.getByTestId('next-button'));
-//     const submitEvent =  screen.getByTestId('submit-button')
-//     fireEvent.click(submitEvent);
-//     expect(createProfile).toHaveBeenCalledTimes(1);
-//
-// });
-
-

@@ -14,7 +14,6 @@ export const Milestones = ({ projectOnChain, firstPendingMilestoneIndex }: Miles
         setActiveMilestone(milestoneKey != activeMilestone ? milestoneKey : -1);
     };
 
-
     return projectOnChain.milestones ?
         <div className="container accordion">
             {projectOnChain.milestones.map((milestone, index) => (

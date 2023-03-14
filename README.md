@@ -119,3 +119,31 @@ yarn start
 ```
 
 which starts webpack in "watch" mode. This is connected to the running nginx server via the docker-compose `volumes` directive, which is tied to the `./web/dist` directory (where webpack outputs its bundle).
+
+
+## Testing the frontened components
+
+### Running all the unit tests at once
+You can run the unit test for the components by going to the api directory by ```cd api```
+And once inside the api directory run 
+
+```bash
+yarn test
+```
+
+It will run all the test cases and you will see the results in the terminal
+
+### Testing the individual components
+If you want to run the test cases for a specific component then you can run 
+
+```bash 
+yarn test <component_name> for example yarn test Freelancer
+```
+
+### Testing the individual test inside any component 
+If you want to run a single test case inside a component then you can run
+
+```bash 
+yarn test -t <test_name> for example yarn test -t "should render the component"
+```
+

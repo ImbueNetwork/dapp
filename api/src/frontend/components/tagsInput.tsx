@@ -51,6 +51,7 @@ export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.
         <input
           type="text"
           className="new-tag-input"
+          data-testid="tag-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}

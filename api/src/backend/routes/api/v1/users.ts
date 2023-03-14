@@ -10,7 +10,6 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-
 type ProjectPkg = models.Project & {
     milestones: models.Milestone[]
 }
@@ -125,7 +124,6 @@ router.get("/:userOrEmail", (req, res, next) => {
         }
     });
 });
-
 
 router.get("/byid/:id", (req, res, next) => {
     const id = Number(req.params.id);

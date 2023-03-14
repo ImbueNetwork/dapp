@@ -70,7 +70,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                 total_cost_without_fee: totalCostWithoutFee,
                 imbue_fee: imbueFee,
                 currency_id: currencyId,
-                milestones: milestones.filter(m => m.amount !== undefined).map(m =>  { return {name:m.name, amount: m.amount, percentage_to_unlock: (( (m.amount ?? 0)  / totalCostWithoutFee) * 100).toFixed(0)}}),
+                milestones: milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: m.amount, percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0) } }),
                 required_funds: totalCost
             }),
         });
@@ -149,7 +149,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                                             ...milestones[
                                                             index
                                                             ],
-                                                            amount:  Number(e.target.value),
+                                                            amount: Number(e.target.value),
                                                         },
                                                         ...milestones.slice(
                                                             index + 1
@@ -195,7 +195,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                             </div>
                         </div>
                         <div className="budget-value">
-                            ${totalCostWithoutFee.toFixed(2)}
+                            ${Number((totalCostWithoutFee).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
                     <hr className="separator" />
@@ -206,8 +206,8 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                                 fees
                             </h3>
                         </div>
-                        <div className="budget-value text-inactive">
-                            ${(imbueFee).toFixed(2)}
+                        <div className="budget-value">
+                            ${Number((imbueFee).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
 
@@ -216,8 +216,8 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                         <div className="budget-description">
                             <h3>Total</h3>
                         </div>
-                        <div className="budget-value text-inactive">
-                            ${(totalCost).toFixed(2)}
+                        <div className="budget-value">
+                            ${Number((totalCost).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
                 </div>
@@ -286,13 +286,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     const user = await getCurrentUser();
     const freelancer = await getFreelancerProfile(user.username);
 
-    if(!freelancer) {
+    if (!freelancer) {
         redirect(`freelancers/new`);
     }
 
     if (briefId) {
         const userApplication = await getUserBriefs(user.id, briefId);
-        if(userApplication) {
+        if (userApplication) {
             redirect(`briefs/${briefId}/applications/${userApplication.id}/`)
         }
         const brief: Brief = await getBrief(briefId);

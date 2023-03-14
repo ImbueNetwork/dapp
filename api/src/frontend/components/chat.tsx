@@ -11,7 +11,7 @@ export type ChatProps = {
     targetUser: User;
 };
 
-export const ChatBox = ({ user, targetUser }: ChatProps): JSX.Element => {
+export const ChatBox = ({ user, targetUser }: ChatProps) => {
     const [client, setClient] = useState<StreamChat>();
 
     useEffect(() => {

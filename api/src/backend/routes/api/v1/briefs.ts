@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
@@ -29,7 +29,6 @@ router.get("/", async (req, res, next) => {
     });
 });
 
-
 router.get("/:id", (req, res, next) => {
     const id = req.params.id;
     db.transaction(async tx => {
@@ -43,6 +42,30 @@ router.get("/:id", (req, res, next) => {
         } catch (e) {
             next(new Error(
                 `Failed to fetch brief with id ${id}`,
+                { cause: e as Error }
+            ));
+        }
+    });
+});
+
+router.get("/:id/applications", (req, res, next) => {
+    const id = req.params.id;
+    db.transaction(async tx => {
+        try {
+            const briefApplications = await fetchBriefApplications(id)(tx);
+
+            const response = await Promise.all(briefApplications.map(async (application) => {
+                return {
+                    ...application,
+                    freelancer: await fetchFreelancerDetailsByUserID(application.user_id)(tx),
+                    milestones: await fetchProjectMilestones(application.id)(tx)
+                }
+            }));
+
+            res.send(response);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch brief applications with id ${id}`,
                 { cause: e as Error }
             ));
         }

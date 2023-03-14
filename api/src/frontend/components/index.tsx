@@ -2,6 +2,7 @@ export * from "./accountChoice";
 export * from "./alert";
 export * from "./approveMilestone";
 export * from "./briefFilter";
+export * from "./chat";
 export * from "./briefInsights";
 export * from "./contribute";
 export * from "./dialogue";

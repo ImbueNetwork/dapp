@@ -301,7 +301,7 @@ export const fetchProjectWithProperties = (id: string | number) =>
 
 export const fetchAllProjects = () =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").whereNotNull('chain_project_id').select();
+        tx("projects").select();
 
 export const fetchUserProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
@@ -345,9 +345,13 @@ export const fetchMilestoneByIndex = (projectId: string | number, milestoneId: s
     (tx: Knex.Transaction) =>
         tx<MilestoneDetails>("milestone_details").select().where({ project_id: projectId }).where('index', '=', milestoneId);
 
+export const fetchBriefApplications = (id: string) =>
+    (tx: Knex.Transaction) =>
+        fetchAllProjects()(tx)
+            .where({ "brief_id": id })
+            .select()
 
-
-export const fetchBrief = (id: string) =>
+            export const fetchBrief = (id: string) =>
     (tx: Knex.Transaction) =>
         fetchAllBriefs()(tx)
             .where({ "briefs.id": id })

@@ -58,7 +58,7 @@ h3 {
 }
 
 .text-primary {
-    color: #baff36;
+    color: var(--theme-primary) !important;
 }
 
 .text-small {

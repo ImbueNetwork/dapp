@@ -40,7 +40,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 total_cost_without_fee: totalCostWithoutFee,
                 imbue_fee: imbueFee,
                 currency_id: currencyId,
-                milestones: milestones.filter(m => m.amount !== undefined).map(m =>  { return {name:m.name, amount: m.amount, percentage_to_unlock: (( (m.amount ?? 0)  / totalCostWithoutFee) * 100).toFixed(0)}}),
+                milestones: milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: m.amount, percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0) } }),
                 required_funds: totalCost
             }),
         });
@@ -187,13 +187,17 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                             );
                         })}
                     </div>
-                    <h3
-                        className="clickable-text btn-add-milestone"
-                        onClick={onAddMilestone}
-                    >
-                        <FiPlusCircle color="var(--theme-primary)" />
-                        Add milestone
-                    </h3>
+                    {isEditingBio &&
+                        <h3
+                            className="clickable-text btn-add-milestone"
+                            onClick={onAddMilestone}
+                        >
+                            <FiPlusCircle color="var(--theme-primary)" />
+                            Add milestone
+                        </h3>
+
+                    }
+
                     <hr className="separator" />
                     <div className="budget-info">
                         <div className="budget-description">
@@ -204,7 +208,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                             </div>
                         </div>
                         <div className="budget-value">
-                            ${totalCostWithoutFee.toFixed(2)}
+                            ${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
                         </div>
                     </div>
                     <hr className="separator" />
@@ -215,8 +219,8 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                 fees
                             </h3>
                         </div>
-                        <div className="budget-value text-inactive">
-                            ${(imbueFee).toFixed(2)}
+                        <div className="budget-value">
+                            ${Number((imbueFee).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
 
@@ -225,8 +229,8 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                         <div className="budget-description">
                             <h3>Total</h3>
                         </div>
-                        <div className="budget-value text-inactive">
-                            ${(totalCost).toFixed(2)}
+                        <div className="budget-value">
+                            ${Number((totalCost).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
                 </div>
@@ -264,7 +268,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                 defaultValue={Number(application.currency_id)}
                                 required
                             >
-                                {currencies.map((currency,index) => (
+                                {currencies.map((currency, index) => (
                                     <option
                                         value={index}
                                         key={index}

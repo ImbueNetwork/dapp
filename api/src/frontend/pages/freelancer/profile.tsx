@@ -19,12 +19,11 @@ import { Freelancer, User } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
 
 import { fetchUser, getCurrentUser, getStreamChat, redirect } from "../../utils";
-import { ChatBox } from "../../components/chat";
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../../../public/freelancer-profile.css";
 
-import { TextInput } from "../../components";
+import { TextInput, ChatBox } from "../../components";
 
 export type ProfileProps = {
     initFreelancer: Freelancer;

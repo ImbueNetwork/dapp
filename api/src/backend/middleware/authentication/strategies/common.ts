@@ -64,5 +64,5 @@ export function validateUserFromJwt(req: any, res: any, next: any, user_id: numb
 
 export const jwtOptions = {
     jwtFromRequest: cookieExtractor,
-    secretOrKey: 'mysecretword'
+    secretOrKey: process.env.JWTSecret ?? 'mysecretword'
 };

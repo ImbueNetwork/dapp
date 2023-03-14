@@ -50,6 +50,14 @@ export const getAllBriefs = async () => {
     }
 }
 
+export const getUserBrief = async (userId, briefId) => {
+    const resp = await fetch(`${config.apiBase}/users/${userId}/briefs/${briefId}`);
+    if (resp.ok) {
+        return resp.json();
+    }
+    return null;
+};
+
 export const getUserBriefs = async (user_id) => {
     const resp = await fetch(`${config.apiBase}/users/${user_id}/briefs/`, {
         headers: postAPIHeaders,

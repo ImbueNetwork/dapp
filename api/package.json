@@ -6,9 +6,6 @@
   "repository": "git@github.com:ImbueNetwork/dapp.git",
   "author": "Tom Brennan <tjb1982@gmail.com>",
   "license": "MIT",
-  "jest": {
-    "testEnvironment": "jsdom"
-  },
   "scripts": {
     "test": "jest",
     "start": "NODE_ENV=development webpack watch --config ./src/frontend/webpack.config.js --mode development & NODE_ENV=development webpack watch --config ./src/legacy/webpack.config.js --mode development & TS_NODE_PROJECT=./src/backend/tsconfig.json nodemon -L --watch src/backend --ext 'js,ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register src/backend/index.ts'",

@@ -285,10 +285,9 @@ export const updateProjectProperties = (id: string | number, properties: Project
     )[0];
 
 
-export const fetchUserBriefs = (user_id: string | number, brief_id: string | number) =>
+export const fetchUserBriefApplications = (user_id: string | number, brief_id: string | number) =>
 (tx: Knex.Transaction) =>
     tx<Project>("projects").select().where({ user_id, brief_id }).first();
-
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
@@ -351,12 +350,30 @@ export const fetchBriefApplications = (id: string) =>
             .where({ "brief_id": id })
             .select()
 
-            export const fetchBrief = (id: string) =>
+export const fetchBriefProjects = (brief_id: string) =>
+    (tx: Knex.Transaction) =>
+        fetchAllProjects()(tx)
+            .where({ brief_id })
+            .select()
+
+export const fetchAcceptedBriefs = (user_id: string) =>
+    (tx: Knex.Transaction) =>
+        fetchAllBriefs()(tx)
+            .where({ user_id })
+            .select()
+
+export const fetchBrief = (id: string) =>
     (tx: Knex.Transaction) =>
         fetchAllBriefs()(tx)
             .where({ "briefs.id": id })
             .first()
 
+
+export const fetchUserBriefs = (user_id: string) =>
+            (tx: Knex.Transaction) =>
+                fetchAllBriefs()(tx)
+                    .where({ user_id })
+                    .select()
 
 export const fetchAllBriefs = () =>
     (tx: Knex.Transaction) =>
@@ -374,6 +391,7 @@ export const fetchAllBriefs = () =>
             "briefs.experience_id",
             "briefs.created",
             "briefs.user_id",
+            "briefs.project_id",
             "users.briefs_submitted as number_of_briefs_submitted",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),

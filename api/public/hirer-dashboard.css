@@ -50,6 +50,11 @@
 .brief-description {
     display: flex;
     flex-direction: column;
+    width: 35%;
+}
+
+.brief-proposals{
+    width: 44%;
 }
 
 .milestone-header {

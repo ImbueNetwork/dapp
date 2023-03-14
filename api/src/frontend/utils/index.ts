@@ -61,7 +61,7 @@ export const getUser = async (user_id) => {
     return null;
 };
 
-export const getUserBriefs = async (userId, briefId) => {
+export const getUserBrief = async (userId, briefId) => {
     const resp = await fetch(`${config.apiBase}/users/${userId}/briefs/${briefId}`);
     if (resp.ok) {
         return resp.json();

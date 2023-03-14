@@ -73,8 +73,8 @@ export async function up(knex: Knex): Promise<void> {
         builder.integer("category");
         builder.integer("currency_id");
         builder.integer("chain_project_id");
-        builder.decimal("total_cost_without_fee");
-        builder.decimal("imbue_fee");
+        builder.decimal("total_cost_without_fee", 10, 2);
+        builder.decimal("imbue_fee", 10, 2);
         builder.integer("status_id").notNullable().defaultTo(1);
         builder.foreign("status_id")
             .references("project_status.id")
@@ -89,7 +89,7 @@ export async function up(knex: Knex): Promise<void> {
         // This type holds numbers as big as 1e128 and beyond (incl. fractional
         // scale). The emphasis is on precision, while arithmetical efficiency
         // takes a hit.
-        builder.decimal("required_funds", null).notNullable();
+        builder.decimal("required_funds", 10, 2).notNullable();
 
         // FIXME: this will need to be ACID, hence we will
         // need to update it from the blockchain.
@@ -155,7 +155,7 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(milestonesTableName, (builder) => {
         builder.integer("milestone_index");
         builder.integer("project_id").notNullable();
-        builder.primary(["project_id","milestone_index"]);
+        builder.primary(["project_id", "milestone_index"]);
         builder.decimal("amount");
 
         builder.foreign("project_id")

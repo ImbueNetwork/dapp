@@ -7,7 +7,7 @@ import * as config from "../../config";
 import { Brief, Currency, Project, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
-import { fetchProject, getCurrentUser, getUserBriefs, redirect } from "../../utils";
+import { fetchProject, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 

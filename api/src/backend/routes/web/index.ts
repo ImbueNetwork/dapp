@@ -73,6 +73,10 @@ router.get("/briefs/:id/applications/:application_id", (req, res) => {
     res.render("application-preview");
 });
 
+router.get("/my-briefs", (req, res) => {
+    res.render("hirer-dashboard");
+});
+
 router.get("/join", (req, res) => {
     res.render("join");
 });

@@ -151,6 +151,7 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
                         </div>
                     ))}
                 </div>
+                {/* TODO Display empty if no applications */}
             </div>
         </div>
     );
@@ -164,7 +165,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const brief: Brief = await getBrief(briefId);
         const browsingUser = await getCurrentUser();
         const isBriefOwner = brief.user_id == browsingUser.id;
-
         if (isBriefOwner) {
             ReactDOMClient.createRoot(
                 document.getElementById("brief-applications")!

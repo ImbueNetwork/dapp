@@ -3,7 +3,6 @@ import { AiFillPlusCircle, AiFillMinusCircle } from "react-icons/ai";
 import { BsCircleFill } from "react-icons/bs";
 import { Currency, Milestone, ProjectOnChain, ProjectState } from "../models";
 
-
 export type MilestonesItemProps = {
   milestone: Milestone,
   projectOnChain: ProjectOnChain,
@@ -22,7 +21,6 @@ const MilestoneItem = ({ milestone, projectOnChain, toggleActive, toggleMileston
       setFormattedMilestoneValue(milestoneValue.toLocaleString());
     }
   }, []);
-
 
 
   const displayMilestoneToggle = (): JSX.Element => {
@@ -47,7 +45,6 @@ const MilestoneItem = ({ milestone, projectOnChain, toggleActive, toggleMileston
       }
     }
   }
-
 
   return (
     <div className="main">

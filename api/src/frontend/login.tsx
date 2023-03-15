@@ -25,7 +25,6 @@ const postAPIHeaders = {
   "content-type": "application/json",
 };
 
-
 type LoginProps = {};
 type LoginState = {
   showPolkadotAccounts: boolean;
@@ -83,7 +82,6 @@ export const Login = ({ }: LoginProps): JSX.Element => {
   const [password, setPassword] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
 
-
   const imbueLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     setErrorMessage(undefined);
     event.preventDefault();
@@ -103,7 +101,6 @@ export const Login = ({ }: LoginProps): JSX.Element => {
       setErrorMessage("incorrect username or password");
     }
   }
-
 
   const selectAccount = async (account: InjectedAccountWithMeta) => {
     const result = await getAccountAndSign(account);

@@ -101,7 +101,6 @@ export const ApproveMilestone = ({ projectOnChain, imbueApi, firstPendingMilesto
         }
     }
 
-
     return projectOnChain && projectOnChain.milestones ?
         <div>
             <ErrorDialog errorMessage={errorMessage} showDialog={errorDialogVisible} closeDialog={closeErrorDialog} />

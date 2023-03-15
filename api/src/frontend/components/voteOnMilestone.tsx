@@ -35,7 +35,6 @@ export const VoteOnMilestone = (props: VoteOnMilestoneProps): JSX.Element => {
     const [vote, setVote] = useState(false);
 
 
-
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         showPolkadotAccounts(true);
@@ -69,7 +68,6 @@ export const VoteOnMilestone = (props: VoteOnMilestoneProps): JSX.Element => {
             await new Promise(f => setTimeout(f, 1000));
         }
     }
-
 
     return props.projectOnChain.milestones ? (
         <div>

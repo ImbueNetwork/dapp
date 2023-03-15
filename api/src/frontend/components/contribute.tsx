@@ -62,7 +62,6 @@ export const Contribute = ({ chainService, projectOnChain }: ContributeProps): J
         }
     }
 
-
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         showPolkadotAccounts(true);

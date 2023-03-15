@@ -5,9 +5,9 @@ import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Project, User } from "../../models";
-import { getBrief } from "../../services/briefsService";
+import { getBrief, getUserBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
-import { getCurrentUser, getUserBriefs, redirect } from "../../utils";
+import { getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 
@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     }
 
     if (briefId) {
-        const userApplication = await getUserBriefs(user.id, briefId);
+        const userApplication = await getUserBrief(user.id, briefId);
         if (userApplication) {
             redirect(`briefs/${briefId}/applications/${userApplication.id}/`)
         }

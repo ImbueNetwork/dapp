@@ -1,7 +1,7 @@
 import express, { response } from "express";
 import db from "../../../db";
 import * as models from "../../../models";
-import { User, getOrCreateFederatedUser, updateFederatedLoginUser } from "../../../models";
+import { User, getOrCreateFederatedUser, updateFederatedLoginUser, fetchUserBriefs, fetchBriefApplications, fetchBriefProjects, fetchProjectMilestones } from "../../../models";
 
 // @ts-ignore
 import * as passportJwt from "passport-jwt"
@@ -44,7 +44,7 @@ router.get("/:id/briefs/:briefId", (req, res, next) => {
     const briefId = req.params.briefId;
     db.transaction(async tx => {
         try {
-            const project = await models.fetchUserBriefs(id,briefId)(tx);
+            const project = await models.fetchUserBriefApplications(id,briefId)(tx);
             
             if (!project) {
                 return res.status(404).end();
@@ -60,6 +60,44 @@ router.get("/:id/briefs/:briefId", (req, res, next) => {
             next(new Error(
                 `Failed to fetch project by id: ${id}`,
                 {cause: e as Error}
+            ));
+        }
+    });
+});
+
+router.get("/:id/briefs", (req, res, next) => {
+    const id = req.params.id;
+    db.transaction(async tx => {
+        try {
+            const briefs = await fetchUserBriefs(id)(tx);
+            const pendingReviewBriefs = briefs.filter(m => m.project_id == null);
+            const briefsWithProjects = briefs.filter(m => m.project_id !== null);
+
+            const briefsUnderReview = await Promise.all(pendingReviewBriefs.map(async (brief) => {
+                return {
+                    ...brief,
+                    number_of_applications: (await fetchBriefApplications(brief.id)(tx)).length
+                }
+            }));
+
+            const acceptedBriefs = await Promise.all(briefsWithProjects.map(async (brief) => {
+                return {
+                    ...brief,
+                    project: (await models.fetchProject(brief.project_id)(tx)),
+                    milestones: (await fetchProjectMilestones(brief.project_id)(tx))
+                }
+            }));
+
+            const response = {
+                briefsUnderReview,
+                acceptedBriefs,
+            }
+
+            res.send(response);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch all briefs for user id ${id}`,
+                { cause: e as Error }
             ));
         }
     });

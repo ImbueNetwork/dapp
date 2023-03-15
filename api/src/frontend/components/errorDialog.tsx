@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Dialog, DialogActions, DialogButton, DialogContent, DialogTitle } from "@rmwc/dialog";
 
-
 export type ErrorDialogProps = {
     errorMessage: String | null,
     showDialog: boolean,

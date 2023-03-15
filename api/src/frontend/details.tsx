@@ -98,7 +98,6 @@ export const Details = ({ chainService, user, projectId, imbueApi }: DetailsProp
     const [approvedVisible, showApproved] = useState(false);
     const [withdrawVisible, showWithdraw] = useState(false);
 
-
     const setProjectState = async (_projectOnChain: ProjectOnChain): Promise<void> => {
         let _userIsInitiator = await chainService.isUserInitiator(user, _projectOnChain);
 
@@ -137,14 +136,12 @@ export const Details = ({ chainService, user, projectId, imbueApi }: DetailsProp
             }
         }
 
-
         // USE THIS FOR DEMO
         // projectOnChain.milestones[0].isApproved = true;
         // projectOnChain.milestones[1].isApproved = true;
         // lastApprovedMilestoneIndex = 1;
         // lastPendingMilestoneIndex = 2;
         // projectOnChain.projectState = ProjectState.OpenForVoting;
-
 
         setProjectOnChain(_projectOnChain);
         setLastApprovedMilestoneIndex(_lastApprovedMilestoneIndex);
@@ -266,7 +263,6 @@ export const Details = ({ chainService, user, projectId, imbueApi }: DetailsProp
                         </li>
                     </ul>
                 </div>
-
 
                 <div className={`tab-content ${activeTabIndex === 1 ? "active" : ""}`}>
                     <Milestones projectOnChain={projectOnChain} firstPendingMilestoneIndex={firstPendingMilestoneIndex}></Milestones>

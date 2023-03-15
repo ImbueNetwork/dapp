@@ -95,7 +95,7 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
         if (browsingUser) {
             setShowMessageBox(true);
         } else {
-            redirect("login", `/dapp/freelancers/${freelancer.username}`)
+            redirect("login", `/dapp/freelancers/${freelancer.username}/`)
         }
     }
 

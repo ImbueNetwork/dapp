@@ -229,10 +229,11 @@ export const insertUserByDisplayName = (displayName: string, username: string) =
         }).returning("*")
     )[0];
 
-export const generateGetStreamToken = (user: User) => {
+export const generateGetStreamToken = async (user: User) => {
     if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
         const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
         const token = client.createToken(user.username);
+        await client.upsertUser({ id: user.username});
         return token;
     }
     return ""
@@ -520,23 +521,16 @@ export const getOrCreateFederatedUser = (
             /**
              * Do we already have a federated_credential ?
              */
-
-            console.log(`Issuer is `, issuer);
-            console.log(`Subject is `, username);
             const federated = await tx<FederatedCredential>("federated_credentials").select().where({
                 issuer,
                 subject: username,
             }).first();
-
-            console.log(`federated is `, federated);
 
             /**
              * If not, create the `usr`, then the `federated_credential`
              */
             if (!federated) {
                 user = await insertUserByDisplayName(displayName, username)(tx);
-                const token = await generateGetStreamToken(user);
-                await updateUserGetStreamToken(user.id, token)(tx);
                 await insertFederatedCredential(user.id, issuer, username)(tx);
             } else {
                 const user_ = await db.select().from<User>("users").where({
@@ -552,6 +546,10 @@ export const getOrCreateFederatedUser = (
                 user = user_;
             }
 
+            if(!user.getstream_token) {
+                const token = await generateGetStreamToken(user);
+                await updateUserGetStreamToken(user.id, token)(tx);
+            }
 
             done(null, user);
         } catch (err) {

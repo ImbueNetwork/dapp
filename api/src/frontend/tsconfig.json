@@ -100,5 +100,5 @@
     /* Skip type checking all .d.ts files. */
     "jsx": "react"
   },
-  "include": ["./"]
+  "include": ["./", "../../postcss.config.js", "../../postcss.config.js"]
 }

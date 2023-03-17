@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-.custom-chat-container{
-    background: #2C2C2C;
-    height: 80vh;
-}
-
 .modal-body,
 .modal-footer,
 .str-chat,
@@ -18,10 +12,20 @@
     background: #2C2C2C !important;
 }
 
-/* channel searchbox */
-.str-chat__channel-search{
+.custom-chat-container{
+    background: #2C2C2C;
+    height: 80vh;
+}
+
+/* left side */
+.chat-list-container{
+    width: 30%;
+}
+.str-chat__channel-search,
+.str-chat__channel-preview {
     padding: 25px 48px;
 }
+
 .str-chat__channel-search .str-chat__channel-search-bar{
     padding: 0;
 }
@@ -35,25 +39,15 @@
     background-color: rgba(120, 120, 120, 0.3);
 }
 
-/* channel list */
-.str-chat-channel-list{
-    width: 22vw;
-}
-
 .str-chat__channel-preview-messenger.str-chat__channel-preview.str-chat__channel-preview-messenger--active{
     background-color: rgba(120, 120, 120, 0.3);
     border-left: 5px solid #BAFF36;
 }
 
-.str-chat__channel-preview{
-    padding: 21px 48px;
-}
-
-/* chat window */
+/* right side */
 .str-chat.str-chat__theme-dark.str-chat-channel.str-chat__channel{
-    width: 100%;
+    width: 70%;
 }
-
 
 .str-chat__channel-preview-messenger--left{
     padding-right: 12px;
@@ -63,6 +57,15 @@
     padding-top: 2px;
 }
 
-.searchbox{
-    background: transparent;
+
+@media only screen and (min-width: 80px) and (max-width: 480px)   {
+    
+    .custom-chat-container{
+        height: 20vh;
+    }
+
+    .chat-list-container{
+        width: 50vw;
+    }
+
 }

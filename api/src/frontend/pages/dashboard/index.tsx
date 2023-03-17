@@ -13,7 +13,7 @@ export type DashboardProps = {
 export const Dashboard = ({ user: user }: DashboardProps): JSX.Element => {
     return (
         <div>
-            <h2>My Chats</h2>
+            {/* <h2>My Chats</h2> */}
             <DashboardChat user={user}></DashboardChat>
         </div>
     );

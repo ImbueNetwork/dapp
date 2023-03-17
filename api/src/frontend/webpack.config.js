@@ -20,6 +20,7 @@ module.exports = {
         "submit-proposal": path.resolve(__dirname, "pages", "briefs", "submit.tsx"),
         "application-preview": path.resolve(__dirname, "pages", "briefs", "application-preview.tsx"),
         "hirer-dashboard": path.resolve(__dirname, "pages", "briefs", "hirer-dashboard.tsx"),
+        "brief-dashboard": path.resolve(__dirname, "pages", "briefs", "brief-dashboard.tsx")
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"

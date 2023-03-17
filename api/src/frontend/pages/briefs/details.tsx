@@ -4,27 +4,32 @@ import { Brief, User } from "../../models";
 import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
 // import "../../../../public/freelancer-profile.css";
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
 
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
-import { fetchUser, fetchUserOrEmail, getCurrentUser, redirect } from "../../utils";
+import {
+    fetchUser,
+    fetchUserOrEmail,
+    getCurrentUser,
+    redirect,
+} from "../../utils";
 import { ChatBox } from "../../components";
-import Modal from 'react-bootstrap/Modal';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Modal from "react-bootstrap/Modal";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export type BriefProps = {
     brief: Brief;
 };
 TimeAgo.addDefaultLocale(en);
 
-export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
-    const [browsingUser, setBrowsingUser] = useState<User| null>();
-    const [targetUser, setTargetUser] = useState<User| null>(null);
+export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
+    const [browsingUser, setBrowsingUser] = useState<User | null>();
+    const [targetUser, setTargetUser] = useState<User | null>(null);
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
-    const isOwnerOfBrief = (browsingUser && browsingUser.id == brief.user_id);
+    const isOwnerOfBrief = browsingUser && browsingUser.id == brief.user_id;
 
     useEffect(() => {
         async function setup() {
@@ -32,30 +37,42 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
             setTargetUser(await fetchUser(brief.user_id));
         }
         setup();
-     }, [])
+    }, []);
 
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
 
     const redirectToApply = () => {
         redirect(`briefs/${brief.id}/apply`);
-    }
+    };
 
     const handleMessageBoxClick = async () => {
         if (browsingUser) {
             setShowMessageBox(true);
         } else {
-            redirect("login", `/dapp/briefs/${brief.id}/`)
+            redirect("login", `/dapp/briefs/${brief.id}/`);
         }
-    }
+    };
 
     const renderChat = (
         <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
             <Modal.Body>
-                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+                {browsingUser && targetUser ? (
+                    <ChatBox
+                        user={browsingUser}
+                        targetUser={targetUser}
+                    ></ChatBox>
+                ) : (
+                    <p>REACT_APP_GETSTREAM_API_KEY not found</p>
+                )}
             </Modal.Body>
             <Modal.Footer>
-                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
+                <button
+                    className="primary-button"
+                    onClick={() => setShowMessageBox(false)}
+                >
+                    Close
+                </button>
             </Modal.Footer>
         </Modal>
     );
@@ -74,7 +91,10 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
             {/* TODO: Do we use same styles for both buttons? */}
             <div className="subsection">
                 <div className="action-buttons">
-                    <button className="primary-btn in-dark w-button" onClick={() => redirectToApply()}>
+                    <button
+                        className="primary-btn in-dark w-button"
+                        onClick={() => redirectToApply()}
+                    >
                         Apply
                     </button>
                     {/* TODO: Implement */}
@@ -163,13 +183,13 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
 
     const BioInsights = (
         <div className="brief-insights">
-            <div className="subsection">
+            <div className="insight-item">
                 <div className="header">
                     <h3>Brief Insights</h3>
                 </div>
             </div>
 
-            <div className="subsection">
+            <div className="insight-item">
                 <div className="brief-insights-stat">
                     <FaHandshake className="brief-insight-icon" />
                     <h3>
@@ -180,7 +200,7 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
                 </div>
             </div>
 
-            <div className="subsection">
+            <div className="insight-item">
                 <div className="brief-insights-stat">
                     <IoMdWallet className="brief-insight-icon" />
                     <h3>
@@ -189,7 +209,7 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
                 </div>
             </div>
 
-            <div className="subsection">
+            <div className="insight-item">
                 <div className="brief-insights-stat">
                     <HiUserGroup className="brief-insight-icon" />
                     <h3>
@@ -200,19 +220,22 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
 
             <hr className="separator" />
 
-            { !isOwnerOfBrief &&
+            {!isOwnerOfBrief && (
                 <>
-                <div className="subsection">
-                    <div className="meet-hiring-team">
-                        <h3>
-                            Meet the hiring team:
-                        </h3>
-                        <button onClick={() => handleMessageBoxClick()}  className="primary-btn in-dark w-button">Message</button>
+                    <div className="insight-item">
+                        <div className="meet-hiring-team">
+                            <h3>Meet the hiring team:</h3>
+                            <button
+                                onClick={() => handleMessageBoxClick()}
+                                className="primary-btn in-dark w-button"
+                            >
+                                Message
+                            </button>
+                        </div>
                     </div>
-                </div>
-                { browsingUser && showMessageBox && renderChat}
+                    {browsingUser && showMessageBox && renderChat}
                 </>
-            }
+            )}
         </div>
     );
 

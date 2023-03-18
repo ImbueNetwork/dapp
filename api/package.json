@@ -15,7 +15,8 @@
     "watch/frontend": "NODE_ENV=development webpack watch --config ./src/frontend/webpack.config.js --mode development",
     "watch/legacy": "NODE_ENV=development webpack watch --config ./src/legacy/webpack.config.js --mode development",
     "watch/backend": "nodemon -L --watch src/backend --ext 'js,ts' src/backend/index.ts",
-    "debug/backend": "TS_NODE_PROJECT=./src/backend/tsconfig.json nodemon -L --watch src/backend --ext 'js,ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register src/backend/index.ts'"
+    "debug/backend": "TS_NODE_PROJECT=./src/backend/tsconfig.json nodemon -L --watch src/backend --ext 'js,ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register src/backend/index.ts'",
+    "lint": "npx eslint --fix ./src/backend & npx eslint --fix ./src/frontend"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.44.0",

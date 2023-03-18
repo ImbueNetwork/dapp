@@ -6,14 +6,17 @@
     color: var(--theme-secondary);
 }
 
-.brief-info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.container {
     background: var(--theme-grey-dark);
     border: 1px solid var(--theme-white);
     border-radius: 20px;
     padding: 50px;
+}
+
+.brief-info-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .brief-info {
@@ -99,6 +102,7 @@
 .milestone-complete-percentage {
     position: absolute;
     left: 0;
+    right: 0;
     top: -12px;
     font-size: 10px;
     line-height: 1;
@@ -149,8 +153,6 @@
 .milestone-item {
     display: flex;
     flex-direction: column;
-    padding: 20px 50px;
-    background: #d9d9d9;
 }
 
 .milestone-header {
@@ -158,30 +160,26 @@
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    color: var(--theme-black-text);
+    color: var(--theme-white);
+    line-height: 1;
 }
 
 .milestone-no {
-    font-size: 39px;
-    line-height: 36px;
+    font-size: 40px;
     margin-right: 10px;
 }
 
 .milestone-name {
     font-size: 24px;
-    line-height: 1.2;
-    font-weight: 700;
     flex-grow: 1;
 }
 
 .milestone-date {
     font-size: 14px;
-    line-height: 16px;
 }
 
 .milestone-status {
     font-size: 20px;
-    line-height: 23px;
     font-weight: 700;
 }
 
@@ -198,14 +196,14 @@
     font-size: 14px;
     line-height: 16px;
     font-weight: 700;
-    color: var(--theme-black-text);
+    color: var(--theme-white);
     margin-top: 10px;
 }
 
 .milestone-description {
     font-size: 14px;
     line-height: 16px;
-    color: var(--theme-black-text);
+    color: var(--theme-white);
     margin-top: 16px;
 }
 

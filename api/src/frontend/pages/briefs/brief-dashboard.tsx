@@ -72,7 +72,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
 
     return (
         <>
-            <div className="brief-info-container">
+            <div className="brief-info-wrapper container">
                 <div className="brief-info">
                     <div className="description">
                         <div className="brief-title">
@@ -111,10 +111,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                                  * TODO: Show circles to indicate milestones
                                  */}
                             </div>
-                            <div
-                                className="milestone-complete-percentage"
-                                style={{ width: "50%" }}
-                            >
+                            <div className="milestone-complete-percentage">
                                 50%
                             </div>
                         </div>
@@ -160,10 +157,10 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
             </div>
             <div className="milestones-container">
                 {milestones.map((m, index) => (
-                    <div className="milestone-item" key={index}>
+                    <div className="milestone-item container" key={index}>
                         <div className="milestone-header">
                             <div className="milestone-no">
-                                Milestone {index + 1}
+                                {`Milestone ${index + 1}`}
                             </div>
                             <div className="milestone-name">{m.name}</div>
                             <div className="milestone-date">{m.date}</div>

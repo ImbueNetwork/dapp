@@ -19,8 +19,7 @@ import Detail from "../proposals/detail";
 import * as utils from "../utils";
 import { ImbueRequest } from "../dapp";
 import * as config from "../config";
-import {getPage} from "../utils";
-
+import { getPage } from "../utils";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -28,67 +27,73 @@ template.innerHTML = `
 ${html}
 `;
 
-
 const CONTENT = Symbol();
 
-
 export default class Proposals extends HTMLElement {
-    [CONTENT]: DocumentFragment;
-    $pages: Pages;
+  [CONTENT]: DocumentFragment;
+  $pages: Pages;
 
-    constructor() {
-        super();
-        this.attachShadow({mode:"open"});
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
 
-        this[CONTENT] =
-            template.content.cloneNode(true) as
-                DocumentFragment;
+    this[CONTENT] = template.content.cloneNode(true) as DocumentFragment;
 
-        this.$pages =
-            this[CONTENT].getElementById("pages") as
-                Pages;
+    this.$pages = this[CONTENT].getElementById("pages") as Pages;
+  }
+
+  connectedCallback() {
+    this.shadowRoot?.appendChild(this[CONTENT]);
+  }
+
+  async route(path: string | null, request: ImbueRequest) {
+    if (!path) {
+      location.assign("/dapp/proposals");
+      return;
     }
 
-    connectedCallback() {
-        this.shadowRoot?.appendChild(this[CONTENT]);
-    }
+    const route = new Route("/:page", path);
+    const userProject = await request.userProject;
 
-    async route(path: string | null, request: ImbueRequest) {
-        if (!path) {
-            location.assign("/dapp/proposals");
-            return;
+    switch (route.data?.page) {
+      case "draft":
+        if (
+          userProject?.chain_project_id ||
+          userProject?.chain_project_id === 0
+        ) {
+          utils.redirect(
+            `${config.grantProposalsURL}/detail/${userProject.id}`
+          );
+          return;
         }
 
-        const route = new Route("/:page", path);
-        const userProject = await request.userProject
-
-        switch (route.data?.page) {
-            case "draft":
-                if (userProject?.chain_project_id || userProject?.chain_project_id === 0) {
-                    utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
-                    return;
-                }
-
-                await getPage<ProposalsDraft>(this.$pages, "editor").init(request);
-                this.$pages.select("editor");
-                break;
-            case "preview":
-                if (userProject?.chain_project_id || userProject?.chain_project_id === 0) {
-                    utils.redirect(`${config.grantProposalsURL}/detail/${userProject.id}`);
-                    return;
-                }
-
-                await getPage<ProposalsDraftPreview>(this.$pages, "preview").init(request);
-                this.$pages.select("preview");
-                break;
-            case "detail":
-                this.$pages.select("detail");
-                (this.$pages.selected as Detail).init(request);
-                break;
-            default:
-                this.dispatchEvent(utils.badRouteEvent("not-found"));
+        await getPage<ProposalsDraft>(this.$pages, "editor").init(request);
+        this.$pages.select("editor");
+        break;
+      case "preview":
+        if (
+          userProject?.chain_project_id ||
+          userProject?.chain_project_id === 0
+        ) {
+          utils.redirect(
+            `${config.grantProposalsURL}/detail/${userProject.id}`
+          );
+          return;
         }
+
+        await getPage<ProposalsDraftPreview>(this.$pages, "preview").init(
+          request
+        );
+        this.$pages.select("preview");
+        break;
+      case "detail":
+        this.$pages.select("detail");
+        (this.$pages.selected as Detail).init(request);
+        break;
+      default:
+        this.dispatchEvent(utils.badRouteEvent("not-found"));
     }
+  }
 }
 
 window.customElements.define("imbu-proposals", Proposals);

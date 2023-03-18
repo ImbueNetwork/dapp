@@ -1,12 +1,16 @@
-import React, { useState, KeyboardEvent } from "react";
+import React, { useState, type KeyboardEvent } from "react";
 
-export type TagsInputProps = {
+export interface TagsInputProps {
   tags: string[];
   suggestData: string[];
   onChange: (tags: string[]) => void;
-};
+}
 
-export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.Element => {
+export const TagsInput = ({
+  tags,
+  suggestData,
+  onChange,
+}: TagsInputProps): JSX.Element => {
   const [vtags, setTags] = useState<string[]>(tags);
   const [input, setInput] = useState("");
 
@@ -42,7 +46,9 @@ export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.
             {tag}
             <div
               className="unselect-tag"
-              onClick={() => handleDelete(i)}
+              onClick={() => {
+                handleDelete(i);
+              }}
             >
               x
             </div>
@@ -53,19 +59,23 @@ export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.
           className="new-tag-input"
           data-testid="tag-input"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
         />
       </div>
       <div className="tags-suggestion-container">
         {suggestData
-          .filter((item: string) => vtags.indexOf(item) === -1)
+          .filter((item: string) => !vtags.includes(item))
           .map((item, index) => (
             <div className="tag-suggestion" key={index}>
               <span className="tag-suggestion-text">{item}</span>
               <span
                 className="tag-suggest-button"
-                onClick={() => addItem(item)}
+                onClick={() => {
+                  addItem(item);
+                }}
               >
                 +
               </span>
@@ -74,4 +84,4 @@ export const TagsInput = ({ tags, suggestData, onChange }: TagsInputProps): JSX.
       </div>
     </>
   );
-}
+};

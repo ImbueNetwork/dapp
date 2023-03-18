@@ -8,11 +8,11 @@ import "@pojagi/hoquet/lib/dialog/dialog";
 import Dialog from "@pojagi/hoquet/lib/dialog/dialog";
 
 import "@pojagi/hoquet/lib/nav/nav";
-import Nav, {MenuItem} from "@pojagi/hoquet/lib/nav/nav";
+import Nav, { MenuItem } from "@pojagi/hoquet/lib/nav/nav";
 
 import Route from "@pojagi/hoquet/lib/route/route";
 
-import type {InjectedAccountWithMeta} from '@polkadot/extension-inject/types';
+import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 
 import * as utils from "../utils";
 import * as config from "../config";
@@ -27,41 +27,41 @@ import materialIcons from "../../../material-icons-link.html";
 import commonCSS from "../styles/common.css";
 import logo from "../../../public/logo.svg";
 
-import "../authentication"
+import "../authentication";
 import Authentication from "../authentication";
 
 import "../account-choice";
 import AccountChoice from "../account-choice";
 
 import * as model from "../model";
-import {Proposal, User} from "../model";
-import {getWeb3Accounts} from "../utils/polkadot";
+import { Proposal, User } from "../model";
+import { getWeb3Accounts } from "../utils/polkadot";
 
 import html from "./index.html";
 import styles from "./index.css";
-import {ApiPromise, WsProvider} from "@polkadot/api";
-import {getPage} from "../utils";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { getPage } from "../utils";
 
 import "../relay";
 import Relay from "../relay";
 
 export type ImbueRequest = {
-    user: Promise<User | null>;
-    userProject: Promise<Proposal | null>;
-    accounts: Promise<InjectedAccountWithMeta[]>;
-    apiInfo: Promise<ImbueApiInfo>;
+  user: Promise<User | null>;
+  userProject: Promise<Proposal | null>;
+  accounts: Promise<InjectedAccountWithMeta[]>;
+  apiInfo: Promise<ImbueApiInfo>;
 };
 
 export type ImbueApiInfo = {
-    imbue: PolkadotJsApiInfo;
-    relayChain: PolkadotJsApiInfo;
-}
+  imbue: PolkadotJsApiInfo;
+  relayChain: PolkadotJsApiInfo;
+};
 
 export type PolkadotJsApiInfo = {
-    api: ApiPromise;
-    provider: WsProvider;
-    webSockAddr: string;
-}
+  api: ApiPromise;
+  provider: WsProvider;
+  webSockAddr: string;
+};
 
 const template = document.createElement("template");
 
@@ -73,68 +73,72 @@ template.innerHTML = `
 `;
 const CONTENT = Symbol();
 
-const navigationItems = (isLoggedIn: boolean, hasProposal: boolean): MenuItem[] => {
-    const menuItems: MenuItem[] = [];
+const navigationItems = (
+  isLoggedIn: boolean,
+  hasProposal: boolean
+): MenuItem[] => {
+  const menuItems: MenuItem[] = [];
 
-    if (isLoggedIn) {
-        menuItems.push({
-            name: "account-dashboard",
-            label: "Dashboard",
-            href: "/dapp/dashboard",
-            icon: "face",
-            spa: true,
-        });
-
-        if (!hasProposal) {
-            menuItems.push({
-                name: "new-proposal",
-                label: "Create a Proposal",
-                href: "/dapp/proposals/draft",
-                icon: "library_add",
-                spa: true,
-            });
-        }
-    } else {
-        menuItems.push({
-            name: "account-dashboard",
-            label: "Log in",
-            href: "/dapp/dashboard",
-            icon: "face",
-            spa: true,
-        });
-    }
-
+  if (isLoggedIn) {
     menuItems.push({
-        name: "discover-proposals",
-        label: "Discover",
-        href: "/dapp/proposals",
-        icon: "search",
-        spa: true,
+      name: "account-dashboard",
+      label: "Dashboard",
+      href: "/dapp/dashboard",
+      icon: "face",
+      spa: true,
     });
 
-    menuItems.push({
-        name: "transfer-funds",
-        label: "Transfer funds",
-        href: "/dapp/relay",
-        icon: "money",
+    if (!hasProposal) {
+      menuItems.push({
+        name: "new-proposal",
+        label: "Create a Proposal",
+        href: "/dapp/proposals/draft",
+        icon: "library_add",
         spa: true,
-    });
-
-    if (isLoggedIn) {
-        menuItems.push({
-            name: "log-out",
-            label: "Log out",
-            href: "/dapp/log-out",
-            icon: "logout",
-            spa: true,
-        });
+      });
     }
+  } else {
+    menuItems.push({
+      name: "account-dashboard",
+      label: "Log in",
+      href: "/dapp/dashboard",
+      icon: "face",
+      spa: true,
+    });
+  }
 
-    return menuItems;
-}
+  menuItems.push({
+    name: "discover-proposals",
+    label: "Discover",
+    href: "/dapp/proposals",
+    icon: "search",
+    spa: true,
+  });
 
+  menuItems.push({
+    name: "transfer-funds",
+    label: "Transfer funds",
+    href: "/dapp/relay",
+    icon: "money",
+    spa: true,
+  });
 
-window.customElements.define("imbu-dapp", class extends HTMLElement {
+  if (isLoggedIn) {
+    menuItems.push({
+      name: "log-out",
+      label: "Log out",
+      href: "/dapp/log-out",
+      icon: "logout",
+      spa: true,
+    });
+  }
+
+  return menuItems;
+};
+
+window.customElements.define(
+  "imbu-dapp",
+  class extends HTMLElement {
     [CONTENT]: DocumentFragment;
     $nav: Nav;
     $layout: Layout;
@@ -149,280 +153,268 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     accounts: Promise<InjectedAccountWithMeta[]>;
     apiInfo: Promise<ImbueApiInfo>;
 
-
     constructor() {
-        super();
-        this.attachShadow({mode: "open"});
-        this[CONTENT] = template.content.cloneNode(true) as
-            DocumentFragment;
+      super();
+      this.attachShadow({ mode: "open" });
+      this[CONTENT] = template.content.cloneNode(true) as DocumentFragment;
 
-        this.$layout =
-            this[CONTENT].getElementById("layout") as
-                Layout;
-        this.$nav =
-            this[CONTENT].getElementById("nav") as
-                Nav;
-        this.$mainMenuButton =
-            this[CONTENT].getElementById("main-menu") as
-                HTMLAnchorElement;
-        this.$pages =
-            this[CONTENT].getElementById("pages") as
-                Pages;
-        this.$dialog =
-            this[CONTENT].getElementById("dialog") as
-                Dialog;
-        this.$auth =
-            this[CONTENT].getElementById("auth") as
-                Authentication;
-        this.$accountChoice =
-            this[CONTENT].getElementById("account-choice") as
-                AccountChoice;
+      this.$layout = this[CONTENT].getElementById("layout") as Layout;
+      this.$nav = this[CONTENT].getElementById("nav") as Nav;
+      this.$mainMenuButton = this[CONTENT].getElementById(
+        "main-menu"
+      ) as HTMLAnchorElement;
+      this.$pages = this[CONTENT].getElementById("pages") as Pages;
+      this.$dialog = this[CONTENT].getElementById("dialog") as Dialog;
+      this.$auth = this[CONTENT].getElementById("auth") as Authentication;
+      this.$accountChoice = this[CONTENT].getElementById(
+        "account-choice"
+      ) as AccountChoice;
 
-        this.user = fetch(`${config.apiBase}/user`).then(
-            resp => {
-                if (resp.ok) {
-                    return resp.json();
-                }
-                return null;
-            }
-        );
+      this.user = fetch(`${config.apiBase}/user`).then((resp) => {
+        if (resp.ok) {
+          return resp.json();
+        }
+        return null;
+      });
 
-        this.userProject = this.user
-            .then(user => {
-                if (user?.id) {
-                    return model.fetchUserProject(user.id);
-                }
+      this.userProject = this.user
+        .then((user) => {
+          if (user?.id) {
+            return model.fetchUserProject(user.id);
+          }
 
-                return null
-            })
-            .then(resp => {
-                if (resp?.ok) {
-                    return resp.json();
-                }
+          return null;
+        })
+        .then((resp) => {
+          if (resp?.ok) {
+            return resp.json();
+          }
 
-                return null;
-            });
+          return null;
+        });
 
-        this.accounts = getWeb3Accounts();
-        this.apiInfo = this.initImbueAPIInfo();
+      this.accounts = getWeb3Accounts();
+      this.apiInfo = this.initImbueAPIInfo();
 
-        (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
+      (this[CONTENT].getElementById("logo") as HTMLElement).innerHTML = logo;
     }
 
     async connectedCallback() {
-        this.shadowRoot?.appendChild(this[CONTENT]);
+      this.shadowRoot?.appendChild(this[CONTENT]);
 
-        await this.bind();
+      await this.bind();
 
-        await this.route(window.location.pathname);
+      await this.route(window.location.pathname);
     }
 
     async bind() {
-        this.addEventListener(config.event.badRoute, e => {
-            this.$pages.select((e as CustomEvent).detail);
-        });
+      this.addEventListener(config.event.badRoute, (e) => {
+        this.$pages.select((e as CustomEvent).detail);
+      });
 
-        this.addEventListener(config.event.notification, e => {
-            const {title, content, actions, isDismissable} =
-                (e as CustomEvent).detail;
+      this.addEventListener(config.event.notification, (e) => {
+        const { title, content, actions, isDismissable } = (e as CustomEvent)
+          .detail;
 
-            this.$dialog.create(
-                title, content, actions, isDismissable
-            );
-        });
+        this.$dialog.create(title, content, actions, isDismissable);
+      });
 
-        this.addEventListener(config.event.accountChoice, async e => {
-            const {callback, address} = (e as CustomEvent).detail;
-            callback(await this.$accountChoice.accountChoice(address));
-        });
+      this.addEventListener(config.event.accountChoice, async (e) => {
+        const { callback, address } = (e as CustomEvent).detail;
+        callback(await this.$accountChoice.accountChoice(address));
+      });
 
-        this.$mainMenuButton.addEventListener("click", e => {
-            this.$layout.openDrawer("right");
-        });
+      this.$mainMenuButton.addEventListener("click", (e) => {
+        this.$layout.openDrawer("right");
+      });
 
-        const user = await this.user;
-        const userProject = await this.userProject;
+      const user = await this.user;
+      const userProject = await this.userProject;
 
-        const isLoggedIn = !!user;
-        const hasProposal = !!userProject;
+      const isLoggedIn = !!user;
+      const hasProposal = !!userProject;
 
-        this.initNavigation(navigationItems(isLoggedIn, hasProposal));
-        this.initAuthentication();
-        this.initRouting();
+      this.initNavigation(navigationItems(isLoggedIn, hasProposal));
+      this.initAuthentication();
+      this.initRouting();
     }
 
     initRouting() {
-        window.addEventListener("popstate", e => {
-            console.log("popstate", window.location.href);
-            this.route(window.location.pathname);
-            this.$layout.closeDrawer("right");
-        });
+      window.addEventListener("popstate", (e) => {
+        console.log("popstate", window.location.href);
+        this.route(window.location.pathname);
+        this.$layout.closeDrawer("right");
+      });
     }
 
     initAuthentication() {
-        this.addEventListener(config.event.authenticationRequired, e => {
-            this.$auth.launchAuthDialog((e as CustomEvent).detail);
-        });
+      this.addEventListener(config.event.authenticationRequired, (e) => {
+        this.$auth.launchAuthDialog((e as CustomEvent).detail);
+      });
     }
 
     navRelocate(
-        screenTallEnoughForFooterNav: boolean,
-        screenWideEnoughForDrawer: boolean,
+      screenTallEnoughForFooterNav: boolean,
+      screenWideEnoughForDrawer: boolean
     ) {
-        if (screenWideEnoughForDrawer) {
-            this.$nav.slot = "right-drawer";
-            this.$nav.setAttribute("display-mode", "stack");
-        } else if (screenTallEnoughForFooterNav) {
-            this.$nav.slot = "footer";
-            this.$nav.setAttribute("display-mode", "flex");
-        } else {
-            this.$nav.slot = "right-drawer";
-            this.$nav.setAttribute("display-mode", "stack");
-        }
+      if (screenWideEnoughForDrawer) {
+        this.$nav.slot = "right-drawer";
+        this.$nav.setAttribute("display-mode", "stack");
+      } else if (screenTallEnoughForFooterNav) {
+        this.$nav.slot = "footer";
+        this.$nav.setAttribute("display-mode", "flex");
+      } else {
+        this.$nav.slot = "right-drawer";
+        this.$nav.setAttribute("display-mode", "stack");
+      }
 
-        if (this.$nav.slot === "right-drawer") {
-            this.$mainMenuButton.classList.remove("hidden");
-        } else {
-            this.$mainMenuButton.classList.add("hidden");
-            this.$layout.closeDrawer("right");
-        }
+      if (this.$nav.slot === "right-drawer") {
+        this.$mainMenuButton.classList.remove("hidden");
+      } else {
+        this.$mainMenuButton.classList.add("hidden");
+        this.$layout.closeDrawer("right");
+      }
     }
 
     initNavigation(navigationItems: MenuItem[]) {
-        navigationItems.forEach(item => this.$nav.addItem(item));
-        this.$nav.init();
+      navigationItems.forEach((item) => this.$nav.addItem(item));
+      this.$nav.init();
 
-        this.$layout.breakpointer.addHandler(this.navRelocate.bind(this));
+      this.$layout.breakpointer.addHandler(this.navRelocate.bind(this));
     }
 
     errorNotification(e: Error) {
-        console.log(e);
-        this.dispatchEvent(new CustomEvent(
-            config.event.notification,
-            {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    title: e.name,
-                    content: e.message,
-                    actions: {},
-                    isDismissable: true,
-                }
-            }
-        ));
+      console.log(e);
+      this.dispatchEvent(
+        new CustomEvent(config.event.notification, {
+          bubbles: true,
+          composed: true,
+          detail: {
+            title: e.name,
+            content: e.message,
+            actions: {},
+            isDismissable: true,
+          },
+        })
+      );
     }
 
     async initImbueAPIInfo(): Promise<ImbueApiInfo> {
-        const {imbueNetworkWebsockAddr, relayChainWebsockAddr} = (await fetch(`${config.apiBase}/info`).then(
-            resp => resp.json()
-        ));
+      const { imbueNetworkWebsockAddr, relayChainWebsockAddr } = await fetch(
+        `${config.apiBase}/info`
+      ).then((resp) => resp.json());
 
-        return {
-            imbue: await this.initPolkadotJSAPI(imbueNetworkWebsockAddr),
-            relayChain: await this.initPolkadotJSAPI(relayChainWebsockAddr)
-        }
+      return {
+        imbue: await this.initPolkadotJSAPI(imbueNetworkWebsockAddr),
+        relayChain: await this.initPolkadotJSAPI(relayChainWebsockAddr),
+      };
     }
 
     async initPolkadotJSAPI(webSockAddr: string): Promise<PolkadotJsApiInfo> {
+      const provider = new WsProvider(
+        webSockAddr,
+        undefined,
+        undefined,
+        60_000
+      );
+      provider.on("error", (e) => {
+        this.errorNotification(e);
+        console.log(e);
+      });
 
+      provider.on("disconnected", (e) => {
+        console.log(e);
+      });
 
-        const provider = new WsProvider(webSockAddr,undefined,undefined,60_000);
-        provider.on("error", e => {
-            this.errorNotification(e);
-            console.log(e);
+      provider.on("connected", (e) => {
+        console.log("Polkadot JS connected", e);
+      });
+
+      try {
+        const api = await ApiPromise.create({ provider });
+
+        return {
+          api,
+          provider,
+          webSockAddr,
+        };
+      } catch (e) {
+        const cause = e as Error;
+
+        this.$dialog.create(
+          "PolkadotJS API Error",
+          cause.message,
+          {
+            dismiss: { label: "Okay" },
+          },
+          true
+        );
+
+        throw new Error("Unable to initialize PolkadotJS API", {
+          cause: cause,
         });
-
-        provider.on("disconnected", e => {
-            console.log(e);
-        });
-
-        provider.on("connected", e => {
-            console.log("Polkadot JS connected", e);
-        });
-
-        try {
-            const api = await ApiPromise.create({provider});
-
-            return {
-                api,
-                provider,
-                webSockAddr,
-            }
-        } catch (e) {
-            const cause = e as Error;
-
-            this.$dialog.create("PolkadotJS API Error", cause.message, {
-                "dismiss": {label: "Okay"}
-            }, true);
-
-            throw new Error(
-                "Unable to initialize PolkadotJS API",
-                {cause: cause}
-            );
-        }
+      }
     }
 
     async route(path?: string) {
-        if (!path) {
-            return this.$pages.select("not-found");
-        }
+      if (!path) {
+        return this.$pages.select("not-found");
+      }
 
-        const route = new Route(`${config.context}/:app`, path);
+      const route = new Route(`${config.context}/:app`, path);
 
-        const request: ImbueRequest = {
-            user: this.user,
-            userProject: this.userProject,
-            accounts: this.accounts,
-            apiInfo: this.apiInfo,
-        }
+      const request: ImbueRequest = {
+        user: this.user,
+        userProject: this.userProject,
+        accounts: this.accounts,
+        apiInfo: this.apiInfo,
+      };
 
-        if (!route.active) {
-            /**
-             * the path == `/dapp`, so we redirect to the default "app", which
-             * is currently "/dapp/dashboard"
-             */
-            utils.redirect(
-                this.getAttribute("default-route") || "/dashboard/"
-            );
-            return;
-        }
+      if (!route.active) {
+        /**
+         * the path == `/dapp`, so we redirect to the default "app", which
+         * is currently "/dapp/dashboard"
+         */
+        utils.redirect(this.getAttribute("default-route") || "/dashboard/");
+        return;
+      }
 
-        this.$pages.select("loading");
+      this.$pages.select("loading");
 
-        switch (route.data?.app) {
-            case "log-out":
-                const resp = await fetch(
-                    `/logout`,
-                    {
-                        headers: config.postAPIHeaders,
-                        method: "get"
-                    }
-                );
+      switch (route.data?.app) {
+        case "log-out":
+          const resp = await fetch(`/logout`, {
+            headers: config.postAPIHeaders,
+            method: "get",
+          });
 
-                if (resp.ok) {
-                    location.assign("/");
-                }
-                else {
-                    this.$pages.select("server-error");
-                }
+          if (resp.ok) {
+            location.assign("/");
+          } else {
+            this.$pages.select("server-error");
+          }
 
-                break;
-            case "proposals":
-                await getPage<Proposals>(this.$pages, "proposals").route(route.tail, request);
-                this.$pages.select("proposals");
-                break;
-            case "dashboard":
-                location.assign("/dapp/dashboard");
-                break;
-            case "relay":
-                await getPage<Relay>(this.$pages, "relay").init(request);
-                this.$pages.select("relay");
-                break;
-            default:
-                this.$pages.select("not-found");
-        }
+          break;
+        case "proposals":
+          await getPage<Proposals>(this.$pages, "proposals").route(
+            route.tail,
+            request
+          );
+          this.$pages.select("proposals");
+          break;
+        case "dashboard":
+          location.assign("/dapp/dashboard");
+          break;
+        case "relay":
+          await getPage<Relay>(this.$pages, "relay").init(request);
+          this.$pages.select("relay");
+          break;
+        default:
+          this.$pages.select("not-found");
+      }
     }
-});
+  }
+);
 
 /**
  * This is required at the `document` level in order for the fonts to be loaded
@@ -431,9 +423,8 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
  * We do this here because this should be considered the entrypoint of the app.
  */
 document.head.appendChild(
-    document.createRange().createContextualFragment(`
+  document.createRange().createContextualFragment(`
     <style>${commonCSS}</style>
     ${materialIcons}
     `)
 );
-

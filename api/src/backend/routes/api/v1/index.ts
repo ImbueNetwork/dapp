@@ -10,18 +10,18 @@ import freelancersRouter from "./freelancers";
 const router = express.Router();
 
 router.get(
-    "/user",
-    passport.authenticate("jwt", { session: false }),
-    (req, res) => {
-        res.send(req.user);
-    }
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.send(req.user);
+  }
 );
 
 router.get("/info", (req, res) => {
-    res.send({
-        imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
-        relayChainWebsockAddr: config.relayChainWebsockAddr,
-    });
+  res.send({
+    imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
+    relayChainWebsockAddr: config.relayChainWebsockAddr,
+  });
 });
 
 router.use("/projects", projectsRouter);

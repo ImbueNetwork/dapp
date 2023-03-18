@@ -17,9 +17,9 @@ import path from "path";
 //import { createBrowserHistory } from "history";
 
 declare global {
-    interface ErrorConstructor {
-        new (message?: string, opts?: { cause: Error }): Error;
-    }
+  interface ErrorConstructor {
+    new (message?: string, opts?: { cause: Error }): Error;
+  }
 }
 
 const port = process.env.PORT || config.port;
@@ -40,16 +40,16 @@ app.use(authenticationMiddleware);
 app.use("/api/v1", v1routes);
 
 app.get("/redirect", (req, res) => {
-    const next = (req.session as any).next;
-    if (next) {
-        delete (req.session as any).next;
-        return res.redirect(next);
-    }
-    res.redirect("/");
+  const next = (req.session as any).next;
+  if (next) {
+    delete (req.session as any).next;
+    return res.redirect(next);
+  }
+  res.redirect("/");
 });
 
 app.get("/", (req, res) => {
-    res.redirect("/dapp");
+  res.redirect("/dapp");
 });
 
 // uncaught error
@@ -67,7 +67,7 @@ app.use(errorHandler(environment));
 const server = http.createServer(app);
 
 server.on("listening", () => {
-    const addr = server.address() as AddressInfo;
-    console.log(`Service started on port ${addr.port}`);
+  const addr = server.address() as AddressInfo;
+  console.log(`Service started on port ${addr.port}`);
 });
 server.listen(port);

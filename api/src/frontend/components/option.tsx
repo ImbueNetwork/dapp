@@ -1,14 +1,20 @@
 import React from "react";
 
-export type OptionProps = {
+export interface OptionProps {
   label: string;
   value: string | number;
   checked?: boolean;
   children?: React.ReactNode;
   onSelect: () => void;
-};
+}
 
-export const Option = ({ label, value, checked, children, onSelect }: OptionProps): JSX.Element => {
+export const Option = ({
+  label,
+  value,
+  checked,
+  children,
+  onSelect,
+}: OptionProps): JSX.Element => {
   return (
     <div className="option-container" onClick={onSelect}>
       <div className="option-inner">
@@ -25,4 +31,4 @@ export const Option = ({ label, value, checked, children, onSelect }: OptionProp
       <div className="option-children-container">{children}</div>
     </div>
   );
-}
+};

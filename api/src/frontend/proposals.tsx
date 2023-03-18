@@ -1,15 +1,14 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import * as ReactDOMClient from "react-dom/client";
 import * as config from "./config";
 
 /**
  * Models the milestone data that appears in the /proposals/draft form
  */
-export type DraftMilestone = {
+export interface DraftMilestone {
   name: string;
   percentage_to_unlock: number;
-};
+}
 
 export type Milestone = DraftMilestone & {
   milestone_index?: number;
@@ -19,7 +18,7 @@ export type Milestone = DraftMilestone & {
   modified: string;
 };
 
-export type DraftProposal = {
+export interface DraftProposal {
   name: string;
   logo: string;
   description: string;
@@ -31,7 +30,7 @@ export type DraftProposal = {
   user_id?: number;
   chain_project_id?: number;
   category?: string | number;
-};
+}
 
 /**
  * Models a "project" saved to the db, but not on chain.
@@ -82,15 +81,19 @@ export const Proposals = (): JSX.Element => {
       </ol>
     </div>
   );
-}
+};
 
-type ProposalItemProps = {
+interface ProposalItemProps {
   projectId: number;
   imageSrc: string;
   name: string;
-};
+}
 
-const ProposalItem = ({ projectId, imageSrc, name }: ProposalItemProps): JSX.Element => {
+const ProposalItem = ({
+  projectId,
+  imageSrc,
+  name,
+}: ProposalItemProps): JSX.Element => {
   return (
     <div className="imbu-proposal-item">
       <li>
@@ -101,7 +104,7 @@ const ProposalItem = ({ projectId, imageSrc, name }: ProposalItemProps): JSX.Ele
       </li>
     </div>
   );
-}
+};
 
 document.addEventListener("DOMContentLoaded", (event) => {
   ReactDOMClient.createRoot(document.getElementById("imbu-proposals")!).render(

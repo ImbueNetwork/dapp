@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 
 export interface TextInputProps
-    extends React.DetailedHTMLProps<
-        React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-        HTMLTextAreaElement
-    > {
-    maxLength?: number;
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    title?: string;
+  extends React.DetailedHTMLProps<
+    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    HTMLTextAreaElement
+  > {
+  maxLength?: number;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  title?: string;
 }
 
 export const TextInput = (props: TextInputProps): JSX.Element => {
@@ -19,17 +19,19 @@ export const TextInput = (props: TextInputProps): JSX.Element => {
 
   const getTitle = (title?: string): any => {
     if (title) {
-      return <span>{title}</span>
+      return <span>{title}</span>;
     }
-  } 
+  };
 
   return (
     <>
       {getTitle(props.title)}
       <textarea {...props} onChange={handleChange} />
       {props.maxLength && (
-        <p className="textarea-remaining">{`${remaining} character${remaining !== 1 ? "s" : ""} remaining`}</p>
+        <p className="textarea-remaining">{`${remaining} character${
+          remaining !== 1 ? "s" : ""
+        } remaining`}</p>
       )}
     </>
   );
-}
+};

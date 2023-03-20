@@ -90,26 +90,28 @@ describe("Briefs component", () => {
         }
     });
 
-    it("should filter briefs by amount of Briefs submitted", async () => {
+    it("should filter briefs by number of Briefs submitted", async () => {
         const mockCallSearchBriefs = callSearchBriefs as jest.MockedFunction<
             typeof callSearchBriefs
         >;
 
         const AmountSubmittedcheckbox = await waitFor(
-            () => appQueryAllByTestId("1-1")[0]
+            () => appQueryAllByTestId("1-2")[0]
         );
 
         expect(AmountSubmittedcheckbox).toBeTruthy();
 
         if (appContainer) {
             fireEvent.click(AmountSubmittedcheckbox);
+
             mockCallSearchBriefs.mockResolvedValue(amountOfBriefsSubmitted);
-            // search for intermidiate briefs
+
             await waitFor(() =>
                 fireEvent.click(
                     appContainer.getElementsByClassName("tab-item")[0]
                 )
             );
+
             await waitFor(() =>
                 expect(
                     appContainer.getElementsByClassName("brief-title")
@@ -133,7 +135,7 @@ describe("Briefs component", () => {
             fireEvent.click(ProjectLengthcheckbox);
 
             mockCallSearchBriefs.mockResolvedValue(projectLengthData);
-            // search for intermidiate briefs
+
             await waitFor(() =>
                 fireEvent.click(
                     appContainer.getElementsByClassName("tab-item")[0]

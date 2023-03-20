@@ -27,17 +27,17 @@ describe("Briefs component", () => {
 
     let briefsComponent;
     let appContainer;
-    let appQueryByTestId;
-    let appGetByText;
+    let appGetAllByText;
+    let appQueryAllByTestId;
 
     beforeEach(async () => {
         briefsComponent = await act(async () => render(<Briefs />));
-        const { container, queryByTestId, getByText } = await act(async () =>
-            render(<Briefs />)
+        const { container, queryAllByTestId, getAllByText } = await act(
+            async () => render(<Briefs />)
         );
         appContainer = container;
-        appQueryByTestId = queryByTestId;
-        appGetByText = getByText;
+        appGetAllByText = getAllByText;
+        appQueryAllByTestId = queryAllByTestId;
 
         await waitFor(() =>
             expect(
@@ -65,13 +65,13 @@ describe("Briefs component", () => {
         >;
 
         // get intermidiate checkbox
-        const Intermediatecheckbox = await waitFor(() =>
-            appQueryByTestId("0-1")
-        )[0];
+        const Intermediatecheckbox = await waitFor(
+            () => appQueryAllByTestId("0-1")[0]
+        );
 
-        expect(Intermediatecheckbox).not.toBe(null);
+        expect(Intermediatecheckbox).toBeTruthy();
 
-        if (Intermediatecheckbox && appContainer) {
+        if (appContainer) {
             fireEvent.click(Intermediatecheckbox);
 
             mockCallSearchBriefs.mockResolvedValue(intermidiateExpData);
@@ -95,13 +95,13 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const AmountSubmittedcheckbox = await waitFor(() =>
-            appQueryByTestId("1-1")
-        )[0];
+        const AmountSubmittedcheckbox = await waitFor(
+            () => appQueryAllByTestId("1-1")[0]
+        );
 
-        expect(AmountSubmittedcheckbox).not.toBe(null);
+        expect(AmountSubmittedcheckbox).toBeTruthy();
 
-        if (AmountSubmittedcheckbox && appContainer) {
+        if (appContainer) {
             fireEvent.click(AmountSubmittedcheckbox);
             mockCallSearchBriefs.mockResolvedValue(amountOfBriefsSubmitted);
             // search for intermidiate briefs
@@ -123,13 +123,13 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const ProjectLengthcheckbox = await waitFor(() =>
-            appQueryByTestId("2-0")
-        )[0];
+        const ProjectLengthcheckbox = await waitFor(
+            () => appQueryAllByTestId("2-0")[0]
+        );
 
-        expect(ProjectLengthcheckbox).not.toBe(null);
+        expect(ProjectLengthcheckbox).toBeTruthy();
 
-        if (ProjectLengthcheckbox && appContainer) {
+        if (appContainer) {
             fireEvent.click(ProjectLengthcheckbox);
 
             mockCallSearchBriefs.mockResolvedValue(projectLengthData);
@@ -158,26 +158,21 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const ExperienceCheckBox = await waitFor(() =>
-            appQueryByTestId("0-1")
-        )[0];
-        const SubmitedCheckBox = await waitFor(() =>
-            appQueryByTestId("1-2")
-        )[0];
+        const ExperienceCheckBox = await waitFor(
+            () => appQueryAllByTestId("0-1")[0]
+        );
+        const SubmitedCheckBox = await waitFor(
+            () => appQueryAllByTestId("1-2")[0]
+        );
 
         const searchInput =
             appContainer.getElementsByClassName("search-input")[0];
 
-        expect(ExperienceCheckBox).not.toBe(null);
-        expect(SubmitedCheckBox).not.toBe(null);
-        expect(searchInput).not.toBe(null);
+        expect(ExperienceCheckBox).toBeTruthy();
+        expect(SubmitedCheckBox).toBeTruthy();
+        expect(searchInput).toBeTruthy();
 
-        if (
-            ExperienceCheckBox &&
-            SubmitedCheckBox &&
-            appContainer &&
-            searchInput
-        ) {
+        if (appContainer) {
             // fire checkboxes event
             fireEvent.click(ExperienceCheckBox);
             fireEvent.click(SubmitedCheckBox);
@@ -196,7 +191,7 @@ describe("Briefs component", () => {
             );
 
             await waitFor(() =>
-                expect(appGetByText("briefThree")).not.toBe(null)
+                expect(appGetAllByText("briefThree")[0]).toBeTruthy()
             );
         }
     });

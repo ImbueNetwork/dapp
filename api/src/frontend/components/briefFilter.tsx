@@ -23,6 +23,9 @@ export const BriefFilter = ({ label, filter_options, filter_type }: BriefFilterP
                                     "-" +
                                     interiorIndex
                                 }
+                                data-testid={
+                                    filter_type.toString() + "-" + interiorIndex
+                                }
                             />
                             <label>{value}</label>
                         </div>
@@ -31,6 +34,6 @@ export const BriefFilter = ({ label, filter_options, filter_type }: BriefFilterP
             </div>
         </div>
     );
-}
+};
 
 export default BriefFilter;

@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.modal-body,
+.modal-footer,
+.str-chat,
+.str-chat__list,
+.mdc-dialog__surface,
+.str-chat__empty-channel,
+.str-chat__channel-header {
+    background: #2C2C2C !important;
+}
+
+.custom-chat-container{
+    background: #2C2C2C;
+    height: 80vh;
+}
+
+/* left side */
+.chat-list-container{
+    width: 30%;
+}
+.str-chat__channel-search,
+.str-chat__channel-preview {
+    padding: 25px 48px;
+}
+
+.str-chat__channel-search .str-chat__channel-search-bar{
+    padding: 0;
+}
+
+.str-chat__channel-search-bar .str-chat__channel-search-input--wrapper{
+    border: 1px solid white;
+    background-color: rgba(120, 120, 120, 0.3);
+}
+.str-chat__channel-search-bar .str-chat__channel-search-input--wrapper.str-chat__channel-search-input--wrapper-active{
+    border: 1px solid #337eff;
+    background-color: rgba(120, 120, 120, 0.3);
+}
+
+.str-chat__channel-preview-messenger.str-chat__channel-preview.str-chat__channel-preview-messenger--active{
+    background-color: rgba(120, 120, 120, 0.3);
+    border-left: 5px solid #BAFF36;
+}
+
+/* right side */
+.str-chat.str-chat__theme-dark.str-chat-channel.str-chat__channel{
+    width: 70%;
+}
+
+.str-chat__channel-preview-messenger--left{
+    padding-right: 12px;
+}
+
+.str-chat__channel-preview-messenger--last-message{
+    padding-top: 2px;
+}
+
+
+@media only screen and (min-width: 80px) and (max-width: 480px)   {
+    
+    .custom-chat-container{
+        height: 20vh;
+    }
+
+    .chat-list-container{
+        width: 50vw;
+    }
+
+}

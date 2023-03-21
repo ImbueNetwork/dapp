@@ -31,7 +31,7 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
             setTargetUser(await fetchUser(brief.user_id));
         }
         setup();
-     }, [])
+     }, []);
 
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));

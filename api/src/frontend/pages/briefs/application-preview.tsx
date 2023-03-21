@@ -4,10 +4,10 @@ import { FiEdit, FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
-import { Brief, Currency, Project, User } from "../../models";
+import { Brief, Currency, Freelancer, Project, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
-import { fetchProject, getCurrentUser, redirect } from "../../utils";
+import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 
@@ -25,6 +25,15 @@ export type ApplicationPreviewProps = {
 export const ApplicationPreview = ({ brief, user, application }: ApplicationPreviewProps): JSX.Element => {
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
+    const [freelancer, setFreelancer] = useState<Freelancer>();
+   
+    useEffect(() => {
+        async function setup() {
+            const freelancerUser = await fetchUser(Number(application.user_id));
+            setFreelancer(await getFreelancerProfile(freelancerUser.username));
+        }
+        setup();
+     }, []);
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);

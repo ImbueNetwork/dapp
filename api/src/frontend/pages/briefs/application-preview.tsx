@@ -90,10 +90,8 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
         setCurrencyId(Number(event.target.value))
     };
 
-    console.log(brief);
     return (
         <div className="application-container">
-
             <div className="flex items-center justify-evenly">
                 <img className="w-16 h-16 rounded-full object-cover" src="https://xsgames.co/randomusers/avatar.php?g=male" alt="" />
                 <div className="">
@@ -108,7 +106,6 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                     <button className="primary-btn in-dark w-button">Hire</button>
                 </div>
             </div>
-
 
             <div className="section">
                 <h3 className="section-title">Job description</h3>

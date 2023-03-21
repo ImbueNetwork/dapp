@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .application-container {
     display: flex;
     flex-direction: column;
@@ -27,7 +31,8 @@
     background: var(--theme-grey-dark);
     border: 1px solid var(--theme-white);
     border-radius: 20px;
-    padding: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .brief-info {

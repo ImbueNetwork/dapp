@@ -105,6 +105,7 @@ export type User = {
     username: string;
     password?: string;
     getstream_token: string;
+    web3_address: string;
 };
 
 export interface BasicTxResponse {

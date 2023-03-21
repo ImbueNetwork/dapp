@@ -4,7 +4,7 @@ import { FiEdit, FiPlusCircle } from "react-icons/fi";
 import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
-import { Brief, Currency, Freelancer, Project, User } from "../../models";
+import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../../models";
 import { getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
@@ -26,6 +26,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
+    const applicationStatus = ProjectStatus[application.status_id]
    
     useEffect(() => {
         async function setup() {

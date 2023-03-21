@@ -12,6 +12,23 @@ p {
     margin: 0;
 }
 
+.bio-input {
+    font-size: 25px;
+}
+
+.bio {
+    margin: 0;
+    width: 100%;
+    white-space: pre-wrap; /* Add this property */
+}
+
+.small-text {
+    font-size: 12px; 
+    line-height: 1.4;
+    margin: 0;
+    white-space: normal;
+}
+
 button {
     cursor: pointer;
 }
@@ -20,10 +37,12 @@ button:active {
 }
 
 .profile-container {
+    
 }
 
 .banner {
     position: relative;
+    margin-left: -20%;
 }
 
 .banner-image {
@@ -31,23 +50,24 @@ button:active {
 }
 
 .info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 70px;
-
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
     width: 90%;
-    margin-left: auto;
+    margin-left: 0px;
     margin-right: auto;
+    max-width: 80%;
 }
 
 .section {
     display: flex;
     flex-direction: column;
-    gap: 16px;
     background: var(--theme-grey-dark);
-    border-radius: 10px;
-    padding-bottom: 30px;
+    border-radius: 0px;
+    padding-bottom: 30px; 
+    border: 1px solid white;
 }
+
 
 .subsection {
     margin-left: 80px;
@@ -70,10 +90,10 @@ button:active {
 }
 
 .profile-summary {
-    padding: 0px 100px;
+    padding: 0px 50px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
 }
 
 .location {
@@ -132,6 +152,7 @@ button:active {
 .divider {
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    margin-top: 10px;
 }
 
 .show-more {
@@ -147,12 +168,11 @@ button:active {
 }
 
 .about {
-    padding: 30px 50px 80px 100px;
+    padding: 30px 50px 80px 30px;
 }
 
 .header-editable {
-    display: flex;
-    justify-content: space-between;
+    padding-top: 20px;
     padding-bottom: 8px;
 }
 
@@ -166,13 +186,15 @@ button:active {
     transform: scale(1.2);
 }
 
+
 .portfolio {
     display: flex;
+    width: 50%;
 }
 
 .detailed-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 36px;
     flex: 1 0 40%;
 }
@@ -189,11 +211,19 @@ button:active {
 }
 
 .social-link {
+    position: relative; /* Add this line */
     width: 300px;
     height: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+
+
+.social-link .social-btn {
+    position: absolute;
+    left: 150px; /* Adjust this value to control the gap between the text and the button */
 }
 
 .social-btn {
@@ -328,7 +358,7 @@ button:active {
 
 .projects {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
     grid-column-gap: 20px;
     grid-row-gap: 20px;
     padding-left: 32px;

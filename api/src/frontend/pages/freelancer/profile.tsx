@@ -144,10 +144,10 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                             <p>@{freelancer.username}</p>
                             <IoPeople
                                 color="var(--theme-secondary)"
-                                size="24px"
+                                size="15px"
                             />
-                            <p>{freelancer.title}</p>
                         </div>
+                        <div><p>{freelancer.title}</p></div>
                         <div className="connect-buttons">
 
                             {!isCurrentFreelancer &&
@@ -195,7 +195,6 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                                     )
                                 }}
                                 className="bio-input"
-                                id="bio-input-id"
                             />
 
                         </>
@@ -204,7 +203,7 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                             {freelancer.bio
                                 .split("\n")
                                 .map((line, index) => (
-                                    <p key={index}>{line}</p>
+                                    <p className="small-text" key={index}>{line}</p>
                                 ))}
                         </div>
                     )}
@@ -219,7 +218,7 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                                         ({ label, key, value, icon }, index) => (
 
                                             !isEditMode ? (
-                                                <div className="social-link" key={index} >
+                                                <div className="social-link" key={index}>
                                                     <p>{label} </p>
                                                     <button className="social-btn">
                                                         {socials &&

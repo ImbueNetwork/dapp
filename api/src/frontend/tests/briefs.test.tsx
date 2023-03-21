@@ -65,14 +65,14 @@ describe("Briefs component", () => {
         >;
 
         // get intermidiate checkbox
-        const Intermediatecheckbox = await waitFor(
+        const intermidiateCheckBox = await waitFor(
             () => appQueryAllByTestId("0-1")[0]
         );
 
-        expect(Intermediatecheckbox).toBeTruthy();
+        expect(intermidiateCheckBox).toBeTruthy();
 
         if (appContainer) {
-            fireEvent.click(Intermediatecheckbox);
+            fireEvent.click(intermidiateCheckBox);
 
             mockCallSearchBriefs.mockResolvedValue(intermidiateExpData);
             // search for intermidiate briefs
@@ -95,14 +95,14 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const AmountSubmittedcheckbox = await waitFor(
+        const amountSubmittedCheckBox = await waitFor(
             () => appQueryAllByTestId("1-2")[0]
         );
 
-        expect(AmountSubmittedcheckbox).toBeTruthy();
+        expect(amountSubmittedCheckBox).toBeTruthy();
 
         if (appContainer) {
-            fireEvent.click(AmountSubmittedcheckbox);
+            fireEvent.click(amountSubmittedCheckBox);
 
             mockCallSearchBriefs.mockResolvedValue(amountOfBriefsSubmitted);
 
@@ -125,14 +125,14 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const ProjectLengthcheckbox = await waitFor(
+        const projectLengthCheckBox = await waitFor(
             () => appQueryAllByTestId("2-0")[0]
         );
 
-        expect(ProjectLengthcheckbox).toBeTruthy();
+        expect(projectLengthCheckBox).toBeTruthy();
 
         if (appContainer) {
-            fireEvent.click(ProjectLengthcheckbox);
+            fireEvent.click(projectLengthCheckBox);
 
             mockCallSearchBriefs.mockResolvedValue(projectLengthData);
 
@@ -160,24 +160,24 @@ describe("Briefs component", () => {
             typeof callSearchBriefs
         >;
 
-        const ExperienceCheckBox = await waitFor(
+        const experienceCheckBox = await waitFor(
             () => appQueryAllByTestId("0-1")[0]
         );
-        const SubmitedCheckBox = await waitFor(
+        const submittedCheckBox = await waitFor(
             () => appQueryAllByTestId("1-2")[0]
         );
 
         const searchInput =
             appContainer.getElementsByClassName("search-input")[0];
 
-        expect(ExperienceCheckBox).toBeTruthy();
-        expect(SubmitedCheckBox).toBeTruthy();
+        expect(experienceCheckBox).toBeTruthy();
+        expect(submittedCheckBox).toBeTruthy();
         expect(searchInput).toBeTruthy();
 
         if (appContainer) {
             // fire checkboxes event
-            fireEvent.click(ExperienceCheckBox);
-            fireEvent.click(SubmitedCheckBox);
+            fireEvent.click(experienceCheckBox);
+            fireEvent.click(submittedCheckBox);
 
             // input search text
             fireEvent.change(searchInput, {

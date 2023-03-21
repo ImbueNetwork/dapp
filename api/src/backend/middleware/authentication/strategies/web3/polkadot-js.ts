@@ -9,6 +9,7 @@ import { ensureParams, cookieExtractor, jwtOptions, verifyUserIdFromJwt } from "
 import {
     fetchUser,
     fetchWeb3AccountByAddress,
+    fetchWeb3AccountsByUserId,
     getOrCreateFederatedUser,
     updateOrInsertUserWeb3Address,
     upsertWeb3Challenge,
@@ -17,13 +18,11 @@ import {
 } from "../../../../models";
 import db from "../../../../db";
 
-
 // @ts-ignore
 import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import config from "../../../../config";
-import { StreamChat } from 'stream-chat';
 
 const JwtStrategy = passportJwt.Strategy;
 
@@ -39,16 +38,15 @@ export const polkadotJsStrategy = new JwtStrategy(jwtOptions, async function (jw
     const id = jwt_payload.id;
 
     try {
-        const user = await db.select().from<User>("users").where({ "id": Number(id) }).first();
-        if (!user) {
-            next(`No user found with id: ${id}`, false);
-        } else {
-            user.web3Accounts = await db<Web3Account>("web3_accounts").select().where({
-                user_id: user.id
-            });
-
-            return next(null, user);
-        }
+        db.transaction(async tx => {
+            const user = await fetchUser(id)(tx);
+            if (!user) {
+                next(`No user found with id: ${id}`, false);
+            } else {
+                user.web3Accounts = await fetchWeb3AccountsByUserId(id)(tx);
+                return next(null, user);
+            }
+        });
     } catch (e) {
         return next(`Failed to deserialize user with id ${id}`, false);
     }

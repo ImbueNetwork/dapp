@@ -6,7 +6,7 @@ import { Dialogue } from "./components/dialogue";
 import { AccountChoice } from "./components/accountChoice";
 import { User } from "./models";
 import { signWeb3Challenge } from "./utils/polkadot";
-import { fetchUserOrEmail } from "./utils";
+import { fetchUserOrEmail, getCurrentUser } from "./utils";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { SignerResult } from "@polkadot/api/types";
 import { TextField } from "@rmwc/textfield";
@@ -15,6 +15,7 @@ import * as config from "./config";
 import bcrypt from 'bcryptjs'
 import "../../public/registration.css"
 import * as utils from "./utils"
+import { selectAccount } from "./services/polkadotService";
 
 const getAPIHeaders = {
   accept: "application/json",
@@ -35,48 +36,7 @@ type LoginState = {
   errorMessage?: string
 };
 
-async function getAccountAndSign(account: InjectedAccountWithMeta) {
-  const resp = await fetch(`/auth/web3/${account.meta.source}/`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify(account),
-  });
-
-  if (resp.ok) {
-    // could be 200 or 201
-    const { user, web3Account } = await resp.json();
-    const signature = await signWeb3Challenge(account, web3Account.challenge);
-
-    if (signature) {
-      return { signature, user };
-    } else {
-      // TODO: UX for no way to sign challenge?
-    }
-  }
-}
-
-async function authorise(
-  signature: SignerResult,
-  account: InjectedAccountWithMeta
-) {
-  const resp = await fetch(`/auth/web3/${account.meta.source}/callback`, {
-    headers: postAPIHeaders,
-    method: "post",
-    body: JSON.stringify({
-      signature: signature.signature,
-      address: account.address,
-    }),
-  });
-
-  if (resp.ok) {
-    await utils.redirectBack();
-  } else {
-    // TODO: UX for 401
-  }
-}
-
 export const Login = ({ }: LoginProps): JSX.Element => {
-
   const [polkadotAccountsVisible, showPolkadotAccounts] = useState(false);
   const [userOrEmail, setUserOrEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -102,14 +62,14 @@ export const Login = ({ }: LoginProps): JSX.Element => {
     }
   }
 
-  const selectAccount = async (account: InjectedAccountWithMeta) => {
-    const result = await getAccountAndSign(account);
-    await authorise(result?.signature as SignerResult, account);
-  }
+  const handleSelectAccount = async (account: InjectedAccountWithMeta) => {
+    await selectAccount(account);
+    utils.redirectBack();
+};
 
   return (
     polkadotAccountsVisible ? <AccountChoice
-      accountSelected={(account: InjectedAccountWithMeta) => selectAccount(account)}
+      accountSelected={(account: InjectedAccountWithMeta) => handleSelectAccount(account)}
     /> :
       <Dialogue
         title="You must be signed in to continue"

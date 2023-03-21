@@ -91,8 +91,8 @@ export type Project = {
     owner?: string;
     user_id?: string | number;
     brief_id?: string | number;
-    total_cost_without_fee?:  number;
-    imbue_fee?:  number;
+    total_cost_without_fee?: number;
+    imbue_fee?: number;
 };
 
 export type ProjectProperties = {
@@ -164,12 +164,28 @@ export type FreelancerSqlFilter = {
     search_input: string;
 };
 
-export const fetchWeb3Account = (address: string) =>
+export const fetchWeb3AccountByAddress = (address: string) =>
+    (tx: Knex.Transaction) =>
+        fetchAllWeb3Account()(tx)
+            .where({ address })
+            .first();
+
+export const fetchAllWeb3Account = () =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
-            .select()
-            .where({ address, })
+            .select();
+
+export const fetchWeb3AccountByUserId = (user_id: number) =>
+    (tx: Knex.Transaction) =>
+        fetchAllWeb3Account()(tx)
+            .where({ user_id })
             .first();
+
+export const fetchWeb3AccountsByUserId = (user_id: number) =>
+    (tx: Knex.Transaction) =>
+        fetchAllWeb3Account()(tx)
+            .where({ user_id })
+            .select();
 
 export const fetchUser = (id: number) =>
     (tx: Knex.Transaction) =>
@@ -221,6 +237,44 @@ export const upsertWeb3Challenge = (
         ];
     };
 
+export const updateOrInsertUserWeb3Address = (
+    user: User,
+    address: string,
+    type: string,
+    challenge: string,
+) => async (tx: Knex.Transaction):
+        Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+        const web3Account = await tx<Web3Account>("web3_accounts")
+            .select()
+            .where({
+                user_id: user?.id
+            }).
+            orWhere({ address })
+            .first();
+        if (!web3Account) {
+            return [
+                (
+                    await tx<Web3Account>("web3_accounts").insert({
+                        address,
+                        user_id: user.id,
+                        type,
+                        challenge,
+                    }).returning("*")
+                )[0],
+                true
+            ];
+        }
+        return [
+            (
+                await tx<Web3Account>("web3_accounts").update({ user_id: user.id, address })
+                    .where({ user_id: user.id })
+                    .orWhere({ address })
+                    .returning("*")
+            )[0],
+            false
+        ];
+    };
+
 export const insertUserByDisplayName = (displayName: string, username: string) =>
     async (tx: Knex.Transaction) => (
         await tx<User>("users").insert({
@@ -233,15 +287,15 @@ export const generateGetStreamToken = async (user: User) => {
     if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
         const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
         const token = client.createToken(user.username);
-        await client.upsertUser({ id: user.username});
+        await client.upsertUser({ id: user.username });
         return token;
     }
     return ""
 }
 
-export const updateUserGetStreamToken = (id: number, token: string ) =>
+export const updateUserGetStreamToken = (id: number, token: string) =>
     async (tx: Knex.Transaction) => (
-        await tx<User>("users").where({id}).update({
+        await tx<User>("users").where({ id }).update({
             getstream_token: token
         }).returning("*")
     )[0];
@@ -287,8 +341,8 @@ export const updateProjectProperties = (id: string | number, properties: Project
 
 
 export const fetchUserBriefApplications = (user_id: string | number, brief_id: string | number) =>
-(tx: Knex.Transaction) =>
-    tx<Project>("projects").select().where({ user_id, brief_id }).first();
+    (tx: Knex.Transaction) =>
+        tx<Project>("projects").select().where({ user_id, brief_id }).first();
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
@@ -371,10 +425,10 @@ export const fetchBrief = (id: string) =>
 
 
 export const fetchUserBriefs = (user_id: string) =>
-            (tx: Knex.Transaction) =>
-                fetchAllBriefs()(tx)
-                    .where({ user_id })
-                    .select()
+    (tx: Knex.Transaction) =>
+        fetchAllBriefs()(tx)
+            .where({ user_id })
+            .select()
 
 export const fetchAllBriefs = () =>
     (tx: Knex.Transaction) =>
@@ -546,7 +600,7 @@ export const getOrCreateFederatedUser = (
                 user = user_;
             }
 
-            if(!user.getstream_token) {
+            if (!user.getstream_token) {
                 const token = await generateGetStreamToken(user);
                 await updateUserGetStreamToken(user.id, token)(tx);
             }
@@ -730,8 +784,8 @@ export const updateFreelancerDetails = (userId: number, f: Freelancer) =>
             discord_link: f.discord_link,
             user_id: f.user_id
         })
-        .where({"user_id": userId}).returning("id")        
-)
+            .where({ "user_id": userId }).returning("id")
+    )
 
 
 

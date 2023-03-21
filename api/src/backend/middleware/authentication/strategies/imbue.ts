@@ -1,7 +1,5 @@
 import express from "express";
-import type { Session } from "express-session";
-import passport, { use } from "passport";
-import { generateGetStreamToken, getOrCreateFederatedUser, updateFederatedLoginUser, updateUserGetStreamToken, User } from "../../../models";
+import { fetchUser, generateGetStreamToken, getOrCreateFederatedUser, updateFederatedLoginUser, updateUserGetStreamToken, User } from "../../../models";
 import config from "../../../config";
 import db from "../../../db";
 import * as models from "../../../models";
@@ -11,8 +9,6 @@ import * as passportJwt from "passport-jwt"
 // @ts-ignore
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs'
-import { StreamChat } from 'stream-chat';
-
 
 const JwtStrategy = passportJwt.Strategy;
 export const imbueJsAuthRouter = express.Router();
@@ -21,12 +17,15 @@ export const imbueJsAuthRouter = express.Router();
 export const imbueStrategy = new JwtStrategy(jwtOptions, async function (jwt_payload, next) {
     const id = jwt_payload.id;
     try {
-        const user = await db.select().from<User>("users").where({ "id": Number(id) }).first();
-        if (!user) {
-            next(`No user found with id: ${id}`, false);
-        } else {
-            return next(null, { id: user.id, username: user.username, getstream_token: user.getstream_token, display_name: user.display_name });
-        }
+        db.transaction(async tx => {
+            const user = await fetchUser(id)(tx);
+            const web3Account = await models.fetchWeb3AccountByUserId(id)(tx);
+            if (!user) {
+                next(`No user found with id: ${id}`, false);
+            } else {
+                return next(null, { id: user.id, username: user.username, getstream_token: user.getstream_token, display_name: user.display_name, web3_address: web3Account?.address });
+            }
+        });
     } catch (e) {
         return next(`Failed to deserialize user with id ${id}`, false);
     }
@@ -45,7 +44,7 @@ imbueJsAuthRouter.post("/", (req, res, next) => {
                 return res.status(404).end();
             }
 
-            if(!user.getstream_token) {
+            if (!user.getstream_token) {
                 const token = await generateGetStreamToken(user);
                 await updateUserGetStreamToken(user?.id, token)(tx);
             }

@@ -134,7 +134,8 @@
 .budget-wrapper {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: fit-content;
+    align-items: center;
 }
 
 input,
@@ -168,6 +169,7 @@ select {
     align-items: flex-end;
     margin-top: auto;
     gap: 8px;
+    width: 100%;
 }
 
 .progress-value {
@@ -216,6 +218,7 @@ select {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
+    margin-bottom: 20px;
 }
 
 .budget-description {
@@ -270,4 +273,13 @@ select {
 .edit-icon {
     margin-top: 5px;
     margin-left: 10px;
+}
+
+.dark-button{
+    background-color: var(--theme-grey-dark);
+}
+
+.dark-button:hover{
+    background-color: #a4ff00;
+    color: #000;
 }

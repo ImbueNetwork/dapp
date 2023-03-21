@@ -26,14 +26,14 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
-   
+
     useEffect(() => {
         async function setup() {
             const freelancerUser = await fetchUser(Number(application.user_id));
             setFreelancer(await getFreelancerProfile(freelancerUser.username));
         }
         setup();
-     }, []);
+    }, []);
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);
@@ -93,24 +93,27 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     return (
         <div className="application-container">
             <div className="flex items-center justify-evenly">
-                <img className="w-16 h-16 rounded-full object-cover" src="https://xsgames.co/randomusers/avatar.php?g=male" alt="" />
+                <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                 <div className="">
-                    <p className="text-xl font-bold">Freelancer Name</p>
+                    <p className="text-xl font-bold">{freelancer?.display_name}</p>
                     <p className="text-base underline mt-2">View Full Profile</p>
                 </div>
                 <div>
-                    <p className="text-xl">@username</p>
+                    <p className="text-xl">@{freelancer?.username}</p>
                 </div>
                 <div>
                     <button className="primary-btn rounded-full w-button dark-button">Message</button>
                     <button className="primary-btn in-dark w-button">Hire</button>
                 </div>
             </div>
-
-            <div className="section">
-                <h3 className="section-title">Job description</h3>
-                <BriefInsights brief={brief} />
-            </div>
+            {
+                isEditingBio && (
+                    <div className="section">
+                        <h3 className="section-title">Job description</h3>
+                        <BriefInsights brief={brief} />
+                    </div>
+                )
+            }
             <div className="section">
                 <div className="container milestones">
                     <div className="milestone-header mx-14 -mb-3">
@@ -122,7 +125,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                         <h3>Client's budget: ${Number(brief.budget).toLocaleString()}</h3>
                     </div>
                     <hr className="separator" />
-                    <p className="mx-14 text-xl font-bold">How many milestone do you want to include?</p>
+                    {isEditingBio && <p className="mx-14 text-xl font-bold">How many milestone do you want to include?</p>}
                     <div className="milestone-list mx-14 mb-5">
                         {milestones.map(({ name, amount }, index) => {
                             const percent = Number((

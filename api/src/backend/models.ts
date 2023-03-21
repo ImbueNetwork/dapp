@@ -164,11 +164,18 @@ export type FreelancerSqlFilter = {
     search_input: string;
 };
 
-export const fetchWeb3Account = (address: string) =>
+export const fetchWeb3AccountByAddress = (address: string) =>
     (tx: Knex.Transaction) =>
         tx<Web3Account>("web3_accounts")
             .select()
-            .where({ address, })
+            .where({ address })
+            .first();
+
+export const fetchWeb3AccountByUserId = (user_id: number) =>
+    (tx: Knex.Transaction) =>
+        tx<Web3Account>("web3_accounts")
+            .select()
+            .where({ user_id })
             .first();
 
 export const fetchUser = (id: number) =>
@@ -220,6 +227,44 @@ export const upsertWeb3Challenge = (
             false
         ];
     };
+
+export const updateOrInsertUserWeb3Address = (
+        user: User,
+        address: string,
+        type: string,
+        challenge: string,
+    ) => async (tx: Knex.Transaction):
+            Promise<[web3Account: Web3Account, isInsert: boolean]> => {
+            const web3Account = await tx<Web3Account>("web3_accounts")
+                .select()
+                .where({
+                    user_id: user?.id
+                }).
+                orWhere({ address })
+                .first();
+            if (!web3Account) {
+                return [
+                    (
+                        await tx<Web3Account>("web3_accounts").insert({
+                            address,
+                            user_id: user.id,
+                            type,
+                            challenge,
+                        }).returning("*")
+                    )[0],
+                    true
+                ];
+            }
+            return [
+                (
+                    await tx<Web3Account>("web3_accounts").update({ user_id: user.id, address })
+                    .where({ user_id: user.id })
+                    .orWhere({ address })
+                    .returning("*")
+                )[0],
+                false
+            ];
+        };
 
 export const insertUserByDisplayName = (displayName: string, username: string) =>
     async (tx: Knex.Transaction) => (

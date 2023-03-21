@@ -47,7 +47,7 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
             }
         }
         setup();
-    }, [])
+    }, []);
 
     const redirectToApplication = (applicationId) => {
         redirect(`briefs/${brief.id}/applications/${applicationId}/`);

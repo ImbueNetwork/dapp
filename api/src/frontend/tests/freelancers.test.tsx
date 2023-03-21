@@ -4,19 +4,19 @@ import React from "react";
 import { Simulate } from "react-dom/test-utils";
 
 test("test Freelancer rendering", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     const freelancerComponent = render(<Freelancers user={user}/>);
     expect(freelancerComponent).toBeTruthy();
 });
 
 test("test Freelancer rendering and matching the snapshot", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     render(<Freelancers user={user}/>);
     expect(screen.getByText('Get Started!')).toMatchSnapshot();
 });
 
 test("test freelancer onclick next snapshot matching", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     render(<Freelancers user={user}/>);
     expect(screen.getByText('Get Started!')).toMatchSnapshot();
     fireEvent.click(screen.getByTestId('get-started-button'));
@@ -24,7 +24,7 @@ test("test freelancer onclick next snapshot matching", () => {
 });
 
 test("test freelancer capturing the input textbox value", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     render(<Freelancers user={user}/>);
     fireEvent.click(screen.getByTestId('get-started-button'));
     fireEvent.click(screen.getByTestId('next-button'));
@@ -34,7 +34,7 @@ test("test freelancer capturing the input textbox value", () => {
 });
 
 test("test freelancer capturing the multiselect languages", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     render(<Freelancers user={user}/>);
     fireEvent.click(screen.getByTestId('get-started-button'));
     fireEvent.click(screen.getByTestId('next-button'));
@@ -45,7 +45,7 @@ test("test freelancer capturing the multiselect languages", () => {
 });
 
 test("test freelancer the bio length ", () => {
-    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test" };
+    const user = { "id": 1, "username": "test", "display_name": "test", "password": "test", "web3Accounts": [], "getstream_token": "test", "web3_address": "test" };
     render(<Freelancers user={user}/>);
     fireEvent.click(screen.getByTestId('get-started-button'));
     fireEvent.click(screen.getByTestId('next-button'));

@@ -18,7 +18,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export type BriefProps = {
     brief: Brief;
 };
-TimeAgo.addDefaultLocale(en);
 
 export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
     const [browsingUser, setBrowsingUser] = useState<User| null>();

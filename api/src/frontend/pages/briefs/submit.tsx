@@ -6,10 +6,13 @@ import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Project, User } from "../../models";
 import { getBrief, getUserBrief } from "../../services/briefsService";
-import { BriefInsights } from "../../components";
+import { BriefInsights, AccountChoice } from "../../components";
 import { getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import { selectAccount } from "../../services/polkadotService";
+
 
 interface MilestoneItem {
     name: string;
@@ -23,13 +26,14 @@ export type BriefProps = {
 
 export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
     const [currencyId, setCurrencyId] = useState(0);
+    const userHasWeb3Addresss = !!user.web3_address;
+    const [showPolkadotAccounts, setShowPolkadotAccounts] = useState<boolean>(!userHasWeb3Addresss);
+    const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
     const imbueFeePercentage = 5;
 
     const [milestones, setMilestones] = useState<MilestoneItem[]>([
         { name: "", amount: undefined },
     ]);
-
-    const currencies = Object.keys(Currency).filter(key => !isNaN(Number(Currency[key])));
 
     const durationOptions = timeData.sort((a, b) =>
         a.value > b.value ? 1 : a.value < b.value ? -1 : 0
@@ -39,9 +43,10 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
         (acc, { amount }) => acc + (amount ?? 0),
         0
     );
-
     const imbueFee = (totalCostWithoutFee * imbueFeePercentage) / 100;
     const totalCost = imbueFee + totalCostWithoutFee;
+
+
     const onAddMilestone = () => {
         setMilestones([...milestones, { name: "", amount: undefined }]);
     };
@@ -57,6 +62,11 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setCurrencyId(Number(event.target.value))
+    };
+
+    const handleSelectAccount = async (account: InjectedAccountWithMeta) => {
+        await selectAccount(account);
+        setShowPolkadotAccounts(false);
     };
 
     async function insertProject() {
@@ -82,6 +92,12 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
             console.log("Failed to submit the brief");
         }
     }
+
+    const renderPolkadotJSModal = (
+        <div>
+            <AccountChoice accountSelected={(account: InjectedAccountWithMeta) => handleSelectAccount(account)} />
+        </div>
+    );
 
     return (
         <div className="application-container">
@@ -277,9 +293,11 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                 {/* TODO: Add Drafts Functionality */}
                 {/* <button className="secondary-btn">Save draft</button> */}
             </div>
+            {showPolkadotAccounts && renderPolkadotJSModal}
         </div>
     );
 };
+
 document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
@@ -301,3 +319,4 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         ).render(<SubmitProposal brief={brief} user={user} />);
     }
 });
+

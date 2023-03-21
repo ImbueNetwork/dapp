@@ -10,6 +10,12 @@ import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
+import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Fade from '@mui/material/Fade';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 interface MilestoneItem {
     name: string;
@@ -26,6 +32,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
+    const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         async function setup() {
@@ -90,6 +97,18 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
         setCurrencyId(Number(event.target.value))
     };
 
+    const style = {
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      };
+
     return (
         <div className="application-container">
             <div className="flex items-center justify-evenly">
@@ -103,9 +122,34 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 </div>
                 <div>
                     <button className="primary-btn rounded-full w-button dark-button">Message</button>
-                    <button className="primary-btn in-dark w-button">Hire</button>
+                    <button onClick={()=>setOpen(true)} className="primary-btn in-dark w-button">Hire</button>
                 </div>
             </div>
+
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={open}
+                onClose={()=>setOpen(false)}
+                closeAfterTransition
+                slots={{ backdrop: Backdrop }}
+                slotProps={{
+                    backdrop: {
+                        timeout: 500,
+                    },
+                }}>
+                <Fade in={open}>
+                    <Box sx={style}>
+                        <Typography id="transition-modal-title" variant="h6" component="h2">
+                            Text in a modal
+                        </Typography>
+                        <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                        </Typography>
+                    </Box>
+                </Fade>
+            </Modal>
+            
             {
                 isEditingBio && (
                     <div className="section">

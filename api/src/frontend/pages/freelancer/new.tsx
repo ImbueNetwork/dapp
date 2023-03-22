@@ -58,6 +58,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 {freelancedBefore.map(({ label, value }, index) => (
                     <div
                         key={index}
+                        data-testid={`freelance-xp-${index}`}
                         className={`freelance-xp-item ${
                             freelancingBefore === value ? "active" : ""
                         }`}
@@ -81,6 +82,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                 {freelancingGoal.map(({ label, value }, index) => (
                     <div
                         key={index}
+                        data-testid={`freelance-goal-${index}`}
                         className={`freelance-xp-item ${
                             goal === value ? "active" : ""
                         }`}
@@ -255,6 +257,33 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
         ConfirmPanel,
     ];
 
+    const validate = (): boolean => {
+        // TODO: show notification
+        if (step === 1 && !freelancingBefore) {
+            return false;
+        }
+        if (step === 2 && !goal) {
+            return false;
+        }
+        if (step === 3 && !title) {
+            // TODO: minimum required length for description
+            return false;
+        }
+        if (step === 4 && !languages.length) {
+            return false;
+        }
+        if (step === 5 && !skills.length) {
+            return false;
+        }
+        if (step === 6 && !bio) {
+            return false;
+        }
+        if (step === 7 && !services.length) {
+            return false;
+        }
+        return true;
+    };
+
     async function createProfile () {
         setStep(step + 1);
 
@@ -322,6 +351,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                         <button
                             className="primary-btn in-dark w-button"
                             data-testid="submit-button"
+                            disabled={!validate()}
                             onClick={() => createProfile()}
 
                         >
@@ -331,6 +361,7 @@ export const Freelancers = ({ user: user }: FreelancerProps): JSX.Element => {
                         <button
                             className="primary-btn in-dark w-button"
                             data-testid="next-button"
+                            disabled={!validate()}
                             onClick={() => setStep(step + 1)}
                         >
                             Next

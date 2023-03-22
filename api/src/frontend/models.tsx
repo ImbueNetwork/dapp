@@ -35,6 +35,7 @@ export type Project = {
     chain_project_id?: number;
     required_funds: number;
     currency_id: number;
+    status_id: number;
     milestones: Milestone[];
     owner?: string;
     user_id?: string | number;

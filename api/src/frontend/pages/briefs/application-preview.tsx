@@ -10,6 +10,7 @@ import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
+import { HirePopup } from "../../components/hire-popup";
 
 interface MilestoneItem {
     name: string;
@@ -26,15 +27,17 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
+    const [openPopup, setOpenPopup] = useState<boolean>(false);
+
     const applicationStatus = ProjectStatus[application.status_id]
-   
+ 
     useEffect(() => {
         async function setup() {
             const freelancerUser = await fetchUser(Number(application.user_id));
             setFreelancer(await getFreelancerProfile(freelancerUser.username));
         }
         setup();
-     }, []);
+    }, []);
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);
@@ -93,27 +96,55 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
 
     return (
         <div className="application-container">
+
+            {(user?.username !== freelancer?.username) && (
+                <div className="flex items-center justify-evenly">
+                    <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
+                    <div className="">
+                        <p className="text-xl font-bold">{freelancer?.display_name}</p>
+                        <p className="text-base underline mt-2">View Full Profile</p>
+                    </div>
+                    <div>
+                        <p className="text-xl">@{freelancer?.username}</p>
+                    </div>
+                    <div>
+                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
+                        <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
+                    </div>
+                </div>
+            )}
+
+            <HirePopup
+                openPopup={openPopup}
+                setOpenPopup={setOpenPopup}
+                freelancer={freelancer}
+                milestones={milestones}
+                totalCostWithoutFee={totalCostWithoutFee}
+                imbueFee={imbueFee} 
+                totalCost={totalCost}
+            />
+
+            {
+                (user?.username === freelancer?.username) && (
+                    <div className="section">
+                        <h3 className="section-title">Job description</h3>
+                        <BriefInsights brief={brief} />
+                    </div>
+                )
+            }
             <div className="section">
-                <h3 className="section-title">Job description</h3>
-                <BriefInsights brief={brief} />
-            </div>
-            <div className="section">
-                <h3 className="section-title">Milestones
-                    {!isEditingBio && (
-                        <div
-                            className="edit-icon"
-                            onClick={() => setIsEditingBio(true)}
-                        >
-                            <FiEdit />
-                        </div>
-                    )}
-                </h3>
                 <div className="container milestones">
-                    <div className="milestone-header">
+                    <div className="milestone-header mx-14 -mb-3">
+                        <h3 className="flex">Milestones
+                            {!isEditingBio && (
+                                <div className="edit-icon" onClick={() => setIsEditingBio(true)}><FiEdit /></div>
+                            )}
+                        </h3>
                         <h3>Client's budget: ${Number(brief.budget).toLocaleString()}</h3>
                     </div>
-                    <h3>How many milestone do you want to include?</h3>
-                    <div className="milestone-list">
+                    <hr className="separator" />
+                    {isEditingBio && <p className="mx-14 text-xl font-bold">How many milestone do you want to include?</p>}
+                    <div className="milestone-list mx-14 mb-5">
                         {milestones.map(({ name, amount }, index) => {
                             const percent = Number((
                                 (100 * (amount ?? 0)) /
@@ -127,56 +158,60 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                                     <div className="input-wrappers">
                                         <div className="description-wrapper">
                                             <h3>Description</h3>
-                                            <textarea
-                                                className="input-description"
-                                                value={name}
-                                                disabled={!isEditingBio}
-                                                onChange={(e) =>
-                                                    setMilestones([
-                                                        ...milestones.slice(
-                                                            0,
-                                                            index
-                                                        ),
-                                                        {
-                                                            ...milestones[
-                                                            index
-                                                            ],
-                                                            name: e.target.value,
-                                                        },
-                                                        ...milestones.slice(
-                                                            index + 1
-                                                        ),
+                                            {
+                                                isEditingBio
+                                                    ? <textarea
+                                                        className="input-description"
+                                                        value={name}
+                                                        disabled={!isEditingBio}
+                                                        onChange={(e) =>
+                                                            setMilestones([...milestones.slice(0, index),
+                                                            {
+                                                                ...milestones[index],
+                                                                name: e.target.value,
+                                                            },
+                                                            ...milestones.slice(
+                                                                index + 1
+                                                            ),
 
-                                                    ])
-                                                }
-                                            />
+                                                            ])
+                                                        }
+                                                    />
+                                                    : <p>{milestones[index]?.name}</p>
+                                            }
+
                                         </div>
                                         <div className="budget-wrapper">
                                             <h3>Amount</h3>
-                                            <input
-                                                type="number"
-                                                className="input-budget"
-                                                disabled={!isEditingBio}
-                                                value={amount || ""}
-                                                onChange={(e) =>
-                                                    setMilestones([
-                                                        ...milestones.slice(
-                                                            0,
-                                                            index
-                                                        ),
-                                                        {
-                                                            ...milestones[
-                                                            index
-                                                            ],
-                                                            amount: Number(e.target.value),
-                                                        },
-                                                        ...milestones.slice(
-                                                            index + 1
-                                                        ),
-                                                    ])
-                                                }
-                                            />
-                                            {totalCostWithoutFee !== 0 && (
+                                            {
+                                                isEditingBio
+                                                    ? <input
+                                                        type="number"
+                                                        className="input-budget"
+                                                        disabled={!isEditingBio}
+                                                        value={amount || ""}
+                                                        onChange={(e) =>
+                                                            setMilestones([
+                                                                ...milestones.slice(
+                                                                    0,
+                                                                    index
+                                                                ),
+                                                                {
+                                                                    ...milestones[
+                                                                    index
+                                                                    ],
+                                                                    amount: Number(e.target.value),
+                                                                },
+                                                                ...milestones.slice(
+                                                                    index + 1
+                                                                ),
+                                                            ])
+                                                        }
+                                                    />
+                                                    : <p>{milestones[index]?.amount}</p>
+                                            }
+
+                                            {(totalCostWithoutFee !== 0 && isEditingBio) && (
                                                 <div className="progress-container">
                                                     <div className="progress-value">
                                                         {percent}%
@@ -198,56 +233,55 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                         })}
                     </div>
                     {isEditingBio &&
-                        <h3
-                            className="clickable-text btn-add-milestone"
+                        <h4
+                            className="clickable-text btn-add-milestone mx-14 text-2xl"
                             onClick={onAddMilestone}
                         >
                             <FiPlusCircle color="var(--theme-primary)" />
                             Add milestone
-                        </h3>
+                        </h4>
 
                     }
-
-                    <hr className="separator" />
-                    <div className="budget-info">
-                        <div className="budget-description">
-                            <h3>Total price of the project</h3>
-                            <div className="text-inactive">
-                                This includes all milestonees, and is the amount
-                                client will see
-                            </div>
-                        </div>
-                        <div className="budget-value">
-                            ${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
-                        </div>
-                    </div>
-                    <hr className="separator" />
-                    <div className="budget-info">
-                        <div className="budget-description">
-                            <h3>
-                                Imbue Service Fee 5% - Learn more about Imbue’s
-                                fees
-                            </h3>
-                        </div>
-                        <div className="budget-value">
-                            ${Number((imbueFee).toFixed(2)).toLocaleString()}
+                </div>
+            </div>
+            <div className="container">
+                <p className="mx-14 mb-4 text-xl font-bold">Cost + Payment Wallet Address to box</p>
+                <hr className="separator" />
+                <div className="budget-info mx-14 mt-7">
+                    <div className="budget-description">
+                        <h3>Total price of the project</h3>
+                        <div className="text-inactive">
+                            This includes all milestonees, and is the amount
+                            client will see
                         </div>
                     </div>
-
-                    <hr className="separator" />
-                    <div className="budget-info">
-                        <div className="budget-description">
-                            <h3>Total</h3>
-                        </div>
-                        <div className="budget-value">
-                            ${Number((totalCost).toFixed(2)).toLocaleString()}
-                        </div>
+                    <div className="budget-value">
+                        ${Number(totalCostWithoutFee.toFixed(2)).toLocaleString()}
+                    </div>
+                </div>
+                <div className="budget-info mx-14">
+                    <div className="budget-description">
+                        <h3>
+                            Imbue Service Fee 5% - Learn more about Imbue’s
+                            fees
+                        </h3>
+                    </div>
+                    <div className="budget-value">
+                        ${Number((imbueFee).toFixed(2)).toLocaleString()}
+                    </div>
+                </div>
+                <div className="budget-info mx-14">
+                    <div className="budget-description">
+                        <h3>Total</h3>
+                    </div>
+                    <div className="budget-value">
+                        ${Number((totalCost).toFixed(2)).toLocaleString()}
                     </div>
                 </div>
             </div>
             <div className="section">
                 <h3 className="section-title">Payment terms</h3>
-                <div className="container payment-details">
+                <div className="container payment-details px-14">
                     <div className="duration-selector">
                         <h3>How long will this project take?</h3>
                         <select
@@ -268,7 +302,6 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                     </div>
                     <div className="payment-options">
                         <h3>Currency</h3>
-
                         <div className="network-amount">
                             <select
                                 name="currencyId"
@@ -328,3 +361,4 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     }
     // TODO 404 page when brief of application is not found
 });
+// fdsgit a

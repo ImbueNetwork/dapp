@@ -22,7 +22,7 @@
     padding: 0;
 }
 
-.container {
+.brief-container {
     background: var(--theme-grey-dark);
     border: 1px solid var(--theme-white);
     border-radius: 20px;

@@ -23,7 +23,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export type BriefProps = {
     brief: Brief;
 };
-TimeAgo.addDefaultLocale(en);
 
 export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const [browsingUser, setBrowsingUser] = useState<User | null>();
@@ -37,7 +36,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
             setTargetUser(await fetchUser(brief.user_id));
         }
         setup();
-    }, []);
+     }, []);
 
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));

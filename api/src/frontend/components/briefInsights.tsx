@@ -21,7 +21,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
     };
 
     return (
-        <div className="container brief-info">
+        <div className="brief-container brief-info">
             <div className="description">
                 <div className="brief-title">
                     <h3>{brief.headline}</h3>

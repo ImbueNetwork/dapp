@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .application-container {
     display: flex;
     flex-direction: column;
@@ -27,7 +31,8 @@
     background: var(--theme-grey-dark);
     border: 1px solid var(--theme-white);
     border-radius: 20px;
-    padding: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .brief-info {
@@ -129,7 +134,8 @@
 .budget-wrapper {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: fit-content;
+    align-items: flex-end;
 }
 
 input,
@@ -163,6 +169,7 @@ select {
     align-items: flex-end;
     margin-top: auto;
     gap: 8px;
+    width: 100%;
 }
 
 .progress-value {
@@ -197,7 +204,6 @@ select {
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    margin-bottom: 40px;
 }
 
 .separator {
@@ -210,7 +216,8 @@ select {
 .budget-info {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .budget-description {
@@ -265,4 +272,32 @@ select {
 .edit-icon {
     margin-top: 5px;
     margin-left: 10px;
+}
+
+.dark-button {
+    background-color: var(--theme-grey-dark);
+}
+
+.dark-button:hover {
+    background-color: var(--theme-primary);
+    color: #000;
+}
+
+.modal-container h3 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.grey-container{
+    background: var(--theme-black-text);
+}
+
+.grey-container:hover{
+    border: 1px solid var(--theme-primary);
+    background: var(--theme-black-text);
+}
+
+.primary-text{
+    color: var(--theme-primary);
 }

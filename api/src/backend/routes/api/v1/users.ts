@@ -103,48 +103,6 @@ router.get("/:id/briefs", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
-    const {
-        username,
-        email,
-        password
-    } = req.body;
-
-    let updateUserDetails = async (err: Error, user: User) => {
-        if (err) {
-            next(err);
-        }
-
-        if (!user) {
-            next(new Error("No user provided."));
-        }
-
-        db.transaction(async tx => {
-            try {
-                const updatedUser = await updateFederatedLoginUser(
-                    user, username, email, password
-                )(tx);
-
-                res.send(updatedUser);
-            } catch (e) {
-                tx.rollback();
-                next(new Error(
-                    `Unable to upsert details for user: ${username}`,
-                    { cause: e as Error }
-                ));
-            }
-        });
-    };
-
-    getOrCreateFederatedUser(
-        "Imbue Network",
-        email,
-        username,
-        updateUserDetails);
-
-});
-
-
 router.get("/:userOrEmail", (req, res, next) => {
     const userOrEmail = req.params.userOrEmail;
     db.transaction(async tx => {

@@ -10,12 +10,7 @@ import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
-import Backdrop from '@mui/material/Backdrop';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import Fade from '@mui/material/Fade';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { HirePopup } from "../../components/hire-popup";
 
 interface MilestoneItem {
     name: string;
@@ -32,7 +27,6 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
-    const [open, setOpen] = React.useState(false);
 
     useEffect(() => {
         async function setup() {
@@ -97,61 +91,12 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
         setCurrencyId(Number(event.target.value))
     };
 
-    const style = {
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-      };
-
     return (
         <div className="application-container">
-            <div className="flex items-center justify-evenly">
-                <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
-                <div className="">
-                    <p className="text-xl font-bold">{freelancer?.display_name}</p>
-                    <p className="text-base underline mt-2">View Full Profile</p>
-                </div>
-                <div>
-                    <p className="text-xl">@{freelancer?.username}</p>
-                </div>
-                <div>
-                    <button className="primary-btn rounded-full w-button dark-button">Message</button>
-                    <button onClick={()=>setOpen(true)} className="primary-btn in-dark w-button">Hire</button>
-                </div>
-            </div>
+            {(user?.username !== freelancer?.username) && <HirePopup freelancer = {freelancer} milestones={milestones} totalCostWithoutFee={totalCostWithoutFee} imbueFee={imbueFee} totalCost={totalCost}/>}
 
-            <Modal
-                aria-labelledby="transition-modal-title"
-                aria-describedby="transition-modal-description"
-                open={open}
-                onClose={()=>setOpen(false)}
-                closeAfterTransition
-                slots={{ backdrop: Backdrop }}
-                slotProps={{
-                    backdrop: {
-                        timeout: 500,
-                    },
-                }}>
-                <Fade in={open}>
-                    <Box sx={style}>
-                        <Typography id="transition-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
-                        <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
-                    </Box>
-                </Fade>
-            </Modal>
-            
             {
-                isEditingBio && (
+                (user?.username === freelancer?.username) && (
                     <div className="section">
                         <h3 className="section-title">Job description</h3>
                         <BriefInsights brief={brief} />
@@ -328,7 +273,6 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                     </div>
                     <div className="payment-options">
                         <h3>Currency</h3>
-
                         <div className="network-amount">
                             <select
                                 name="currencyId"

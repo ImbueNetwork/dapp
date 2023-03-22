@@ -106,13 +106,15 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                 <BriefInsights brief={brief} />
             </div>
             <div className="section">
-                <h3 className="section-title">Milestones</h3>
                 <div className="container milestones">
-                    <div className="milestone-header">
+                    <div className="milestone-header mx-14 -mb-3">
+                        <h3 className="section-title">Milestones</h3>
                         <h3>Client's budget: ${Number(brief.budget).toLocaleString()}</h3>
                     </div>
-                    <h3>How many milestone do you want to include?</h3>
-                    <div className="milestone-list">
+                    <hr className="separator" />
+
+                    <p className="mx-14 text-xl font-bold">How many milestone do you want to include?</p>
+                    <div className="milestone-list mx-14">
                         {milestones.map(({ name, amount }, index) => {
                             const percent = Number((
                                 (100 * (amount ?? 0)) /
@@ -194,15 +196,16 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                             );
                         })}
                     </div>
-                    <h3
-                        className="clickable-text btn-add-milestone"
+                    <p
+                        className="clickable-text btn-add-milestone mx-14 mb-0 text-xl font-bold"
                         onClick={onAddMilestone}
                     >
                         <FiPlusCircle color="var(--theme-primary)" />
                         Add milestone
-                    </h3>
+                    </p>
                     <hr className="separator" />
-                    <div className="budget-info">
+
+                    <div className="budget-info mx-14">
                         <div className="budget-description">
                             <h3>Total price of the project</h3>
                             <div className="text-inactive">
@@ -215,7 +218,8 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                         </div>
                     </div>
                     <hr className="separator" />
-                    <div className="budget-info">
+
+                    <div className="budget-info mx-14">
                         <div className="budget-description">
                             <h3>
                                 Imbue Service Fee 5% - Learn more about Imbue’s
@@ -226,9 +230,9 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
                             ${Number((imbueFee).toFixed(2)).toLocaleString()}
                         </div>
                     </div>
-
                     <hr className="separator" />
-                    <div className="budget-info">
+
+                    <div className="budget-info mx-14">
                         <div className="budget-description">
                             <h3>Total</h3>
                         </div>
@@ -240,7 +244,7 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
             </div>
             <div className="section">
                 <h3 className="section-title">Payment terms</h3>
-                <div className="container payment-details">
+                <div className="container payment-details px-14">
                     <div className="duration-selector">
                         <h3>How long will this project take?</h3>
                         <select

@@ -135,7 +135,7 @@
     display: flex;
     flex-direction: column;
     width: fit-content;
-    align-items: center;
+    align-items: flex-end;
 }
 
 input,
@@ -204,7 +204,6 @@ select {
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    margin-bottom: 40px;
 }
 
 .separator {
@@ -217,7 +216,7 @@ select {
 .budget-info {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
     margin-bottom: 20px;
 }
 
@@ -275,11 +274,17 @@ select {
     margin-left: 10px;
 }
 
-.dark-button{
+.dark-button {
     background-color: var(--theme-grey-dark);
 }
 
-.dark-button:hover{
+.dark-button:hover {
     background-color: #a4ff00;
     color: #000;
+}
+
+.modal-container h3 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 700;
 }

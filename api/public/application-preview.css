@@ -279,7 +279,7 @@ select {
 }
 
 .dark-button:hover {
-    background-color: #a4ff00;
+    background-color: var(--theme-primary);
     color: #000;
 }
 
@@ -287,4 +287,17 @@ select {
     font-size: 20px;
     line-height: 1.5;
     font-weight: 700;
+}
+
+.grey-container{
+    background: var(--theme-black-text);
+}
+
+.grey-container:hover{
+    border: 1px solid var(--theme-primary);
+    background: var(--theme-black-text);
+}
+
+.primary-text{
+    color: var(--theme-primary);
 }

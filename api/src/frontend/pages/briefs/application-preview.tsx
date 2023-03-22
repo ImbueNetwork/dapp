@@ -27,6 +27,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
+    const [openPopup, setOpenPopup] = useState<boolean>(false);
 
     useEffect(() => {
         async function setup() {
@@ -93,7 +94,33 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
 
     return (
         <div className="application-container">
-            {(user?.username !== freelancer?.username) && <HirePopup freelancer = {freelancer} milestones={milestones} totalCostWithoutFee={totalCostWithoutFee} imbueFee={imbueFee} totalCost={totalCost}/>}
+
+            {(user?.username !== freelancer?.username) && (
+                <div className="flex items-center justify-evenly">
+                    <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
+                    <div className="">
+                        <p className="text-xl font-bold">{freelancer?.display_name}</p>
+                        <p className="text-base underline mt-2">View Full Profile</p>
+                    </div>
+                    <div>
+                        <p className="text-xl">@{freelancer?.username}</p>
+                    </div>
+                    <div>
+                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
+                        <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
+                    </div>
+                </div>
+            )}
+
+            <HirePopup
+                openPopup={openPopup}
+                setOpenPopup={setOpenPopup}
+                freelancer={freelancer}
+                milestones={milestones}
+                totalCostWithoutFee={totalCostWithoutFee}
+                imbueFee={imbueFee} 
+                totalCost={totalCost}
+            />
 
             {
                 (user?.username === freelancer?.username) && (

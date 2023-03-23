@@ -9,7 +9,7 @@
 .mdc-dialog__surface,
 .str-chat__empty-channel,
 .str-chat__channel-header {
-    background: #2C2C2C !important;
+    background: #2C2C2C ;
 }
 
 .custom-chat-container{
@@ -23,7 +23,7 @@
 }
 .str-chat__channel-search,
 .str-chat__channel-preview {
-    padding: 25px 48px;
+    padding: 25px 18px;
 }
 
 .str-chat__channel-search .str-chat__channel-search-bar{
@@ -33,6 +33,7 @@
 .str-chat__channel-search-bar .str-chat__channel-search-input--wrapper{
     border: 1px solid white;
     background-color: rgba(120, 120, 120, 0.3);
+    border-radius: 10px;
 }
 .str-chat__channel-search-bar .str-chat__channel-search-input--wrapper.str-chat__channel-search-input--wrapper-active{
     border: 1px solid #337eff;
@@ -55,6 +56,10 @@
 
 .str-chat__channel-preview-messenger--last-message{
     padding-top: 2px;
+}
+
+.str-chat__message-input{
+    border-top: 1px solid white;
 }
 
 

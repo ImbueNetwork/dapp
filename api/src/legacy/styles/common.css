@@ -19,13 +19,11 @@
     --dialog-scrim-background: rgba(0, 0, 0, 0.75);
     --dialog-anchor-color: var(--theme-primary);
     --dialog-strong-color: var(--dialog-title-color);
-    --dialog-box-shadow:
-        0px 0px 5px #444,
+    --dialog-box-shadow: 0px 0px 5px #444,
         0px 11px 15px -7px rgba(50, 50, 50, 0.2),
         0px 24px 38px 3px rgba(50, 50, 50, 0.14),
         0px 9px 46px 8px rgba(50, 50, 50, 0.12);
     --dialog-z-index: 1001;
-
 
     /** material design variable */
     --mdc-shape-small: 8px;
@@ -37,7 +35,7 @@
     --mdc-theme-surface: #0f0f0f;
 
     --mdc-typography-font-family: var(--theme-font-family);
-    
+
     --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11);
     --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23);
     --mdc-text-field-label-ink-color: #aaa;
@@ -49,7 +47,7 @@
     --mdc-select-disabled-ink-color: var(--mdc-text-field-disabled-ink-color);
     --mdc-select-label-ink-color: var(--mdc-text-field-label-ink-color);
     --mdc-select-ink-color: var(--mdc-text-field-ink-color);
-    
+
     --mdc-theme-text-primary-on-background: var(--mdc-text-field-ink-color);
     --mdc-theme-text-secondary-on-background: var(--mdc-theme-secondary);
     --mdc-theme-text-icon-on-background: var(--mdc-text-field-label-ink-color);
@@ -71,7 +69,6 @@
     --disabled-button-color: #b5b5b5;
     --base-transition: all 200ms ease-in-out;
 
-
     --hq-dialog-content-color: var(--dialog-content-color);
     --hq-dialog-strong-color: var(--dialog-strong-color);
     --hq-dialog-title-color: var(--dialog-title-color);
@@ -83,13 +80,23 @@
     --hq-button-font-size: var(--button-font-size);
     --hq-button-padding: var(--button-padding);
     --hq-button-border-radius: var(--button-border-radius);
-    --hq-primary-button-background-color: var(--primary-button-background-color);
-    --hq-primary-button-background-hover-color: var(--primary-button-background-hover-color);
-    --hq-secondary-button-background-color: var(--secondary-button-background-color);
-    --hq-secondary-button-background-hover-color: var(--secondary-button-background-hover-color);
+    --hq-primary-button-background-color: var(
+        --primary-button-background-color
+    );
+    --hq-primary-button-background-hover-color: var(
+        --primary-button-background-hover-color
+    );
+    --hq-secondary-button-background-color: var(
+        --secondary-button-background-color
+    );
+    --hq-secondary-button-background-hover-color: var(
+        --secondary-button-background-hover-color
+    );
     --hq-secondary-button-color: var(--secondary-button-color);
     --hq-secondary-button-border: var(--secondary-button-border);
-    --hq-disabled-button-background-color: var(--disabled-button-background-color);
+    --hq-disabled-button-background-color: var(
+        --disabled-button-background-color
+    );
     --hq-disabled-button-color: var(--disabled-button-color);
     --hq-base-transition: var(--base-transition);
 }

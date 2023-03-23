@@ -19,6 +19,7 @@ TimeAgo.addDefaultLocale(en);
 export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
     const timeAgo = new TimeAgo("en-US");
     const timePosted = timeAgo.format(new Date(brief.created));
+    const milestonecompleted = 2;
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);
@@ -76,7 +77,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                 <div className="brief-info">
                     <div className="description">
                         <div className="brief-title">
-                            <h3>{brief.headline}</h3>
+                            <h2 className="text-3xl">{brief.headline}</h2>
                             <h3
                                 className="clickable-text"
                                 onClick={viewFullBrief}
@@ -99,7 +100,9 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                             />
                             <div className="insight-value milestone">
                                 <h3>Milestone</h3>
-                                <div className="milestones-complete">2/4</div>
+                                <span className="milestones-complete font-sans text-xl">
+                                    2/4
+                                </span>
                             </div>
                         </div>
                         <div className="milestone-progress-indicator">
@@ -107,13 +110,15 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                                 className="milestone-complete"
                                 style={{ width: "50%" }}
                             >
-                                {/*
-                                 * TODO: Show circles to indicate milestones
-                                 */}
                             </div>
-                            <div className="milestone-complete-percentage">
+                            <div className="flex -mt-1.5 justify-evenly">
+                                    {milestones.map((milestone, index) => (
+                                        <div className={`h-4 w-4 rounded-full ${milestonecompleted>=(index+1)?"bg-[#b2ff0b]" :"bg-[#1c2608]"} `}></div>
+                                    ))}
+                                </div>
+                            {/* <div className="milestone-complete-percentage">
                                 50%
-                            </div>
+                            </div> */}
                         </div>
                         <div className="insight-item">
                             <FaDollarSign
@@ -121,7 +126,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                                 size={24}
                             />
                             <div className="insight-value">
-                                <h3>
+                                <h3 className="font-sans">
                                     ${Number(brief.budget).toLocaleString()}
                                 </h3>
                                 <div className="text-inactive">
@@ -135,7 +140,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                                 size={24}
                             />
                             <div className="insight-value">
-                                <h3>{brief.duration}</h3>
+                                <h3 className="font-sa">{brief.duration}</h3>
                                 <div className="text-inactive">Timeline</div>
                             </div>
                         </div>
@@ -148,7 +153,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                             src="/public/profile-image.png"
                             className="freelancer-profile-pic"
                         />
-                        <div>Idris Muhammad</div>
+                        <h3>Idris Muhammad</h3>
                         <button className="primary-btn w-button in-dark">
                             Message
                         </button>
@@ -162,7 +167,7 @@ export const BriefDashboard = ({ brief }: BriefDashboardProps) => {
                             <div className="milestone-no">
                                 {`Milestone ${index + 1}`}
                             </div>
-                            <div className="milestone-name">{m.name}</div>
+                            <h3 className="milestone-name mt-auto">{m.name}</h3>
                             <div className="milestone-date">{m.date}</div>
                             <div
                                 className={`milestone-status ${

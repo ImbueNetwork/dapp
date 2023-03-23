@@ -31,13 +31,12 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
             const userBriefs = await getUserBriefs(user.id);
             setBriefsUnderReview(userBriefs.briefsUnderReview);
             setAcceptedBriefs(userBriefs.acceptedBriefs);
-        }
+        };
         setup();
     }, []);
 
     return (
         <div className="application-container">
-
             <div className="section">
                 <div className="container">
                     <div className="brief-info">
@@ -45,33 +44,48 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
                             <h3>Open Briefs</h3>
                         </div>
                         <div className="brief-proposals">
-                                <h3>Proposals</h3>
+                            <h3>Proposals</h3>
                         </div>
-
                     </div>
                     <hr className="separator" />
                     {briefsUnderReview.map((brief) => {
-                        const timePosted = timeAgo.format(new Date(brief.created));
+                        const timePosted = timeAgo.format(
+                            new Date(brief.created)
+                        );
 
                         return (
                             <>
                                 <div className="brief-info">
                                     <div className="brief-description">
                                         <h3>{brief.headline}</h3>
-                                        <span>${Number(brief.budget).toLocaleString()}</span>
+                                        <span>
+                                            $
+                                            {Number(
+                                                brief.budget
+                                            ).toLocaleString()}
+                                        </span>
                                         <span>Created {timePosted}</span>
                                     </div>
                                     <div className="project-milestones">
                                         <div className="milestone-header">
-                                            <h3>{brief.number_of_applications}</h3>
+                                            <h3>
+                                                {brief.number_of_applications}
+                                            </h3>
                                         </div>
                                     </div>
                                     <div className="brief-button">
-                                        <button className="primary-btn in-dark w-button" onClick={() => redirectToApplications(brief.id)}>View Status</button>
+                                        <button
+                                            className="primary-btn in-dark w-button"
+                                            onClick={() =>
+                                                redirectToApplications(brief.id)
+                                            }
+                                        >
+                                            View Status
+                                        </button>
                                     </div>
                                 </div>
                             </>
-                        )
+                        );
                     })}
                 </div>
             </div>
@@ -85,22 +99,42 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
                     </div>
                     <hr className="separator" />
                     {acceptedBriefs.map((brief) => {
-                        const numberOfApprovedMilestones = brief.milestones.filter(milestone => milestone.is_approved).length;
+                        const numberOfApprovedMilestones =
+                            brief.milestones.filter(
+                                (milestone) => milestone.is_approved
+                            ).length;
                         const totalMilestoneCount = brief.milestones.length;
-                        const percent = ((numberOfApprovedMilestones / totalMilestoneCount) ?? 0) * 100;
-                        const timePosted = timeAgo.format(new Date(brief.created));
+                        const percent =
+                            (numberOfApprovedMilestones / totalMilestoneCount ??
+                                0) * 100;
+                        const timePosted = timeAgo.format(
+                            new Date(brief.created)
+                        );
                         return (
                             <>
                                 <div className="brief-info">
                                     <div className="brief-description">
                                         <h3>{brief.headline}</h3>
-                                        <span>{Number(brief.project.required_funds).toLocaleString()} ${Currency[brief.project.currency_id]}</span>
+                                        <span>
+                                            {Number(
+                                                brief.project.required_funds
+                                            ).toLocaleString()}{" "}
+                                            $
+                                            {
+                                                Currency[
+                                                    brief.project.currency_id
+                                                ]
+                                            }
+                                        </span>
                                         <span>Created {timePosted}</span>
                                     </div>
                                     <div className="project-milestones">
                                         <div className="milestone-header">
                                             <h3>Milestones</h3>
-                                            <h3 className="milestones-info">{numberOfApprovedMilestones}/{totalMilestoneCount}</h3>
+                                            <h3 className="milestones-info">
+                                                {numberOfApprovedMilestones}/
+                                                {totalMilestoneCount}
+                                            </h3>
                                         </div>
 
                                         <div className="project-progress">
@@ -113,15 +147,24 @@ export const HirerDashboard = ({ user }: HirerDashboardProps): JSX.Element => {
                                         </div>
                                     </div>
                                     <div className="brief-button">
-                                        <button className="primary-btn in-dark w-button" onClick={() => redirectToProjectDetails(brief.project_id)}>View Status</button>
+                                        <button
+                                            className="primary-btn in-dark w-button"
+                                            onClick={() =>
+                                                redirectToProjectDetails(
+                                                    brief.project_id
+                                                )
+                                            }
+                                        >
+                                            View Status
+                                        </button>
                                     </div>
                                 </div>
                             </>
-                        )
+                        );
                     })}
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

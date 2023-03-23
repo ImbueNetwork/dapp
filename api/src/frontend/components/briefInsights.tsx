@@ -24,7 +24,7 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
         <div className="brief-container brief-info">
             <div className="description">
                 <div className="brief-title">
-                    <h3>{brief.headline }</h3>
+                    <h3>{brief.headline}</h3>
                     <h3 className="clickable-text" onClick={viewFullBrief}>
                         View full brief
                     </h3>

@@ -12,18 +12,14 @@ import {
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
-
 import "../../../../public/freelancer-profile.css";
 import { timeStamp } from "console";
 import { Freelancer, User } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
-
 import { fetchUser, getCurrentUser, getStreamChat, redirect } from "../../utils";
-import Modal from 'react-bootstrap/Modal';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../../../public/freelancer-profile.css";
-
 import { TextInput, ChatBox } from "../../components";
+import ChatPopup from "../../components/chat-popup";
 
 export type ProfileProps = {
     initFreelancer: Freelancer;
@@ -79,18 +75,6 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
         flipEdit()
     };
 
-    const renderChat = (
-        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
-            <Modal.Body>
-                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
-            </Modal.Footer>
-        </Modal>
-    );
-
     const handleMessageBoxClick = () => {
         if (browsingUser) {
             setShowMessageBox(true);
@@ -102,6 +86,17 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
     const flipEdit = () => {
         setIsEditMode(!isEditMode)
     }
+
+    // const renderChat = (
+    //     <Slide direction="up" in={showMessageBox} mountOnEnter unmountOnExit>
+    //         <Box sx={chatPopupStyle}>
+    //             <div className="relative">
+    //                 <div className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold" onClick={() => setShowMessageBox(false)}>X</div>
+    //                 {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+    //             </div>
+    //         </Box>
+    //     </Slide>
+    // )
 
     return (
         <div className="profile-container">
@@ -152,8 +147,8 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
 
                             {!isCurrentFreelancer &&
                                 <>
-                                    <button onClick={() => handleMessageBoxClick()} className="message">Message</button>
-                                    {browsingUser && showMessageBox && renderChat}
+                                    <button onClick={() => handleMessageBoxClick()} className=" message">Message</button>
+
                                 </>
 
                             }
@@ -371,6 +366,7 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                     </div> */}
                 </div>
             </div>
+            {browsingUser && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,targetUser, browsingUser}}/>}
         </div>
     );
 }

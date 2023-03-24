@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Freelancer, User } from "../models";
-import { StreamChat } from 'stream-chat';
-import { Chat, Channel, ChannelHeader, MessageInput, MessageList, Thread, Window } from 'stream-chat-react';
-import 'stream-chat-react/dist/css/v2/index.css';
+import { StreamChat } from "stream-chat";
+import {
+    Chat,
+    Channel,
+    ChannelHeader,
+    MessageInput,
+    MessageList,
+    Thread,
+    Window,
+} from "stream-chat-react";
+import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat } from "../utils";
 
 export type ChatProps = {
@@ -19,7 +27,7 @@ export const ChatBox = ({ user, targetUser }: ChatProps) => {
             setClient(await getStreamChat());
         }
         setup();
-     }, [])
+    }, []);
 
     if (client) {
         const currentChannel = `${user.display_name} (${user.username}) <> ${targetUser.display_name} ${targetUser.username}`;
@@ -29,21 +37,26 @@ export const ChatBox = ({ user, targetUser }: ChatProps) => {
                 id: user.username,
                 name: user.display_name,
             },
-            user.getstream_token,
+            user.getstream_token
         );
 
-        const channel = client.channel('messaging', {
-            image: 'https://www.drupal.org/files/project-images/react.png',
+        const channel = client.channel("messaging", {
+            image: "https://www.drupal.org/files/project-images/react.png",
             name: currentChannel,
             members: [user.username, targetUser.username],
         });
 
         return (
-            <Chat client={client} theme='str-chat__theme-dark'>
+            <Chat client={client} theme="str-chat__theme-dark">
                 <Channel channel={channel}>
                     <Window>
+                        <div className="pl-2 pr-8 py-2 border-b border-b-white">
+                            <ChannelHeader />
+                        </div>
                         <MessageList />
-                        <MessageInput />
+                        <div className="border-t border-t-white">
+                            <MessageInput />
+                        </div>
                     </Window>
                     <Thread />
                 </Channel>
@@ -51,8 +64,5 @@ export const ChatBox = ({ user, targetUser }: ChatProps) => {
         );
     }
 
-    return (
-        <p>REACT_APP_GETSTREAM_API_KEY not found</p>
-    );
+    return <p>REACT_APP_GETSTREAM_API_KEY not found</p>;
 };
-

@@ -12,8 +12,7 @@ import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
 import { fetchUser, fetchUserOrEmail, getCurrentUser, redirect } from "../../utils";
 import { ChatBox } from "../../components";
-import Modal from 'react-bootstrap/Modal';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import ChatPopup from "../../components/chat-popup";
 
 export type BriefProps = {
     brief: Brief;
@@ -48,16 +47,16 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
         }
     }
 
-    const renderChat = (
-        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
-            <Modal.Body>
-                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
-            </Modal.Footer>
-        </Modal>
-    );
+    // const renderChat = (
+    //     <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
+    //         <Modal.Body>
+    //             {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+    //         </Modal.Body>
+    //         <Modal.Footer>
+    //             <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
+    //         </Modal.Footer>
+    //     </Modal>
+    // );
 
     const BioPanel = (
         <div className="brief-bio">
@@ -209,7 +208,7 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
                         <button onClick={() => handleMessageBoxClick()}  className="primary-btn in-dark w-button">Message</button>
                     </div>
                 </div>
-                { browsingUser && showMessageBox && renderChat}
+                { browsingUser && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox, targetUser, browsingUser}}/>}
                 </>
             }
         </div>

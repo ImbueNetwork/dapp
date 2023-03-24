@@ -5,11 +5,10 @@ import { FaPaperclip, FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { Brief, Project, User } from "../../models";
 import { getBrief, getBriefApplications } from "../../services/briefsService";
 import { BriefInsights, ChatBox } from "../../components";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import "../../../../public/brief-applications.css";
 import { fetchUser, getCurrentUser, redirect } from "../../utils";
-import Modal from 'react-bootstrap/Modal';
+import ChatPopup from "../../components/chat-popup";
 
 interface BriefApplicationsProps {
     brief: Brief;
@@ -19,17 +18,6 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
     const [briefApplications, setBriefApplications] = useState<any[]>();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
-
-    const renderChat = (
-        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
-            <Modal.Body>
-                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
-            </Modal.Footer>
-        </Modal>
-    );
 
     const handleMessageBoxClick = async (user_id) => {
         if (browsingUser) {
@@ -55,8 +43,7 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
 
     return (
         <div className="page-wrapper">
-            {browsingUser && showMessageBox && renderChat}
-
+            {browsingUser && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,targetUser, browsingUser}}/>}
             <div className="section">
                 <h3 className="section-title">Review proposals</h3>
                 <BriefInsights brief={brief} />

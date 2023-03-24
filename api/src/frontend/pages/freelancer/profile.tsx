@@ -87,17 +87,6 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
         setIsEditMode(!isEditMode)
     }
 
-    // const renderChat = (
-    //     <Slide direction="up" in={showMessageBox} mountOnEnter unmountOnExit>
-    //         <Box sx={chatPopupStyle}>
-    //             <div className="relative">
-    //                 <div className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold" onClick={() => setShowMessageBox(false)}>X</div>
-    //                 {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-    //             </div>
-    //         </Box>
-    //     </Slide>
-    // )
-
     return (
         <div className="profile-container">
             <div className="banner">

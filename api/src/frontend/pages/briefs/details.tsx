@@ -3,10 +3,8 @@ import ReactDOMClient from "react-dom/client";
 import { Brief, User } from "../../models";
 import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
-// import "../../../../public/freelancer-profile.css";
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-
 import { IoMdWallet } from "react-icons/io";
 import { FaHandshake } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi";
@@ -46,17 +44,6 @@ export const BriefDetails =  ({ brief: brief }: BriefProps): JSX.Element => {
             redirect("login", `/dapp/briefs/${brief.id}/`)
         }
     }
-
-    // const renderChat = (
-    //     <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
-    //         <Modal.Body>
-    //             {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-    //         </Modal.Body>
-    //         <Modal.Footer>
-    //             <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
-    //         </Modal.Footer>
-    //     </Modal>
-    // );
 
     const BioPanel = (
         <div className="brief-bio">

@@ -9,6 +9,8 @@ import { BriefInsights, ChatBox } from "../../components";
 import "../../../../public/brief-applications.css";
 import { fetchUser, getCurrentUser, redirect } from "../../utils";
 import ChatPopup from "../../components/chat-popup";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { border } from "@mui/system";
 
 interface BriefApplicationsProps {
     brief: Brief;
@@ -18,6 +20,7 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
     const [briefApplications, setBriefApplications] = useState<any[]>();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
+    const [sortValue, setSortValue] = useState<string>('match');
 
     const handleMessageBoxClick = async (user_id) => {
         if (browsingUser) {
@@ -43,13 +46,32 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
 
     return (
         <div className="page-wrapper">
-            {browsingUser && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,targetUser, browsingUser}}/>}
+            {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
             <div className="section">
                 <h3 className="section-title">Review proposals</h3>
                 <BriefInsights brief={brief} />
             </div>
             <div className="section">
-                <h3 className="section-title">All applicants</h3>
+                <div className="w-full flex items-center justify-between mb-4">
+                    <h3 className="section-title">All applicants</h3>
+                    <FormControl sx={{ m: 1, minWidth: 120, bgcolor: "#2c2c2c" }}>
+                        <InputLabel sx={{ color: '#fff' }} id="demo-simple-select-helper-label">Sort</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-helper-label"
+                            id="demo-simple-select-helper"
+                            value={sortValue}
+                            label="Sort"
+                            onChange={(e) => setSortValue(e.target.value)}
+                            sx={{
+                                color: "#fff",
+                                bgcolor: "#2c2c2c",
+                            }}>
+                            <MenuItem value="match">Best Match</MenuItem>
+                            <MenuItem value='ratings'>Ratings</MenuItem>
+                            <MenuItem value='budget'>Budget</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
                 <div className="applicants-list">
                     {briefApplications?.map((application, index) => (
                         <div className="applicant-wrapper" key={index}>

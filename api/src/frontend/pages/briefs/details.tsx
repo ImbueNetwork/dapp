@@ -5,11 +5,8 @@ import "../../../../public/brief-details.css";
 import { getBrief } from "../../services/briefsService";
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import { IoMdWallet } from "react-icons/io";
-import { FaHandshake, FaRegShareSquare } from "react-icons/fa";
-import { HiUserGroup } from "react-icons/hi";
+import { FaRegShareSquare } from "react-icons/fa";
 import { fetchUser, fetchUserOrEmail, getCurrentUser, redirect } from "../../utils";
-import { ChatBox } from "../../components";
 import ChatPopup from "../../components/chat-popup";
 import VerifiedIcon from '@mui/icons-material/Verified';
 import StarIcon from '@mui/icons-material/Star';
@@ -267,7 +264,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     ))
                 }
             </div>
-            {showClientHistory && <span className="primary-text font-bold absolute bottom-2 right-4">View more (1)</span>}
+            {showClientHistory && <span className="primary-text font-bold absolute bottom-2 right-4 cursor-pointer">View more (1)</span>}
         </div>
     );
 
@@ -302,7 +299,7 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     ))
                 }
             </div>
-            {showSimilarBrief && <span className="primary-text font-bold absolute bottom-2 right-4">View more (1)</span>}
+            {showSimilarBrief && <span className="primary-text font-bold absolute bottom-2 right-4 cursor-pointer">View more (1)</span>}
         </div>
     );
 

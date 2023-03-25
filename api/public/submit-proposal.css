@@ -44,11 +44,13 @@
 
 .brief-title {
     display: flex;
-    flex-direction: row;
-    gap: 36px;
+    align-items: center;
+    gap: 20px;
 }
 
 .clickable-text {
+    font-size: 16px;
+    font-weight: 700;
     color: var(--theme-primary);
     cursor: pointer;
 }

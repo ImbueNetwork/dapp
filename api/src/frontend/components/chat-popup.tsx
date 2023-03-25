@@ -25,7 +25,7 @@ const ChatPopup = (props:ChatPopupProps) => {
     };
 
     return (
-        <Slide direction="up" in={showMessageBox} mountOnEnter unmountOnExit>
+        <Slide direction="up" className="z-10" in={showMessageBox} mountOnEnter unmountOnExit>
             <Box sx={chatPopupStyle}>
                 <div className="relative">
                     <div className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold" onClick={() => setShowMessageBox(false)}>x</div>

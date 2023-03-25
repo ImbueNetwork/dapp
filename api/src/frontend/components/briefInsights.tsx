@@ -24,15 +24,15 @@ export const BriefInsights = ({ brief }: BriefInsightsProps) => {
         <div className="brief-container brief-info">
             <div className="description">
                 <div className="brief-title">
-                    <h3>{brief.headline }</h3>
-                    <h3 className="clickable-text" onClick={viewFullBrief}>
+                    <h3>{brief.headline}</h3>
+                    <span className="clickable-text" onClick={viewFullBrief}>
                         View full brief
-                    </h3>
+                    </span>
                 </div>
                 <div className="text-inactive">
                     <p>{brief.description}</p>
                 </div>
-                <div className="text-inactive">Posted {timePosted} </div>
+                <p className="text-inactive">Posted {timePosted} </p>
             </div>
             <div className="insights">
                 <div className="insight-item">

@@ -6,12 +6,14 @@
     gap: 3rem;
 }
 
-h3 {
+.page-wrapper h3 {
     font-size: 20px;
     line-height: 1.5;
     font-weight: 700;
-    margin: 0;
-    padding: 0;
+}
+
+.page-wrapper p {
+    line-height: 1.5;
 }
 
 .section .section-title {
@@ -20,24 +22,21 @@ h3 {
 }
 
 .applicants-list {
+    background: var(--theme-grey-dark);
+    border: 1px solid var(--theme-imbue-white);
+    border-radius: 20px;
 }
 
 .applicant-wrapper {
     display: flex;
     flex-direction: row;
     padding: 60px 120px 100px 60px;
-    background: var(--theme-grey-dark);
-    border: 1px solid var(--theme-imbue-white);
-    border-bottom: none;
     gap: 50px;
-}
-.applicant-wrapper:first-child {
-    border-radius: 20px 20px 0 0;
+    border-bottom: 1px solid var(--theme-imbue-white);
 }
 
 .applicant-wrapper:last-child {
-    border-bottom: 1px solid var(--theme-imbue-white);
-    border-radius: 0 0 20px 20px;
+    border-bottom: none;
 }
 
 .freelancer-profile-pic {
@@ -80,8 +79,7 @@ h3 {
     gap: 8px;
 }
 
-.country .country-flag {
-}
+.country .country-flag {}
 
 .country .country-name {
     font-size: 16px;
@@ -128,4 +126,21 @@ h3 {
 
 .ctas-container button {
     margin: 0;
+}
+
+.css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {
+    background-color: var(--theme-grey-dark) !important;
+    color: white !important;
+}
+
+.css-1d3z3hw-MuiOutlinedInput-notchedOutline{
+    border-color: white !important;
+}
+
+.css-1mkefvk-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root.Mui-focused .MuiOutlinedInput-notchedOutline{
+    border-color: #1976d2 !important;
+}
+
+.css-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
+    color: white !important;
 }

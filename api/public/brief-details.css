@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: Aeoniktrial, sans-serif;
-}
-
 h1 {
     font-size: 52px;
     line-height: 1.1;

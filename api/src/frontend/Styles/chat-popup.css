@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+p {
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--theme-ink-color);
+    margin: 0;
+}

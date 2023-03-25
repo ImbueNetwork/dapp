@@ -54,12 +54,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         const { title } = props;
         const { channel, members,watcher_count } = useChannelStateContext();
         const { name, image } = channel?.data || {};
-        // const { client:contextClient, channel, setActiveChannel } = useChatContext();
-        console.log(watcher_count);
-        // console.log(props);
 
         return (
-            <div className="py-5 border border-b-white">
+            <div className="py-3 border border-b-white">
                 <div className="w-full flex gap-4 items-center ml-3">
                     {image && (
                         <div className="relative">

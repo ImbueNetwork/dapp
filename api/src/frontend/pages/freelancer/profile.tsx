@@ -149,7 +149,7 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                             }
 
                             <button className="share" >
-                                <FaRegShareSquare color="white" /> {"  "}
+                                <FaRegShareSquare color="white" />
                                 Share Profile
                             </button>
                         </div>

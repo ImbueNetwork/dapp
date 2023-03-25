@@ -1,3 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    font-family: Aeoniktrial, sans-serif;
+}
+
 h1 {
     font-size: 52px;
     line-height: 1.1;
@@ -6,8 +14,18 @@ h1 {
     padding: 16px 0px;
 }
 
-p {
+.brief-details-container h2{
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.brief-details-container h3{
     font-size: 20px;
+    font-weight: 700;
+}
+
+.brief-details-container p {
+    font-size: 16px;
     line-height: 1.2;
 }
 
@@ -76,6 +94,18 @@ p {
     padding-bottom: 2%;
     height: 100%;
     flex-grow: 1;
+}
+
+.primary-btn-outlined{
+    border: 1px solid var(--theme-primary);
+    border-radius: 46px;
+    background: transparent;
+    color: var(--theme-primary);
+}
+
+.primary-btn-outlined:hover{
+    color: black;
+    background-color: var(--theme-primary);
 }
 
 .button-left {
@@ -170,9 +200,6 @@ p {
     border-radius: 23px;
 }
 
-.freelance-xp-container {
-}
-
 .freelance-xp-options {
     display: flex;
     flex-direction: column;
@@ -202,7 +229,7 @@ p {
 
 .brief-bio {
     flex: 1 0 30%;
-    width: 35%;
+    width: 50%;
     background-color: var(--theme-grey-dark);
     border: 1px solid var(--theme-ink-color);
     border-radius: 20px;
@@ -210,14 +237,10 @@ p {
 }
 
 .brief-insights {
-    width: 28%;
+    width: 35%;
     background-color: var(--theme-grey-dark);
     border: 1px solid var(--theme-ink-color);
     border-radius: 20px;
-}
-
-.brief-insights > .subsection {
-    height: 18%;
 }
 
 .brief-insights-stat {
@@ -229,24 +252,24 @@ p {
     padding-top: 20px;
 }
 
-.brief-insights-stat > h3 > span {
+.primary-text {
     color: var(--theme-primary);
 }
 
 .subsection {
-    margin-left: 20px;
-    margin-bottom: 25px;
-}
-.subsection > ul > li {
-    list-style: disc;
+    margin: 25px 0;
 }
 
 .subsection > .divider {
     width: 75%;
 }
 
-.similar-briefs {
-    padding-top: 40px;
+.transparent-conatainer{
+    margin-top: 70px;
+    padding: 35px 54px;
+    background: transparent;
+    border: 1px solid white;
+    border-radius: 20px;
 }
 
 .similar-brief {
@@ -259,7 +282,7 @@ p {
 .similar-brief-details {
     display: flex;
     justify-content: space-between;
-    width: 55%;
+    width: 70%;
 }
 
 .similar-brief > button {
@@ -267,19 +290,9 @@ p {
     padding: 6px 12px;
 }
 
-.similar-brief > .title {
-    font-weight: bold;
-}
-
 .brief-insight-icon {
     margin-right: 10px;
     font-size: 23px;
-}
-
-.meet-hiring-team {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
 }
 
 .section {
@@ -291,17 +304,12 @@ p {
     padding-bottom: 30px;
 }
 
-.skill {
-    padding: 12px 24px;
-    border: 1px solid white;
-    border-radius: 8px;
-}
-
-.skills {
+.list-row {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    margin-top: 24px;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 
 .meet-hiring-team > button {
@@ -309,10 +317,14 @@ p {
     font-size: 14px;
 }
 
-.h3, h3 {
-    font-size: 1.17em !important;
-}
-
 .meet-hiring-team > h3 {
     margin-top: 10px
+}
+
+.primary-icon{
+    fill: var(--theme-primary) !important;
+}
+
+.secondary-icon{
+    fill: var(--theme-secondary) !important;
 }

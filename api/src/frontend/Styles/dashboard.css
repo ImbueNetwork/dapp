@@ -65,7 +65,7 @@
 }
 
 .str-chat__channel-list .str-chat__channel-list-messenger .str-chat__channel-list-messenger__main {
-    height: 70vh;
+    height: 65vh;
 }
 
 .str-chat ::-webkit-scrollbar {
@@ -99,6 +99,29 @@
     background-color: var(--theme-primary);
     color: black !important;
 }
+
+.MuiBox-root svg, .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active{
+    color: white !important;
+}
+
+/* .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active, .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active .MuiTableSortLabel-icon{
+    color: var(--theme-primary) !important;
+} */
+
+.Accepted-text{
+    color: var(--theme-primary) !important;
+}
+
+.Pending-text{
+    color: yellow !important;
+}
+
+.Rejected-text, .Expired-Text{
+    color: red !important;
+}
+
+
+
 
 @media only screen and (min-width: 80px) and (max-width: 480px) {
 

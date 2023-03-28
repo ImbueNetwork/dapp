@@ -54,6 +54,7 @@
 .freelancer-info {
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .text-primary {
@@ -95,7 +96,9 @@
 .freelancer-title {
     font-weight: 700;
     color: var(--theme-imbue-white);
-    flex-grow: 1;
+    width: fit-content;
+    max-width: 320px;
+    margin-right: 20px;
 }
 
 .freelancer-earn {

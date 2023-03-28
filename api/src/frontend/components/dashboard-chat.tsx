@@ -23,7 +23,6 @@ import "../Styles/dashboard.css";
 
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, TextField } from "@mui/material";
-import EnhancedTable from "./dashboard-activities";
 
 export type DashboardProps = {
     user: User;
@@ -95,11 +94,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                <>
                 <div className="pt-3 mb-8">
                     <h2 className="ml-4 mb-3 font-bold text-xl">Open Briefs</h2>
-                    <EnhancedTable data={briefs} titles={["name", "created", "budget", "applications"]}/>
                 </div>
                 <div className="pt-3">
                     <h2 className="ml-4 mb-3 font-bold text-xl">Ongoing Projects</h2>
-                    <EnhancedTable data={briefs} titles={["name", "created", "budget", "applications"]}/>
                 </div>
                </>
             }
@@ -110,11 +107,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                 selectedOption === 3 && <>
                 <div className="pt-3 mb-8">
                     <h2 className="ml-4 mb-3 font-bold text-xl">Working Projects</h2>
-                    <EnhancedTable data={briefs} titles={["name", "created", "budget", "milestones"]}/>
                 </div>
                 <div className="pt-3">
                     <h2 className="ml-4 mb-3 font-bold text-xl">Applied Projects</h2>
-                    <EnhancedTable data={briefs} titles={["name", "created", "budget", "condition"]}/>
                 </div>
                </>
             }

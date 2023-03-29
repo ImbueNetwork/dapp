@@ -12,7 +12,6 @@ import {
 import { FiEdit } from "react-icons/fi";
 import { IoPeople } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import "../../../../public/freelancer-profile.css";
 import { timeStamp } from "console";
 import { Freelancer, User } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
@@ -105,11 +104,12 @@ export const Profile = ({ initFreelancer: initFreelancer }: ProfileProps): JSX.E
                         />
                     </div>
                     <div className="profile-summary">
-                        <h5>{freelancer.display_name}</h5>
-                        {/* <div className="location">
+                        <h3 className="text-2xl font-bold">{freelancer.display_name}</h3>
+                        <div className="location">
                             <ReactCountryFlag countryCode="US" />
                             <p>Los Angeles, United State</p>
-                        </div> */}
+                        </div>
+                        {/* TODO: Implement reviews */}
                         {/* <div className="rating">
                             <p>
                                 <FaStar color="var(--theme-yellow)" />

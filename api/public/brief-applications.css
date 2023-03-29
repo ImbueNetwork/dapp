@@ -30,7 +30,7 @@
 .applicant-wrapper {
     display: flex;
     flex-direction: row;
-    padding: 60px 120px 100px 60px;
+    padding: 35px 60px;
     gap: 50px;
     border-bottom: 1px solid var(--theme-imbue-white);
 }
@@ -129,6 +129,14 @@
 
 .ctas-container button {
     margin: 0;
+}
+
+.Accepted-button{
+    background-color: var(--theme-primary);
+}
+
+.Rejected-button{
+    background-color: var(--theme-error);
 }
 
 .css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {

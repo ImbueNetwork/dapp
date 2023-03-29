@@ -18,11 +18,12 @@ import {
     useChatContext,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
-import { getStreamChat } from "../utils";
+import { getStreamChat, redirect } from "../utils";
 import "../Styles/dashboard.css";
 
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, TextField } from "@mui/material";
+import { ApplicationContainer } from "../pages/briefs/applications";
 
 export type DashboardProps = {
     user: User;
@@ -34,15 +35,79 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const [selectedOption, setSelectedOption] = useState<number>(1)
     const [unreadMessages, setUnreadMsg] = useState<number>(0)
 
-    // TODO: get client's all brief 
-    const briefs = [
-        {id:1, name: "C++ Network Experts for banking app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 300, created: "20th Frebruary, 2022", applications: 30, completedMilestones:3, totalMilestones:4, condition:"Accepted"},
-        {id:2, name: "Crypto app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 400, created: "22th Frebruary, 2022", applications: 20, completedMilestones:1, totalMilestones:4, condition:"Pending"},
-        {id:3, name: "Finance banking app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 500, created: "10th March, 2022", applications: 3, completedMilestones:3, totalMilestones:4, condition:"Rejected"},
-        {id:4, name: "Defi app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 3200, created: "2nd Frebruary, 2022", applications: 13, completedMilestones:4, totalMilestones:4, condition:"Accepted"},
-        {id:5, name: "Blockchain app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 1300, created: "10th Janusary, 2022", applications: 50, completedMilestones:3, totalMilestones:4, condition:"Accepted"},
-        {id:6, name: "ChatGPT app",description: "How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can't hold' your products online? Help your reader imagine what it would be like to own your NFT. U", budget: 500, created: "25th May, 2022", applications: 3, completedMilestones:4, totalMilestones:4, condition:"Expired"},
+    // TODO: get client's all brief
+
+    const appliedBriefs = [
+        {
+            id: 1,
+            name: "Product Development Engineer",
+            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
+            postDate: "Feb 21, 2023",
+            condition: "Accepted"
+        },
+        {
+            id: 1,
+            name: "Product Development Engineer",
+            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
+            postDate: "Feb 21, 2023",
+            condition: "Rejected"
+        },
+        {
+            id: 1,
+            name: "Product Development Engineer",
+            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
+            postDate: "Feb 21, 2023",
+            condition: "Rejected"
+        },
+        {
+            id: 1,
+            name: "Product Development Engineer",
+            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
+            postDate: "Feb 21, 2023",
+            condition: "Accepted"
+        },
     ]
+
+    const applications = [
+        {
+            id: 1,
+            user_id: 1014,
+            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
+            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            required_funds: 23000,
+        },
+        {
+            id: 1,
+            user_id: 1014,
+            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
+            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            required_funds: 23000,
+        },
+        {
+            id: 1,
+            user_id: 1014,
+            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
+            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            required_funds: 23000,
+        },
+        {
+            id: 1,
+            user_id: 1014,
+            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
+            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            required_funds: 23000,
+        },
+    ]
+
+    const handleMessageBoxClick = async (user_id) => {
+        // TODO: Implement chat popup 
+    }
+
+    const redirectToApplication = (applicationId) => {
+        // TODO: need brief id
+        const briefId = 1
+        redirect(`briefs/${briefId}/applications/${applicationId}/`);
+    };
 
     useEffect(() => {
         async function setup() {
@@ -51,7 +116,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         setup();
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         if (client) {
             client.connectUser(
                 {
@@ -60,15 +125,15 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                 },
                 user.getstream_token
             );
-    
+
             client.on((event) => {
                 if (event.total_unread_count !== undefined) {
                     setUnreadMsg(event.total_unread_count);
                 }
-           });
-           
+            });
+
         }
-    },[client])    
+    }, [client])
 
     return client ? (
         <div className="-mt-8">
@@ -80,38 +145,41 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                 }}
                 sx={{
                     bgcolor: "#2c2c2c",
-                    borderRadius:"10px",
+                    borderRadius: "10px",
                     border: "1px solid white",
                     marginBottom: '36px',
-                    overflow:"hidden"
+                    overflow: "hidden"
                 }}>
                 <BottomNavigationAction label="Client View" value={1} />
-                <BottomNavigationAction label={`Messages ${unreadMessages>0 ? `(${unreadMessages})` : ""}`} value={2} />
+                <BottomNavigationAction label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ""}`} value={2} />
                 <BottomNavigationAction label="Freelancer View" value={3} />
             </BottomNavigation>
             {
-                selectedOption === 1 && 
-               <>
-                <div className="pt-3 mb-8">
-                    <h2 className="ml-4 mb-3 font-bold text-xl">Open Briefs</h2>
-                </div>
-                <div className="pt-3">
-                    <h2 className="ml-4 mb-3 font-bold text-xl">Ongoing Projects</h2>
-                </div>
-               </>
+                selectedOption === 1 &&
+                <>
+                    <div className="bg-[#2c2c2c] rounded-xl border border-white">
+                        {
+                            applications.map((application, index) => (
+                                <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication, view: "client" }} />
+                            ))
+                        }
+                    </div>
+                </>
             }
             {
-                selectedOption === 2 && <ChatBox client={client} filters={filters}/>
+                selectedOption === 2 && <ChatBox client={client} filters={filters} />
             }
             {
-                selectedOption === 3 && <>
-                <div className="pt-3 mb-8">
-                    <h2 className="ml-4 mb-3 font-bold text-xl">Working Projects</h2>
-                </div>
-                <div className="pt-3">
-                    <h2 className="ml-4 mb-3 font-bold text-xl">Applied Projects</h2>
-                </div>
-               </>
+                selectedOption === 3 &&
+                <>
+                    <div className="bg-[#2c2c2c] rounded-xl border border-white">
+                        {
+                            appliedBriefs.map((brief, index) => (
+                                <BriefState brief={brief}/>
+                            ))
+                        }
+                    </div>
+                </>
             }
         </div>
     ) : (
@@ -119,7 +187,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     );
 };
 
-function ChatBox ({client, filters}:{client:StreamChat, filters:object}) {
+function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
     return (
         <div className="custom-chat-container w-full rounded-2xl border border-white overflow-hidden">
             <Chat client={client} theme="str-chat__theme-dark">
@@ -144,7 +212,25 @@ function ChatBox ({client, filters}:{client:StreamChat, filters:object}) {
     )
 }
 
-function CustomChannelHeader (props: ChannelHeaderProps) {
+function BriefState({ brief }) {
+    return (
+        <div className="flex h-64 gap-8 px-9 py-12 border-b last:border-b-0 border-b-white">
+            <div className="w-4/5">
+                <h3 className="text-xl font-bold mb-3">{brief?.name}</h3>
+                <span>
+                    {brief?.description}
+                </span>
+            </div>
+            <div className="flex flex-col justify-between items-center ml-auto">
+                <span>{brief?.postDate}</span>
+                <div className={`px-4 py-2 text-black ${brief?.condition}-button w-fit rounded-full`}>{brief?.condition}</div>
+            </div>
+
+        </div>
+    )
+}
+
+function CustomChannelHeader(props: ChannelHeaderProps) {
     const { title } = props;
     const { channel, members, watcher_count } = useChannelStateContext();
     const { name, image } = channel?.data || {};

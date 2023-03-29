@@ -17,7 +17,7 @@ interface BriefApplicationsProps {
     browsingUser: User;
 }
 
-const ApplicationContainer = ({ application, redirectToApplication, handleMessageBoxClick }) => {
+export const ApplicationContainer = ({ application, redirectToApplication, handleMessageBoxClick }) => {
     return (
         <div className="applicant-wrapper" >
             <img
@@ -88,7 +88,7 @@ const ApplicationContainer = ({ application, redirectToApplication, handleMessag
                 <div className="flex-row justify-between">
                     <div className="attachment">
                         <h3>Attachment(s)</h3>
-                        <div className="flex p-3">
+                        <div className="flex p-3 gap-2">
                             {/* TODO: Implement */}
                             <FaPaperclip />
                             <div className="text-grey text-small">
@@ -97,11 +97,27 @@ const ApplicationContainer = ({ application, redirectToApplication, handleMessag
                         </div>
                     </div>
                     <div>
-                        <div className="text-primary">
-                            Milestones({application.milestones.length})
+                        <div className="flex gap-5">
+                            <div className="text-small text-grey">
+                                ${Number(application.required_funds).toLocaleString()}
+                            </div>
+                            <span className="font-bold">
+                                Milestones
+                                <span className="text-primary ml-2">{application.milestones.filter((m) => m.is_approved).length}/{application.milestones?.length}</span>
+                            </span>
                         </div>
-                        <div className="text-small text-grey">
-                            ${Number(application.required_funds).toLocaleString()}
+                        <div className="w-48 bg-[#1C2608] h-1 relative mt-5">
+                            <div
+                                style={{
+                                    width: `${(application?.milestones?.filter((m) => m.is_approved)?.length / application.milestones?.length) * 100}%`
+                                }}
+                                className="h-full rounded-xl Accepted-button absolute">
+                            </div>
+                            <div className="flex justify-evenly">
+                                {
+                                    application.milestones.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,6 +131,7 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
     const [sortValue, setSortValue] = useState<string>('match');
+    console.log(briefApplications);
 
     const handleMessageBoxClick = async (user_id) => {
         if (browsingUser) {

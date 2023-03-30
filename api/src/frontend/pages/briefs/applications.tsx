@@ -5,12 +5,11 @@ import { FaPaperclip, FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { Brief, Project, User } from "../../models";
 import { getBrief, getBriefApplications } from "../../services/briefsService";
 import { BriefInsights, ChatBox } from "../../components";
-
 import "../../../../public/brief-applications.css";
 import { fetchUser, getCurrentUser, redirect } from "../../utils";
 import ChatPopup from "../../components/chat-popup";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { border } from "@mui/system";
+import { border, StyledEngineProvider } from "@mui/system";
 
 interface BriefApplicationsProps {
     brief: Brief;
@@ -110,7 +109,6 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
     const [sortValue, setSortValue] = useState<string>('match');
-    console.log(briefApplications);
 
     const handleMessageBoxClick = async (user_id) => {
         if (browsingUser) {
@@ -144,23 +142,21 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
             <div className="section">
                 <div className="w-full ml-auto flex items-end justify-between">
                     <h3 className="section-title">All applicants</h3>
-                    <FormControl sx={{ m: 1, minWidth: 120, bgcolor: "#2c2c2c", marginBottom: "24px" }}>
-                        <InputLabel sx={{ color: '#fff' }} id="demo-simple-select-helper-label">Sort</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-helper-label"
-                            id="demo-simple-select-helper"
-                            value={sortValue}
-                            label="Sort"
-                            onChange={(e) => setSortValue(e.target.value)}
-                            sx={{
-                                color: "#fff",
-                                bgcolor: "#2c2c2c",
-                            }}>
-                            <MenuItem value="match">Best Match</MenuItem>
-                            <MenuItem value='ratings'>Ratings</MenuItem>
-                            <MenuItem value='budget'>Budget</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <StyledEngineProvider injectFirst>
+                        <FormControl>
+                            <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-helper-label"
+                                id="demo-simple-select-helper"
+                                value={sortValue}
+                                label="Sort"
+                                onChange={(e) => setSortValue(e.target.value)}>
+                                <MenuItem value="match">Best Match</MenuItem>
+                                <MenuItem value='ratings'>Ratings</MenuItem>
+                                <MenuItem value='budget'>Budget</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </StyledEngineProvider>
                 </div>
                 <div className="applicants-list">
                     {briefApplications?.map((application, index) => (

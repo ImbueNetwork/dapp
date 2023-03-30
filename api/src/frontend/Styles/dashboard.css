@@ -86,34 +86,44 @@
     background: #555;
 }
 
-.css-1bjk3jo-MuiButtonBase-root-MuiBottomNavigationAction-root{
-    max-width: 33.333333% !important;
-    color: white !important;
+/* Navigation bar */
+.MuiBottomNavigation-root{
+    background: var(--theme-grey-dark);
+    border-radius: 10px;
+    border: 1px solid var(--theme-light-white);
+    margin-bottom: 36px;
+    overflow: hidden;
 }
 
-.css-imwso6-MuiBottomNavigationAction-label{
-    font-size: 18px !important;
+.css-1bjk3jo-MuiButtonBase-root-MuiBottomNavigationAction-root{
+    max-width: 33.34%;
+    color: white;
 }
 
 .css-1bjk3jo-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected{
     background-color: var(--theme-primary);
-    color: black !important;
+    color: black;
+}
+
+.MuiBottomNavigationAction-label,
+.MuiBottomNavigationAction-label.Mui-selected{
+    font-size: 18px;
 }
 
 .MuiBox-root svg, .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active{
-    color: white !important;
+    color: white;
 }
 
 .Accepted-text{
-    color: var(--theme-primary) !important;
+    color: var(--theme-primary);
 }
 
 .Pending-text{
-    color: yellow !important;
+    color: yellow;
 }
 
 .Rejected-text, .Expired-Text{
-    color: red !important;
+    color: red;
 }
 
 .list-container{

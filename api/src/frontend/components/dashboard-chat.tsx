@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { User } from "../models";
-
 import { StreamChat } from "stream-chat";
 import {
     Chat,
@@ -20,9 +19,8 @@ import {
 import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat, redirect } from "../utils";
 import "../Styles/dashboard.css";
-
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import { BottomNavigation, BottomNavigationAction, TextField } from "@mui/material";
+import { BottomNavigation, BottomNavigationAction, StyledEngineProvider, TextField } from "@mui/material";
 import { ApplicationContainer } from "../pages/briefs/applications";
 
 export type DashboardProps = {
@@ -73,28 +71,28 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             id: 1,
             user_id: 1014,
             freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
             required_funds: 23000,
         },
         {
             id: 1,
             user_id: 1014,
             freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
             required_funds: 23000,
         },
         {
             id: 1,
             user_id: 1014,
             freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
             required_funds: 23000,
         },
         {
             id: 1,
             user_id: 1014,
             freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{is_approved:true}, {is_approved:true}, {is_approved:true}, {is_approved:false}],
+            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
             required_funds: 23000,
         },
     ]
@@ -137,23 +135,19 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
 
     return client ? (
         <div className="-mt-8">
-            <BottomNavigation
-                showLabels
-                value={selectedOption}
-                onChange={(event, newValue) => {
-                    setSelectedOption(newValue);
-                }}
-                sx={{
-                    bgcolor: "var(--theme-grey-dark)",
-                    borderRadius: "10px",
-                    border: "1px solid var(--theme-light-white)",
-                    marginBottom: '36px',
-                    overflow: "hidden"
-                }}>
-                <BottomNavigationAction label="Client View" value={1} />
-                <BottomNavigationAction label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ""}`} value={2} />
-                <BottomNavigationAction label="Freelancer View" value={3} />
-            </BottomNavigation>
+            <StyledEngineProvider injectFirst>
+                <BottomNavigation
+                    showLabels
+                    value={selectedOption}
+                    onChange={(event, newValue) => {
+                        setSelectedOption(newValue);
+                    }}
+                >
+                    <BottomNavigationAction label="Client View" value={1} />
+                    <BottomNavigationAction label={`Messages ${unreadMessages > 0 ? `(${unreadMessages})` : ""}`} value={2} />
+                    <BottomNavigationAction label="Freelancer View" value={3} />
+                </BottomNavigation>
+            </StyledEngineProvider>
             {
                 selectedOption === 1 &&
                 <>
@@ -175,7 +169,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                     <div className="list-container">
                         {
                             appliedBriefs.map((brief, index) => (
-                                <BriefState brief={brief}/>
+                                <BriefState brief={brief} />
                             ))
                         }
                     </div>

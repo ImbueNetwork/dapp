@@ -58,7 +58,7 @@
 }
 
 .text-primary {
-    color: var(--theme-primary) !important;
+    color: var(--theme-primary);
 }
 
 .text-small {
@@ -139,19 +139,29 @@
     background-color: var(--theme-error);
 }
 
+.MuiFormControl-root{
+    margin-bottom: 24px;
+}
+
+#demo-simple-select-helper-label,
+#demo-simple-select-helper,
+.css-hfutr2-MuiSvgIcon-root-MuiSelect-icon{
+    color: #fff;
+}
+
+.css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root:hover .MuiOutlinedInput-notchedOutline{
+    border: 1px solid white;
+}
+
 .css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {
-    background-color: var(--theme-grey-dark) !important;
-    color: white !important;
+    background-color: var(--theme-grey-dark);
+    color: white;
 }
 
 .css-1d3z3hw-MuiOutlinedInput-notchedOutline{
-    border-color: var(--theme-light-white) !important;
+    border-color: var(--theme-light-white);
 }
 
 .css-1mkefvk-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root.Mui-focused .MuiOutlinedInput-notchedOutline{
-    border-color: #1976d2 !important;
-}
-
-.css-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
-    color: var(--theme-light-white) !important;
+    border-color: #1976d2;
 }

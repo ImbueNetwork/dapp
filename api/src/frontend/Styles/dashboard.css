@@ -32,7 +32,7 @@
 }
 
 .str-chat__channel-search-bar .str-chat__channel-search-input--wrapper {
-    border: 1px solid white;
+    border: 1px solid var(--theme-light-white);
     background-color: rgba(120, 120, 120, 0.3);
     border-radius: 10px;
 }
@@ -61,7 +61,7 @@
 }
 
 .str-chat__message-input {
-    border-top: 1px solid white;
+    border-top: 1px solid var(--theme-light-white);
 }
 
 .str-chat__channel-list .str-chat__channel-list-messenger .str-chat__channel-list-messenger__main {
@@ -104,10 +104,6 @@
     color: white !important;
 }
 
-/* .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active, .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active .MuiTableSortLabel-icon{
-    color: var(--theme-primary) !important;
-} */
-
 .Accepted-text{
     color: var(--theme-primary) !important;
 }
@@ -120,17 +116,8 @@
     color: red !important;
 }
 
-
-
-
-@media only screen and (min-width: 80px) and (max-width: 480px) {
-
-    .custom-chat-container {
-        height: 20vh;
-    }
-
-    .chat-list-container {
-        width: 50vw;
-    }
-
+.list-container{
+    background-color: var(--theme-grey-dark);
+    border: 1px solid var(--theme-light-white);
+    border-radius: 0.75rem;
 }

@@ -3,7 +3,7 @@
     flex-direction: column;
     font-size: 20px;
     line-height: 1.5;
-    gap: 3rem;
+    gap: 20px;
 }
 
 .page-wrapper h3 {
@@ -18,12 +18,12 @@
 
 .section .section-title {
     margin-left: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .applicants-list {
     background: var(--theme-grey-dark);
-    border: 1px solid var(--theme-imbue-white);
+    border: 1px solid var(--theme-light-white);
     border-radius: 20px;
 }
 
@@ -32,7 +32,7 @@
     flex-direction: row;
     padding: 35px 60px;
     gap: 50px;
-    border-bottom: 1px solid var(--theme-imbue-white);
+    border-bottom: 1px solid var(--theme-light-white);
 }
 
 .applicant-wrapper:last-child {
@@ -145,7 +145,7 @@
 }
 
 .css-1d3z3hw-MuiOutlinedInput-notchedOutline{
-    border-color: white !important;
+    border-color: var(--theme-light-white) !important;
 }
 
 .css-1mkefvk-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root.Mui-focused .MuiOutlinedInput-notchedOutline{
@@ -153,5 +153,5 @@
 }
 
 .css-hfutr2-MuiSvgIcon-root-MuiSelect-icon {
-    color: white !important;
+    color: var(--theme-light-white) !important;
 }

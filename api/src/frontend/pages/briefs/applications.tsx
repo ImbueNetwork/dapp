@@ -30,14 +30,14 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                         {/* @{application.freelancer.username} */}
                         @Sam
                     </div>
-                    <div className="country">
+                    {/* <div className="country">
                         <div className="country-flag">
                             <ReactCountryFlag countryCode="us" />
                         </div>
                         <div className="country-name text-grey">
                             United States
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="ctas-container ml-auto">
                         {/* TODO: Like/unlike feature. On hold */}
@@ -64,19 +64,11 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                         {/* {application.freelancer.title} */}
                         WEB3 Developer
                     </div>
-                    {/* TODO: Implement total earned */}
-                    <div className="flex-row freelancer-earn">
-                        <div className="text-grey">
-                            $230000.00+
-                        </div>
-                        <div className="text-primary text-small">
-                            earned
-                        </div>
-                    </div>
                 </div>
                 <div className="cover-letter">
                     <div>
                         <span className="font-bold">Cover Letter - </span>
+                        {/* TODO: Implement cover letters */}
                         {/* {application.freelancer.bio
                                             .split("\n")
                                             .map((line, index) => (
@@ -97,28 +89,15 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                         </div>
                     </div>
                     <div>
-                        <div className="flex gap-5">
+                        <div className="flex gap-2 flex-col items-center">
+                            <span className="font-bold text-primary">
+                                Milestones ({application.milestones?.length})
+                            </span>
                             <div className="text-small text-grey">
                                 ${Number(application.required_funds).toLocaleString()}
                             </div>
-                            <span className="font-bold">
-                                Milestones
-                                <span className="text-primary ml-2">{application.milestones.filter((m) => m.is_approved).length}/{application.milestones?.length}</span>
-                            </span>
                         </div>
-                        <div className="w-48 bg-[#1C2608] h-1 relative mt-5">
-                            <div
-                                style={{
-                                    width: `${(application?.milestones?.filter((m) => m.is_approved)?.length / application.milestones?.length) * 100}%`
-                                }}
-                                className="h-full rounded-xl Accepted-button absolute">
-                            </div>
-                            <div className="flex justify-evenly">
-                                {
-                                    application.milestones.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
-                                }
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -163,9 +142,9 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
                 <BriefInsights brief={brief} />
             </div>
             <div className="section">
-                <div className="w-full flex items-center justify-between mb-4">
+                <div className="w-full ml-auto flex items-end justify-between">
                     <h3 className="section-title">All applicants</h3>
-                    <FormControl sx={{ m: 1, minWidth: 120, bgcolor: "#2c2c2c" }}>
+                    <FormControl sx={{ m: 1, minWidth: 120, bgcolor: "#2c2c2c", marginBottom: "24px" }}>
                         <InputLabel sx={{ color: '#fff' }} id="demo-simple-select-helper-label">Sort</InputLabel>
                         <Select
                             labelId="demo-simple-select-helper-label"

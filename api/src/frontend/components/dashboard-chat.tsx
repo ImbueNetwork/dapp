@@ -144,9 +144,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                     setSelectedOption(newValue);
                 }}
                 sx={{
-                    bgcolor: "#2c2c2c",
+                    bgcolor: "var(--theme-grey-dark)",
                     borderRadius: "10px",
-                    border: "1px solid white",
+                    border: "1px solid var(--theme-light-white)",
                     marginBottom: '36px',
                     overflow: "hidden"
                 }}>
@@ -157,7 +157,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             {
                 selectedOption === 1 &&
                 <>
-                    <div className="bg-[#2c2c2c] rounded-xl border border-white">
+                    <div className="list-container">
                         {
                             applications.map((application, index) => (
                                 <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication, view: "client" }} />
@@ -172,7 +172,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             {
                 selectedOption === 3 &&
                 <>
-                    <div className="bg-[#2c2c2c] rounded-xl border border-white">
+                    <div className="list-container">
                         {
                             appliedBriefs.map((brief, index) => (
                                 <BriefState brief={brief}/>
@@ -189,7 +189,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
 
 function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
     return (
-        <div className="custom-chat-container w-full rounded-2xl border border-white overflow-hidden">
+        <div className="custom-chat-container w-full rounded-2xl border border-white border-opacity-25 overflow-hidden">
             <Chat client={client} theme="str-chat__theme-dark">
                 <div className="flex h-full">
                     <div className="chat-list-container border-r border-r-white">
@@ -214,7 +214,7 @@ function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
 
 function BriefState({ brief }) {
     return (
-        <div className="flex h-64 gap-8 px-9 py-12 border-b last:border-b-0 border-b-white">
+        <div className="flex h-64 gap-8 px-9 py-12 border-b last:border-b-0 border-b-white border-opacity-25">
             <div className="w-4/5">
                 <h3 className="text-xl font-bold mb-3">{brief?.name}</h3>
                 <span>
@@ -236,7 +236,7 @@ function CustomChannelHeader(props: ChannelHeaderProps) {
     const { name, image } = channel?.data || {};
 
     return (
-        <div className="py-3 border border-b-white">
+        <div className="py-3 border-b border-b-white border-opacity-25">
             <div className="w-full flex gap-4 items-center ml-3">
                 {image && (
                     <div className="relative">

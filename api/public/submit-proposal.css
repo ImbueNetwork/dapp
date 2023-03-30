@@ -24,7 +24,7 @@
 
 .brief-container {
     background: var(--theme-grey-dark);
-    border: 1px solid var(--theme-white);
+    border: 1px solid var(--theme-light-white);
     border-radius: 20px;
     padding: 50px;
 }

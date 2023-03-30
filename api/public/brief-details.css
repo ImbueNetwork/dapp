@@ -225,7 +225,7 @@ h1 {
     flex: 1 0 30%;
     width: 50%;
     background-color: var(--theme-grey-dark);
-    border: 1px solid var(--theme-ink-color);
+    border: 1px solid var(--theme-light-white);
     border-radius: 20px;
     margin-right: 40px;
 }
@@ -233,7 +233,7 @@ h1 {
 .brief-insights {
     width: 35%;
     background-color: var(--theme-grey-dark);
-    border: 1px solid var(--theme-ink-color);
+    border: 1px solid var(--theme-light-white);
     border-radius: 20px;
 }
 
@@ -262,7 +262,7 @@ h1 {
     margin-top: 70px;
     padding: 35px 54px;
     background: transparent;
-    border: 1px solid white;
+    border: 1px solid var(--theme-light-white);
     border-radius: 20px;
 }
 

@@ -195,6 +195,7 @@ function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
                     <Channel>
                         <Window>
                             <CustomChannelHeader />
+                            {/* <ChannelHeader/> */}
                             <MessageList />
                             <MessageInput />
                         </Window>
@@ -226,29 +227,30 @@ function BriefState({ brief }) {
 
 function CustomChannelHeader(props: ChannelHeaderProps) {
     const { title } = props;
-    const { channel, members, watcher_count } = useChannelStateContext();
-    const { name, image } = channel?.data || {};
+    const { channel, members = {}, watcher_count, watchers } = useChannelStateContext();
+    const { client, setActiveChannel } = useChatContext();
+    let chatTitle = "Not Found"
+
+    const membersCount = Object.keys(members).length;
+
+    Object.keys(members).forEach(function (key, index) {
+        if (membersCount === 2 && key !== client.userID) chatTitle = key
+    })
 
     return (
         <div className="py-3 border-b border-b-white border-opacity-25">
             <div className="w-full flex gap-4 items-center ml-3">
-                {image && (
-                    <div className="relative">
-                        <img
-                            src="/public/profile-image.png"
-                            className="w-16 h-16 rounded-full object-cover object-top"
-                            alt=""
-                        />
-                        {watcher_count && watcher_count >= 2 && <div className="h-4 w-4 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-black"></div>}
-                    </div>
-                )}
+                <div className="relative">
+                    <img
+                        src="/public/profile-image.png"
+                        className="w-16 h-16 rounded-full object-cover object-top"
+                        alt=""
+                    />
+                    {watcher_count && watcher_count >= 2 && <div className="h-4 w-4 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-black"></div>}
+                </div>
                 <div className="flex flex-col items-start">
                     <span className="header-pound font-bold text-lg">
-                        {/* {title || name || "No Name Found"} */}
-                        Alison Burgers
-                    </span>
-                    <span className="text-sm">
-                        Software Engineer at California
+                        {chatTitle}
                     </span>
                 </div>
             </div>

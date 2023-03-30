@@ -5,31 +5,110 @@ import { FaPaperclip, FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { Brief, Project, User } from "../../models";
 import { getBrief, getBriefApplications } from "../../services/briefsService";
 import { BriefInsights, ChatBox } from "../../components";
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 import "../../../../public/brief-applications.css";
 import { fetchUser, getCurrentUser, redirect } from "../../utils";
-import Modal from 'react-bootstrap/Modal';
+import ChatPopup from "../../components/chat-popup";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { border, StyledEngineProvider } from "@mui/system";
 
 interface BriefApplicationsProps {
     brief: Brief;
     browsingUser: User;
 }
+
+export const ApplicationContainer = ({ application, redirectToApplication, handleMessageBoxClick }) => {
+    return (
+        <div className="applicant-wrapper" >
+            <img
+                src="/public/profile-image.png"
+                className="freelancer-profile-pic"
+            />
+            <div className="application-wrapper">
+                <div className="freelancer-info">
+                    <div className="user-id text-primary">
+                        {/* @{application.freelancer.username} */}
+                        @Sam
+                    </div>
+                    {/* <div className="country">
+                        <div className="country-flag">
+                            <ReactCountryFlag countryCode="us" />
+                        </div>
+                        <div className="country-name text-grey">
+                            United States
+                        </div>
+                    </div> */}
+
+                    <div className="ctas-container ml-auto">
+                        {/* TODO: Like/unlike feature. On hold */}
+                        {/* <div className="cta-votes">
+                                            <div className="cta-vote">
+                                                <FaRegThumbsUp />
+                                                Yes
+                                            </div>
+                                            <div className="cta-vote">
+                                                <FaRegThumbsDown />
+                                                No
+                                            </div>
+                                        </div> */}
+                        <button className="primary-btn in-dark w-button" onClick={() => redirectToApplication(application.id)}>
+                            View proposal
+                        </button>
+                        <button onClick={() => handleMessageBoxClick(application.user_id)} className="secondary-btn in-dark w-button">
+                            Message
+                        </button>
+                    </div>
+                </div>
+                <div className="select-freelancer">
+                    <div className="freelancer-title">
+                        {/* {application.freelancer.title} */}
+                        WEB3 Developer
+                    </div>
+                </div>
+                <div className="cover-letter">
+                    <div>
+                        <span className="font-bold">Cover Letter - </span>
+                        {/* TODO: Implement cover letters */}
+                        {/* {application.freelancer.bio
+                                            .split("\n")
+                                            .map((line, index) => (
+                                                <span key={index}>{line}</span>
+                                            ))} */}
+                        Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!
+                    </div>
+                </div>
+                <div className="flex-row justify-between">
+                    <div className="attachment">
+                        <h3>Attachment(s)</h3>
+                        <div className="flex p-3 gap-2">
+                            {/* TODO: Implement */}
+                            <FaPaperclip />
+                            <div className="text-grey text-small">
+                                https://www.behance.net/abbioty
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex gap-2 flex-col items-center">
+                            <span className="font-bold text-primary">
+                                Milestones ({application.milestones?.length})
+                            </span>
+                            <div className="text-small text-grey">
+                                ${Number(application.required_funds).toLocaleString()}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProps) => {
     const [briefApplications, setBriefApplications] = useState<any[]>();
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const [targetUser, setTargetUser] = useState<User | null>(null);
-
-    const renderChat = (
-        <Modal show={showMessageBox} onHide={() => setShowMessageBox(false)}>
-            <Modal.Body>
-                {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} ></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="primary-button" onClick={() => setShowMessageBox(false)}>Close</button>
-            </Modal.Footer>
-        </Modal>
-    );
+    const [sortValue, setSortValue] = useState<string>('match');
 
     const handleMessageBoxClick = async (user_id) => {
         if (browsingUser) {
@@ -55,100 +134,33 @@ export const BriefApplications = ({ brief, browsingUser }: BriefApplicationsProp
 
     return (
         <div className="page-wrapper">
-            {browsingUser && showMessageBox && renderChat}
-
+            {browsingUser && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser }} />}
             <div className="section">
                 <h3 className="section-title">Review proposals</h3>
                 <BriefInsights brief={brief} />
             </div>
             <div className="section">
-                <h3 className="section-title">All applicants</h3>
+                <div className="w-full ml-auto flex items-end justify-between">
+                    <h3 className="section-title">All applicants</h3>
+                    <StyledEngineProvider injectFirst>
+                        <FormControl>
+                            <InputLabel id="demo-simple-select-helper-label">Sort</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-helper-label"
+                                id="demo-simple-select-helper"
+                                value={sortValue}
+                                label="Sort"
+                                onChange={(e) => setSortValue(e.target.value)}>
+                                <MenuItem value="match">Best Match</MenuItem>
+                                <MenuItem value='ratings'>Ratings</MenuItem>
+                                <MenuItem value='budget'>Budget</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </StyledEngineProvider>
+                </div>
                 <div className="applicants-list">
                     {briefApplications?.map((application, index) => (
-                        <div className="applicant-wrapper" key={index}>
-                            <img
-                                src="/public/profile-image.png"
-                                className="freelancer-profile-pic"
-                            />
-                            <div className="application-wrapper">
-                                <div className="freelancer-info">
-                                    <div className="user-id text-primary">
-                                        @{application.freelancer.username}
-                                    </div>
-                                    {/* <div className="country">
-                                        <div className="country-flag">
-                                            <ReactCountryFlag countryCode="us" />
-                                        </div>
-                                        <div className="country-name text-grey">
-                                            United States
-                                        </div>
-                                    </div> */}
-                                </div>
-                                <div className="select-freelancer">
-                                    <div className="freelancer-title">
-                                        {application.freelancer.title}
-                                    </div>
-                                    {/* TODO: Implement total earned */}
-                                    {/* <div className="flex-row freelancer-earn">
-                                        <div className="text-grey">
-                                            $230000.00+
-                                        </div>
-                                        <div className="text-primary text-small">
-                                            earned
-                                        </div>
-                                    </div> */}
-
-                                    <div className="ctas-container">
-                                        <div className="cta-votes">
-                                            <div className="cta-vote">
-                                                <FaRegThumbsUp />
-                                                Yes
-                                            </div>
-                                            <div className="cta-vote">
-                                                <FaRegThumbsDown />
-                                                No
-                                            </div>
-                                        </div>
-                                        <button className="primary-btn in-dark w-button" onClick={() => redirectToApplication(application.id)}>
-                                            View proposal
-                                        </button>
-                                        <button onClick={() => handleMessageBoxClick(application.user_id)} className="secondary-btn in-dark w-button">
-                                            Message
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="cover-letter">
-                                    <div>
-                                        {application.freelancer.bio
-                                            .split("\n")
-                                            .map((line, index) => (
-                                                <p key={index}>{line}</p>
-                                            ))}
-                                    </div>
-                                </div>
-                                <div className="flex-row justify-between">
-                                    <div className="attachment">
-                                        {/* <h3>Attachment(s)</h3> */}
-                                        <div className="flex-row">
-                                            {/* TODO: Implement */}
-
-                                            {/* <FaPaperclip />
-                                            <div className="text-grey text-small">
-                                                https://www.behance.net/abbioty
-                                            </div> */}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-primary">
-                                            Milestones({application.milestones.length})
-                                        </div>
-                                        <div className="text-small text-grey">
-                                            ${Number(application.required_funds).toLocaleString()}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <ApplicationContainer {...{ application, redirectToApplication, handleMessageBoxClick }} />
                     ))}
                 </div>
                 {/* TODO Display empty if no applications */}

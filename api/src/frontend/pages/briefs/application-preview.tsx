@@ -114,15 +114,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 </div>
             )}
 
-            <HirePopup
-                openPopup={openPopup}
-                setOpenPopup={setOpenPopup}
-                freelancer={freelancer}
-                milestones={milestones}
-                totalCostWithoutFee={totalCostWithoutFee}
-                imbueFee={imbueFee} 
-                totalCost={totalCost}
-            />
+            <HirePopup {...{openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
 
             {
                 (user?.username === freelancer?.username) && (

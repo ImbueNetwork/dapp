@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+p {
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--theme-ink-color);
+    margin: 0;
+}
+
+.MuiBox-root{
+    position: fixed;
+    right: 150px;
+    bottom: 0;
+    width: 400px;
+    height: 480px;
+    background-color: #2c2c2c;
+}

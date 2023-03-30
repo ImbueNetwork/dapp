@@ -3,41 +3,40 @@
     flex-direction: column;
     font-size: 20px;
     line-height: 1.5;
-    gap: 3rem;
+    gap: 20px;
 }
 
-h3 {
+.page-wrapper h3 {
     font-size: 20px;
     line-height: 1.5;
     font-weight: 700;
-    margin: 0;
-    padding: 0;
+}
+
+.page-wrapper p {
+    line-height: 1.5;
 }
 
 .section .section-title {
     margin-left: 2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .applicants-list {
+    background: var(--theme-grey-dark);
+    border: 1px solid var(--theme-light-white);
+    border-radius: 20px;
 }
 
 .applicant-wrapper {
     display: flex;
     flex-direction: row;
-    padding: 60px 120px 100px 60px;
-    background: var(--theme-grey-dark);
-    border: 1px solid var(--theme-imbue-white);
-    border-bottom: none;
+    padding: 35px 60px;
     gap: 50px;
-}
-.applicant-wrapper:first-child {
-    border-radius: 20px 20px 0 0;
+    border-bottom: 1px solid var(--theme-light-white);
 }
 
 .applicant-wrapper:last-child {
-    border-bottom: 1px solid var(--theme-imbue-white);
-    border-radius: 0 0 20px 20px;
+    border-bottom: none;
 }
 
 .freelancer-profile-pic {
@@ -55,10 +54,11 @@ h3 {
 .freelancer-info {
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .text-primary {
-    color: var(--theme-primary) !important;
+    color: var(--theme-primary);
 }
 
 .text-small {
@@ -80,8 +80,7 @@ h3 {
     gap: 8px;
 }
 
-.country .country-flag {
-}
+.country .country-flag {}
 
 .country .country-name {
     font-size: 16px;
@@ -97,7 +96,9 @@ h3 {
 .freelancer-title {
     font-weight: 700;
     color: var(--theme-imbue-white);
-    flex-grow: 1;
+    width: fit-content;
+    max-width: 320px;
+    margin-right: 20px;
 }
 
 .freelancer-earn {
@@ -128,4 +129,39 @@ h3 {
 
 .ctas-container button {
     margin: 0;
+}
+
+.Accepted-button{
+    background-color: var(--theme-primary);
+}
+
+.Rejected-button{
+    background-color: var(--theme-error);
+}
+
+.MuiFormControl-root{
+    margin-bottom: 24px;
+}
+
+#demo-simple-select-helper-label,
+#demo-simple-select-helper,
+.css-hfutr2-MuiSvgIcon-root-MuiSelect-icon{
+    color: #fff;
+}
+
+.css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root:hover .MuiOutlinedInput-notchedOutline{
+    border: 1px solid white;
+}
+
+.css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {
+    background-color: var(--theme-grey-dark);
+    color: white;
+}
+
+.css-1d3z3hw-MuiOutlinedInput-notchedOutline{
+    border-color: var(--theme-light-white);
+}
+
+.css-1mkefvk-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root.Mui-focused .MuiOutlinedInput-notchedOutline{
+    border-color: #1976d2;
 }

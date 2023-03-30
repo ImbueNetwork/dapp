@@ -73,7 +73,7 @@
 }
 
 .str-chat ::-webkit-scrollbar-track {
-    background: #2C2C2C;
+    background: var(--theme-grey-dark);
     border-radius: 10px;
 }
 

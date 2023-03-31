@@ -289,5 +289,3 @@ function BriefState({ brief }) {
         </div>
     )
 }
-
-

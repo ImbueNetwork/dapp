@@ -156,9 +156,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                             </div>
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
-                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} />
+                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} type="open" />
                                 <h2 className="text-xl font-bold mb-3">Projects</h2>
-                                <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
+                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} type="projects" />
                             </div>
 
                     }
@@ -183,7 +183,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     );
 };
 
-function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Function }) {
+function BriefLists({ briefs = [], setBriefId, type }: { briefs: any[], setBriefId: Function, type: string }) {
     if (briefs?.length === 0) return <h2>Nothing to show</h2>
 
     const getTimeDifference = (date) => {
@@ -200,9 +200,9 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-        maximumFractionDigits: 0, 
+        maximumFractionDigits: 0,
         minimumFractionDigits: 0,
-      });
+    });
 
     return (
         <div className="list-container mb-8">
@@ -216,10 +216,29 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
                             <p>Budget {formatter.format(brief.budget)} - Public</p>
                             <p>Created {getTimeDifference(brief.created)} ago</p>
                         </div>
-                        <div className="flex flex-col items-center gap-3">
-                            <h2 className="text-xl font-bold">Proposals</h2>
-                            <h2 className="text-xl font-bold primary-text">{brief.number_of_applications}</h2>
-                        </div>
+                        {
+                            type === "open" && (
+                                <div className="flex flex-col items-center gap-3">
+                                    <h2 className="text-xl font-bold">Proposals</h2>
+                                    <h2 className="text-xl font-bold primary-text">{brief.number_of_applications}</h2>
+                                </div>)
+                        }
+                        {
+                            type === "projects" && (
+                                <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
+                                    <div
+                                        style={{
+                                            width: `${(brief.milestones?.filter((m) => m.is_approved)?.length / brief.milestones?.length) * 100}%`
+                                        }}
+                                        className="h-full rounded-xl Accepted-button absolute">
+                                    </div>
+                                    <div className="flex justify-evenly">
+                                        {
+                                            brief.milestones?.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
+                                        }
+                                    </div>
+                                </div>)
+                        }
                     </div>
                 ))
             }

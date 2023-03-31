@@ -6,15 +6,10 @@ import {
     Chat,
     Channel,
     ChannelList,
-    ChannelHeader,
     MessageInput,
     MessageList,
     Thread,
     Window,
-    TypingIndicator,
-    ChannelHeaderProps,
-    useChannelStateContext,
-    useChatContext,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
 import { getStreamChat, redirect } from "../utils";
@@ -22,6 +17,9 @@ import "../Styles/dashboard.css";
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, StyledEngineProvider, TextField } from "@mui/material";
 import { ApplicationContainer } from "../pages/briefs/applications";
+import { getBriefApplications, getUserBriefs } from "../services/briefsService";
+import { CustomChannelHeader } from "./chat";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export type DashboardProps = {
     user: User;
@@ -32,6 +30,30 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const filters = { members: { $in: [user.username] } };
     const [selectedOption, setSelectedOption] = useState<number>(1)
     const [unreadMessages, setUnreadMsg] = useState<number>(0)
+    const [briefs, setBriefs] = useState<any>({})
+    const [briefId, setBriefId] = useState<number>()
+    const [applications, setApplications] = useState<any[]>([])
+
+    console.log(briefs);
+
+    useEffect(() => {
+        const setup = async () => {
+            setBriefs(await getUserBriefs(user.id))
+            // const promises: any[] = []
+            // userBriefs?.briefsUnderReview.map((brief, index) => {
+            //     promises.push(getBriefApplications(brief.id))
+            // })
+            // setBriefs(await Promise.all(promises));
+        }
+        setup();
+    }, []);
+
+    useEffect(() => {
+        const getApplications = async (id) => {
+            setApplications(await getBriefApplications(id))
+        }
+        briefId && getApplications(briefId)
+    }, [briefId])
 
     // TODO: get client's all brief
 
@@ -63,37 +85,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
             postDate: "Feb 21, 2023",
             condition: "Accepted"
-        },
-    ]
-
-    const applications = [
-        {
-            id: 1,
-            user_id: 1014,
-            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
-            required_funds: 23000,
-        },
-        {
-            id: 1,
-            user_id: 1014,
-            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
-            required_funds: 23000,
-        },
-        {
-            id: 1,
-            user_id: 1014,
-            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
-            required_funds: 23000,
-        },
-        {
-            id: 1,
-            user_id: 1014,
-            freelancer: { username: "Sam", title: "Web3 Developer", bio: "Hello, I would like to help you! I have 4+ years Experience with web 3, so i’ll make things work properly. Feel free to communicate!" },
-            milestones: [{ is_approved: true }, { is_approved: true }, { is_approved: true }, { is_approved: false }],
-            required_funds: 23000,
         },
     ]
 
@@ -150,36 +141,91 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             </StyledEngineProvider>
             {
                 selectedOption === 1 &&
-                <>
-                    <div className="list-container">
-                        {
-                            applications.map((application, index) => (
-                                <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication, view: "client" }} />
-                            ))
-                        }
-                    </div>
-                </>
+                <div>
+                    {
+                        briefId
+                            ? <div className="list-container relative">
+                                <div className="absolute top-2 left-2 cursor-pointer" onClick={() => setBriefId(undefined)}>
+                                    <ArrowBackIcon />
+                                </div>
+                                {
+                                    applications?.map((application, index) => (
+                                        <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication, view: "client" }} key={index} />
+                                    ))
+                                }
+                            </div>
+                            : <div>
+                                <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
+                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} />
+                                <h2 className="text-xl font-bold mb-3">Projects</h2>
+                                <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
+                            </div>
+
+                    }
+                </div>
             }
             {
                 selectedOption === 2 && <ChatBox client={client} filters={filters} />
             }
             {
                 selectedOption === 3 &&
-                <>
-                    <div className="list-container">
-                        {
-                            appliedBriefs.map((brief, index) => (
-                                <BriefState brief={brief} />
-                            ))
-                        }
-                    </div>
-                </>
+                <div className="list-container">
+                    {
+                        appliedBriefs.map((brief, index) => (
+                            <BriefState brief={brief} key={index} />
+                        ))
+                    }
+                </div>
             }
         </div>
     ) : (
         <p>REACT_APP_GETSTREAM_API_KEY not found</p>
     );
 };
+
+function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Function }) {
+    if (briefs?.length === 0) return <h2>Nothing to show</h2>
+
+    const getTimeDifference = (date) => {
+        const today: any = new Date()
+        const created: any = new Date(date)
+        const difference = Math.abs((today - created) / 1000);
+
+        if (difference < 60) return `${Math.ceil(difference)} seconds`
+        else if (difference < 3600) return `${Math.ceil(difference / 60)} minutes`
+        else if (difference < (3600 * 24)) return `${Math.ceil(difference / (60 * 60))} hours`
+        else return `${Math.ceil(difference / (60 * 60 * 24))} days`
+    }
+
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0, 
+        minimumFractionDigits: 0,
+      });
+
+    return (
+        <div className="list-container mb-8">
+            {
+                briefs?.map((brief, index) => (
+                    <div
+                        onClick={() => setBriefId(brief.id)}
+                        className="list-item-container justify-between">
+                        <div className="flex flex-col gap-3">
+                            <h3 className="text-xl font-bold">{brief.headline}</h3>
+                            <p>Budget {formatter.format(brief.budget)} - Public</p>
+                            <p>Created {getTimeDifference(brief.created)} ago</p>
+                        </div>
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-xl font-bold">Proposals</h2>
+                            <h2 className="text-xl font-bold primary-text">{brief.number_of_applications}</h2>
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    )
+}
 
 function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
     return (
@@ -209,14 +255,14 @@ function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
 
 function BriefState({ brief }) {
     return (
-        <div className="flex h-64 gap-8 px-9 py-12 border-b last:border-b-0 border-b-white border-opacity-25">
+        <div className="list-item-container h-56 gap-8">
             <div className="w-4/5">
                 <h3 className="text-xl font-bold mb-3">{brief?.name}</h3>
                 <span>
                     {brief?.description}
                 </span>
             </div>
-            <div className="flex flex-col justify-between items-center ml-auto">
+            <div className="flex flex-col justify-evenly items-center ml-auto">
                 <span>{brief?.postDate}</span>
                 <div className={`px-4 py-2 text-black ${brief?.condition}-button w-fit rounded-full`}>{brief?.condition}</div>
             </div>
@@ -225,36 +271,4 @@ function BriefState({ brief }) {
     )
 }
 
-function CustomChannelHeader(props: ChannelHeaderProps) {
-    const { title } = props;
-    const { channel, members = {}, watcher_count, watchers } = useChannelStateContext();
-    const { client, setActiveChannel } = useChatContext();
-    let chatTitle = "Not Found"
 
-    const membersCount = Object.keys(members).length;
-
-    Object.keys(members).forEach(function (key, index) {
-        if (membersCount === 2 && key !== client.userID) chatTitle = key
-    })
-
-    return (
-        <div className="py-3 border-b border-b-white border-opacity-25">
-            <div className="w-full flex gap-4 items-center ml-3">
-                <div className="relative">
-                    <img
-                        src="/public/profile-image.png"
-                        className="w-16 h-16 rounded-full object-cover object-top"
-                        alt=""
-                    />
-                    {watcher_count && watcher_count >= 2 && <div className="h-4 w-4 bg-green-500 rounded-full absolute bottom-0 right-0 border-2 border-black"></div>}
-                </div>
-                <div className="flex flex-col items-start">
-                    <span className="header-pound font-bold text-lg">
-                        {chatTitle}
-                    </span>
-                </div>
-            </div>
-            <TypingIndicator />
-        </div>
-    );
-};

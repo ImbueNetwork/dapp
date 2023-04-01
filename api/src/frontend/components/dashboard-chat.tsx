@@ -39,9 +39,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
             setBriefs(await getUserBriefs(user.id))
         }
         setup();
-    }, []);
-
-    useEffect(() => {
         const getApplications = async (id) => {
             setApplications(await getBriefApplications(id))
         }

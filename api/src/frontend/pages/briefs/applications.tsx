@@ -26,7 +26,7 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
             <div className="application-wrapper">
                 <div className="freelancer-info">
                     <div className="user-id text-primary">
-                        @{application.freelancer.username}
+                        @{application?.freelancer?.username}
                     </div>
                     {/* <div className="country">
                         <div className="country-flag">
@@ -49,10 +49,10 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                                                 No
                                             </div>
                                         </div> */}
-                        <button className="primary-btn in-dark w-button" onClick={() => redirectToApplication(application.id)}>
+                        <button className="primary-btn in-dark w-button" onClick={() => redirectToApplication(application?.id)}>
                             View proposal
                         </button>
-                        <button onClick={() => handleMessageBoxClick(application.user_id)} className="secondary-btn in-dark w-button">
+                        <button onClick={() => handleMessageBoxClick(application?.user_id,application?.freelancer)} className="secondary-btn in-dark w-button">
                             Message
                         </button>
                     </div>

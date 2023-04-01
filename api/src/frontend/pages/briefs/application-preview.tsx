@@ -11,6 +11,7 @@ import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 import { HirePopup } from "../../components/hire-popup";
+import ChatPopup from "../../components/chat-popup";
 
 interface MilestoneItem {
     name: string;
@@ -28,6 +29,8 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [freelancer, setFreelancer] = useState<Freelancer>();
     const [openPopup, setOpenPopup] = useState<boolean>(false);
+    const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
+    const [targetUser, setTargetUser] = useState<User | null>(null);
 
     const applicationStatus = ProjectStatus[application.status_id]
  
@@ -94,27 +97,39 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
         setCurrencyId(Number(event.target.value))
     };
 
+    const handleMessageBoxClick = async (user_id, freelancer) => {
+        if (user_id) {
+            setShowMessageBox(true);
+            setTargetUser(await fetchUser(user_id));
+        } else {
+            redirect("login", `/dapp/freelancers/${freelancer?.username}/`)
+        }
+    }
+
     return (
         <div className="application-container">
+            {user && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,browsingUser:user, targetUser}}/>}
 
             {(user?.username !== freelancer?.username) && (
+                <>
                 <div className="flex items-center justify-evenly">
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                     <div className="">
                         <p className="text-xl font-bold">{freelancer?.display_name}</p>
-                        <p className="text-base underline mt-2">View Full Profile</p>
+                        <p className="text-base mt-2 underline cursor-pointer primary-text" onClick={()=>redirect(`freelancers/${freelancer?.username}/`)}>View Full Profile</p>
                     </div>
                     <div>
-                        <p className="text-xl">@{freelancer?.username}</p>
+                        <p className="text-xl primary-text">@{freelancer?.username}</p>
                     </div>
                     <div>
-                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
+                        <button className="primary-btn rounded-full w-button dark-button" onClick={()=>handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
                         <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
                     </div>
                 </div>
+                <HirePopup {...{openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
+                </>
             )}
 
-            <HirePopup {...{openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
 
             {
                 (user?.username === freelancer?.username) && (

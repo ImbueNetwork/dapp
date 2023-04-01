@@ -12,7 +12,7 @@ import {
     Window,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
-import { getStreamChat, redirect } from "../utils";
+import { fetchUser, getStreamChat, redirect } from "../utils";
 import "../Styles/dashboard.css";
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, StyledEngineProvider, TextField } from "@mui/material";
@@ -20,6 +20,7 @@ import { ApplicationContainer } from "../pages/briefs/applications";
 import { getBriefApplications, getUserBriefs } from "../services/briefsService";
 import { CustomChannelHeader } from "./chat";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ChatPopup from "./chat-popup";
 
 export type DashboardProps = {
     user: User;
@@ -33,6 +34,8 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const [briefs, setBriefs] = useState<any>({})
     const [briefId, setBriefId] = useState<number>()
     const [applications, setApplications] = useState<any[]>([])
+    const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
+    const [targetUser, setTargetUser] = useState<User | null>(null);
 
     useEffect(() => {
         const setup = async () => {
@@ -78,8 +81,13 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         },
     ]
 
-    const handleMessageBoxClick = async (user_id) => {
-        // TODO: Implement chat popup 
+    const handleMessageBoxClick = async (user_id, freelancer) => {
+        if (user_id) {
+            setShowMessageBox(true);
+            setTargetUser(await fetchUser(user_id));
+        } else {
+            redirect("login", `/dapp/freelancers/${freelancer?.username}/`)
+        }
     }
 
     const redirectToApplication = (applicationId) => {
@@ -165,6 +173,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                     }
                 </div>
             }
+            {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser:user }} />}
         </div>
     ) : (
         <p>REACT_APP_GETSTREAM_API_KEY not found</p>

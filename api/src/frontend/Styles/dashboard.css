@@ -114,20 +114,40 @@
     color: white;
 }
 
-.Accepted-text{
+.primary-text{
     color: var(--theme-primary);
 }
 
-.Pending-text{
-    color: yellow;
+.Accepted-button{
+    background-color: var(--theme-primary);
 }
 
-.Rejected-text, .Expired-Text{
-    color: red;
+.Pending-button{
+    background-color: var(--theme-yellow);
+}
+
+.Rejected-button, .Expired-button{
+    background-color: var(--theme-error);
 }
 
 .list-container{
     background-color: var(--theme-grey-dark);
     border: 1px solid var(--theme-light-white);
     border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.list-item-container{
+    display: flex;
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid var(--theme-light-white);
+    cursor: pointer;
+}
+
+.list-item-container:last-child{
+    border-bottom: 0;
+}
+
+.list-item-container:hover{
+    background: var(--theme-secondary-dark-hover);
 }

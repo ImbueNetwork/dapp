@@ -26,8 +26,7 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
             <div className="application-wrapper">
                 <div className="freelancer-info">
                     <div className="user-id text-primary">
-                        {/* @{application.freelancer.username} */}
-                        @Sam
+                        @{application.freelancer.username}
                     </div>
                     {/* <div className="country">
                         <div className="country-flag">
@@ -61,8 +60,11 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                 <div className="select-freelancer">
                     <div className="freelancer-title">
                         {/* {application.freelancer.title} */}
-                        WEB3 Developer
+                        Web3 Developer
                     </div>
+                </div>
+                <div className="text-base font-bold">
+                    {application.name}
                 </div>
                 <div className="cover-letter">
                     <div>
@@ -90,7 +92,7 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                     <div>
                         <div className="flex gap-2 flex-col items-center">
                             <span className="font-bold text-primary">
-                                Milestones ({application.milestones?.length})
+                                Milestones ({application?.milestones?.length})
                             </span>
                             <div className="text-small text-grey">
                                 ${Number(application.required_funds).toLocaleString()}

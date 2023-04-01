@@ -34,16 +34,9 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const [briefId, setBriefId] = useState<number>()
     const [applications, setApplications] = useState<any[]>([])
 
-    console.log(briefs);
-
     useEffect(() => {
         const setup = async () => {
             setBriefs(await getUserBriefs(user.id))
-            // const promises: any[] = []
-            // userBriefs?.briefsUnderReview.map((brief, index) => {
-            //     promises.push(getBriefApplications(brief.id))
-            // })
-            // setBriefs(await Promise.all(promises));
         }
         setup();
     }, []);
@@ -93,8 +86,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     }
 
     const redirectToApplication = (applicationId) => {
-        // TODO: need brief id
-        const briefId = 1
         redirect(`briefs/${briefId}/applications/${applicationId}/`);
     };
 
@@ -150,15 +141,15 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
                                 </div>
                                 {
                                     applications?.map((application, index) => (
-                                        <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication, view: "client" }} key={index} />
+                                        <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication}} key={index} />
                                     ))
                                 }
                             </div>
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
-                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} type="open" />
+                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} />
                                 <h2 className="text-xl font-bold mb-3">Projects</h2>
-                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} type="projects" />
+                                <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
                             </div>
 
                     }
@@ -183,7 +174,7 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     );
 };
 
-function BriefLists({ briefs = [], setBriefId, type }: { briefs: any[], setBriefId: Function, type: string }) {
+function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Function }) {
     if (briefs?.length === 0) return <h2>Nothing to show</h2>
 
     const getTimeDifference = (date) => {
@@ -217,15 +208,10 @@ function BriefLists({ briefs = [], setBriefId, type }: { briefs: any[], setBrief
                             <p>Created {getTimeDifference(brief.created)} ago</p>
                         </div>
                         {
-                            type === "open" && (
-                                <div className="flex flex-col items-center gap-3">
-                                    <h2 className="text-xl font-bold">Proposals</h2>
-                                    <h2 className="text-xl font-bold primary-text">{brief.number_of_applications}</h2>
-                                </div>)
-                        }
-                        {
-                            type === "projects" && (
-                                <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
+                            brief.projectid
+                                ? <div className="flex flex-col items-center">
+                                    <h2>Milestones <span className="primary-text">{brief.milestones?.filter((m) => m.is_approved)?.length}/{brief.milestones?.length}</span></h2>
+                                    <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
                                     <div
                                         style={{
                                             width: `${(brief.milestones?.filter((m) => m.is_approved)?.length / brief.milestones?.length) * 100}%`
@@ -237,7 +223,12 @@ function BriefLists({ briefs = [], setBriefId, type }: { briefs: any[], setBrief
                                             brief.milestones?.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
                                         }
                                     </div>
-                                </div>)
+                                </div>
+                                </div>
+                                : <div className="flex flex-col items-center gap-3">
+                                    <h2 className="text-xl font-bold">Proposals</h2>
+                                    <h2 className="text-xl font-bold primary-text">{brief.number_of_applications}</h2>
+                                </div>
                         }
                     </div>
                 ))

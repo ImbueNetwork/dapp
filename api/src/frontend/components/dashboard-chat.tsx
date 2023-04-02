@@ -197,6 +197,7 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
             {
                 briefs?.map((brief, index) => (
                     <div
+                        key={index}
                         onClick={() => setBriefId(brief.id)}
                         className="list-item-container justify-between">
                         <div className="flex flex-col gap-3">

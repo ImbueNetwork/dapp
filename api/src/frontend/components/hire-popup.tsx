@@ -1,13 +1,24 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import "../../../public/application-preview.css";
+import { getWeb3Accounts, initImbueAPIInfo } from '../utils/polkadot';
+import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../models";
+import sha256 from 'crypto-js/sha256';
+import Base64 from 'crypto-js/enc-base64';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { selectAccount } from '../services/polkadotService';
+import ChainService from '../services/chainService';
+import { BasicTxResponse } from '../models';
+import { getCurrentUser } from '../utils';
 
-export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
+export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
     const [popupStage, setstage] = useState<number>(0)
     const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2])
+    const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
 
     const modalStyle = {
         position: 'absolute' as 'absolute',
@@ -23,6 +34,48 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
         boxShadow: 24,
         borderRadius: '20px'
     };
+
+    const fetchAndSetAccounts = async () => {
+        const accounts = await getWeb3Accounts();
+        setAccounts(accounts);
+    };
+
+    const selectedAccount = async (account: InjectedAccountWithMeta) => {
+        const imbueApi = await initImbueAPIInfo();
+        const user: User = await getCurrentUser();
+        const chainService = new ChainService(imbueApi, user);
+
+        const briefOwners: string[] = [user.web3_address];
+        const freelancerAddress: string = freelancer.web3_address;
+        const budget: bigint = BigInt(totalCost * 1e12);
+        const initialContribution: bigint = BigInt(totalCost * 1e12);
+        const briefId=blake2AsHex(JSON.stringify(application));
+        const currencyId = application.currency_id;
+
+        const milestones = application.milestones.map((m, idx) => ({
+            percentageToUnlock: parseInt(m.percentage_to_unlock)
+        }));
+
+        const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefId, currencyId, milestones);
+        while (true) {
+            if (result.status || result.txError) {
+                if (result.status) {
+                    console.log("***** success");
+                } else if (result.txError) {
+                    console.log("***** failed");
+                    console.log(result.errorMessage);
+                }
+                break;
+            }
+            await new Promise(f => setTimeout(f, 1000));
+        }
+
+        setstage(3)
+    }
+
+    useEffect(() => {
+        void fetchAndSetAccounts();
+    }, []);
 
     const FirstContent = () => {
         return (
@@ -102,13 +155,14 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
             <div className="flex flex-col justify-center items-center modal-container">
                 <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
                 {
-                    walletOptions.map((option, index) => (
-                        <div className='w-1/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
-                            <p className='text-center'>Wallet Option {index + 1}</p>
+                    accounts.map((account, index) => (
+                        <div key={index} onClick={()=> selectedAccount(account)} className='w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
+                            <p className='text-center'>{account.address}</p>
                         </div>
                     ))
+
                 }
-                <button onClick={() => setstage(2) } className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Connect Wallet</button>
+                {/* <button onClick={() => setstage(2) } className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Connect Wallet</button> */}
             </div>
         )
     }
@@ -141,7 +195,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
             <Fade in={openPopup}>
                 <Box sx={modalStyle}>
                     {
-                        (!popupStage && openPopup) && <FirstContent />
+                        (!popupStage && openPopup) && <SecondContent />
                     }
                     {
                         popupStage === 1 && <SecondContent />

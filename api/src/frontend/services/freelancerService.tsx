@@ -15,7 +15,6 @@ export async function createFreelancingProfile(freelancer: any) {
         console.log("Freelancer created successfully via Freelancer REST API");
     } else {
         throw new Error('Failed to create freelancer profile. status:' + resp.status);
-
     }
 }
 
@@ -39,6 +38,8 @@ export async function getFreelancerProfile(username: string) {
     })
     if (resp.ok) {
         return await resp.json() as Freelancer
+    }  else {
+        throw new Error('Failed to get freelancer profile. status:' + resp.status);
     }
 }
 

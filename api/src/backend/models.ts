@@ -617,7 +617,7 @@ export const getOrCreateFederatedUser = (
 export const fetchFreelancerDetailsByUserID = (user_id: number | string) =>
     (tx: Knex.Transaction) =>
         fetchAllFreelancers()(tx)
-            .where({ user_id })
+            .where({ "freelancers.user_id": user_id })
             .first()
             .debug(false)
 
@@ -645,9 +645,10 @@ export const fetchAllFreelancers = () =>
             "discord_link",
             "title",
             "bio",
-            "user_id",
+            "freelancers.user_id",
             "username",
             "display_name",
+            "web3_accounts.address as web3_address",
             "freelancers.created",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.id as text)) as skill_ids"),
@@ -681,12 +682,14 @@ export const fetchAllFreelancers = () =>
             .leftJoin("languages", { 'freelancer_languages.language_id': "languages.id" })
             .innerJoin("users", { "freelancers.user_id": "users.id" })
             .leftJoin("freelancer_ratings", { "freelancers.id": "freelancer_ratings.freelancer_id" })
+            .leftJoin("web3_accounts", { "freelancers.user_id": "web3_accounts.user_id" })
 
             // order and group by many-many selects
             .orderBy("freelancers.created", "desc")
             .groupBy("freelancers.id")
             .groupBy("users.username")
             .groupBy("users.display_name")
+            .groupBy("address")
             .orderBy("freelancers.id", "desc")
             // TODO Add limit until we have spinning loading icon in freelancers page
             .limit(100)

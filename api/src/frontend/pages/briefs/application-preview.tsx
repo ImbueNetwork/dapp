@@ -21,20 +21,19 @@ export type ApplicationPreviewProps = {
     brief: Brief;
     user: User;
     application: Project;
+    freelancer: Freelancer;
 };
 
-export const ApplicationPreview = ({ brief, user, application }: ApplicationPreviewProps): JSX.Element => {
+export const ApplicationPreview = ({ brief, user, application, freelancer }: ApplicationPreviewProps): JSX.Element => {
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
-    const [freelancer, setFreelancer] = useState<Freelancer>();
     const [openPopup, setOpenPopup] = useState<boolean>(false);
-
     const applicationStatus = ProjectStatus[application.status_id]
+    const isApplicationOwner = user.id == application.user_id;
  
     useEffect(() => {
         async function setup() {
-            const freelancerUser = await fetchUser(Number(application.user_id));
-            setFreelancer(await getFreelancerProfile(freelancerUser.username));
+
         }
         setup();
     }, []);
@@ -114,7 +113,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 </div>
             )}
 
-            <HirePopup {...{openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
+            <HirePopup {...{openPopup, setOpenPopup, freelancer,application, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
 
             {
                 (user?.username === freelancer?.username) && (
@@ -128,7 +127,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 <div className="container milestones">
                     <div className="milestone-header mx-14 -mb-3">
                         <h3 className="flex">Milestones
-                            {!isEditingBio && (
+                            {!isEditingBio && isApplicationOwner && (
                                 <div className="edit-icon" onClick={() => setIsEditingBio(true)}><FiEdit /></div>
                             )}
                         </h3>
@@ -237,13 +236,13 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 </div>
             </div>
             <div className="container">
-                <p className="mx-14 mb-4 text-xl font-bold">Cost + Payment Wallet Address to box</p>
+                <p className="mx-14 mb-4 text-xl font-bold">Costs</p>
                 <hr className="separator" />
                 <div className="budget-info mx-14 mt-7">
                     <div className="budget-description">
                         <h3>Total price of the project</h3>
                         <div className="text-inactive">
-                            This includes all milestonees, and is the amount
+                            This includes all milestones, and is the amount
                             client will see
                         </div>
                     </div>
@@ -254,8 +253,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 <div className="budget-info mx-14">
                     <div className="budget-description">
                         <h3>
-                            Imbue Service Fee 5% - Learn more about Imbue’s
-                            fees
+                            Imbue Service Fee 5%
                         </h3>
                     </div>
                     <div className="budget-value">
@@ -343,13 +341,19 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 4]);
     let applicationId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
+
     if (briefId && applicationId) {
-        const brief: Brief = await getBrief(briefId);
+
         const application = await fetchProject(applicationId);
+        const freelancerUser = await fetchUser(Number(application.user_id));
+        const freelancer = await getFreelancerProfile(freelancerUser.username);
+    
+        const brief: Brief = await getBrief(briefId);
         const user = await getCurrentUser();
+
         ReactDOMClient.createRoot(
             document.getElementById("application-preview")!
-        ).render(<ApplicationPreview brief={brief} user={user} application={application} />);
+        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer}/>);
     }
     // TODO 404 page when brief of application is not found
 });

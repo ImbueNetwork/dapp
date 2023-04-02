@@ -29,6 +29,7 @@ const eventMapping: Record<string, EventDetails> = {
     voteOnMilestone: { eventName: "VoteComplete" },
     approveMilestone: { eventName: "MilestoneApproved" },
     withraw: { eventName: "ProjectFundsWithdrawn" },
+    createBrief: { eventName: "BriefSubmitted" },
 };
 
 class ChainService {
@@ -38,6 +39,34 @@ class ChainService {
         this.imbueApi = imbueApi;
         this.user = user;
     }
+
+
+    public async hireFreelancer(
+        account: InjectedAccountWithMeta,
+        briefOwners: string[], 
+        freelancerAddress: string, 
+        budget: bigint, 
+        initialContribution: bigint, 
+        briefId: string,
+        currencyId: number, 
+        milestones: any[]): Promise<BasicTxResponse> {
+        const extrinsic =
+            await this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
+                briefOwners,
+                freelancerAddress,
+                budget,
+                initialContribution,
+                briefId,
+                currencyId,
+                milestones
+            );
+        return await this.submitImbueExtrinsic(
+            account,
+            extrinsic,
+            eventMapping["createBrief"].eventName
+        );
+    }
+
 
     public async contribute(
         account: InjectedAccountWithMeta,
@@ -56,7 +85,9 @@ class ChainService {
             extrinsic,
             eventMapping["contribute"].eventName
         );
+        
     }
+
 
     public async submitMilestone(
         account: InjectedAccountWithMeta,
@@ -133,7 +164,8 @@ class ChainService {
     async submitImbueExtrinsic(
         account: InjectedAccountWithMeta,
         extrinsic: SubmittableExtrinsic<"promise">,
-        eventName: String
+        eventName: String,
+        returnProjectId?: Boolean
     ): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
         const transactionState: BasicTxResponse = {} as BasicTxResponse;
@@ -145,23 +177,31 @@ class ChainService {
                     this.imbueApi.imbue.api.query.system.events(
                         (events: EventRecord[]) => {
                             if (!result || !result.status || !events) {
+                                console.log("****** failed returning")
                                 return;
                             }
 
                             events
-                                .filter(
-                                    ({
-                                        event: { data, method, section },
-                                        phase,
-                                    }: EventRecord) =>
-                                        section === "imbueProposals" ||
-                                        section === "system"
-                                )
+                                // .filter(
+                                //     ({
+                                //         event: { data, method, section },
+                                //         phase,
+                                //     }: EventRecord) =>
+                                //         section === "imbueProposals" ||
+                                //         section === "imbueBriefs" ||
+                                //         section === "system"
+                                // )
                                 .forEach(
                                     ({
                                         event: { data, method, section },
                                         phase,
                                     }: EventRecord): BasicTxResponse => {
+
+                                        // console.log(data);
+                                        // console.log(method);
+                                        // console.log(section);
+                                        // console.log(phase);
+
                                         transactionState.transactionHash =
                                             extrinsic.hash.toHex();
 
@@ -183,6 +223,10 @@ class ChainService {
                                             account.address
                                         ) {
                                             transactionState.status = true;
+                                            if(returnProjectId) {
+                                                const projectId = parseInt(data[2].toString());
+                                                transactionState.projectId = projectId
+                                            }
                                             return transactionState;
                                         } else if (
                                             method === "ExtrinsicFailed"
@@ -211,6 +255,8 @@ class ChainService {
         } catch (error) {
             if (error instanceof Error) {
                 transactionState.errorMessage = error.message;
+                console.log("*********** error");
+                console.log(error.message);
             }
             transactionState.txError = true;
         } finally {

@@ -28,12 +28,14 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [openPopup, setOpenPopup] = useState<boolean>(false);
+    const [briefOwner, setBriefOwner] = useState<User>();
     const applicationStatus = ProjectStatus[application.status_id]
     const isApplicationOwner = user.id == application.user_id;
- 
+
     useEffect(() => {
         async function setup() {
-
+            const briefOwner: User = await fetchUser(brief.user_id);
+            setBriefOwner(briefOwner);
         }
         setup();
     }, []);
@@ -96,7 +98,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     return (
         <div className="application-container">
 
-            {(user?.username !== freelancer?.username) && (
+            {(user?.id == brief?.user_id) && (
                 <div className="flex items-center justify-evenly">
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                     <div className="">
@@ -113,7 +115,24 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                 </div>
             )}
 
-            <HirePopup {...{openPopup, setOpenPopup, freelancer,application, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
+            {(user?.id == freelancer?.user_id) && (
+                <div className="flex items-center justify-evenly">
+                    <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
+                    <div className="">
+                        <p className="text-xl font-bold">{briefOwner?.display_name}</p>
+                        <p className="text-base underline mt-2">View Full Profile</p>
+                    </div>
+                    <div>
+                        <p className="text-xl">@{briefOwner?.username}</p>
+                    </div>
+                    <div>
+                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
+                        <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Start Work</button>
+                    </div>
+                </div>
+            )}
+
+            <HirePopup {...{ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
 
             {
                 (user?.username === freelancer?.username) && (
@@ -347,13 +366,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
         const application = await fetchProject(applicationId);
         const freelancerUser = await fetchUser(Number(application.user_id));
         const freelancer = await getFreelancerProfile(freelancerUser.username);
-    
+
         const brief: Brief = await getBrief(briefId);
         const user = await getCurrentUser();
 
         ReactDOMClient.createRoot(
             document.getElementById("application-preview")!
-        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer}/>);
+        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer} />);
     }
     // TODO 404 page when brief of application is not found
 });

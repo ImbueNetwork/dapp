@@ -7,10 +7,7 @@ import Fade from '@mui/material/Fade';
 import "../../../public/application-preview.css";
 import { getWeb3Accounts, initImbueAPIInfo } from '../utils/polkadot';
 import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../models";
-import sha256 from 'crypto-js/sha256';
-import Base64 from 'crypto-js/enc-base64';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { selectAccount } from '../services/polkadotService';
 import ChainService from '../services/chainService';
 import { BasicTxResponse } from '../models';
 import { getCurrentUser } from '../utils';
@@ -61,6 +58,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log("***** success");
+                    console.log(result.eventData)
                 } else if (result.txError) {
                     console.log("***** failed");
                     console.log(result.errorMessage);
@@ -126,8 +124,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
                     <div className="budget-info mx-16">
                         <div className="budget-description">
                             <h3>
-                                Imbue Service Fee 5% - Learn more about Imbue’s
-                                fees
+                                Imbue Service Fee 5%
                             </h3>
                         </div>
                         <div className="budget-value">
@@ -152,6 +149,18 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
 
     const SecondContent = () => {
         return (
+            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto">
+                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Deposit Fuds</h3>
+                <p className="text-center w-full text-xl font-bold my-4">Deposit the funds required for the project, these funds will be taken from your account once the freelancer starts the project.</p>
+                <p className="text-center w-full text-xl font-bold my-4">The  funds are then paid to the freelancer iin stages only when you approve the completion of each milestone</p>
+                <h3 className='mb-10'><span className='primary-text mr-1'>{Number((totalCost).toFixed(2)).toLocaleString()}</span>${Currency[application.currency_id]}</h3>
+                <button onClick={() => { setstage(2) }} className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Deposit Funds</button>
+            </div>
+        )
+    }
+
+    const ThirdContent = () => {
+        return (
             <div className="flex flex-col justify-center items-center modal-container">
                 <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
                 {
@@ -162,19 +171,6 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
                     ))
 
                 }
-                {/* <button onClick={() => setstage(2) } className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Connect Wallet</button> */}
-            </div>
-        )
-    }
-
-    const ThirdContent = () => {
-        return (
-            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto">
-                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Deposit Fuds</h3>
-                <p className="text-center w-full text-xl font-bold my-4">Deposit the funds required for the project, these funds will be taken from your account once the freelancer starts the project.</p>
-                <p className="text-center w-full text-xl font-bold my-4">The  funds are then paid to the freelancer iin stages only when you approve the completion of each milestone</p>
-                <h3 className='mb-10'><span className='primary-text mr-1'>24000</span>$IIMBUE</h3>
-                <button onClick={() => { setstage(0);setOpenPopup(false) }} className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Deposit Funds</button>
             </div>
         )
     }
@@ -195,7 +191,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
             <Fade in={openPopup}>
                 <Box sx={modalStyle}>
                     {
-                        (!popupStage && openPopup) && <SecondContent />
+                        (!popupStage && openPopup) && <FirstContent />
                     }
                     {
                         popupStage === 1 && <SecondContent />

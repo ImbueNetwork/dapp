@@ -115,7 +115,7 @@ export interface BasicTxResponse {
     status?: boolean;
     transactionHash?: string;
     txError?: boolean;
-    projectId? : number;
+    eventData? : any;
 }
 
 export type Freelancer = {

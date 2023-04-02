@@ -165,7 +165,6 @@ class ChainService {
         account: InjectedAccountWithMeta,
         extrinsic: SubmittableExtrinsic<"promise">,
         eventName: String,
-        returnProjectId?: Boolean
     ): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
         const transactionState: BasicTxResponse = {} as BasicTxResponse;
@@ -223,10 +222,7 @@ class ChainService {
                                             account.address
                                         ) {
                                             transactionState.status = true;
-                                            if(returnProjectId) {
-                                                const projectId = parseInt(data[2].toString());
-                                                transactionState.projectId = projectId
-                                            }
+                                            transactionState.eventData = data;
                                             return transactionState;
                                         } else if (
                                             method === "ExtrinsicFailed"

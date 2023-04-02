@@ -20,10 +20,8 @@ import { ApplicationContainer } from "../pages/briefs/applications";
 import { getBriefApplications, getUserBriefs } from "../services/briefsService";
 import { CustomChannelHeader } from "./chat";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-<<<<<<< HEAD
 import ChatPopup from "./chat-popup";
-=======
->>>>>>> upstream/imbue-enterprise
+
 
 export type DashboardProps = {
     user: User;
@@ -37,11 +35,8 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
     const [briefs, setBriefs] = useState<any>({})
     const [briefId, setBriefId] = useState<number>()
     const [applications, setApplications] = useState<any[]>([])
-<<<<<<< HEAD
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
     const [targetUser, setTargetUser] = useState<User | null>(null);
-=======
->>>>>>> upstream/imbue-enterprise
 
     useEffect(() => {
         const setup = async () => {
@@ -87,7 +82,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         },
     ]
 
-<<<<<<< HEAD
     const handleMessageBoxClick = async (user_id, freelancer) => {
         if (user_id) {
             setShowMessageBox(true);
@@ -95,10 +89,6 @@ export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
         } else {
             redirect("login", `/dapp/freelancers/${freelancer?.username}/`)
         }
-=======
-    const handleMessageBoxClick = async (user_id) => {
-        // TODO: Implement chat popup 
->>>>>>> upstream/imbue-enterprise
     }
 
     const redirectToApplication = (applicationId) => {

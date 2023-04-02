@@ -59,13 +59,8 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                 </div>
                 <div className="select-freelancer">
                     <div className="freelancer-title">
-                        {/* {application.freelancer.title} */}
-                        Web3 Developer
-                        Web3 Developer
+                        {application.freelancer.title}
                     </div>
-                </div>
-                <div className="text-base font-bold">
-                    {application.name}
                 </div>
                 <div className="text-base font-bold">
                     {application.name}
@@ -96,7 +91,6 @@ export const ApplicationContainer = ({ application, redirectToApplication, handl
                     <div>
                         <div className="flex gap-2 flex-col items-center">
                             <span className="font-bold text-primary">
-                                Milestones ({application?.milestones?.length})
                                 Milestones ({application?.milestones?.length})
                             </span>
                             <div className="text-small text-grey">

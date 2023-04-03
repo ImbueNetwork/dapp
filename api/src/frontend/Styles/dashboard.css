@@ -77,13 +77,17 @@
     border-radius: 10px;
 }
 
-.str-chat ::-webkit-scrollbar-thumb {
-    background: #777777;
+.str-chat ::-webkit-scrollbar-thumb,
+.chat__list ::-webkit-scrollbar-thumb {
+    background: #505050;
     border-radius: 10px;
 }
 
 .str-chat ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+.str-chat__list-notifications{
+    margin: 0;
 }
 
 /* Navigation bar */

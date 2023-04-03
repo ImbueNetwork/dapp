@@ -120,6 +120,7 @@ export type Brief = {
     experience_level: string,
     experience_id: number
     user_id: number;
+    project_id: number;
 };
 
 export type Freelancer = {
@@ -348,6 +349,14 @@ export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
         tx<Project>("projects").select().where({ id }).first();
 
+export const acceptBriefApplication = (id: string | number, project_id: number) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Brief>("briefs").update({
+            project_id,
+        }).where({
+            id
+        }).returning("*")
+    )[0];
 
 export const fetchProjectWithProperties = (id: string | number) =>
     (tx: Knex.Transaction) =>

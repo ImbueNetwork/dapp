@@ -30,6 +30,7 @@ const eventMapping: Record<string, EventDetails> = {
     approveMilestone: { eventName: "MilestoneApproved" },
     withraw: { eventName: "ProjectFundsWithdrawn" },
     createBrief: { eventName: "BriefSubmitted" },
+    commenceWork: { eventName: "ProjectCreated" },
 };
 
 class ChainService {
@@ -38,6 +39,21 @@ class ChainService {
     constructor(imbueApi: ImbueApiInfo, user: User) {
         this.imbueApi = imbueApi;
         this.user = user;
+    }
+
+
+    public async commenceWork(
+        account: InjectedAccountWithMeta,
+        briefId: string): Promise<BasicTxResponse> {
+        const extrinsic =
+            await this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
+                briefId,
+            );
+        return await this.submitImbueExtrinsic(
+            account,
+            extrinsic,
+            eventMapping["commenceWork"].eventName
+        );
     }
 
 
@@ -67,7 +83,6 @@ class ChainService {
         );
     }
 
-
     public async contribute(
         account: InjectedAccountWithMeta,
         projectOnChain: any,
@@ -85,9 +100,7 @@ class ChainService {
             extrinsic,
             eventMapping["contribute"].eventName
         );
-        
     }
-
 
     public async submitMilestone(
         account: InjectedAccountWithMeta,
@@ -176,30 +189,25 @@ class ChainService {
                     this.imbueApi.imbue.api.query.system.events(
                         (events: EventRecord[]) => {
                             if (!result || !result.status || !events) {
-                                console.log("****** failed returning")
                                 return;
                             }
 
                             events
-                                // .filter(
-                                //     ({
-                                //         event: { data, method, section },
-                                //         phase,
-                                //     }: EventRecord) =>
-                                //         section === "imbueProposals" ||
-                                //         section === "imbueBriefs" ||
-                                //         section === "system"
-                                // )
+                                .filter(
+                                    ({
+                                        event: { data, method, section },
+                                        phase,
+                                    }: EventRecord) =>
+                                        section === "imbueProposals" ||
+                                        section === "imbueBriefs" ||
+                                        section === "system"
+                                )
                                 .forEach(
                                     ({
                                         event: { data, method, section },
                                         phase,
                                     }: EventRecord): BasicTxResponse => {
 
-                                        // console.log(data);
-                                        // console.log(method);
-                                        // console.log(section);
-                                        // console.log(phase);
 
                                         transactionState.transactionHash =
                                             extrinsic.hash.toHex();
@@ -222,7 +230,7 @@ class ChainService {
                                             account.address
                                         ) {
                                             transactionState.status = true;
-                                            transactionState.eventData = data;
+                                            transactionState.eventData = data.toHuman();
                                             return transactionState;
                                         } else if (
                                             method === "ExtrinsicFailed"

@@ -46,7 +46,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
         const freelancerAddress: string = freelancer.web3_address;
         const budget: bigint = BigInt(totalCost * 1e12);
         const initialContribution: bigint = BigInt(totalCost * 1e12);
-        const briefId=blake2AsHex(JSON.stringify(application));
+        const briefId = blake2AsHex(JSON.stringify(application));
         const currencyId = application.currency_id;
 
         const milestones = application.milestones.map((m, idx) => ({
@@ -54,11 +54,14 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
         }));
 
         const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefId, currencyId, milestones);
+        
+        // TODO: handle popup here
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log("***** success");
-                    console.log(result.eventData)
+                    console.log(result.eventData);
+
                 } else if (result.txError) {
                     console.log("***** failed");
                     console.log(result.errorMessage);
@@ -68,7 +71,8 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
             await new Promise(f => setTimeout(f, 1000));
         }
 
-        setstage(3)
+        setstage(0);
+        setOpenPopup(false)
     }
 
     useEffect(() => {

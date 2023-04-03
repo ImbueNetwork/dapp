@@ -83,3 +83,18 @@ export const getBriefApplications = async (brifId: string | number) => {
     }
 
 }
+
+export const acceptBriefApplication = async (briefId: string | number, projectId: number) => {
+    const resp = await fetch(`${config.apiBase}/briefs/${briefId}/accept`, {
+        headers: postAPIHeaders,
+        method: "put",
+        body: JSON.stringify({ projectId })
+    })
+
+    if (resp.ok) {
+        return await resp.json()
+
+    } else {
+        throw new Error(`Failed to hire for briefId ${briefId} . status: ${resp.status}`);
+    }
+}

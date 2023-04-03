@@ -5,12 +5,16 @@ import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../../models";
-import { getBrief } from "../../services/briefsService";
+import { acceptBriefApplication, getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 import { HirePopup } from "../../components/hire-popup";
+import ChainService from "../../services/chainService";
+import { getWeb3Accounts, initImbueAPIInfo } from "../../utils/polkadot";
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 interface MilestoneItem {
     name: string;
@@ -32,14 +36,22 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const applicationStatus = ProjectStatus[application.status_id]
     const isApplicationOwner = user.id == application.user_id;
     const isBriefOwner = user.id == brief.user_id;
+    const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
 
     useEffect(() => {
         async function setup() {
             const briefOwner: User = await fetchUser(brief.user_id);
             setBriefOwner(briefOwner);
+            await fetchAndSetAccounts();
         }
         setup();
     }, []);
+
+    const fetchAndSetAccounts = async () => {
+        const accounts = await getWeb3Accounts();
+        const account = accounts.filter(account => account.address === freelancer.web3_address)[0];
+        setFreelancerAccount(account);
+    };
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);
@@ -61,6 +73,34 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
         });
         setIsEditingBio(false)
     };
+
+    const startWork = async () => {
+
+        if (freelancerAccount) {
+            const imbueApi = await initImbueAPIInfo();
+            const chainService = new ChainService(imbueApi, user);
+            const briefHash = blake2AsHex(JSON.stringify(application));
+            const result = await chainService?.commenceWork(freelancerAccount, briefHash);
+            while (true) {
+                if (result.status || result.txError) {
+                    if (result.status) {
+                        const projectId = result.eventData[2];
+                        const briefId = brief.id;
+                        const resp = await acceptBriefApplication(briefId! , projectId);
+
+                        console.log("****** resp is ");
+                        console.log(resp);
+                    } else if (result.txError) {
+                        console.log("***** failed");
+                        console.log(result.errorMessage);
+                    }
+                    break;
+                }
+                await new Promise(f => setTimeout(f, 1000));
+            }
+        }
+
+    }
 
     const imbueFeePercentage = 5;
     const applicationMilestones = application.milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: Number(m.amount) } });
@@ -121,14 +161,13 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                     <div className="">
                         <p className="text-xl font-bold">{briefOwner?.display_name}</p>
-                        <p className="text-base underline mt-2">View Full Profile</p>
                     </div>
                     <div>
                         <p className="text-xl">@{briefOwner?.username}</p>
                     </div>
                     <div>
                         <button className="primary-btn rounded-full w-button dark-button">Message</button>
-                        <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Start Work</button>
+                        <button onClick={() => startWork()} className="primary-btn in-dark w-button">Start Work</button>
                     </div>
                 </div>
             )}
@@ -136,10 +175,10 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
             <HirePopup {...{ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
 
             {
-                    <div className="section">
-                        <h3 className="section-title">Job description</h3>
-                        <BriefInsights brief={brief} />
-                    </div>
+                <div className="section">
+                    <h3 className="section-title">Job description</h3>
+                    <BriefInsights brief={brief} />
+                </div>
             }
             <div className="section">
                 <div className="container milestones">

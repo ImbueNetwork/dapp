@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import { User } from "../models";
+import { Project, ProjectStatus, User } from "../models";
 import { StreamChat } from "stream-chat";
 import {
     Chat,
@@ -21,13 +21,17 @@ import { getBriefApplications, getUserBriefs } from "../services/briefsService";
 import { CustomChannelHeader } from "./chat";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ChatPopup from "./chat-popup";
-
+import { getFreelancerApplications } from "../services/freelancerService";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+const timeAgo = new TimeAgo("en-US");
 
 export type DashboardProps = {
     user: User;
 };
 
 export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
+
     const [client, setClient] = useState<StreamChat>();
     const filters = { members: { $in: [user.username] } };
     const [selectedOption, setSelectedOption] = useState<number>(1)
@@ -37,50 +41,23 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     const [applications, setApplications] = useState<any[]>([])
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
     const [targetUser, setTargetUser] = useState<User | null>(null);
+    const [briefApplications, setBriefApplications] = useState<Project[]>([])
+    const [myApplications, setMyApplications] = useState<Project[]>([])
+
 
     useEffect(() => {
         const setup = async () => {
+            const myApplications = await getFreelancerApplications(user.id);
+            setMyApplications(myApplications);
             setBriefs(await getUserBriefs(user.id))
         }
         setup();
         const getApplications = async (id) => {
-            setApplications(await getBriefApplications(id))
+            setBriefApplications(await getBriefApplications(id))
         }
         briefId && getApplications(briefId)
     }, [briefId])
 
-    // TODO: get client's all brief
-
-    const appliedBriefs = [
-        {
-            id: 1,
-            name: "Product Development Engineer",
-            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
-            postDate: "Feb 21, 2023",
-            condition: "Accepted"
-        },
-        {
-            id: 1,
-            name: "Product Development Engineer",
-            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
-            postDate: "Feb 21, 2023",
-            condition: "Rejected"
-        },
-        {
-            id: 1,
-            name: "Product Development Engineer",
-            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
-            postDate: "Feb 21, 2023",
-            condition: "Rejected"
-        },
-        {
-            id: 1,
-            name: "Product Development Engineer",
-            description: "How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. Use words that describe what what your NFT is about and how owning it will elicit a certain feeling..........How can you help a potential buyer can’t ‘hold’ your products online? Help your reader imagine what it would be like to own your NFT. U",
-            postDate: "Feb 21, 2023",
-            condition: "Accepted"
-        },
-    ]
 
     const handleMessageBoxClick = async (user_id, freelancer) => {
         if (user_id) {
@@ -91,9 +68,10 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
         }
     }
 
-    const redirectToApplication = (applicationId) => {
+    const redirectToBriefApplications = (applicationId) => {
         redirect(`briefs/${briefId}/applications/${applicationId}/`);
     };
+
 
     useEffect(() => {
         async function setup() {
@@ -146,8 +124,8 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                                     <ArrowBackIcon />
                                 </div>
                                 {
-                                    applications?.map((application, index) => (
-                                        <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication}} key={index} />
+                                    briefApplications?.map((application, index) => (
+                                        <ApplicationContainer {...{ application, handleMessageBoxClick, redirectToApplication: redirectToBriefApplications }} key={index} />
                                     ))
                                 }
                             </div>
@@ -166,15 +144,9 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
             }
             {
                 selectedOption === 3 &&
-                <div className="list-container">
-                    {
-                        appliedBriefs.map((brief, index) => (
-                            <BriefState brief={brief} key={index} />
-                        ))
-                    }
-                </div>
+                < MyFreelancerApplications myApplications={myApplications} />
             }
-            {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser:user }} />}
+            {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser: user }} />}
         </div>
     ) : (
         <p>REACT_APP_GETSTREAM_API_KEY not found</p>
@@ -183,24 +155,6 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
 
 function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Function }) {
     if (briefs?.length === 0) return <h2>Nothing to show</h2>
-
-    const getTimeDifference = (date) => {
-        const today: any = new Date()
-        const created: any = new Date(date)
-        const difference = Math.abs((today - created) / 1000);
-
-        if (difference < 60) return `${Math.ceil(difference)} seconds`
-        else if (difference < 3600) return `${Math.ceil(difference / 60)} minutes`
-        else if (difference < (3600 * 24)) return `${Math.ceil(difference / (60 * 60))} hours`
-        else return `${Math.ceil(difference / (60 * 60 * 24))} days`
-    }
-
-    const formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0,
-        minimumFractionDigits: 0,
-    });
 
     return (
         <div className="list-container mb-8">
@@ -212,26 +166,26 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
                         className="list-item-container justify-between">
                         <div className="flex flex-col gap-3">
                             <h3 className="text-xl font-bold">{brief.headline}</h3>
-                            <p>Budget {formatter.format(brief.budget)} - Public</p>
-                            <p>Created {getTimeDifference(brief.created)} ago</p>
+                            <p>Budget ${Number(brief.budget).toLocaleString()} - Public</p>
+                            <p>Created {timeAgo.format(new Date(brief.created))}</p>
                         </div>
                         {
                             brief.project_id
                                 ? <div className="flex flex-col items-center">
                                     <h2>Milestones <span className="primary-text">{brief.milestones?.filter((m) => m.is_approved)?.length}/{brief.milestones?.length}</span></h2>
                                     <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
-                                    <div
-                                        style={{
-                                            width: `${(brief.milestones?.filter((m) => m.is_approved)?.length / brief.milestones?.length) * 100}%`
-                                        }}
-                                        className="h-full rounded-xl Accepted-button absolute">
+                                        <div
+                                            style={{
+                                                width: `${(brief.milestones?.filter((m) => m.is_approved)?.length / brief.milestones?.length) * 100}%`
+                                            }}
+                                            className="h-full rounded-xl Accepted-button absolute">
+                                        </div>
+                                        <div className="flex justify-evenly">
+                                            {
+                                                brief.milestones?.map((m, i) => (<div key={i} className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
+                                            }
+                                        </div>
                                     </div>
-                                    <div className="flex justify-evenly">
-                                        {
-                                            brief.milestones?.map((m,i) => (<div key={i} className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
-                                        }
-                                    </div>
-                                </div>
                                 </div>
                                 : <div className="flex flex-col items-center gap-3">
                                     <h2 className="text-xl font-bold">Proposals</h2>
@@ -271,20 +225,32 @@ function ChatBox({ client, filters }: { client: StreamChat, filters: object }) {
     )
 }
 
-function BriefState({ brief }) {
-    return (
-        <div className="list-item-container h-56 gap-8">
-            <div className="w-4/5">
-                <h3 className="text-xl font-bold mb-3">{brief?.name}</h3>
-                <span>
-                    {brief?.description}
-                </span>
-            </div>
-            <div className="flex flex-col justify-evenly items-center ml-auto">
-                <span>{brief?.postDate}</span>
-                <div className={`px-4 py-2 text-black ${brief?.condition}-button w-fit rounded-full`}>{brief?.condition}</div>
-            </div>
+function MyFreelancerApplications({ myApplications }) {
 
+    const redirectToApplication = (application) => {
+        redirect(`briefs/${application.brief_id}/applications/${application.id}/`);
+    };
+
+    if (myApplications?.length === 0) return <h2>Nothing to show</h2>
+
+    return (
+        <div className="list-container">
+            {
+                myApplications.map((application, index) => (
+                    <div key={index}
+                        onClick={() => redirectToApplication(application)}
+
+                        className="list-item-container h-56 gap-8">
+                        <div className="w-4/5">
+                            <h3 className="text-xl font-bold mb-3">{application?.name}</h3>
+                        </div>
+                        <div className="flex flex-col justify-evenly items-center ml-auto">
+                            <span>{timeAgo.format(new Date(application.created))}</span>
+                            <div className={`px-4 py-2 text-black ${ProjectStatus[application.status_id]}-button w-fit rounded-full`}>{ProjectStatus[application.status_id]}</div>
+                        </div>
+                    </div>
+                ))
+            }
         </div>
     )
 }

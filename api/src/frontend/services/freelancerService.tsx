@@ -1,4 +1,4 @@
-import { Freelancer, FreelancerSqlFilter } from "../models";
+import { Freelancer, FreelancerSqlFilter, Project } from "../models";
 import * as config from "../config";
 import { postAPIHeaders, getAPIHeaders } from "../config";
 
@@ -28,6 +28,19 @@ export const getAllFreelancers = async () => {
         return await resp.json() as Array<Freelancer>
     } else {
         throw new Error('Failed to get all briefs. status:' + resp.status);
+    }
+}
+
+export const getFreelancerApplications = async (userId: number) => {
+    const resp = await fetch(`${config.apiBase}/freelancers/${userId}/applications`, {
+        headers: postAPIHeaders,
+        method: "get",
+    })
+
+    if (resp.ok) {
+        return await resp.json() as Array<Project>
+    } else {
+        throw new Error('Failed to get all freelancer applications. status:' + resp.status);
     }
 }
 

@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones, User, fetchProject, acceptBriefApplication, fetchUser } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones, User, fetchProject, acceptBriefApplication, fetchUser, ProjectStatus, updateProject } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
@@ -147,7 +147,12 @@ router.put("/:id/accept", async (req, res, next) => {
                     "Project does not exist."
                 ));
             }
+            
             let updatedBrief = await acceptBriefApplication(id, projectId)(tx);
+            project.status_id = ProjectStatus.Accepted;
+            await updateProject(project.id!, project)(tx);
+            await acceptBriefApplication(id, projectId)(tx);
+
             return res.send(updatedBrief);
         } catch (e: any) {
             return next(new Error(

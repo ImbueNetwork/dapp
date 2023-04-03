@@ -171,14 +171,15 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                         <div>
                             <p className="text-xl primary-text">@{freelancer?.username}</p>
                         </div>
-                        <div>
+                        <div className="grid grid-cols-2 gap-2">
                             <button className="primary-btn rounded-full w-button dark-button" onClick={() => handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
                             {
                                 application.status_id !== 4
-                                    ? <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
-                                    : <button className="Accepted-btn in-dark w-button rounded-full px-6 py-3">{applicationStatusId[application?.status_id]}</button>
+                                    ? <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button text-center">Hire</button>
+                                    : <button className="Accepted-btn in-dark w-button rounded-full px-6 py-3">Start Work</button>
                             }
-
+                            <button className="Request-btn in-dark w-button rounded-full px-6 py-3 dark-button">Request Changes</button>
+                            <button className="Rejected-btn in-dark w-button rounded-full px-6 py-3 dark-button">Reject</button>
                         </div>
                     </div>
                     <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost, setLoading }} />
@@ -192,7 +193,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                         <p className="text-xl font-bold">{briefOwner?.display_name}</p>
                     </div>
                     <div>
-                        <p className="text-xl">@{briefOwner?.username}</p>
+                        <p className="text-xl primary-text">@{briefOwner?.username}</p>
                     </div>
                     <div>
                         <button className="primary-btn in-dark w-button" onClick={() => handleMessageBoxClick(brief.user_id, freelancer?.username)}>Message</button>

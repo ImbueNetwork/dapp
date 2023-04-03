@@ -12,8 +12,6 @@ import ChainService from '../services/chainService';
 import { BasicTxResponse } from '../models';
 import { getCurrentUser } from '../utils';
 import { acceptBriefApplication } from '../services/briefsService';
-import { CircularProgress } from '@mui/material';
-import zIndex from '@mui/material/styles/zIndex';
 
 export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost,setLoading }) => {
     const [popupStage, setstage] = useState<number>(0)
@@ -26,6 +24,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
         transform: 'translate(-50%, -50%)',
         width: "65vw",
         height: "auto",
+        minHeight:"510px",
         bgcolor: '#2c2c2c',
         color: '#fff',
         pt: '28px',

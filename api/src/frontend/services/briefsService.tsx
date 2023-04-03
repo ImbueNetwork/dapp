@@ -1,5 +1,5 @@
 import * as config from "../config";
-import { Brief, Freelancer, Project } from "../models";
+import { Brief, Freelancer, Project, User } from "../models";
 import { BriefSqlFilter } from "../models";
 
 const getAPIHeaders = {
@@ -82,4 +82,21 @@ export const getBriefApplications = async (brifId: string | number) => {
         throw new Error('Failed to get all brief applications. status:' + resp.status);
     }
 
+}
+
+export const acceptBriefApplication = async (briefId: string | number, projectId: number) => {
+    const resp = await fetch(`${config.apiBase}/briefs/${briefId}/accept`, {
+        headers: postAPIHeaders,
+        method: "put",
+        body: JSON.stringify({
+            project_id: projectId,
+         })
+    })
+
+    if (resp.ok) {
+        return await resp.json()
+
+    } else {
+        throw new Error(`Failed to hire for briefId ${briefId} . status: ${resp.status}`);
+    }
 }

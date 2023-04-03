@@ -1,13 +1,22 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import "../../../public/application-preview.css";
+import { getWeb3Accounts, initImbueAPIInfo } from '../utils/polkadot';
+import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../models";
+import { blake2AsHex } from '@polkadot/util-crypto';
+import ChainService from '../services/chainService';
+import { BasicTxResponse } from '../models';
+import { getCurrentUser } from '../utils';
+import { acceptBriefApplication } from '../services/briefsService';
 
-export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
+export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
     const [popupStage, setstage] = useState<number>(0)
     const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2])
+    const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
 
     const modalStyle = {
         position: 'absolute' as 'absolute',
@@ -23,6 +32,53 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
         boxShadow: 24,
         borderRadius: '20px'
     };
+
+    const fetchAndSetAccounts = async () => {
+        const accounts = await getWeb3Accounts();
+        setAccounts(accounts);
+    };
+
+    const selectedAccount = async (account: InjectedAccountWithMeta) => {
+        const imbueApi = await initImbueAPIInfo();
+        const user: User = await getCurrentUser();
+        const chainService = new ChainService(imbueApi, user);
+
+        const briefOwners: string[] = [user.web3_address];
+        const freelancerAddress: string = freelancer.web3_address;
+        const budget: bigint = BigInt(totalCost * 1e12);
+        const initialContribution: bigint = BigInt(totalCost * 1e12);
+        const briefHash = blake2AsHex(JSON.stringify(application));
+        const currencyId = application.currency_id;
+
+        const milestones = application.milestones.map((m, idx) => ({
+            percentageToUnlock: parseInt(m.percentage_to_unlock)
+        }));
+
+        const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefHash, currencyId, milestones);
+        // TODO: handle popup here
+        while (true) {
+            if (result.status || result.txError) {
+                if (result.status) {
+                    console.log("***** success");
+                    const briefId = brief.id;
+                    const resp = await acceptBriefApplication(briefId! , application.id);
+                    console.log(result.eventData);
+                } else if (result.txError) {
+                    console.log("***** failed");
+                    console.log(result.errorMessage);
+                }
+                break;
+            }
+            await new Promise(f => setTimeout(f, 1000));
+        }
+
+        setstage(0);
+        setOpenPopup(false)
+    }
+
+    useEffect(() => {
+        void fetchAndSetAccounts();
+    }, []);
 
     const FirstContent = () => {
         return (
@@ -73,8 +129,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
                     <div className="budget-info mx-16">
                         <div className="budget-description">
                             <h3>
-                                Imbue Service Fee 5% - Learn more about Imbue’s
-                                fees
+                                Imbue Service Fee 5%
                             </h3>
                         </div>
                         <div className="budget-value">
@@ -99,28 +154,28 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, milestones, tot
 
     const SecondContent = () => {
         return (
-            <div className="flex flex-col justify-center items-center modal-container">
-                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
-                {
-                    walletOptions.map((option, index) => (
-                        <div className='w-1/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
-                            <p className='text-center'>Wallet Option {index + 1}</p>
-                        </div>
-                    ))
-                }
-                <button onClick={() => setstage(2) } className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Connect Wallet</button>
+            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto">
+                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Deposit Fuds</h3>
+                <p className="text-center w-full text-xl font-bold my-4">Deposit the funds required for the project, these funds will be taken from your account once the freelancer starts the project.</p>
+                <p className="text-center w-full text-xl font-bold my-4">The  funds are then paid to the freelancer iin stages only when you approve the completion of each milestone</p>
+                <h3 className='mb-10'><span className='primary-text mr-1'>{Number((totalCost).toFixed(2)).toLocaleString()}</span>${Currency[application.currency_id]}</h3>
+                <button onClick={() => { setstage(2) }} className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Deposit Funds</button>
             </div>
         )
     }
 
     const ThirdContent = () => {
         return (
-            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto">
-                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Deposit Fuds</h3>
-                <p className="text-center w-full text-xl font-bold my-4">Deposit the funds required for the project, these funds will be taken from your account once the freelancer starts the project.</p>
-                <p className="text-center w-full text-xl font-bold my-4">The  funds are then paid to the freelancer iin stages only when you approve the completion of each milestone</p>
-                <h3 className='mb-10'><span className='primary-text mr-1'>24000</span>$IIMBUE</h3>
-                <button onClick={() => { setstage(0);setOpenPopup(false) }} className="primary-btn in-dark w-button w-1/3 mx-16" style={{ textAlign: "center" }} >Deposit Funds</button>
+            <div className="flex flex-col justify-center items-center modal-container">
+                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
+                {
+                    accounts.map((account, index) => (
+                        <div key={index} onClick={()=> selectedAccount(account)} className='w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
+                            <p className='text-center'>{account.address}</p>
+                        </div>
+                    ))
+
+                }
             </div>
         )
     }

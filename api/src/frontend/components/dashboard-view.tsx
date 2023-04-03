@@ -25,7 +25,7 @@ export type DashboardProps = {
     user: User;
 };
 
-export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
+export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     const [client, setClient] = useState<StreamChat>();
     const filters = { members: { $in: [user.username] } };
     const [selectedOption, setSelectedOption] = useState<number>(1)
@@ -197,6 +197,7 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
             {
                 briefs?.map((brief, index) => (
                     <div
+                        key={index}
                         onClick={() => setBriefId(brief.id)}
                         className="list-item-container justify-between">
                         <div className="flex flex-col gap-3">

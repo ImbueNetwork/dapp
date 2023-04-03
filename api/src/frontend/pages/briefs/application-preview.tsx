@@ -42,6 +42,8 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const isBriefOwner = user.id == brief.user_id;
     const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
 
+    console.log(application);
+
     useEffect(() => {
         async function setup() {
             const briefOwner: User = await fetchUser(brief.user_id);

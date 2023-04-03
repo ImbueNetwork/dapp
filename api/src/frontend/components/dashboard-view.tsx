@@ -154,7 +154,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
                                 <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} />
-                                <h2 className="text-xl font-bold mb-3">Projects</h2>
+                                <h2 className="text-xl font-bold my-3">Projects</h2>
                                 <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
                             </div>
 
@@ -208,7 +208,7 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
                 briefs?.map((brief, index) => (
                     <div
                         key={index}
-                        onClick={() => setBriefId(brief.id)}
+                        onClick={() => brief.number_of_applications && !brief.project_id && setBriefId(brief.id)}
                         className="list-item-container justify-between">
                         <div className="flex flex-col gap-3">
                             <h3 className="text-xl font-bold">{brief.headline}</h3>
@@ -216,7 +216,7 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
                             <p>Created {getTimeDifference(brief.created)} ago</p>
                         </div>
                         {
-                            brief.projectid
+                            brief.project_id
                                 ? <div className="flex flex-col items-center">
                                     <h2>Milestones <span className="primary-text">{brief.milestones?.filter((m) => m.is_approved)?.length}/{brief.milestones?.length}</span></h2>
                                     <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
@@ -228,7 +228,7 @@ function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Fu
                                     </div>
                                     <div className="flex justify-evenly">
                                         {
-                                            brief.milestones?.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
+                                            brief.milestones?.map((m,i) => (<div key={i} className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
                                         }
                                     </div>
                                 </div>

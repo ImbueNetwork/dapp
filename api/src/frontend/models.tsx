@@ -115,6 +115,7 @@ export interface BasicTxResponse {
     status?: boolean;
     transactionHash?: string;
     txError?: boolean;
+    eventData? : any;
 }
 
 export type Freelancer = {
@@ -141,6 +142,7 @@ export type Freelancer = {
     rating?: number;
     num_ratings: number;
     profileImageUrl: string;
+    web3_address: string;
 };
 
 export function getDefaultFreelancer(): Freelancer {
@@ -168,6 +170,7 @@ export function getDefaultFreelancer(): Freelancer {
         rating: 3,
         num_ratings:0,
         profileImageUrl:"default",
+        web3_address:"default",
     }
 }
 
@@ -194,6 +197,7 @@ export type Brief = {
     experience_id: number;
     number_of_briefs_submitted: number;
     user_id: number;
+    project_id?: number;
 };
 
 export type BriefSqlFilter = {

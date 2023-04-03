@@ -29,6 +29,8 @@ const eventMapping: Record<string, EventDetails> = {
     voteOnMilestone: { eventName: "VoteComplete" },
     approveMilestone: { eventName: "MilestoneApproved" },
     withraw: { eventName: "ProjectFundsWithdrawn" },
+    createBrief: { eventName: "BriefSubmitted" },
+    commenceWork: { eventName: "ProjectCreated" },
 };
 
 class ChainService {
@@ -37,6 +39,48 @@ class ChainService {
     constructor(imbueApi: ImbueApiInfo, user: User) {
         this.imbueApi = imbueApi;
         this.user = user;
+    }
+
+
+    public async commenceWork(
+        account: InjectedAccountWithMeta,
+        briefId: string): Promise<BasicTxResponse> {
+        const extrinsic =
+            await this.imbueApi.imbue.api.tx.imbueBriefs.commenceWork(
+                briefId,
+            );
+        return await this.submitImbueExtrinsic(
+            account,
+            extrinsic,
+            eventMapping["commenceWork"].eventName
+        );
+    }
+
+
+    public async hireFreelancer(
+        account: InjectedAccountWithMeta,
+        briefOwners: string[], 
+        freelancerAddress: string, 
+        budget: bigint, 
+        initialContribution: bigint, 
+        briefHash: string,
+        currencyId: number, 
+        milestones: any[]): Promise<BasicTxResponse> {
+        const extrinsic =
+            await this.imbueApi.imbue.api.tx.imbueBriefs.createBrief(
+                briefOwners,
+                freelancerAddress,
+                budget,
+                initialContribution,
+                briefHash,
+                currencyId,
+                milestones
+            );
+        return await this.submitImbueExtrinsic(
+            account,
+            extrinsic,
+            eventMapping["createBrief"].eventName
+        );
     }
 
     public async contribute(
@@ -133,7 +177,7 @@ class ChainService {
     async submitImbueExtrinsic(
         account: InjectedAccountWithMeta,
         extrinsic: SubmittableExtrinsic<"promise">,
-        eventName: String
+        eventName: String,
     ): Promise<BasicTxResponse> {
         const injector = await web3FromSource(account.meta.source);
         const transactionState: BasicTxResponse = {} as BasicTxResponse;
@@ -155,6 +199,7 @@ class ChainService {
                                         phase,
                                     }: EventRecord) =>
                                         section === "imbueProposals" ||
+                                        section === "imbueBriefs" ||
                                         section === "system"
                                 )
                                 .forEach(
@@ -162,6 +207,8 @@ class ChainService {
                                         event: { data, method, section },
                                         phase,
                                     }: EventRecord): BasicTxResponse => {
+
+
                                         transactionState.transactionHash =
                                             extrinsic.hash.toHex();
 
@@ -183,6 +230,7 @@ class ChainService {
                                             account.address
                                         ) {
                                             transactionState.status = true;
+                                            transactionState.eventData = data.toHuman();
                                             return transactionState;
                                         } else if (
                                             method === "ExtrinsicFailed"
@@ -211,6 +259,8 @@ class ChainService {
         } catch (error) {
             if (error instanceof Error) {
                 transactionState.errorMessage = error.message;
+                console.log("*********** error");
+                console.log(error.message);
             }
             transactionState.txError = true;
         } finally {

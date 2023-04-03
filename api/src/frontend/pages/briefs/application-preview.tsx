@@ -5,13 +5,17 @@ import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../../models";
-import { getBrief } from "../../services/briefsService";
+import { acceptBriefApplication, getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
 import "../../../../public/application-preview.css";
 import { HirePopup } from "../../components/hire-popup";
 import ChatPopup from "../../components/chat-popup";
+import ChainService from "../../services/chainService";
+import { getWeb3Accounts, initImbueAPIInfo } from "../../utils/polkadot";
+import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 interface MilestoneItem {
     name: string;
@@ -22,46 +26,84 @@ export type ApplicationPreviewProps = {
     brief: Brief;
     user: User;
     application: Project;
+    freelancer: Freelancer;
 };
 
-export const ApplicationPreview = ({ brief, user, application }: ApplicationPreviewProps): JSX.Element => {
+export const ApplicationPreview = ({ brief, user, application, freelancer }: ApplicationPreviewProps): JSX.Element => {
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
-    const [freelancer, setFreelancer] = useState<Freelancer>();
     const [openPopup, setOpenPopup] = useState<boolean>(false);
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
     const [targetUser, setTargetUser] = useState<User | null>(null);
 
+    const [briefOwner, setBriefOwner] = useState<User>();
     const applicationStatus = ProjectStatus[application.status_id]
- 
+    const isApplicationOwner = user.id == application.user_id;
+    const isBriefOwner = user.id == brief.user_id;
+    const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
+
     useEffect(() => {
+        console.log("***** brief project_id is ");
+        console.log(brief.project_id!)
         async function setup() {
-            const freelancerUser = await fetchUser(Number(application.user_id));
-            setFreelancer(await getFreelancerProfile(freelancerUser.username));
+            const briefOwner: User = await fetchUser(brief.user_id);
+            setBriefOwner(briefOwner);
+            await fetchAndSetAccounts();
         }
         setup();
     }, []);
+
+    const fetchAndSetAccounts = async () => {
+        const accounts = await getWeb3Accounts();
+        const account = accounts.filter(account => account.address === freelancer.web3_address)[0];
+        setFreelancerAccount(account);
+    };
 
     const viewFullBrief = () => {
         redirect(`briefs/${brief.id}/`);
     };
 
-    const updateProject = async () => {
+    const updateProject = async (chainProjectId?: number) => {
         await fetch(`${config.apiBase}/projects/${application.id}`, {
             headers: postAPIHeaders,
             method: "put",
             body: JSON.stringify({
                 user_id: user.id,
-                name: `Brief Application: ${brief.headline}`,
+                name: `${brief.headline}`,
                 total_cost_without_fee: totalCostWithoutFee,
                 imbue_fee: imbueFee,
                 currency_id: currencyId,
                 milestones: milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: m.amount, percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0) } }),
-                required_funds: totalCost
+                required_funds: totalCost,
+                chain_project_id: chainProjectId
             }),
         });
         setIsEditingBio(false)
     };
+
+    const startWork = async () => {
+        if (freelancerAccount) {
+            const imbueApi = await initImbueAPIInfo();
+            const chainService = new ChainService(imbueApi, user);
+            const briefHash = blake2AsHex(JSON.stringify(application));
+            const result = await chainService?.commenceWork(freelancerAccount, briefHash);
+            while (true) {
+                if (result.status || result.txError) {
+                    if (result.status) {
+                        console.log("***** success");
+                        const projectId = parseInt(result.eventData[2]);
+                        await updateProject(projectId);
+                    } else if (result.txError) {
+                        console.log("***** failed");
+                        console.log(result.errorMessage);
+                    }
+                    break;
+                }
+                await new Promise(f => setTimeout(f, 1000));
+            }
+        }
+
+    }
 
     const imbueFeePercentage = 5;
     const applicationMilestones = application.milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: Number(m.amount) } });
@@ -110,7 +152,8 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
         <div className="application-container">
             {user && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,browsingUser:user, targetUser}}/>}
 
-            {(user?.username !== freelancer?.username) && (
+
+            {isBriefOwner && (
                 <>
                 <div className="flex items-center justify-evenly">
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
@@ -126,24 +169,40 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                         <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
                     </div>
                 </div>
-                <HirePopup {...{openPopup, setOpenPopup, freelancer, milestones, totalCostWithoutFee, imbueFee, totalCost}}/>
+                <HirePopup {...{openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }}/>
                 </>
             )}
 
+            {isApplicationOwner && (
+                <div className="flex items-center justify-evenly">
+                    <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
+                    <div className="">
+                        <p className="text-xl font-bold">{briefOwner?.display_name}</p>
+                    </div>
+                    <div>
+                        <p className="text-xl">@{briefOwner?.username}</p>
+                    </div>
+                    <div>
+                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
+                        <button disabled={!brief.project_id} onClick={() => startWork()} className="primary-btn in-dark w-button">Start Work</button>
+                    </div>
+                </div>
+            )}
+
+            <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
+
 
             {
-                (user?.username === freelancer?.username) && (
-                    <div className="section">
-                        <h3 className="section-title">Job description</h3>
-                        <BriefInsights brief={brief} />
-                    </div>
-                )
+                <div className="section">
+                    <h3 className="section-title">Job description</h3>
+                    <BriefInsights brief={brief} />
+                </div>
             }
             <div className="section">
                 <div className="container milestones">
                     <div className="milestone-header mx-14 -mb-3">
                         <h3 className="flex">Milestones
-                            {!isEditingBio && (
+                            {!isEditingBio && isApplicationOwner && (
                                 <div className="edit-icon" onClick={() => setIsEditingBio(true)}><FiEdit /></div>
                             )}
                         </h3>
@@ -252,13 +311,13 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 </div>
             </div>
             <div className="container">
-                <p className="mx-14 mb-4 text-xl font-bold">Cost + Payment Wallet Address to box</p>
+                <p className="mx-14 mb-4 text-xl font-bold">Costs</p>
                 <hr className="separator" />
                 <div className="budget-info mx-14 mt-7">
                     <div className="budget-description">
                         <h3>Total price of the project</h3>
                         <div className="text-inactive">
-                            This includes all milestonees, and is the amount
+                            This includes all milestones, and is the amount
                             client will see
                         </div>
                     </div>
@@ -269,8 +328,7 @@ export const ApplicationPreview = ({ brief, user, application }: ApplicationPrev
                 <div className="budget-info mx-14">
                     <div className="budget-description">
                         <h3>
-                            Imbue Service Fee 5% - Learn more about Imbue’s
-                            fees
+                            Imbue Service Fee 5%
                         </h3>
                     </div>
                     <div className="budget-value">
@@ -358,13 +416,19 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     let paths = window.location.pathname.split("/");
     let briefId = paths.length >= 2 && parseInt(paths[paths.length - 4]);
     let applicationId = paths.length >= 2 && parseInt(paths[paths.length - 2]);
+
     if (briefId && applicationId) {
-        const brief: Brief = await getBrief(briefId);
+
         const application = await fetchProject(applicationId);
+        const freelancerUser = await fetchUser(Number(application.user_id));
+        const freelancer = await getFreelancerProfile(freelancerUser.username);
+
+        const brief: Brief = await getBrief(briefId);
         const user = await getCurrentUser();
+
         ReactDOMClient.createRoot(
             document.getElementById("application-preview")!
-        ).render(<ApplicationPreview brief={brief} user={user} application={application} />);
+        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer} />);
     }
     // TODO 404 page when brief of application is not found
 });

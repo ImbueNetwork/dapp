@@ -3,7 +3,7 @@ import ReactDOMClient from "react-dom/client";
 import { getCurrentUser } from "../../utils";
 import { User } from "../../models";
 
-import { DashboardChat } from "../../components/dashboard-chat";
+import { DashboardView } from "../../components/dashboard-view";
 import "../../../../public/dashboard.css";
 
 export type DashboardProps = {
@@ -13,7 +13,7 @@ export type DashboardProps = {
 export const Dashboard = ({ user: user }: DashboardProps): JSX.Element => {
     return (
         <div>
-            <DashboardChat user={user}></DashboardChat>
+            <DashboardView user={user}></DashboardView>
         </div>
     );
 };

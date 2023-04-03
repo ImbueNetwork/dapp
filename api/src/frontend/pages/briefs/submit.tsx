@@ -70,6 +70,8 @@ export const SubmitProposal = ({ brief, user }: BriefProps): JSX.Element => {
     };
 
     async function insertProject() {
+
+        //TODO: validate all milestone sum up to 100%
         const resp = await fetch(`${config.apiBase}/projects/`, {
             headers: postAPIHeaders,
             method: "post",

@@ -132,7 +132,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
                                 <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} showNewBriefButton={true} />
-                                <h2 className="text-xl font-bold mb-3">Projects</h2>
+                                <h2 className="text-xl font-bold mb-3 mt-10">Projects</h2>
                                 <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
                             </div>
 

@@ -54,9 +54,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
             percentageToUnlock: parseInt(m.percentage_to_unlock)
         }));
 
-
         const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefHash, currencyId, milestones);
-        
         // TODO: handle popup here
         while (true) {
             if (result.status || result.txError) {

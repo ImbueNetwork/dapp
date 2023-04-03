@@ -25,7 +25,7 @@ export type DashboardProps = {
     user: User;
 };
 
-export const DashboardChat = ({ user }: DashboardProps): JSX.Element => {
+export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     const [client, setClient] = useState<StreamChat>();
     const filters = { members: { $in: [user.username] } };
     const [selectedOption, setSelectedOption] = useState<number>(1)

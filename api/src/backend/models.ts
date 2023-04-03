@@ -377,9 +377,14 @@ export const fetchAllProjects = () =>
 
 export const fetchUserProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select().where({
-            user_id: id
-        }).first();
+        fetchAllProjects()(tx)
+        .where({ "id": id })
+        .first()
+
+export const fetchUserProjects = (id: string | number) =>
+    (tx: Knex.Transaction) =>
+        fetchAllProjects()(tx)
+        .where({ "user_id": id })
 
 export const insertMilestones = (
     milestones: ProposedMilestone[],

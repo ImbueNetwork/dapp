@@ -69,6 +69,24 @@ router.get("/:username", (req, res, next) => {
     });
 });
 
+router.get("/:id/applications", (req, res, next) => {
+    const id = req.params.id;
+    db.transaction(async tx => {
+        try {
+            const projects = await models.fetchUserProjects(id)(tx);
+            if (!projects) {
+                return res.status(404).end();
+            }
+            res.send(projects);
+        } catch (e) {
+            next(new Error(
+                `Failed to fetch freelancer applications by userid: ${id}`,
+                { cause: e as Error }
+            ));
+        }
+    });
+});
+
 router.post("/", (req, res, next) => {
     const freelancer = req.body.freelancer as Freelancer;
     verifyUserIdFromJwt(req, res, next, freelancer.user_id)

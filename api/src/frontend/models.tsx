@@ -197,6 +197,7 @@ export type Brief = {
     experience_id: number;
     number_of_briefs_submitted: number;
     user_id: number;
+    project_id?: number;
 };
 
 export type BriefSqlFilter = {

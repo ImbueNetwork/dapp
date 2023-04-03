@@ -39,6 +39,8 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
 
     useEffect(() => {
+        console.log("***** brief project_id is ");
+        console.log(brief.project_id!)
         async function setup() {
             const briefOwner: User = await fetchUser(brief.user_id);
             setBriefOwner(briefOwner);
@@ -164,7 +166,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                     </div>
                     <div>
                         <button className="primary-btn rounded-full w-button dark-button">Message</button>
-                        <button onClick={() => startWork()} className="primary-btn in-dark w-button">Start Work</button>
+                        <button disabled={!brief.project_id} onClick={() => startWork()} className="primary-btn in-dark w-button">Start Work</button>
                     </div>
                 </div>
             )}

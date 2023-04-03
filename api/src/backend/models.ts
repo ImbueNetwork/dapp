@@ -28,6 +28,14 @@ export type Service = {
     name: string
 }
 
+export enum ProjectStatus {
+    Draft = 0,
+    PendingReview = 1,
+    ChangesRequested = 2,
+    Rejected = 3,
+    Accepted = 4,
+}
+
 export type Web3Account = {
     address: string,
     user_id: number;
@@ -93,6 +101,7 @@ export type Project = {
     brief_id?: string | number;
     total_cost_without_fee?: number;
     imbue_fee?: number;
+    status_id?: number;
 };
 
 export type ProjectProperties = {

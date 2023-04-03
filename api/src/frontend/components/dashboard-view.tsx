@@ -12,7 +12,7 @@ import {
     Window,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
-import { getStreamChat, redirect } from "../utils";
+import { fetchUser, getStreamChat, redirect } from "../utils";
 import "../Styles/dashboard.css";
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, StyledEngineProvider, TextField } from "@mui/material";
@@ -20,6 +20,7 @@ import { ApplicationContainer } from "../pages/briefs/applications";
 import { getBriefApplications, getUserBriefs } from "../services/briefsService";
 import { CustomChannelHeader } from "./chat";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ChatPopup from "./chat-popup";
 import { getFreelancerApplications } from "../services/freelancerService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -37,8 +38,12 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     const [unreadMessages, setUnreadMsg] = useState<number>(0)
     const [briefs, setBriefs] = useState<any>({})
     const [briefId, setBriefId] = useState<number>()
+    const [applications, setApplications] = useState<any[]>([])
+    const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
+    const [targetUser, setTargetUser] = useState<User | null>(null);
     const [briefApplications, setBriefApplications] = useState<Project[]>([])
     const [myApplications, setMyApplications] = useState<Project[]>([])
+
 
     useEffect(() => {
         const setup = async () => {
@@ -54,8 +59,13 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     }, [briefId])
 
 
-    const handleMessageBoxClick = async (user_id) => {
-        // TODO: Implement chat popup 
+    const handleMessageBoxClick = async (user_id, freelancer) => {
+        if (user_id) {
+            setShowMessageBox(true);
+            setTargetUser(await fetchUser(user_id));
+        } else {
+            redirect("login", `/dapp/freelancers/${freelancer?.username}/`)
+        }
     }
 
     const redirectToBriefApplications = (applicationId) => {
@@ -122,7 +132,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
                                 <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} showNewBriefButton={true} />
-                                <h2 className="text-xl font-bold mb-3">Projects</h2>
+                                <h2 className="text-xl font-bold mb-3 mt-10">Projects</h2>
                                 <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
                             </div>
 
@@ -136,6 +146,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                 selectedOption === 3 &&
                 < MyFreelancerApplications myApplications={myApplications} />
             }
+            {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser: user }} />}
         </div>
     ) : (
         <p>REACT_APP_GETSTREAM_API_KEY not found</p>
@@ -156,7 +167,7 @@ function BriefLists({ briefs = [], setBriefId, showNewBriefButton }: { briefs: a
                 briefs?.map((brief, index) => (
                     <div
                         key={index}
-                        onClick={() => setBriefId(brief.id)}
+                        onClick={() => brief.number_of_applications && !brief.project_id && setBriefId(brief.id)}
                         className="list-item-container justify-between">
                         <div className="flex flex-col gap-3">
                             <h3 className="text-xl font-bold">{brief.headline}</h3>
@@ -164,7 +175,7 @@ function BriefLists({ briefs = [], setBriefId, showNewBriefButton }: { briefs: a
                             <p>Created {timeAgo.format(new Date(brief.created))}</p>
                         </div>
                         {
-                            brief.projectid
+                            brief.project_id
                                 ? <div className="flex flex-col items-center">
                                     <h2>Milestones <span className="primary-text">{brief.milestones?.filter((m) => m.is_approved)?.length}/{brief.milestones?.length}</span></h2>
                                     <div className="w-48 bg-[#1C2608] h-1 relative my-auto">
@@ -176,7 +187,7 @@ function BriefLists({ briefs = [], setBriefId, showNewBriefButton }: { briefs: a
                                         </div>
                                         <div className="flex justify-evenly">
                                             {
-                                                brief.milestones?.map((m) => (<div className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
+                                                brief.milestones?.map((m, i) => (<div key={i} className={`h-4 w-4 ${m.is_approved ? "Accepted-button" : "bg-[#1C2608]"} rounded-full -mt-1.5`}></div>))
                                             }
                                         </div>
                                     </div>

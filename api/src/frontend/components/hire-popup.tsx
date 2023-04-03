@@ -13,11 +13,10 @@ import { BasicTxResponse } from '../models';
 import { getCurrentUser } from '../utils';
 import { acceptBriefApplication } from '../services/briefsService';
 
-export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
+export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost,setLoading }) => {
     const [popupStage, setstage] = useState<number>(0)
     const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2])
     const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
-
     const modalStyle = {
         position: 'absolute' as 'absolute',
         top: '50%',
@@ -25,12 +24,14 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
         transform: 'translate(-50%, -50%)',
         width: "65vw",
         height: "auto",
+        minHeight:"510px",
         bgcolor: '#2c2c2c',
         color: '#fff',
         pt: '28px',
         pb: '28px',
         boxShadow: 24,
-        borderRadius: '20px'
+        borderRadius: '20px',
+        zIndex:1
     };
 
     const fetchAndSetAccounts = async () => {
@@ -39,6 +40,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
     };
 
     const selectedAccount = async (account: InjectedAccountWithMeta) => {
+        setLoading(true)
         const imbueApi = await initImbueAPIInfo();
         const user: User = await getCurrentUser();
         const chainService = new ChainService(imbueApi, user);
@@ -54,14 +56,14 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
             percentageToUnlock: parseInt(m.percentage_to_unlock)
         }));
 
-        const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefHash, currencyId, milestones);
+        const result = await chainService?.hireFreelancer(account, briefOwners, freelancerAddress, budget, initialContribution, briefHash, currencyId, milestones);
         // TODO: handle popup here
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log("***** success");
                     const briefId = brief.id;
-                    const resp = await acceptBriefApplication(briefId! , application.id);
+                    const resp = await acceptBriefApplication(briefId!, application.id);
                     console.log(result.eventData);
                 } else if (result.txError) {
                     console.log("***** failed");
@@ -71,7 +73,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
             }
             await new Promise(f => setTimeout(f, 1000));
         }
-
+        setLoading(false)
         setstage(0);
         setOpenPopup(false)
     }
@@ -170,7 +172,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
                 <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
                 {
                     accounts.map((account, index) => (
-                        <div key={index} onClick={()=> selectedAccount(account)} className='w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
+                        <div key={index} onClick={() => selectedAccount(account)} className='w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
                             <p className='text-center'>{account.address}</p>
                         </div>
                     ))
@@ -180,33 +182,38 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
         )
     }
 
-    return (
-        <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            open={openPopup}
-            onClose={() => { setOpenPopup(false); setstage(0) }}
-            closeAfterTransition
-            slots={{ backdrop: Backdrop }}
-            slotProps={{
-                backdrop: {
-                    timeout: 500,
-                },
-            }}>
-            <Fade in={openPopup}>
-                <Box sx={modalStyle}>
-                    {
-                        (!popupStage && openPopup) && <FirstContent />
-                    }
-                    {
-                        popupStage === 1 && <SecondContent />
-                    }
-                    {
-                        popupStage === 2 && <ThirdContent />
-                    }
-                </Box>
-            </Fade>
-        </Modal>
 
+    return (
+        <>
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={openPopup}
+                onClose={() => { setOpenPopup(false); setstage(0) }}
+                closeAfterTransition
+                slots={{ backdrop: Backdrop }}
+                sx={{zIndex:4}}
+                slotProps={{
+                    backdrop: {
+                        timeout: 500,
+                    },
+                }}>
+                <Fade in={openPopup}>
+                    <Box sx={modalStyle}>
+                        {
+                            (!popupStage && openPopup) && <FirstContent />
+                        }
+                        {
+                            popupStage === 1 && <SecondContent />
+                        }
+                        {
+                            popupStage === 2 && <ThirdContent />
+                        }
+                    </Box>
+                </Fade>
+            </Modal>
+
+            
+        </>
     );
 };

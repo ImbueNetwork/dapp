@@ -293,11 +293,31 @@ select {
     background: var(--theme-black-text);
 }
 
-.grey-container:hover{
+.primary-hover:hover{
     border: 1px solid var(--theme-primary);
     background: var(--theme-black-text);
 }
 
 .primary-text{
     color: var(--theme-primary);
+}
+
+.Accepted-btn{
+    background-color: var(--theme-primary);
+    color: #000;
+}
+
+.Rejected-btn{
+    background-color: var(--theme-error);
+    color: #000;
+}
+
+.Request-btn{
+    background-color: yellow;
+    color: #000;
+}
+
+.Pending.Review-btn{
+    background-color: var(--theme-grey-dark);
+    color: white;
 }

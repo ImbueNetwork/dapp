@@ -17,3 +17,7 @@ p {
     height: 480px;
     background-color: var(--theme-grey-dark);
 }
+
+.MuiSkeleton-root{
+    background-color: rgb(255 255 255 / 11%);
+}

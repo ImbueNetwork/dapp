@@ -1,5 +1,5 @@
 import * as config from "../config";
-import { Brief, Freelancer, Project } from "../models";
+import { Brief, Freelancer, Project, User } from "../models";
 import { BriefSqlFilter } from "../models";
 
 const getAPIHeaders = {
@@ -88,7 +88,9 @@ export const acceptBriefApplication = async (briefId: string | number, projectId
     const resp = await fetch(`${config.apiBase}/briefs/${briefId}/accept`, {
         headers: postAPIHeaders,
         method: "put",
-        body: JSON.stringify({ projectId })
+        body: JSON.stringify({
+            project_id: projectId,
+         })
     })
 
     if (resp.ok) {

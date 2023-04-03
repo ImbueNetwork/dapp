@@ -11,8 +11,9 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import ChainService from '../services/chainService';
 import { BasicTxResponse } from '../models';
 import { getCurrentUser } from '../utils';
+import { acceptBriefApplication } from '../services/briefsService';
 
-export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
+export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }) => {
     const [popupStage, setstage] = useState<number>(0)
     const [walletOptions, setWalletOptions] = useState<number[]>([0, 1, 2])
     const [accounts, setAccounts] = React.useState<InjectedAccountWithMeta[]>([]);
@@ -46,22 +47,24 @@ export const HirePopup = ({ openPopup, setOpenPopup, freelancer, application, mi
         const freelancerAddress: string = freelancer.web3_address;
         const budget: bigint = BigInt(totalCost * 1e12);
         const initialContribution: bigint = BigInt(totalCost * 1e12);
-        const briefId = blake2AsHex(JSON.stringify(application));
+        const briefHash = blake2AsHex(JSON.stringify(application));
         const currencyId = application.currency_id;
 
         const milestones = application.milestones.map((m, idx) => ({
             percentageToUnlock: parseInt(m.percentage_to_unlock)
         }));
 
-        const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefId, currencyId, milestones);
+
+        const result = await chainService?.hireFreelancer(account, briefOwners,freelancerAddress,budget,initialContribution,briefHash, currencyId, milestones);
         
         // TODO: handle popup here
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log("***** success");
+                    const briefId = brief.id;
+                    const resp = await acceptBriefApplication(briefId! , application.id);
                     console.log(result.eventData);
-
                 } else if (result.txError) {
                     console.log("***** failed");
                     console.log(result.errorMessage);

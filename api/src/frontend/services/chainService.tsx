@@ -63,7 +63,7 @@ class ChainService {
         freelancerAddress: string, 
         budget: bigint, 
         initialContribution: bigint, 
-        briefId: string,
+        briefHash: string,
         currencyId: number, 
         milestones: any[]): Promise<BasicTxResponse> {
         const extrinsic =
@@ -72,7 +72,7 @@ class ChainService {
                 freelancerAddress,
                 budget,
                 initialContribution,
-                briefId,
+                briefHash,
                 currencyId,
                 milestones
             );

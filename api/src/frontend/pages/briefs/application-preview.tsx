@@ -57,25 +57,25 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
         redirect(`briefs/${brief.id}/`);
     };
 
-    const updateProject = async () => {
+    const updateProject = async (chainProjectId?: number) => {
         await fetch(`${config.apiBase}/projects/${application.id}`, {
             headers: postAPIHeaders,
             method: "put",
             body: JSON.stringify({
                 user_id: user.id,
-                name: `Brief Application: ${brief.headline}`,
+                name: `${brief.headline}`,
                 total_cost_without_fee: totalCostWithoutFee,
                 imbue_fee: imbueFee,
                 currency_id: currencyId,
                 milestones: milestones.filter(m => m.amount !== undefined).map(m => { return { name: m.name, amount: m.amount, percentage_to_unlock: (((m.amount ?? 0) / totalCostWithoutFee) * 100).toFixed(0) } }),
-                required_funds: totalCost
+                required_funds: totalCost,
+                chain_project_id: chainProjectId
             }),
         });
         setIsEditingBio(false)
     };
 
     const startWork = async () => {
-
         if (freelancerAccount) {
             const imbueApi = await initImbueAPIInfo();
             const chainService = new ChainService(imbueApi, user);
@@ -84,12 +84,9 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
             while (true) {
                 if (result.status || result.txError) {
                     if (result.status) {
-                        const projectId = result.eventData[2];
-                        const briefId = brief.id;
-                        const resp = await acceptBriefApplication(briefId! , projectId);
-
-                        console.log("****** resp is ");
-                        console.log(resp);
+                        console.log("***** success");
+                        const projectId = parseInt(result.eventData[2]);
+                        await updateProject(projectId);
                     } else if (result.txError) {
                         console.log("***** failed");
                         console.log(result.errorMessage);
@@ -172,7 +169,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                 </div>
             )}
 
-            <HirePopup {...{ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
+            <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
 
             {
                 <div className="section">

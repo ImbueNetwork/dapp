@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones, User, fetchProject, acceptBriefApplication } from "../../../models";
+import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones, User, fetchProject, acceptBriefApplication, fetchUser } from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
@@ -130,21 +130,25 @@ router.post("/search", (req, res, next) => {
 
 router.put("/:id/accept", async (req, res, next) => {
     const id = req.params.id;
-    const projectId = req.body.project_id ;
-    const briefOwner = req.body.brief_owner as User;
-    verifyUserIdFromJwt(req, res, next, briefOwner.id)
-
+    const projectId = req.body.project_id;
     db.transaction(async tx => {
-
         try {
-            const exists: any = await fetchProject(projectId)(tx);
-            if (!exists) {
+            let brief: Brief = await fetchBrief(id)(tx);
+            if (!brief) {
                 return next(new Error(
-                    "Brief Application does not exist."
+                    "Brief does not exist."
                 ));
             }
-            let brief = await acceptBriefApplication(id, projectId)(tx);
-            return res.send(brief);
+            let briefOwner = await fetchUser(brief.user_id)(tx) as User;
+            verifyUserIdFromJwt(req, res, next, briefOwner?.id);
+            let project = await fetchProject(projectId)(tx);
+            if (!project) {
+                return next(new Error(
+                    "Project does not exist."
+                ));
+            }
+            let updatedBrief = await acceptBriefApplication(id, projectId)(tx);
+            return res.send(updatedBrief);
         } catch (e: any) {
             return next(new Error(
                 `Failed to accept brief application: ${e.message}`,

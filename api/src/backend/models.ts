@@ -347,12 +347,12 @@ export const fetchUserBriefApplications = (user_id: string | number, brief_id: s
 
 export const fetchProject = (id: string | number) =>
     (tx: Knex.Transaction) =>
-        tx<Project>("projects").select().where({ id }).first();
+        tx<Project>("projects").select().where({ "id": id }).first();
 
 export const acceptBriefApplication = (id: string | number, project_id: number) =>
     async (tx: Knex.Transaction) => (
         await tx<Brief>("briefs").update({
-            project_id,
+            "project_id": project_id,
         }).where({
             id
         }).returning("*")

@@ -16,6 +16,7 @@ import ChainService from "../../services/chainService";
 import { getWeb3Accounts, initImbueAPIInfo } from "../../utils/polkadot";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { Backdrop, CircularProgress } from "@mui/material";
 
 interface MilestoneItem {
     name: string;
@@ -29,18 +30,20 @@ export type ApplicationPreviewProps = {
     freelancer: Freelancer;
 };
 
+const applicationStatusId = ["Draft", "Pending Review", "Changes Requested", "Rejected", "Accepted"]
+
 export const ApplicationPreview = ({ brief, user, application, freelancer }: ApplicationPreviewProps): JSX.Element => {
     const [currencyId, setCurrencyId] = useState(application.currency_id);
     const [isEditingBio, setIsEditingBio] = useState<boolean>(false);
     const [openPopup, setOpenPopup] = useState<boolean>(false);
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false)
     const [targetUser, setTargetUser] = useState<User | null>(null);
-
     const [briefOwner, setBriefOwner] = useState<User>();
     const applicationStatus = ProjectStatus[application.status_id]
     const isApplicationOwner = user.id == application.user_id;
     const isBriefOwner = user.id == brief.user_id;
     const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
+    const [loading, setLoading] = useState<boolean>(false)
 
     console.log(application);
 
@@ -64,6 +67,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     };
 
     const updateProject = async (chainProjectId?: number) => {
+        setLoading(true)
         await fetch(`${config.apiBase}/projects/${application.id}`, {
             headers: postAPIHeaders,
             method: "put",
@@ -78,11 +82,13 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                 chain_project_id: chainProjectId
             }),
         });
+        setLoading(false)
         setIsEditingBio(false)
     };
 
     const startWork = async () => {
         if (freelancerAccount) {
+            setLoading(true)
             const imbueApi = await initImbueAPIInfo();
             const chainService = new ChainService(imbueApi, user);
             const briefHash = blake2AsHex(JSON.stringify(application));
@@ -101,6 +107,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                 }
                 await new Promise(f => setTimeout(f, 1000));
             }
+            setLoading(false)
         }
 
     }
@@ -150,26 +157,31 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
 
     return (
         <div className="application-container">
-            {user && showMessageBox && <ChatPopup {...{showMessageBox, setShowMessageBox,browsingUser:user, targetUser}}/>}
+            {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, browsingUser: user, targetUser }} />}
 
 
             {isBriefOwner && (
                 <>
-                <div className="flex items-center justify-evenly">
-                    <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
-                    <div className="">
-                        <p className="text-xl font-bold">{freelancer?.display_name}</p>
-                        <p className="text-base mt-2 underline cursor-pointer primary-text" onClick={()=>redirect(`freelancers/${freelancer?.username}/`)}>View Full Profile</p>
+                    <div className="flex items-center justify-evenly">
+                        <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
+                        <div className="">
+                            <p className="text-xl font-bold">{freelancer?.display_name}</p>
+                            <p className="text-base mt-2 underline cursor-pointer primary-text" onClick={() => redirect(`freelancers/${freelancer?.username}/`)}>View Full Profile</p>
+                        </div>
+                        <div>
+                            <p className="text-xl primary-text">@{freelancer?.username}</p>
+                        </div>
+                        <div>
+                            <button className="primary-btn rounded-full w-button dark-button" onClick={() => handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
+                            {
+                                application.status_id !== 4
+                                    ? <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
+                                    : <button className="Accepted-btn in-dark w-button rounded-full px-6 py-3">{applicationStatusId[application?.status_id]}</button>
+                            }
+
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-xl primary-text">@{freelancer?.username}</p>
-                    </div>
-                    <div>
-                        <button className="primary-btn rounded-full w-button dark-button" onClick={()=>handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
-                        <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button">Hire</button>
-                    </div>
-                </div>
-                <HirePopup {...{openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }}/>
+                    <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost, setLoading }} />
                 </>
             )}
 
@@ -183,14 +195,26 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                         <p className="text-xl">@{briefOwner?.username}</p>
                     </div>
                     <div>
-                        <button className="primary-btn rounded-full w-button dark-button">Message</button>
-                        <button disabled={!brief.project_id} onClick={() => startWork()} className="primary-btn in-dark w-button">Start Work</button>
+                        <button className="primary-btn in-dark w-button" onClick={() => handleMessageBoxClick(brief.user_id, freelancer?.username)}>Message</button>
+                        {
+                            application.status_id === 4
+                                ? <button onClick={() => brief.project_id && startWork()} className="Accepted-btn in-dark w-button rounded-full text-black px-6 py-3">Start Work</button>
+                                : <button className={`${applicationStatusId[application?.status_id]}-btn in-dark w-button rounded-full px-6 py-3`}>{applicationStatusId[application?.status_id]}</button>
+                        }
+
                     </div>
                 </div>
             )}
 
-            <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
+            <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost, setLoading }} />
 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 5 }}
+                open={loading}
+            // onClick={handleClose}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
 
             {
                 <div className="section">

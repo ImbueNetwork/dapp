@@ -301,3 +301,13 @@ select {
 .primary-text{
     color: var(--theme-primary);
 }
+
+.Accepted-btn{
+    background-color: var(--theme-primary);
+    color: #000;
+}
+
+.Pending.Review-btn{
+    background-color: var(--theme-grey-dark);
+    color: white;
+}

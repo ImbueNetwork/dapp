@@ -126,11 +126,15 @@
     background-color: var(--theme-primary);
 }
 
-.Pending-button{
+.ChangesRequested-button{
+    background-color: yellow;
+}
+
+.PendingReview-button{
     background-color: var(--theme-yellow);
 }
 
-.Rejected-button, .Expired-button{
+.Rejected-button{
     background-color: var(--theme-error);
 }
 

@@ -121,7 +121,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
                             </div>
                             : <div>
                                 <h2 className="text-xl font-bold mb-3">Open Briefs</h2>
-                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} />
+                                <BriefLists briefs={briefs?.briefsUnderReview} setBriefId={setBriefId} showNewBriefButton={true} />
                                 <h2 className="text-xl font-bold mb-3">Projects</h2>
                                 <BriefLists briefs={briefs?.acceptedBriefs} setBriefId={setBriefId} />
                             </div>
@@ -142,8 +142,13 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     );
 };
 
-function BriefLists({ briefs = [], setBriefId }: { briefs: any[], setBriefId: Function }) {
-    if (briefs?.length === 0) return <h2>Nothing to show</h2>
+function BriefLists({ briefs = [], setBriefId,showNewBriefButton }: { briefs: any[], setBriefId: Function, showNewBriefButton?: Boolean }) {
+    const redirectToNewBrief = () => {
+        redirect(`briefs/new`);
+    };
+
+    if (briefs?.length === 0 && showNewBriefButton) return <button onClick={() => { redirectToNewBrief() }} className="primary-btn in-dark w-button w-1/3" style={{ textAlign: "center" }} >Post Brief</button>
+    if (briefs?.length === 0 && !showNewBriefButton) return <h2>Nothing to show</h2>
 
     return (
         <div className="list-container mb-8">
@@ -220,7 +225,12 @@ function MyFreelancerApplications({ myApplications }) {
         redirect(`briefs/${application.brief_id}/applications/${application.id}/`);
     };
 
-    if (myApplications?.length === 0) return <h2>Nothing to show</h2>
+    const redirectToDiscoverBriefs = () => {
+        redirect(`briefs/`);
+    };
+
+    if (myApplications?.length === 0) return <button onClick={() => { redirectToDiscoverBriefs() }} className="primary-btn in-dark w-button w-1/3" style={{ textAlign: "center" }} >Discover Briefs</button>
+
 
     return (
         <div className="list-container">

@@ -31,6 +31,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const [briefOwner, setBriefOwner] = useState<User>();
     const applicationStatus = ProjectStatus[application.status_id]
     const isApplicationOwner = user.id == application.user_id;
+    const isBriefOwner = user.id == brief.user_id;
 
     useEffect(() => {
         async function setup() {
@@ -98,7 +99,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     return (
         <div className="application-container">
 
-            {(user?.id == brief?.user_id) && (
+            {isBriefOwner && (
                 <div className="flex items-center justify-evenly">
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                     <div className="">
@@ -115,7 +116,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                 </div>
             )}
 
-            {(user?.id == freelancer?.user_id) && (
+            {isApplicationOwner && (
                 <div className="flex items-center justify-evenly">
                     <img className="w-16 h-16 rounded-full object-cover" src='/public/profile-image.png' alt="" />
                     <div className="">
@@ -135,12 +136,10 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
             <HirePopup {...{ openPopup, setOpenPopup, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost }} />
 
             {
-                (user?.username === freelancer?.username) && (
                     <div className="section">
                         <h3 className="section-title">Job description</h3>
                         <BriefInsights brief={brief} />
                     </div>
-                )
             }
             <div className="section">
                 <div className="container milestones">

@@ -142,7 +142,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
     );
 };
 
-function BriefLists({ briefs = [], setBriefId,showNewBriefButton }: { briefs: any[], setBriefId: Function, showNewBriefButton?: Boolean }) {
+function BriefLists({ briefs = [], setBriefId, showNewBriefButton }: { briefs: any[], setBriefId: Function, showNewBriefButton?: Boolean }) {
     const redirectToNewBrief = () => {
         redirect(`briefs/new`);
     };

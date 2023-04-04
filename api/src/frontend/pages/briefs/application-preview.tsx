@@ -156,7 +156,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
 
     const updateApplicationState = async (application, projectStatus: ProjectStatus) => {
         await updateBriefApplicationStatus(application.brief_id, application.id, projectStatus);
-        window.location.reload(false);
+        window.location.reload();
     }
 
     return (

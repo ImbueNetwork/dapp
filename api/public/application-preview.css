@@ -282,6 +282,10 @@ select {
     background-color: var(--theme-primary);
     color: #000;
 }
+.modal-container{
+    height: 100%;
+    margin: auto;
+}
 
 .modal-container h3 {
     font-size: 20px;
@@ -291,6 +295,10 @@ select {
 
 .grey-container{
     background: var(--theme-black-text);
+}
+
+.grey-container:hover{
+    border: 1px solid var(--theme-primary);
 }
 
 .primary-hover:hover{

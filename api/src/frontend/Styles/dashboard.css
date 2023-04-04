@@ -99,12 +99,12 @@
     overflow: hidden;
 }
 
-.css-1bjk3jo-MuiButtonBase-root-MuiBottomNavigationAction-root{
+.MuiButtonBase-root.MuiBottomNavigationAction-root{
     max-width: 33.34%;
     color: white;
 }
 
-.css-1bjk3jo-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected{
+.MuiButtonBase-root.MuiBottomNavigationAction-root.Mui-selected{
     background-color: var(--theme-primary);
     color: black;
 }
@@ -114,7 +114,7 @@
     font-size: 18px;
 }
 
-.MuiBox-root svg, .css-dhvfrb-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active{
+.MuiBox-root svg{
     color: white;
 }
 
@@ -131,7 +131,8 @@
 }
 
 .PendingReview-button{
-    background-color: var(--theme-yellow);
+    background-color: var(--theme-background);
+    color: white;
 }
 
 .Rejected-button{

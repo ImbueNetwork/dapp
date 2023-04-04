@@ -23,8 +23,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: "65vw",
-        height: "auto",
-        minHeight:"510px",
+        height: "80vh",
         bgcolor: '#2c2c2c',
         color: '#fff',
         pt: '28px',
@@ -156,7 +155,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
 
     const SecondContent = () => {
         return (
-            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto">
+            <div className="flex flex-col justify-center items-center modal-container w-2/3 mx-auto my-auto">
                 <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Deposit Fuds</h3>
                 <p className="text-center w-full text-xl font-bold my-4">Deposit the funds required for the project, these funds will be taken from your account once the freelancer starts the project.</p>
                 <p className="text-center w-full text-xl font-bold my-4">The  funds are then paid to the freelancer iin stages only when you approve the completion of each milestone</p>
@@ -169,7 +168,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
     const ThirdContent = () => {
         return (
             <div className="flex flex-col justify-center items-center modal-container">
-                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Hire This Freelancer</h3>
+                <h3 className="text-center w-full text-xl font-bold my-4 primary-text">Choose Your Account</h3>
                 {
                     accounts.map((account, index) => (
                         <div key={index} onClick={() => selectedAccount(account)} className='w-2/3 h-14 grey-container mb-3 flex justify-center items-center cursor-pointer'>
@@ -189,7 +188,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 open={openPopup}
-                onClose={() => { setOpenPopup(false); setstage(0) }}
+                onClose={() => { setOpenPopup(false)}}
                 closeAfterTransition
                 slots={{ backdrop: Backdrop }}
                 sx={{zIndex:4}}

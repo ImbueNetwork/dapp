@@ -100,14 +100,7 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-
-
-    // const {imbueNetworkWebsockAddr, relayChainWebsockAddr, _} = (await fetch(`${config.apiBase}/info`).then(
-        // resp => resp.json()
-    // ));
-
-
-    const {_, getstreamApiKey} = (await fetch(`${config.apiBase}/info`).then(
+    const {imbueNetworkWebsockAddr, relayChainWebsockAddr, getstreamApiKey} = (await fetch(`${config.apiBase}/info`).then(
         resp => resp.json()
     ));
 

@@ -43,7 +43,7 @@ migrate_reset: node_modules
 seed:
 	yarn run knex --cwd ${DBDIR} seed:run
 
-db_up: migrate seed
+db_up: migrate
 
 db_down: migrate_reset
 

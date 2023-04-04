@@ -145,23 +145,19 @@
 
 #demo-simple-select-helper-label,
 #demo-simple-select-helper,
-.css-hfutr2-MuiSvgIcon-root-MuiSelect-icon{
+.MuiSvgIcon-root.MuiSvgIcon-fontSizeMedium.MuiSelect-icon.MuiSelect-iconOutlined{
     color: #fff;
 }
 
-.css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root:hover .MuiOutlinedInput-notchedOutline{
+.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:hover .MuiOutlinedInput-notchedOutline{
     border: 1px solid white;
 }
 
-.css-1poimk-MuiPaper-root-MuiMenu-paper-MuiPaper-root-MuiPopover-paper {
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiPaper-root.MuiMenu-paper.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPopover-paper {
     background-color: var(--theme-grey-dark);
     color: white;
 }
 
-.css-1d3z3hw-MuiOutlinedInput-notchedOutline{
+.MuiOutlinedInput-notchedOutline{
     border-color: var(--theme-light-white);
-}
-
-.css-1mkefvk-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root.Mui-focused .MuiOutlinedInput-notchedOutline{
-    border-color: #1976d2;
 }

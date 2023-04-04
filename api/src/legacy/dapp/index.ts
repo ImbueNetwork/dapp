@@ -313,7 +313,7 @@ window.customElements.define("imbu-dapp", class extends HTMLElement {
     }
 
     async initImbueAPIInfo(): Promise<ImbueApiInfo> {
-        const {imbueNetworkWebsockAddr, relayChainWebsockAddr} = (await fetch(`${config.apiBase}/info`).then(
+        const {imbueNetworkWebsockAddr, relayChainWebsockAddr, _} = (await fetch(`${config.apiBase}/info`).then(
             resp => resp.json()
         ));
 

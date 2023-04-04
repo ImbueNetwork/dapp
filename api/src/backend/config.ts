@@ -17,6 +17,7 @@ export default {
             callbackURL: `${process.env.WEB_HOST}/auth/oauth2/accounts.google.com/redirect`,
         }
     },
+    getstreamApiKey: process.env.GETSTREAM_API_KEY,
     imbueNetworkWebsockAddr: process.env.IMBUE_NETWORK_WEBSOCK_ADDR,
     relayChainWebsockAddr: process.env.RELAY_CHAIN_WEBSOCK_ADDR
 };

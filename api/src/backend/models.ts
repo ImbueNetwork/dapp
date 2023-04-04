@@ -294,8 +294,8 @@ export const insertUserByDisplayName = (displayName: string, username: string) =
     )[0];
 
 export const generateGetStreamToken = async (user: User) => {
-    if (process.env.REACT_APP_GETSTREAM_API_KEY && process.env.REACT_APP_GETSTREAM_SECRET_KEY) {
-        const client: StreamChat = new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY, process.env.REACT_APP_GETSTREAM_SECRET_KEY);
+    if (process.env.GETSTREAM_API_KEY && process.env.GETSTREAM_SECRET_KEY) {
+        const client: StreamChat = new StreamChat(process.env.GETSTREAM_API_KEY, process.env.GETSTREAM_SECRET_KEY);
         const token = client.createToken(user.username);
         await client.upsertUser({ id: user.username });
         return token;

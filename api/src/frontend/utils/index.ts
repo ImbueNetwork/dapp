@@ -100,9 +100,18 @@ export function validateForm(form: HTMLFormElement): boolean {
 }
 
 export const getStreamChat = async () => {
-    if (process.env.REACT_APP_GETSTREAM_API_KEY) {
-        return new StreamChat(process.env.REACT_APP_GETSTREAM_API_KEY);
-    }
+
+
+    // const {imbueNetworkWebsockAddr, relayChainWebsockAddr, _} = (await fetch(`${config.apiBase}/info`).then(
+        // resp => resp.json()
+    // ));
+
+
+    const {_, getstreamApiKey} = (await fetch(`${config.apiBase}/info`).then(
+        resp => resp.json()
+    ));
+
+    return new StreamChat(getstreamApiKey);
 }
 
 function reportValidity(input: HTMLInputElement, submitting: boolean = false) {

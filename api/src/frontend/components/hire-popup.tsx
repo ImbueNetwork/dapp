@@ -11,7 +11,7 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import ChainService from '../services/chainService';
 import { BasicTxResponse } from '../models';
 import { getCurrentUser } from '../utils';
-import { acceptBriefApplication } from '../services/briefsService';
+import { changeBriefApplicationStatus } from '../services/briefsService';
 
 export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost,setLoading }) => {
     const [popupStage, setstage] = useState<number>(0)
@@ -58,13 +58,12 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
             percentageToUnlock: parseInt(m.percentage_to_unlock)
         }));
         const result = await chainService?.hireFreelancer(account, briefOwners, freelancerAddress, budget, initialContribution, briefHash, currencyId, milestones);
-        // TODO: handle popup here
         while (true) {
             if (result.status || result.txError) {
                 if (result.status) {
                     console.log("***** success");
                     const briefId = brief.id;
-                    await acceptBriefApplication(briefId!, application.id);
+                    await changeBriefApplicationStatus(briefId!, application.id, ProjectStatus.Accepted);
                     console.log(result.eventData);
                 } else if (result.txError) {
                     console.log("***** failed");

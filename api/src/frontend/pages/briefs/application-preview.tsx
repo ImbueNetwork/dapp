@@ -5,7 +5,7 @@ import MilestoneItem from "../../components/milestoneItem";
 import { timeData } from "../../config/briefs-data";
 import * as config from "../../config";
 import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../../models";
-import { acceptBriefApplication, getBrief } from "../../services/briefsService";
+import { changeBriefApplicationStatus as updateBriefApplicationStatus, getBrief } from "../../services/briefsService";
 import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
@@ -154,6 +154,11 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
         }
     }
 
+    const updateApplicationState = async (application, projectStatus: ProjectStatus) => {
+        await updateBriefApplicationStatus(application.brief_id, application.id, projectStatus);
+        window.location.reload(false);
+    }
+
     return (
         <div className="application-container">
             {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, browsingUser: user, targetUser }} />}
@@ -173,14 +178,15 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
 
                         <div className="grid grid-cols-2 gap-2">
                             {
-                                application.status_id == ProjectStatus.PendingReview && (
+                                application.status_id == ProjectStatus.PendingReview ?
                                     <>
                                         <button onClick={() => { setOpenPopup(true) }} className="Accepted-btn in-dark w-button rounded-full px-1 py-2 dark-button">Hire</button>
-                                        <button className="Request-btn in-dark w-button rounded-full px-1 py-2 dark-button">Request Changes</button>
-                                        <button className="Rejected-btn in-dark w-button rounded-full px-1 py-2 dark-button">Reject</button>
+                                        <button onClick={() => { updateApplicationState(application, ProjectStatus.ChangesRequested) }} className="Request-btn in-dark w-button rounded-full px-1 py-2 dark-button">Request Changes</button>
+                                        <button onClick={() => { updateApplicationState(application, ProjectStatus.Rejected) }} className="Rejected-btn in-dark w-button rounded-full px-1 py-2 dark-button">Reject</button>
                                     </>
+                                    :
+                                    <button className={`${applicationStatusId[application?.status_id]}-btn in-dark w-button rounded-full px-6 py-3`}>{applicationStatusId[application?.status_id]}</button>
 
-                                )
                             }
                         </div>
                     </div>

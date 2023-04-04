@@ -256,7 +256,7 @@ function MyFreelancerApplications({ myApplications }) {
                         </div>
                         <div className="flex flex-col justify-evenly items-center ml-auto">
                             <span>{timeAgo.format(new Date(application.created))}</span>
-                            <div className={`px-4 py-2 text-black ${ProjectStatus[application.status_id]}-button w-fit rounded-full`}>{ProjectStatus[application.status_id]}</div>
+                            <div className={`px-4 py-2 ${ProjectStatus[application.status_id]}-button w-fit rounded-full`}>{ProjectStatus[application.status_id]}</div>
                         </div>
                     </div>
                 ))

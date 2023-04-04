@@ -149,9 +149,7 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
             {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser: user }} />}
         </div>
     ) : (
-        <p>GETSTREAM
-
-_API_KEY not found</p>
+        <p>GETSTREAM_API_KEY not found</p>
     );
 };
 

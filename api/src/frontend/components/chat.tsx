@@ -134,9 +134,7 @@ export const ChatBox = ({ user, targetUser, showMessageBox, setShowMessageBox }:
                 }
             } catch (error) {
                 console.log(error);
-                setContent(<p>GETSTREAM
-
-_API_KEY not found</p>)
+                setContent(<p>GETSTREAM_API_KEY not found</p>)
             }
 
         }

@@ -10,7 +10,7 @@ clean_deps:
 	rm -rf node_modules/
 
 node_modules:
-	yarn install
+	yarn install --force
 
 build: node_modules
 	yarn build/frontend

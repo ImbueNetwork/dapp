@@ -45,8 +45,6 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
     const [freelancerAccount, setFreelancerAccount] = React.useState<InjectedAccountWithMeta>();
     const [loading, setLoading] = useState<boolean>(false)
 
-    console.log(application);
-
     useEffect(() => {
         async function setup() {
             const briefOwner: User = await fetchUser(brief.user_id);
@@ -91,6 +89,7 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
             setLoading(true)
             const imbueApi = await initImbueAPIInfo();
             const chainService = new ChainService(imbueApi, user);
+            delete application.modified;
             const briefHash = blake2AsHex(JSON.stringify(application));
             const result = await chainService?.commenceWork(freelancerAccount, briefHash);
             while (true) {
@@ -456,7 +455,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
 
         ReactDOMClient.createRoot(
             document.getElementById("application-preview")!
-        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer} />);
+        ).render(<ApplicationPreview brief={brief} user={user} application={application} freelancer={freelancer!} />);
     }
     // TODO 404 page when brief of application is not found
 });

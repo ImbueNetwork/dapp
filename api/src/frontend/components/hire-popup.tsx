@@ -49,13 +49,14 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
         const freelancerAddress: string = freelancer.web3_address;
         const budget: bigint = BigInt(totalCost * 1e12);
         const initialContribution: bigint = BigInt(totalCost * 1e12);
+        application.status_id = ProjectStatus.Accepted;
+        delete application.modified;
         const briefHash = blake2AsHex(JSON.stringify(application));
         const currencyId = application.currency_id;
 
         const milestones = application.milestones.map((m, idx) => ({
             percentageToUnlock: parseInt(m.percentage_to_unlock)
         }));
-
         const result = await chainService?.hireFreelancer(account, briefOwners, freelancerAddress, budget, initialContribution, briefHash, currencyId, milestones);
         // TODO: handle popup here
         while (true) {
@@ -63,7 +64,7 @@ export const HirePopup = ({ openPopup, setOpenPopup, brief, freelancer, applicat
                 if (result.status) {
                     console.log("***** success");
                     const briefId = brief.id;
-                    const resp = await acceptBriefApplication(briefId!, application.id);
+                    await acceptBriefApplication(briefId!, application.id);
                     console.log(result.eventData);
                 } else if (result.txError) {
                     console.log("***** failed");

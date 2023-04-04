@@ -147,10 +147,10 @@ router.put("/:id/accept", async (req, res, next) => {
                     "Project does not exist."
                 ));
             }
-            
             let updatedBrief = await acceptBriefApplication(id, projectId)(tx);
             project.status_id = ProjectStatus.Accepted;
             await updateProject(project.id!, project)(tx);
+
             await acceptBriefApplication(id, projectId)(tx);
 
             return res.send(updatedBrief);

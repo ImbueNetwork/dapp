@@ -159,7 +159,6 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
         <div className="application-container">
             {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, browsingUser: user, targetUser }} />}
 
-
             {isBriefOwner && (
                 <>
                     <div className="flex items-center justify-evenly">
@@ -171,15 +170,19 @@ export const ApplicationPreview = ({ brief, user, application, freelancer }: App
                         <div>
                             <p className="text-xl primary-text">@{freelancer?.username}</p>
                         </div>
+                        <button className="Pending.Review-btn in-dark w-button rounded-full px-6 py-3 dark-button" onClick={() => handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
+
                         <div className="grid grid-cols-2 gap-2">
-                            <button className="primary-btn rounded-full w-button dark-button" onClick={() => handleMessageBoxClick(application.user_id, freelancer?.username)}>Message</button>
                             {
-                                application.status_id !== 4
-                                    ? <button onClick={() => { setOpenPopup(true) }} className="primary-btn in-dark w-button text-center">Hire</button>
-                                    : <button className="Accepted-btn in-dark w-button rounded-full px-6 py-3">Start Work</button>
+                                application.status_id == ProjectStatus.PendingReview && (
+                                    <>
+                                        <button onClick={() => { setOpenPopup(true) }} className="Accepted-btn in-dark w-button rounded-full px-1 py-2 dark-button">Hire</button>
+                                        <button className="Request-btn in-dark w-button rounded-full px-1 py-2 dark-button">Request Changes</button>
+                                        <button className="Rejected-btn in-dark w-button rounded-full px-1 py-2 dark-button">Reject</button>
+                                    </>
+
+                                )
                             }
-                            <button className="Request-btn in-dark w-button rounded-full px-6 py-3 dark-button">Request Changes</button>
-                            <button className="Rejected-btn in-dark w-button rounded-full px-6 py-3 dark-button">Reject</button>
                         </div>
                     </div>
                     <HirePopup {...{ openPopup, setOpenPopup, brief, freelancer, application, milestones, totalCostWithoutFee, imbueFee, totalCost, setLoading }} />

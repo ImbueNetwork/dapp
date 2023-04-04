@@ -22,7 +22,7 @@ const ChatPopup = (props: ChatPopupProps) => {
                 <Box>
                     <div className="relative">
                         <div className="w-5 cursor-pointer absolute top-2 right-1 z-10 font-semibold" onClick={() => setShowMessageBox(false)}>x</div>
-                        {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} setShowMessageBox={setShowMessageBox} showMessageBox={showMessageBox}></ChatBox> : <p>REACT_APP_GETSTREAM_API_KEY not found</p>}
+                        {(browsingUser && targetUser) ? <ChatBox user={browsingUser} targetUser={targetUser} setShowMessageBox={setShowMessageBox} showMessageBox={showMessageBox}></ChatBox> : <p>GETSTREAM_API_KEY not found</p>}
                     </div>
                 </Box>
             </Slide>

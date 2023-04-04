@@ -51,9 +51,7 @@ export async function getFreelancerProfile(username: string) {
     })
     if (resp.ok) {
         return await resp.json() as Freelancer
-    }  else {
-        throw new Error('Failed to get freelancer profile. status:' + resp.status);
-    }
+    } 
 }
 
 export async function freelancerExists(username: string): Promise<boolean> {

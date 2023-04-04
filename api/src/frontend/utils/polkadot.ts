@@ -24,7 +24,7 @@ export type ImbueApiInfo = {
 
 export const initImbueAPIInfo = async () => {
     showLoading();
-    const {imbueNetworkWebsockAddr, relayChainWebsockAddr} = (await fetch(`${config.apiBase}/info`).then(
+    const {imbueNetworkWebsockAddr, relayChainWebsockAddr, _} = (await fetch(`${config.apiBase}/info`).then(
         resp => resp.json()
     ));
     const imbueApi = await initPolkadotJSAPI(imbueNetworkWebsockAddr);

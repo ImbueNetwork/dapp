@@ -42,6 +42,8 @@ export type Project = {
     brief_id?: string | number;
     total_cost_without_fee?:  number;
     imbue_fee?:  number;
+    created: Date;
+    modified?: Date;
 };
 
 export enum ProjectState {

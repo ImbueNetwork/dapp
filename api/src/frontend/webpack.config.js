@@ -1,5 +1,4 @@
 const path = require("path");
-const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     entry: {
@@ -67,7 +66,5 @@ module.exports = {
     watchOptions: {
         poll: true
     },
-    plugins: [
-        new Dotenv()
-      ]
+    plugins: []
 };

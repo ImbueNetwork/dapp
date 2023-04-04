@@ -21,6 +21,7 @@ router.get("/info", (req, res) => {
     res.send({
         imbueNetworkWebsockAddr: config.imbueNetworkWebsockAddr,
         relayChainWebsockAddr: config.relayChainWebsockAddr,
+        getstreamApiKey: config.getstreamApiKey,
     });
 });
 

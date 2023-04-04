@@ -128,9 +128,10 @@ router.post("/search", (req, res, next) => {
     });
 });
 
-router.put("/:id/accept", async (req, res, next) => {
+router.put("/:id/status", async (req, res, next) => {
     const id = req.params.id;
     const projectId = req.body.project_id;
+    const status_id = req.body.status_id;
     db.transaction(async tx => {
         try {
             let brief: Brief = await fetchBrief(id)(tx);
@@ -147,12 +148,10 @@ router.put("/:id/accept", async (req, res, next) => {
                     "Project does not exist."
                 ));
             }
-            
-            let updatedBrief = await acceptBriefApplication(id, projectId)(tx);
-            project.status_id = ProjectStatus.Accepted;
+            project.status_id = status_id;
             await updateProject(project.id!, project)(tx);
-            await acceptBriefApplication(id, projectId)(tx);
 
+            let updatedBrief = await acceptBriefApplication(id, projectId)(tx);
             return res.send(updatedBrief);
         } catch (e: any) {
             return next(new Error(

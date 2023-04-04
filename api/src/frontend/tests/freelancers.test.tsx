@@ -10,6 +10,7 @@ function setUp() {
         "password": "test",
         "web3Accounts": [],
         "getstream_token": "test",
+        "web3_address": "test",
     };
     render(<Freelancers user={user} />);
 }
@@ -22,6 +23,7 @@ test("test Freelancer rendering", () => {
         "password": "test",
         "web3Accounts": [],
         "getstream_token": "test",
+        "web3_address": "test",
     }} />)).toBeTruthy();
 });
 
@@ -61,7 +63,7 @@ test("test freelancer capturing the input textbox value", () => {
     fireEvent.click(screen.getByTestId('freelance-goal-2'));
     fireEvent.click(screen.getByTestId('next-button'));
     fireEvent.change(screen.getByTestId('title'), {target: {value: 'imbueLegends'}})
-    expect(screen.getByTestId('title').value).toEqual('imbueLegends');
+    expect((screen.getByTestId('title') as HTMLInputElement).value).toEqual('imbueLegends');
 });
 
 test("test freelancer capturing the multiselect languages", () => {

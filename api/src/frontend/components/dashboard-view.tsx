@@ -149,11 +149,11 @@ export const DashboardView = ({ user }: DashboardProps): JSX.Element => {
             {user && showMessageBox && <ChatPopup {...{ showMessageBox, setShowMessageBox, targetUser, browsingUser: user }} />}
         </div>
     ) : (
-        <p>REACT_APP_GETSTREAM_API_KEY not found</p>
+        <p>GETSTREAM_API_KEY not found</p>
     );
 };
 
-function BriefLists({ briefs = [], setBriefId,showNewBriefButton }: { briefs: any[], setBriefId: Function, showNewBriefButton?: Boolean }) {
+function BriefLists({ briefs = [], setBriefId, showNewBriefButton }: { briefs: any[], setBriefId: Function, showNewBriefButton?: Boolean }) {
     const redirectToNewBrief = () => {
         redirect(`briefs/new`);
     };

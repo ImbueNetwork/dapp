@@ -1,0 +1,87 @@
+.application-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.application-container h3 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background: var(--theme-grey-dark);
+    border: 1px solid var(--theme-white);
+    border-radius: 20px;
+    padding: 50px;
+}
+
+.brief-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.brief-title {
+    display: flex;
+    flex-direction: row;
+    gap: 36px;
+}
+
+.separator {
+    width: 100%;
+    height: 1px;
+    background: var(--theme-white);
+    margin: 12px 0;
+}
+
+.brief-info {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 15px;
+}
+
+.brief-description {
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+}
+
+.brief-proposals{
+    width: 44%;
+}
+
+.milestone-header {
+    display: flex;
+    justify-content: start;
+    flex-direction: row;
+}
+
+.milestone-header h3 {
+    padding-right: 20px;
+}
+
+.milestones-info {
+    color: var(--theme-primary);
+}
+
+.project-progress {
+    position: relative;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-top: 24px;
+}
+
+.project-progress-indicator {
+    background: var(--theme-primary);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}

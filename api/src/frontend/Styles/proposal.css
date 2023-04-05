@@ -1,0 +1,447 @@
+:host {
+    font-family: var(--theme-font-family);
+    /* --mdc-typography-body1-font-size: 14pt; */
+}
+
+.hidden {
+    display: none;
+}
+
+.top-wrapper {
+    margin-bottom: 10px;
+}
+
+#project-logo {
+    object-fit: cover;
+    height: 33vh;
+    width: 100%;
+}
+
+.project-name-heading {
+    width: 100%;
+}
+
+.form {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 15px 0;
+    width: 100%;
+    height: fit-content;
+}
+
+.form label,
+.form button {
+    width: 50%;
+    margin: 15px 15px;
+}
+
+.edit:not(:disabled) {
+    background-color: var(--secondary-button-background-color);
+    color: var(--secondary-button-color);
+    border: var(--secondary-button-border);
+}
+
+.edit:not(:disabled):hover {
+    background-color: var(--secondary-button-background-hover-color);
+}
+
+.button {
+    transition: all 200ms ease-in-out;
+    border-radius: 3px;
+
+    width: 100%;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    background-color: var(--theme-secondary);
+    /* font-family: var(--theme-font-family); */
+    font-size: var(--button-font-size);
+    font-weight: 400;
+    text-align: center;
+    cursor: pointer;
+    /* display: block; */
+    text-decoration: none;
+    line-height: 24px;
+}
+
+.button:disabled,
+.button:disabled:hover,
+.button.primary:disabled {
+    background-color: #676767;
+    color: var(--disabled-button-color);
+    cursor: unset;
+}
+
+.button.primary:not(:disabled) {
+    background-color: var(--theme-secondary);
+    color: white;
+    border: 1px solid var(--theme-secondary);
+}
+
+.button.primary:not(:disabled):hover {
+    background-color: var(--theme-primary);
+    /* text-shadow: 0px 0px 5px #000; */
+    color: black;
+    border-color: var(--theme-primary);
+}
+
+
+
+.mdc-tab .mdc-tab__text-label,
+.mdc-tab .mdc-tab__icon {
+    color: #fff;
+}
+
+header.project-name-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+@media screen and (max-width: 380px) {
+    .action-buttons {
+        flex-direction: column;
+        width: 100% !important;
+    }
+
+    .action-button-container {
+        width: 100% !important;
+        margin: 0 0 10px 0;
+    }
+
+    .button {
+        /* padding: 8px; */
+        border-radius: 3px;
+    }
+}
+
+.tab-content {
+    margin: 20px 0;
+    display: none;
+}
+
+/* ol.tab-content {
+    list-style: none outside none;
+    padding-left: 0;
+}
+
+ol.tab-content li {
+    margin-bottom: 5px;
+} */
+
+#milestones li {
+    color: var(--mdc-theme-text-primary-on-background);
+    background-color: var(--mdc-theme-background);
+    margin: 5px 0;
+}
+
+#milestones .mdc-deprecated-list-item__secondary-text {
+    color: var(--theme-primary);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content a {
+    color: var(--theme-primary);
+}
+
+
+
+ul.brief-details {
+    color: #fff;
+    list-style: none outside none;
+    padding: 0;
+}
+
+ul.project-details li {
+    color: #fff;
+}
+
+#auth-dialog-web2-list li {
+    color: #fff;
+}
+
+#funding-round-not-yet-open {
+    font-weight: normal;
+}
+
+#funding-round-not-yet-open>a {
+    color: var(--theme-primary);
+}
+
+
+.blob {
+    box-shadow: 0 0 0 0 var(--theme-primary);
+    transform: scale(1);
+    animation: pulse 2s infinite;
+}
+
+
+#finalize.finalized, #contribute.finalized, #submit-milestone.finalized, #vote.finalized , #approve-milestone.finalized, #withdraw.finalized {
+    background-color: var(--theme-primary);
+    color: black;
+    font-weight: bolder;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(178, 255, 11, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(178, 255, 11, 0.7);
+    }
+}
+
+
+:root {
+    --mdc-text-field-fill-color: rgba(235, 234, 226, 0.11) !important;
+    --mdc-text-field-disabled-fill-color: rgba(235, 234, 226, 0.23) !important;
+    --mdc-text-field-label-ink-color: #aaa !important;
+    --mdc-text-field-disabled-ink-color: rgba(255, 255, 255, 0.25) !important;
+    --mdc-text-field-ink-color: var(--theme-ink-color) !important;
+}
+
+
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-floating-label {
+    color: var(--mdc-text-field-label-ink-color) !important;
+}
+
+.mdc-text-field {
+    background-color: var(--mdc-text-field-fill-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+    color: var(--theme-ink-color) !important;
+}
+
+.mdc-text-field__input {
+    color: var(--theme-ink-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+}
+
+
+.mdc-text-field__affix--prefix {
+    color: var(--theme-ink-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+}
+
+.mdc-text-field {
+    width: 100%;
+    padding: 0 0px !important;
+}
+
+
+.mdc-tab-scroller__scroll-content {
+    margin-bottom: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #2c2c2c;
+    background-color: #0f0f0f;
+    font-family: var(--theme-font-family);
+    color: #fff;
+    font-weight: 400;
+}
+
+.mdc-tab {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-style: none solid none none;
+    border-width: 1px;
+    border-color: #2c2c2c;
+    background-color: #0f0f0f;
+    color: #fff;
+    max-width: 12%;
+}
+
+.mdc-tab__content {
+    height: auto;
+}
+
+.mdc-tab-indicator--active {
+    background-color: var(--theme-secondary);
+}
+
+.mdc-tab-indicator--active .mdc-tab-indicator__content {
+    display: none !important;
+}
+
+#funding-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    width: 100%;
+    height: fit-content;
+}
+
+#funding-info>* {
+    width: 50%;
+    margin: 15px 15px;
+}
+
+.RSPBprogression {
+    background: #1c2608 linear-gradient(to right, var(--theme-primary), var(--theme-primary)) repeat scroll 0% 0% !important;
+    width: 33.3333%;
+}
+
+.mdc-linear-progress__buffer-bar {
+    background-color: #1c2608 !important;
+}
+
+.RSPBprogressBar {
+    height: 4px !important;
+    background-color: #1c2608 !important;
+}
+
+.progress-dot {
+    display: "flex";
+    align-items: "center";
+    justify-content: "center";
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: #1c2608;
+}
+
+.completed {
+    background-color: var(--theme-primary);
+}
+
+#funding-progress-info {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+.progress-info>nav,
+.RSPBprogressBar {
+    margin-bottom: 15px;
+}
+
+.progress-info>span {
+    display: flex;
+    padding-top: 5px;
+}
+
+
+.funding-goal {
+    display: flex;
+    width: 37%;
+    justify-content: space-between;
+}
+
+.funds-required {
+    color: var(--theme-primary);
+    font-weight: bold;
+}
+
+.show {
+    display: block;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.hide {
+    display: none;
+}
+
+.milestone-row {
+    display: flex;
+    padding: 5px;
+    justify-content: space-between;
+    border-bottom: 1px solid #2c2c2c;
+    padding: 5px;
+    font-size: 35px;
+    margin-bottom: 10px;
+}
+
+.milestone-row > div {
+    display: flex;
+}
+
+.milestone-row > div > svg {
+    color: var(--theme-secondary);
+    padding-left: 10px;
+}
+
+.milestone-details-info {
+    display: flex;
+    justify-content: space-between;
+    width: 65%;
+    flex-direction: column;
+    font-size: 15px;
+}
+
+
+.milestone-details-info > div {
+    display: flex;
+    justify-content: space-between;
+    width: 32%;
+    font-size: 15px;
+}
+
+.milestone-row > div > span, .milestone-status-icon {
+    padding: 5px 5px;
+    font-size: 20px;
+}
+
+.milestone-status {
+    padding-top: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.not-started {
+    color: #5e5e5b;
+}
+
+.approved {
+    color: var(--theme-secondary);
+}
+
+.active {
+    color: var(--theme-ink-color) !important;
+}
+
+.mdc-select {
+    width: 50%;
+    padding-top: 15px;
+}
+
+.mdc-select__anchor {
+    background-color: #1a1a19 !important;
+}
+
+.mdc-select__selected-text, .mdc-select__anchor > span, .rmwc-icon {
+    color: var(--theme-ink-color) !important;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-buttons > div {
+    width: 80%;
+}
+
+#vote-progress {
+    padding-top: 30px;
+}
+
+#vote-progress > div {
+    background-color: #000;
+    color: var(--theme-ink-color);
+    font-family: var(--theme-font-family);
+    font-size: 15px;
+    font-weight: bold;
+}

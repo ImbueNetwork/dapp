@@ -1,0 +1,173 @@
+.search-briefs-container {
+    margin: 72px;
+    display: flex;
+    flex-direction: row;
+}
+
+.filter-panel {
+    flex: 1 0 30%;
+}
+
+.briefs-section {
+    flex: 1 0 70%;
+    background-color: var(--theme-grey-dark);
+    border: 1px solid var(--theme-ink-color);
+    border-radius: 20px;
+}
+
+.filter-heading {
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--theme-title-color);
+    margin-bottom: 30px;
+}
+
+.filter-label {
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--theme-title-color);
+    margin-bottom: 20px;
+}
+
+.filter-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 48px;
+}
+
+.filter-option {
+    font-size: 16px;
+    line-height: 1.2;
+    user-select: none;
+    cursor: pointer;
+}
+
+.filter-option > label {
+    margin-left: 8px;
+}
+
+.briefs-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin: 32px;
+}
+
+.tab-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.tab-item {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    width: 112px;
+    color: var(--theme-title-color);
+    cursor: pointer;
+}
+
+.search-input {
+    background: rgba(235, 234, 226, 0.11);
+    border: 0.75px solid rgba(235, 234, 226, 0.5);
+    backdrop-filter: blur(7.5px);
+    border-radius: 8px;
+    width: 75%;
+    height: 60px;
+}
+
+input {
+    color: rgba(235, 234, 226);
+    padding-left: 16px;
+    font-size: 16px;
+    line-height: 30px;
+}
+
+input::placeholder {
+    color: rgba(235, 234, 226, 0.75);
+}
+
+.search-result {
+    color: var(--theme-title-color);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.result-count {
+    font-weight: 700;
+}
+
+.briefs-list {
+}
+
+.brief-item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 1px solid var(--theme-light-grey);
+    padding: 32px;
+}
+
+.brief-item:hover {
+    background: var(--theme-purple-dark);
+    border: none;
+    border-radius: 10px;
+    opacity: 0.86;
+}
+
+.brief-title {
+    font-size: 24px;
+    line-height: 1.2;
+    color: var(--theme-title-color);
+    text-transform: capitalize;
+}
+
+.brief-time-info {
+    color: var(--theme-light-purple);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.brief-description {
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--theme-white);
+    margin-bottom: 16px;
+}
+
+.brief-tags {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.tag-item {
+    background: var(--theme-white);
+    border-radius: 25px;
+    color: var(--theme-purple);
+    font-size: 16px;
+    line-height: 1.2;
+    padding: 6px 16px;
+}
+
+.brief-proposals {
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.proposals-heading {
+    color: var(--theme-white);
+}
+
+.proposals-count {
+    color: var(--theme-primary);
+}
+
+

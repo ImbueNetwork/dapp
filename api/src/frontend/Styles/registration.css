@@ -1,0 +1,99 @@
+h1 {
+    font-size: 52px;
+    line-height: 1.1;
+    color: var(--theme-title-color);
+    margin: 0px;
+    padding: 16px 0px;
+}
+
+.registration-container {
+    display: flex;
+    width: 100%;
+}
+
+.contents {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+    width: 75%;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contents > div {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.contents > div > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 70%;
+}
+
+.contents > div > div > .mdc-text-field {
+    width: 47%;
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled)
+    + .mdc-text-field-helper-line
+    .mdc-text-field-helper-text {
+    color: var(--theme-ink-color);
+}
+
+.confirm {
+    width: 70% !important;
+    text-align: center !important;
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-floating-label {
+    color: var(--mdc-text-field-label-ink-color) !important;
+}
+
+.mdc-text-field {
+    background-color: var(--mdc-text-field-fill-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+    color: var(--theme-ink-color) !important;
+    width: 70%;
+}
+.mdc-text-field__input {
+    color: var(--theme-ink-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+}
+
+.mdc-text-field__affix--prefix {
+    color: var(--theme-ink-color) !important;
+    border-radius: 10px !important;
+    padding-left: 10px !important;
+}
+
+.login {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.login > div {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.error {
+    color: var(--theme-error);
+}
+
+.hide {
+    display: none;
+}
+
+.signup {
+    padding-left: 10px;
+}

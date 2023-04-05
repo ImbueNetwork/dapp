@@ -53,11 +53,6 @@ html
                                 span() Dashboard
 
                         li(class="menu-item" id="menu-item__account-dashboard")
-                            a(href="/dapp/freelancers/new" title="Join As A Freelancer")
-                                i(class="material-icons" aria-hidden="true") group_add
-                                span() Join The Freelancers
-
-                        li(class="menu-item" id="menu-item__account-dashboard")
                             a(href="/dapp/briefs/new" title="Submit a brief")
                                 i(class="material-icons" aria-hidden="true") work
                                 span() Submit A Brief
@@ -68,15 +63,19 @@ html
                                 span() Discover Briefs
 
                         li(class="menu-item" id="menu-item__account-dashboard")
-                            a(href="/dapp/relay" title="Transfer Funds")
-                                i(class="material-icons" aria-hidden="true") money
-                                span() Transfer Funds
+                            a(href="/dapp/freelancers/new" title="Join As A Freelancer")
+                                i(class="material-icons" aria-hidden="true") group_add
+                                span() Join The Freelancers
+
+                        //- li(class="menu-item" id="menu-item__account-dashboard")
+                        //-     a(href="/dapp/relay" title="Transfer Funds")
+                        //-         i(class="material-icons" aria-hidden="true") money
+                        //-         span() Transfer Funds
 
                         li(class="menu-item" id="menu-item__account-dashboard")
                             a(href="/logout" id="sign-in-href" title="Sign out")
                                 i(class="material-icons" aria-hidden="true") logout
                                 span(id="sign-in-title") Sign out
-
 
             main(id="content-root" class="padded")
                 block content

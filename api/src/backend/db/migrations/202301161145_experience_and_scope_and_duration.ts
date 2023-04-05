@@ -37,7 +37,7 @@ export async function up(knex: Knex): Promise<void> {
 };
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.schema.dropTableIfExists("experience");
-    await knex.schema.dropTableIfExists("scope");
-    await knex.schema.dropTableIfExists("duration");
+    await knex.raw("drop table experience cascade");
+    await knex.raw("drop table scope cascade");
+    await knex.raw("drop table duration cascade");
 };

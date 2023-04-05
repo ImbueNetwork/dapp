@@ -56,11 +56,12 @@ export async function up(knex: Knex): Promise<void> {
 
 };
 
-        //builder.specificType("skill_ids", "integer[]");
-
-
 export async function down(knex: Knex): Promise<void> {
+    await knex.schema.dropTableIfExists("freelancer_clients");
     await knex.schema.dropTableIfExists("clients");
+    await knex.schema.dropTableIfExists("freelancer_services");
     await knex.schema.dropTableIfExists("services");
+    await knex.schema.dropTableIfExists("freelancer_languages");
     await knex.schema.dropTableIfExists("languages");
+
 };

@@ -3,7 +3,7 @@ DBDIR := "./src/backend/db"
 
 all: build
 
-clean: clean_cache clean_deps clean_build
+clean: clean_build
 clean_build:
 	rm -rf -- build/*.js build/*/ public/lib/* node_modules/ rm *.lock
 clean_deps:

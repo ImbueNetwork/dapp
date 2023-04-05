@@ -13,7 +13,7 @@ import {
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
 import { fetchUser, getStreamChat, redirect } from "../utils";
-import "../Styles/dashboard.css";
+import "../styles/dashboard.css";
 import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { BottomNavigation, BottomNavigationAction, StyledEngineProvider, TextField } from "@mui/material";
 import { ApplicationContainer } from "../pages/briefs/applications";

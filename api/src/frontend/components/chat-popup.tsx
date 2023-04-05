@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import { ChatBox } from "./";
 import { User } from "../models";
-import '../Styles/chat-popup.css'
+import '../styles/chat-popup.css'
 import { StyledEngineProvider } from "@mui/material";
 
 interface ChatPopupProps {

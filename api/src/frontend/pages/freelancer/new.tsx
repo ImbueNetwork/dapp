@@ -13,7 +13,7 @@ import { Freelancer, User } from "../../models";
 import { TagsInput } from "../../components/tagsInput";
 import * as utils from "../../utils";
 import {getFreelancerProfile, createFreelancingProfile, freelancerExists} from "../../services/freelancerService";
-import "../../../../public/new-freelancer.css";
+import "../../styles/new-freelancer.css";
 
 export type FreelancerProps = {
     user: User;

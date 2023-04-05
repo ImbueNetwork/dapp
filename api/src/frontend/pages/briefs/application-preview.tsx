@@ -9,7 +9,7 @@ import { changeBriefApplicationStatus as updateBriefApplicationStatus, getBrief 
 import { BriefInsights } from "../../components";
 import { fetchProject, fetchUser, getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
-import "../../../../public/application-preview.css";
+import "../../styles/application-preview.css";
 import { HirePopup } from "../../components/hire-popup";
 import ChatPopup from "../../components/chat-popup";
 import ChainService from "../../services/chainService";

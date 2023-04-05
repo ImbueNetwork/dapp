@@ -9,7 +9,7 @@ import { getBrief, getUserBrief } from "../../services/briefsService";
 import { BriefInsights, AccountChoice } from "../../components";
 import { getCurrentUser, redirect } from "../../utils";
 import { getFreelancerProfile } from "../../services/freelancerService";
-import "../../../../public/application-preview.css";
+import "../../styles/application-preview.css";
 import { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import { selectAccount } from "../../services/polkadotService";
 

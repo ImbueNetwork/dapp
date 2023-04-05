@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOMClient from "react-dom/client";
-import "../../../../public/new-project.css";
+import "../../styles/new-project.css";
 
 type FormInput = {
     label: string;

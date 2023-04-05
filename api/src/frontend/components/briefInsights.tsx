@@ -2,7 +2,7 @@ import React from "react";
 import { FaDollarSign, FaRegCalendarAlt } from "react-icons/fa";
 import { RiShieldUserLine } from "react-icons/ri";
 import { Brief } from "../models";
-import "../Styles/submit-proposal.css"; // TODO: update css
+import "../styles/submit-proposal.css"; // TODO: update css
 import { redirect } from "../utils";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";

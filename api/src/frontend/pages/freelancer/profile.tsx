@@ -16,7 +16,7 @@ import { timeStamp } from "console";
 import { Freelancer, User } from "../../models";
 import { getFreelancerProfile, updateFreelancer } from "../../services/freelancerService";
 import { fetchUser, getCurrentUser, getStreamChat, redirect } from "../../utils";
-import "../../Styles/freelancer-profile.css";
+import "../../styles/freelancer-profile.css";
 import { TextInput, ChatBox } from "../../components";
 import ChatPopup from "../../components/chat-popup";
 

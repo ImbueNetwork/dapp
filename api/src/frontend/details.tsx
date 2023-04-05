@@ -5,7 +5,7 @@ import { List, SimpleListItem } from "@rmwc/list";
 import * as utils from "./utils";
 import * as polkadot from "./utils/polkadot";
 import { Currency, RoundType, Project, ProjectOnChain, User, ProjectState } from "./models";
-import "./Styles/proposal.css"
+import "./styles/proposal.css"
 import '@rmwc/list/styles';
 import { marked } from "marked";
 

@@ -4,7 +4,7 @@ import { getCurrentUser } from "../../utils";
 import { User } from "../../models";
 
 import { DashboardView } from "../../components/dashboard-view";
-import "../../Styles/dashboard.css";
+import "../../styles/dashboard.css";
 
 export type DashboardProps = {
     user: User;

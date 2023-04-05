@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Freelancer, FreelancerSqlFilter, Item } from "../../models";
 import * as utils from "../../utils";
-import "../../Styles/freelancers.css";
+import "../../styles/freelancers.css";
 import {
     callSearchFreelancers,
     getAllFreelancers,

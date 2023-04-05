@@ -13,7 +13,7 @@ import { TextField } from "@rmwc/textfield";
 import '@rmwc/textfield/styles';
 import * as config from "./config";
 import bcrypt from 'bcryptjs'
-import "./Styles/registration.css"
+import "./styles/registration.css"
 import * as utils from "./utils"
 import { selectAccount } from "./services/polkadotService";
 

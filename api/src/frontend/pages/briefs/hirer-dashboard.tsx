@@ -3,7 +3,7 @@ import ReactDOMClient from "react-dom/client";
 import { Brief, Currency, Project, User } from "../../models";
 import { getCurrentUser, redirect } from "../../utils";
 // import "../../../../public/hirer-dashboard.css";
-import "../../Styles/hirer-dashboard.css";
+import "../../styles/hirer-dashboard.css";
 import { getUserBriefs } from "../../services/briefsService";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";

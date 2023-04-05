@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import * as ReactDOMClient from "react-dom/client";
 import { TextField } from "@rmwc/textfield";
 import "@rmwc/textfield/styles";
-import "./Styles/registration.css";
+import "./styles/registration.css";
 import bcrypt from "bcryptjs";
 import * as config from "./config";
 import * as utils from "./utils";

@@ -14,7 +14,6 @@ module.exports = {
         "freelancer-profile": path.resolve(__dirname, "pages", "freelancer", "profile.tsx"),
         "new-project": path.resolve(__dirname, "pages", "projects", "new.tsx"),
         "freelancers": path.resolve(__dirname, "pages", "freelancer", "index.tsx"),
-        "googlelogin": path.resolve(__dirname, "googlelogin.tsx"),
         "join": path.resolve(__dirname, "join.tsx"),
         "submit-proposal": path.resolve(__dirname, "pages", "briefs", "submit.tsx"),
         "application-preview": path.resolve(__dirname, "pages", "briefs", "application-preview.tsx"),
@@ -50,15 +49,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [".js", ".ts", ".tsx"],
-        alias: {
-            lib: path.resolve(__dirname, "lib"),
-        },
-        fallback: {
-            "crypto": require.resolve("crypto-browserify"),
-            "stream": require.resolve("stream-browserify"),
-            "buffer": false,
-           },
+        extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     output: {
         path: path.resolve(__dirname, "../../public/lib"),

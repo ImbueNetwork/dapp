@@ -81,10 +81,6 @@ router.get("/join", (req, res) => {
     res.render("join");
 });
 
-router.get("/googlelogin", (req, res) => {
-    res.render("googlelogin");
-});
-
 router.get("/briefs/", (req, res) => {
     res.render("briefs");
 });
@@ -108,8 +104,8 @@ router.get("/freelancers/:username", (req, res) => {
     res.render("freelancer-profile");
 });
 
-router.use((_req, res, next) => {
-    res.render("legacy");
-});
+// router.use((_req, res, next) => {
+//     res.render("legacy");
+// });
 
 export default router;

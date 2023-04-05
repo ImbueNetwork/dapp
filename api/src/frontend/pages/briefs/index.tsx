@@ -5,6 +5,7 @@ import { Brief, BriefSqlFilter } from "../../models";
 import { callSearchBriefs, getAllBriefs } from "../../services/briefsService";
 import { BriefFilterOption } from "../../types/briefs";
 import { redirect } from "../../utils";
+import '../../Styles/briefs.css'
 
 export type BriefProps = {};
 

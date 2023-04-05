@@ -15,7 +15,7 @@ import {
     suggestedSkills,
 } from "../../config/briefs-data";
 import * as config from "../../config";
-import "../../../../public/new-brief.css";
+import "../../Styles/new-brief.css";
 
 const getAPIHeaders = {
     accept: "application/json",

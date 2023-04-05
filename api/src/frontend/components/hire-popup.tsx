@@ -4,7 +4,7 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import "../../../public/application-preview.css";
+import "../Styles/application-preview.css";
 import { getWeb3Accounts, initImbueAPIInfo } from '../utils/polkadot';
 import { Brief, Currency, Freelancer, Project, ProjectStatus, User } from "../models";
 import { blake2AsHex } from '@polkadot/util-crypto';

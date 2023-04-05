@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Brief, User } from "../../models";
-import "../../../../public/brief-details.css";
+import "../../Styles/brief-details.css";
 import { getBrief } from "../../services/briefsService";
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';

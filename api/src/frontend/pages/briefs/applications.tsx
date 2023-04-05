@@ -5,7 +5,7 @@ import { FaPaperclip, FaRegThumbsDown, FaRegThumbsUp } from "react-icons/fa";
 import { Brief, Project, User } from "../../models";
 import { getBrief, getBriefApplications } from "../../services/briefsService";
 import { BriefInsights, ChatBox } from "../../components";
-import "../../../../public/brief-applications.css";
+import "../../Styles/brief-applications.css";
 import { fetchUser, getCurrentUser, redirect } from "../../utils";
 import ChatPopup from "../../components/chat-popup";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";

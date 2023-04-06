@@ -50,7 +50,10 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"],
+        extensions: [".js", ".ts", ".tsx"],
+        alias: {
+            lib: path.resolve(__dirname, "lib"),
+        },
         fallback: {
             "crypto": require.resolve("crypto-browserify"),
             "stream": require.resolve("stream-browserify"),
@@ -61,11 +64,6 @@ module.exports = {
         path: path.resolve(__dirname, "../../public/lib"),
     },
     mode: mode,
-    performance: {
-        hints: false,
-        maxEntrypointSize: 512000,
-        maxAssetSize: 512000
-      },
     watchOptions: {
         poll: true
     },

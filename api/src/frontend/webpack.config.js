@@ -1,4 +1,5 @@
 const path = require("path");
+var mode = process.env.NODE_ENV || 'development';
 
 module.exports = {
     entry: {
@@ -21,7 +22,7 @@ module.exports = {
     },
     devtool: process.env.NODE_ENV === "development"
         ? "inline-source-map"
-        : void 0,
+        : false,
     module: {
         rules: [
             {
@@ -50,10 +51,21 @@ module.exports = {
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
+        fallback: {
+            "crypto": require.resolve("crypto-browserify"),
+            "stream": require.resolve("stream-browserify"),
+            "buffer": false,
+           },
     },
     output: {
         path: path.resolve(__dirname, "../../public/lib"),
     },
+    mode: mode,
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+      },
     watchOptions: {
         poll: true
     },

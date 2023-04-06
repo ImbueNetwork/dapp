@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest",
     "start": "NODE_ENV=development webpack watch --config ./src/frontend/webpack.config.js --mode development & NODE_ENV=development webpack watch --mode development & TS_NODE_PROJECT=./src/backend/tsconfig.json nodemon -L --watch src/backend --ext 'js,ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register src/backend/index.ts'",
-    "build/frontend": "webpack --mode=production --config ./src/frontend/webpack.config.js",
+    "build/frontend": "webpack --config ./src/frontend/webpack.config.js",
     "build/backend": "tsc -p ./src/backend",
     "watch/frontend": "NODE_ENV=development webpack watch --config ./src/frontend/webpack.config.js --mode development",
     "watch/backend": "nodemon -L --watch src/backend --ext 'js,ts' src/backend/index.ts",
@@ -107,5 +107,8 @@
     "webpack": "^5.77.0",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.10.0"
+  },
+  "browser": {
+    "[module-name]": false   
   }
 }

@@ -3,9 +3,9 @@ DBDIR := "./src/backend/db"
 
 all: build
 
-clean: clean_build
+clean: clean_deps clean_build
 clean_build:
-	rm -rf -- build/*.js build/*/ public/lib/* node_modules/ rm *.lock
+	rm -rf -- build/*.js build/*/ public/lib/* m
 clean_deps:
 	rm -rf node_modules/
 clean_cache:
@@ -23,7 +23,7 @@ build: install
 	cp -r ./public/* ./build/public/
 
 install:
-	yarn install
+	yarn install --force
 
 migrate: migrate_latest
 

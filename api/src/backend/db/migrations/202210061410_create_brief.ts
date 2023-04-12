@@ -14,6 +14,7 @@ export async function up(knex: Knex): Promise<void> {
         builder.bigInteger("budget");
         builder.integer("experience_id");
         builder.integer("project_id");
+        builder.text("document_url");
         builder.foreign("project_id").references("projects.id");
 
         // stored in its own table

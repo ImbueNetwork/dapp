@@ -130,6 +130,7 @@ export type Brief = {
     experience_id: number
     user_id: number;
     project_id: number;
+    document_url: string;
 };
 
 export type Freelancer = {
@@ -328,6 +329,13 @@ export const updateFederatedLoginUser = (user: User, username: string, email: st
         }).returning("*")
     )[0];
 
+export const updateDocumentURL = (id: number, url: string) =>
+    async (tx: Knex.Transaction) => (
+        await tx<Brief>("briefs").where({ id }).update({
+            document_url: url
+        }).returning("*")
+    )[0];
+
 export const insertProject = (project: Project) =>
     async (tx: Knex.Transaction) => (
         await tx<Project>("projects").insert(project).returning("*")
@@ -469,6 +477,7 @@ export const fetchAllBriefs = () =>
             "briefs.experience_id",
             "briefs.created",
             "briefs.user_id",
+            "briefs.document_url",
             "briefs.project_id",
             "users.briefs_submitted as number_of_briefs_submitted",
             tx.raw("ARRAY_AGG(DISTINCT CAST(skills.name as text)) as skills"),

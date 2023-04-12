@@ -6,6 +6,7 @@ import briefsRouter from "./briefs";
 import config from "../../../config";
 import milestonesRouter from "./milestones";
 import freelancersRouter from "./freelancers";
+import filehandlerRouter from "./filehandler";
 
 const router = express.Router();
 
@@ -30,4 +31,5 @@ router.use("/users", usersRouter);
 router.use("/milestones", milestonesRouter);
 router.use("/briefs", briefsRouter);
 router.use("/freelancers", freelancersRouter);
+router.use("/filehandler", filehandlerRouter);
 export default router;

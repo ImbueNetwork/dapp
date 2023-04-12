@@ -9,6 +9,7 @@ function setUp() {
         "display_name": "test",
         "password": "test",
         "web3Accounts": [],
+        "web3_address": "test",
         "getstream_token": "test",
         "web3_address": "test",
     };
@@ -22,6 +23,7 @@ test("test Freelancer rendering", () => {
         "display_name": "test",
         "password": "test",
         "web3Accounts": [],
+        "web3_address": "test",
         "getstream_token": "test",
         "web3_address": "test",
     }} />)).toBeTruthy();

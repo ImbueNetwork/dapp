@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import ReactDOMClient from "react-dom/client";
 import { Brief, User } from "../../models";
 import "../../styles/brief-details.css";
@@ -13,6 +13,15 @@ import StarIcon from '@mui/icons-material/Star';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import ArrowIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
+import { IoMdWallet } from "react-icons/io";
+import { FaHandshake } from "react-icons/fa";
+import { HiUserGroup } from "react-icons/hi";
+import { ChatBox } from "../../components";
+import Modal from 'react-bootstrap/Modal';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import * as config from "../../config";
+
 export type BriefProps = {
     brief: Brief;
 };
@@ -22,8 +31,11 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
     const [targetUser, setTargetUser] = useState<User | null>(null);
     const [showMessageBox, setShowMessageBox] = useState<boolean>(false);
     const isOwnerOfBrief = (browsingUser && browsingUser.id == brief.user_id);
+    const isDocumentPresent = (browsingUser && brief.document_url != null);
     const [showSimilarBrief, setShowSimilarBrief] = useState<boolean>(false)
     const [showClientHistory, setShowClientHistory] = useState<boolean>(false)
+    const [file, setFile] = useState<File>();
+    const [showUploadButton, setShowUploadButton] = useState<boolean>(true);
 
     // TODO: need to get project category array from the brief
     const projectCategories = ["Product Development", "Health", "Wellness"]
@@ -43,6 +55,48 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
         redirect(`briefs/${brief.id}/apply`);
     }
 
+    const onButtonClick = () => {
+        // using Java Script method to get PDF file
+        fetch(`${config.apiBase}/filehandler/download/${brief.id}`).then(response => {
+            response.blob().then(blob => {
+                // Creating new object of PDF file
+                const fileURL = window.URL.createObjectURL(blob);
+                // Setting various property values
+                const alink = document.createElement('a');
+                alink.href = fileURL;
+                alink.download = 'brief.pdf';
+                alink.click();
+            })
+        })
+    }
+
+
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFile(e.target.files[0]);
+        }
+    };
+
+    const handleUploadClick = (e) => {
+        if (!file) {
+            return;
+        }
+        const formData = new FormData();
+        formData.append('brief', file);
+
+        // 👇 Uploading the file using the fetch API to the server
+        fetch(`${config.apiBase}/filehandler/${brief.id}/upload`, {
+            method: 'POST',
+            body: formData,
+            // 👇 Set headers manually for single file upload
+        })
+            .then((res) => res.json())
+            .then((data) => console.log(data))
+            .catch((err) => console.error(err));
+        setShowUploadButton(false);
+    };
+
     const handleMessageBoxClick = async () => {
         if (browsingUser) {
             setShowMessageBox(true);
@@ -61,6 +115,53 @@ export const BriefDetails = ({ brief: brief }: BriefProps): JSX.Element => {
                     Posted {timePosted} by {brief.created_by}
                 </span>
             </div>
+
+            {/* TODO: Do we use same styles for both buttons? */}
+            <div className="subsection">
+                <div className="action-buttons">
+                    <button className="primary-btn in-dark w-button" onClick={() => redirectToApply()}>
+                        Apply
+                    </button>
+                    {/* TODO: Implement */}
+                    {/* <button className="primary-btn in-dark w-button">
+                        Save
+                    </button> */}
+                </div>
+            </div>
+
+            {isDocumentPresent &&
+                <div className="subsection">
+                    <div className="action-buttons">
+                        <button className="primary-btn in-dark w-button" onClick={() => onButtonClick()}>
+                            Download
+                        </button>
+
+                    </div>
+                </div>
+            }
+
+            {!isDocumentPresent && isOwnerOfBrief && showUploadButton &&
+                <div className="subsection" >
+                    <div className="action-buttons">
+                        <input type="file" onChange={handleFileChange} />
+                        {/*<div>{file && `${file.name} - ${file.type}`}</div>*/}
+
+                        <button className="primary-btn in-dark w-button" onClick={handleUploadClick}>Upload</button>
+                        {/* <button className="primary-btn in-dark w-button">
+                        Save
+                    </button> */}
+                    </div>
+                </div>
+            }
+
+            {!isDocumentPresent && isOwnerOfBrief && !showUploadButton &&
+                <div className="subsection" >
+                    <div className="action-buttons">
+                        File Uploaded Successfully
+                    </div>
+                </div>
+            }
+
 
             <div className="subsection">
                 <h3>Project Description</h3>

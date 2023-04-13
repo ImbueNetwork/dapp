@@ -1,12 +1,30 @@
 import express, { response } from "express";
 import db from "../../../db";
-import { fetchAllBriefs, insertBrief, upsertItems, searchBriefs, BriefSqlFilter, Brief, incrementUserBriefSubmissions, fetchBrief, fetchItems, fetchBriefApplications, fetchFreelancerDetailsByUserID, fetchProjectMilestones, User, fetchProject, acceptBriefApplication, fetchUser, ProjectStatus, updateProject } from "../../../models";
+import {
+    fetchAllBriefs,
+    insertBrief,
+    upsertItems,
+    searchBriefs,
+    BriefSqlFilter,
+    Brief,
+    incrementUserBriefSubmissions,
+    fetchBrief,
+    fetchItems,
+    fetchBriefApplications,
+    fetchFreelancerDetailsByUserID,
+    fetchProjectMilestones,
+    User, fetchProject, acceptBriefApplication, fetchUser, ProjectStatus, updateProject,
+    FreelancerSqlFilter, Freelancer, searchFreelancers,
+} from "../../../models";
 import { json } from "stream/consumers";
 import { brotliDecompress } from "zlib";
 import { verifyUserIdFromJwt } from "../../../middleware/authentication/strategies/common"
 
-const router = express.Router();
+import multer from "multer";
+import path from "path";
+import * as models from "../../../models";
 
+const router = express.Router();
 router.get("/", async (req, res, next) => {
     db.transaction(async (tx) => {
         try {
@@ -92,7 +110,7 @@ router.post("/", (req, res, next) => {
             res.status(201).send(
                 {
                     status: "Successful",
-                    brief_id: brief_id
+                    brief_id
                 }
             );
         } catch (cause) {
@@ -108,7 +126,7 @@ router.post("/search", (req, res, next) => {
     db.transaction(async tx => {
         try {
             const data: BriefSqlFilter = req.body;
-            const briefs: Array<Brief> = await searchBriefs(tx, data);
+            const briefs: Brief[] = await searchBriefs(tx, data);
 
             await Promise.all([
                 briefs,
@@ -160,5 +178,6 @@ router.put("/:id/status", async (req, res, next) => {
         }
     });
 });
+
 
 export default router;

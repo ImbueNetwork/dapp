@@ -197,6 +197,7 @@ export type Brief = {
     created_by: string;
     experience_level: string;
     experience_id: number;
+    document_url: string;
     number_of_briefs_submitted: number;
     user_id: number;
     project_id?: number;

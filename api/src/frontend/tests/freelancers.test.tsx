@@ -9,8 +9,8 @@ function setUp() {
         "display_name": "test",
         "password": "test",
         "web3Accounts": [],
-        "getstream_token": "test",
         "web3_address": "test",
+        "getstream_token": "test"
     };
     render(<Freelancers user={user} />);
 }
@@ -22,8 +22,8 @@ test("test Freelancer rendering", () => {
         "display_name": "test",
         "password": "test",
         "web3Accounts": [],
-        "getstream_token": "test",
         "web3_address": "test",
+        "getstream_token": "test"
     }} />)).toBeTruthy();
 });
 
